@@ -2,1581 +2,230 @@
 <html lang="vi">
 <head>
   <meta charset="UTF-8">
-  <meta name="viewport" content="width=device-width, initial-scale=1.0">
 
-  <title>SportsVN - Thể thao Việt Nam</title>
+  <meta
+    name="viewport"
+    content="width=device-width, initial-scale=1.0"
+  >
 
   <meta
     name="description"
-    content="SportsVN - Tin tức thể thao, giải đấu, lịch thi đấu, kết quả, vận động viên và bảng xếp hạng."
+    content="SportsVN - Nền tảng thể thao Việt Nam. Tin tức, giải đấu, lịch thi đấu, kết quả và vận động viên."
   >
 
-  <link rel="stylesheet" href="style.css">
+  <title>SportsVN - Nền tảng thể thao Việt Nam</title>
+
+  <!-- CSS -->
+  <link rel="stylesheet" href="./styles.css?v=20260822">
 
   <!-- Supabase -->
   <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
 
   <!-- Cấu hình Supabase -->
-  <script src="config.js"></script>
+  <script src="./config.js?v=20260822"></script>
 </head>
 
 <body>
 
-<!-- =====================================================
-     HEADER
-===================================================== -->
+  <!-- APP -->
+  <div id="app"></div>
 
-<header class="site-header">
+  <!-- MODAL ĐĂNG NHẬP / ĐĂNG KÝ -->
+  <div
+    id="auth-modal"
+    class="modal"
+    aria-hidden="true"
+  >
 
-  <div class="container header-inner">
+    <div
+      class="modal-backdrop"
+      data-close-auth
+    ></div>
 
-    <a href="/" class="brand">
-
-      <span class="brand-mark">SV</span>
-
-      <span>
-        <strong>SPORTSVN</strong>
-        <small>THỂ THAO VIỆT NAM</small>
-      </span>
-
-    </a>
-
-
-    <button
-      type="button"
-      class="mobile-menu"
-      id="mobile-menu"
-      aria-label="Mở menu">
-      ☰
-    </button>
-
-
-    <nav class="main-nav" id="main-nav">
-
-      <a href="/" class="active">
-        Trang chủ
-      </a>
-
-      <a href="#news">
-        Tin tức
-      </a>
-
-      <a href="#tournaments">
-        Giải đấu
-      </a>
-
-      <a href="#schedule">
-        Lịch thi đấu
-      </a>
-
-      <a href="#results">
-        Kết quả
-      </a>
-
-      <a href="#athletes">
-        VĐV
-      </a>
-
-      <a href="#rankings">
-        BXH
-      </a>
-
-    </nav>
-
-
-    <div class="header-actions">
+    <section
+      class="auth-card"
+      role="dialog"
+      aria-modal="true"
+      aria-labelledby="auth-title"
+    >
 
       <button
         type="button"
-        class="icon-btn"
-        id="search-btn"
-        title="Tìm kiếm">
-        🔍
+        class="modal-close"
+        data-close-auth
+        aria-label="Đóng"
+      >
+        ×
       </button>
 
+      <div class="auth-brand">
+        <span>SV</span>
 
-      <!-- Khi chưa đăng nhập -->
+        <div>
+          <strong>SportsVN</strong>
+          <small>Nền tảng thể thao Việt Nam</small>
+        </div>
+      </div>
 
-      <button
-        type="button"
-        class="btn btn-outline"
-        id="login-btn">
-        Đăng nhập
-      </button>
-
-
-      <button
-        type="button"
-        class="btn btn-primary"
-        id="register-btn">
-        Đăng ký
-      </button>
-
-
-      <!-- Khi đã đăng nhập -->
-
-      <div
-        class="user-menu hidden"
-        id="user-menu">
+      <!-- TAB -->
+      <div class="auth-tabs">
 
         <button
           type="button"
-          class="user-btn"
-          id="user-btn">
-          Tài khoản
+          class="auth-tab active"
+          id="login-tab"
+        >
+          Đăng nhập
+        </button>
+
+        <button
+          type="button"
+          class="auth-tab"
+          id="register-tab"
+        >
+          Đăng ký
+        </button>
+
+      </div>
+
+      <!-- ĐĂNG NHẬP -->
+      <form
+        id="login-form"
+        class="auth-form"
+      >
+
+        <h2 id="auth-title">
+          Đăng nhập
+        </h2>
+
+        <p>
+          Đăng nhập để quản lý giải đấu và tài khoản SportsVN.
+        </p>
+
+        <label>
+          Email
+
+          <input
+            type="email"
+            id="login-email"
+            placeholder="Nhập email"
+            autocomplete="email"
+            required
+          >
+        </label>
+
+        <label>
+          Mật khẩu
+
+          <input
+            type="password"
+            id="login-password"
+            placeholder="Nhập mật khẩu"
+            autocomplete="current-password"
+            required
+          >
+        </label>
+
+        <button
+          type="submit"
+          class="btn btn-primary btn-full"
+        >
+          ĐĂNG NHẬP
         </button>
 
         <div
-          class="user-dropdown"
-          id="user-dropdown">
-
-          <a href="admin.html">
-            🏆 Trung tâm điều hành
-          </a>
-
-          <a href="#profile">
-            👤 Hồ sơ cá nhân
-          </a>
-
-          <a href="#tournaments">
-            🏆 Giải đấu của tôi
-          </a>
-
-          <button
-            type="button"
-            id="logout-btn">
-            🚪 Đăng xuất
-          </button>
-
-        </div>
-
-      </div>
-
-    </div>
-
-  </div>
-
-</header>
-
-
-<!-- =====================================================
-     HOT BAR
-===================================================== -->
-
-<div class="hotbar">
-
-  <div class="container hotbar-inner">
-
-    <b>🔥 ĐANG QUAN TÂM</b>
-
-    <span>Thể thao Việt Nam</span>
-    <span>Đại hội TDTT Đà Nẵng 2026</span>
-    <span>Bóng đá</span>
-    <span>Cầu lông</span>
-    <span>Pickleball</span>
-    <span>Taekwondo</span>
-
-  </div>
-
-</div>
-
-
-<!-- =====================================================
-     MAIN
-===================================================== -->
-
-<main>
-
-
-<!-- =====================================================
-     HERO
-===================================================== -->
-
-<section class="container hero">
-
-  <article
-    class="hero-main"
-    style="background-image:url('https://images.unsplash.com/photo-1461896836934-ffe607ba8211?auto=format&fit=crop&w=1400&q=85');">
-
-    <div class="hero-overlay"></div>
-
-    <div class="hero-content">
-
-      <span class="tag">
-        THỂ THAO
-      </span>
-
-      <h1>
-        SportsVN - Nền tảng thể thao Việt Nam
-      </h1>
-
-      <p>
-        Tin tức, giải đấu, lịch thi đấu, kết quả và thông tin vận động viên
-        trên một nền tảng.
-      </p>
-
-      <a
-        href="#news"
-        class="hero-link">
-        Xem tin tức mới nhất →
-      </a>
-
-    </div>
-
-  </article>
-
-
-  <div class="hero-side">
-
-    <article class="side-news">
-
-      <img
-        src="https://images.unsplash.com/photo-1552674605-db6ffd4facb5?auto=format&fit=crop&w=500&q=80"
-        alt="Thể thao">
-
-      <div>
-
-        <span>THỂ THAO</span>
-
-        <h3>
-          Các giải đấu thể thao đang được quan tâm
-        </h3>
-
-        <small>
-          SportsVN
-        </small>
-
-      </div>
-
-    </article>
-
-
-    <article class="side-news">
-
-      <img
-        src="https://images.unsplash.com/photo-1517649763962-0c623066013b?auto=format&fit=crop&w=500&q=80"
-        alt="Giải đấu">
-
-      <div>
-
-        <span>GIẢI ĐẤU</span>
-
-        <h3>
-          Theo dõi lịch thi đấu và kết quả
-        </h3>
-
-        <small>
-          SportsVN
-        </small>
-
-      </div>
-
-    </article>
-
-
-    <article class="side-news">
-
-      <img
-        src="https://images.unsplash.com/photo-1531415074968-036ba1b575da?auto=format&fit=crop&w=500&q=80"
-        alt="Thể thao">
-
-      <div>
-
-        <span>SPORTSVN</span>
-
-        <h3>
-          Quản lý giải đấu chuyên nghiệp
-        </h3>
-
-        <small>
-          SportsVN
-        </small>
-
-      </div>
-
-    </article>
-
-  </div>
-
-</section>
-
-
-<!-- =====================================================
-     NEWS
-===================================================== -->
-
-<section
-  class="section"
-  id="news">
-
-  <div class="container">
-
-    <div class="section-head">
-
-      <div>
-
-        <div class="eyebrow">
-          SPORTS NEWS
-        </div>
+          id="login-message"
+          class="form-message"
+        ></div>
+
+      </form>
+
+      <!-- ĐĂNG KÝ -->
+      <form
+        id="register-form"
+        class="auth-form hidden"
+      >
 
         <h2>
-          Tin tức thể thao
+          Tạo tài khoản
         </h2>
 
-      </div>
+        <p>
+          Tạo tài khoản để bắt đầu quản lý giải đấu.
+        </p>
 
-      <a href="#news">
-        Xem tất cả →
-      </a>
+        <label>
+          Họ và tên
 
-    </div>
+          <input
+            type="text"
+            id="register-name"
+            placeholder="Nguyễn Văn A"
+            autocomplete="name"
+            required
+          >
+        </label>
 
+        <label>
+          Email
 
-    <div class="category-tabs">
+          <input
+            type="email"
+            id="register-email"
+            placeholder="example@gmail.com"
+            autocomplete="email"
+            required
+          >
+        </label>
 
-      <button class="active">
-        Tất cả
-      </button>
+        <label>
+          Mật khẩu
 
-      <button>
-        Bóng đá
-      </button>
+          <input
+            type="password"
+            id="register-password"
+            placeholder="Tối thiểu 6 ký tự"
+            autocomplete="new-password"
+            minlength="6"
+            required
+          >
+        </label>
 
-      <button>
-        Cầu lông
-      </button>
+        <label>
+          Nhập lại mật khẩu
 
-      <button>
-        Pickleball
-      </button>
+          <input
+            type="password"
+            id="register-password-confirm"
+            placeholder="Nhập lại mật khẩu"
+            autocomplete="new-password"
+            minlength="6"
+            required
+          >
+        </label>
 
-      <button>
-        Bóng rổ
-      </button>
+        <button
+          type="submit"
+          class="btn btn-primary btn-full"
+        >
+          TẠO TÀI KHOẢN
+        </button>
 
-      <button>
-        Võ thuật
-      </button>
+        <div
+          id="register-message"
+          class="form-message"
+        ></div>
 
-      <button>
-        Điền kinh
-      </button>
+      </form>
 
-    </div>
-
-
-    <div class="news-grid">
-
-      <article class="news-card">
-
-        <img
-          src="https://images.unsplash.com/photo-1579952363873-27f3bade9f55?auto=format&fit=crop&w=900&q=80"
-          alt="Bóng đá">
-
-        <div class="news-body">
-
-          <span>BÓNG ĐÁ</span>
-
-          <h3>
-            Tin tức bóng đá và những giải đấu đáng chú ý
-          </h3>
-
-          <small>
-            SportsVN · Hôm nay
-          </small>
-
-        </div>
-
-      </article>
-
-
-      <article class="news-card">
-
-        <img
-          src="https://images.unsplash.com/photo-1626224583764-f87db24ac4ea?auto=format&fit=crop&w=900&q=80"
-          alt="Cầu lông">
-
-        <div class="news-body">
-
-          <span>CẦU LÔNG</span>
-
-          <h3>
-            Cập nhật các giải cầu lông trong nước
-          </h3>
-
-          <small>
-            SportsVN · Hôm nay
-          </small>
-
-        </div>
-
-      </article>
-
-
-      <article class="news-card">
-
-        <img
-          src="https://images.unsplash.com/photo-1613918431703-aa50889e3be9?auto=format&fit=crop&w=900&q=80"
-          alt="Thể thao">
-
-        <div class="news-body">
-
-          <span>THỂ THAO</span>
-
-          <h3>
-            Những hoạt động thể thao nổi bật
-          </h3>
-
-          <small>
-            SportsVN · Hôm nay
-          </small>
-
-        </div>
-
-      </article>
-
-    </div>
-
+    </section>
   </div>
 
-</section>
-
-
-<!-- =====================================================
-     TOURNAMENTS
-===================================================== -->
-
-<section
-  class="section section-soft"
-  id="tournaments">
-
-  <div class="container">
-
-    <div class="section-head">
-
-      <div>
-
-        <div class="eyebrow">
-          SPORTS EVENTS
-        </div>
-
-        <h2>
-          Giải đấu nổi bật
-        </h2>
-
-      </div>
-
-      <a href="#tournaments">
-        Xem tất cả →
-      </a>
-
-    </div>
-
-
-    <div class="tournament-grid">
-
-      <article class="tournament-card">
-
-        <div class="trophy">
-          🏆
-        </div>
-
-        <div>
-
-          <span class="sport-label">
-            Cầu lông
-          </span>
-
-          <h3>
-            Giải Cầu lông mở rộng 2026
-          </h3>
-
-          <p>
-            📅 2026 · 📍 Đà Nẵng
-          </p>
-
-          <button
-            class="text-btn"
-            type="button">
-            Xem giải đấu →
-          </button>
-
-        </div>
-
-      </article>
-
-
-      <article class="tournament-card">
-
-        <div class="trophy">
-          🏆
-        </div>
-
-        <div>
-
-          <span class="sport-label">
-            Pickleball
-          </span>
-
-          <h3>
-            Giải Pickleball 2026
-          </h3>
-
-          <p>
-            📅 2026 · 📍 Đà Nẵng
-          </p>
-
-          <button
-            class="text-btn"
-            type="button">
-            Xem giải đấu →
-          </button>
-
-        </div>
-
-      </article>
-
-
-      <article class="tournament-card">
-
-        <div class="trophy">
-          🏆
-        </div>
-
-        <div>
-
-          <span class="sport-label">
-            Bóng rổ
-          </span>
-
-          <h3>
-            Giải Bóng rổ 5x5 2026
-          </h3>
-
-          <p>
-            📅 2026 · 📍 Đà Nẵng
-          </p>
-
-          <button
-            class="text-btn"
-            type="button">
-            Xem giải đấu →
-          </button>
-
-        </div>
-
-      </article>
-
-    </div>
-
-  </div>
-
-</section>
-
-
-<!-- =====================================================
-     SPORTS
-===================================================== -->
-
-<section
-  class="section"
-  id="sports">
-
-  <div class="container">
-
-    <div class="section-head">
-
-      <div>
-
-        <div class="eyebrow">
-          SPORTS
-        </div>
-
-        <h2>
-          Các môn thể thao
-        </h2>
-
-      </div>
-
-    </div>
-
-
-    <div class="sport-grid">
-
-      <a href="#football" class="sport-tile">
-        <span>⚽</span>
-        <strong>Bóng đá</strong>
-        <small>Giải đấu & kết quả</small>
-      </a>
-
-      <a href="#badminton" class="sport-tile">
-        <span>🏸</span>
-        <strong>Cầu lông</strong>
-        <small>Giải đấu & kết quả</small>
-      </a>
-
-      <a href="#pickleball" class="sport-tile">
-        <span>🎾</span>
-        <strong>Pickleball</strong>
-        <small>Giải đấu & kết quả</small>
-      </a>
-
-      <a href="#basketball" class="sport-tile">
-        <span>🏀</span>
-        <strong>Bóng rổ</strong>
-        <small>Giải đấu & kết quả</small>
-      </a>
-
-      <a href="#swimming" class="sport-tile">
-        <span>🏊</span>
-        <strong>Bơi</strong>
-        <small>Giải đấu & kết quả</small>
-      </a>
-
-      <a href="#taekwondo" class="sport-tile">
-        <span>🥋</span>
-        <strong>Taekwondo</strong>
-        <small>Giải đấu & kết quả</small>
-      </a>
-
-      <a href="#athletics" class="sport-tile">
-        <span>🏃</span>
-        <strong>Điền kinh</strong>
-        <small>Giải đấu & kết quả</small>
-      </a>
-
-      <a href="#chess" class="sport-tile">
-        <span>♟️</span>
-        <strong>Cờ vua</strong>
-        <small>Giải đấu & kết quả</small>
-      </a>
-
-      <a href="#vovinam" class="sport-tile">
-        <span>🥋</span>
-        <strong>Vovinam</strong>
-        <small>Giải đấu & kết quả</small>
-      </a>
-
-      <a href="#more-sports" class="sport-tile">
-        <span>＋</span>
-        <strong>Thêm môn</strong>
-        <small>Khám phá SportsVN</small>
-      </a>
-
-    </div>
-
-  </div>
-
-</section>
-
-
-<!-- =====================================================
-     SCHEDULE
-===================================================== -->
-
-<section
-  class="section section-soft"
-  id="schedule">
-
-  <div class="container">
-
-    <div class="section-head">
-
-      <div>
-
-        <div class="eyebrow">
-          MATCH SCHEDULE
-        </div>
-
-        <h2>
-          Lịch thi đấu
-        </h2>
-
-      </div>
-
-      <a href="#schedule">
-        Xem lịch →
-      </a>
-
-    </div>
-
-
-    <div class="tournament-grid">
-
-      <article class="tournament-card">
-
-        <div class="trophy">
-          📅
-        </div>
-
-        <div>
-
-          <span class="sport-label">
-            HÔM NAY
-          </span>
-
-          <h3>
-            Chưa có lịch thi đấu
-          </h3>
-
-          <p>
-            Lịch thi đấu sẽ được cập nhật trên SportsVN.
-          </p>
-
-        </div>
-
-      </article>
-
-
-      <article class="tournament-card">
-
-        <div class="trophy">
-          🕐
-        </div>
-
-        <div>
-
-          <span class="sport-label">
-            SẮP DIỄN RA
-          </span>
-
-          <h3>
-            Theo dõi các giải đấu
-          </h3>
-
-          <p>
-            Cập nhật lịch thi đấu mới nhất.
-          </p>
-
-        </div>
-
-      </article>
-
-
-      <article class="tournament-card">
-
-        <div class="trophy">
-          📍
-        </div>
-
-        <div>
-
-          <span class="sport-label">
-            ĐỊA ĐIỂM
-          </span>
-
-          <h3>
-            Các địa điểm thi đấu
-          </h3>
-
-          <p>
-            Theo dõi địa điểm tổ chức giải.
-          </p>
-
-        </div>
-
-      </article>
-
-    </div>
-
-  </div>
-
-</section>
-
-
-<!-- =====================================================
-     RESULTS
-===================================================== -->
-
-<section
-  class="section"
-  id="results">
-
-  <div class="container">
-
-    <div class="section-head">
-
-      <div>
-
-        <div class="eyebrow">
-          RESULTS
-        </div>
-
-        <h2>
-          Kết quả mới nhất
-        </h2>
-
-      </div>
-
-      <a href="#results">
-        Xem tất cả →
-      </a>
-
-    </div>
-
-
-    <div class="tournament-grid">
-
-      <article class="tournament-card">
-
-        <div class="trophy">
-          🏅
-        </div>
-
-        <div>
-
-          <span class="sport-label">
-            KẾT QUẢ
-          </span>
-
-          <h3>
-            Chưa có kết quả mới
-          </h3>
-
-          <p>
-            Kết quả sẽ được cập nhật tự động.
-          </p>
-
-        </div>
-
-      </article>
-
-
-      <article class="tournament-card">
-
-        <div class="trophy">
-          📊
-        </div>
-
-        <div>
-
-          <span class="sport-label">
-            BẢNG XẾP HẠNG
-          </span>
-
-          <h3>
-            Theo dõi thành tích
-          </h3>
-
-          <p>
-            Xem bảng xếp hạng của các giải đấu.
-          </p>
-
-        </div>
-
-      </article>
-
-
-      <article class="tournament-card">
-
-        <div class="trophy">
-          🥇
-        </div>
-
-        <div>
-
-          <span class="sport-label">
-            THÀNH TÍCH
-          </span>
-
-          <h3>
-            Vận động viên nổi bật
-          </h3>
-
-          <p>
-            Thành tích được cập nhật theo giải.
-          </p>
-
-        </div>
-
-      </article>
-
-    </div>
-
-  </div>
-
-</section>
-
-
-<!-- =====================================================
-     ATHLETES
-===================================================== -->
-
-<section
-  class="section section-soft"
-  id="athletes">
-
-  <div class="container">
-
-    <div class="section-head">
-
-      <div>
-
-        <div class="eyebrow">
-          ATHLETES
-        </div>
-
-        <h2>
-          Vận động viên
-        </h2>
-
-      </div>
-
-      <a href="#athletes">
-        Xem VĐV →
-      </a>
-
-    </div>
-
-
-    <div class="news-grid">
-
-      <article class="news-card">
-
-        <div class="news-body">
-
-          <span>SPORTSVN</span>
-
-          <h3>
-            Hồ sơ vận động viên
-          </h3>
-
-          <small>
-            Thành tích · Giải đấu · Xếp hạng
-          </small>
-
-        </div>
-
-      </article>
-
-
-      <article class="news-card">
-
-        <div class="news-body">
-
-          <span>CLB / ĐƠN VỊ</span>
-
-          <h3>
-            Quản lý đội và đơn vị
-          </h3>
-
-          <small>
-            Thông tin các đội tham dự giải
-          </small>
-
-        </div>
-
-      </article>
-
-
-      <article class="news-card">
-
-        <div class="news-body">
-
-          <span>THÀNH TÍCH</span>
-
-          <h3>
-            Theo dõi thành tích thi đấu
-          </h3>
-
-          <small>
-            Lịch sử thi đấu của VĐV
-          </small>
-
-        </div>
-
-      </article>
-
-    </div>
-
-  </div>
-
-</section>
-
-
-<!-- =====================================================
-     RANKINGS
-===================================================== -->
-
-<section
-  class="section"
-  id="rankings">
-
-  <div class="container">
-
-    <div class="section-head">
-
-      <div>
-
-        <div class="eyebrow">
-          RANKINGS
-        </div>
-
-        <h2>
-          Bảng xếp hạng
-        </h2>
-
-      </div>
-
-      <a href="#rankings">
-        Xem BXH →
-      </a>
-
-    </div>
-
-
-    <div class="tournament-grid">
-
-      <article class="tournament-card">
-
-        <div class="trophy">
-          🥇
-        </div>
-
-        <div>
-
-          <span class="sport-label">
-            XẾP HẠNG
-          </span>
-
-          <h3>
-            Bảng xếp hạng giải đấu
-          </h3>
-
-          <p>
-            Dữ liệu được cập nhật theo kết quả thi đấu.
-          </p>
-
-        </div>
-
-      </article>
-
-
-      <article class="tournament-card">
-
-        <div class="trophy">
-          📈
-        </div>
-
-        <div>
-
-          <span class="sport-label">
-            THÀNH TÍCH
-          </span>
-
-          <h3>
-            Thành tích vận động viên
-          </h3>
-
-          <p>
-            Theo dõi phong độ và thành tích.
-          </p>
-
-        </div>
-
-      </article>
-
-
-      <article class="tournament-card">
-
-        <div class="trophy">
-          🏆
-        </div>
-
-        <div>
-
-          <span class="sport-label">
-            ĐƠN VỊ
-          </span>
-
-          <h3>
-            Xếp hạng CLB / đơn vị
-          </h3>
-
-          <p>
-            Tổng hợp thành tích các đơn vị.
-          </p>
-
-        </div>
-
-      </article>
-
-    </div>
-
-  </div>
-
-</section>
-
-
-<!-- =====================================================
-     CTA
-===================================================== -->
-
-<section class="cta-section">
-
-  <div class="container cta-inner">
-
-    <div>
-
-      <div class="eyebrow">
-        SPORTSVN TOURNAMENT
-      </div>
-
-      <h2>
-        Bạn muốn tổ chức một giải đấu?
-      </h2>
-
-      <p>
-        Đăng ký tài khoản SportsVN để tạo và điều hành
-        giải đấu của riêng bạn.
-      </p>
-
-    </div>
-
-
-    <button
-      type="button"
-      class="btn btn-light"
-      id="cta-register">
-
-      Đăng ký tổ chức giải →
-
-    </button>
-
-  </div>
-
-</section>
-
-</main>
-
-
-<!-- =====================================================
-     FOOTER
-===================================================== -->
-
-<footer class="site-footer">
-
-  <div class="container footer-grid">
-
-    <div>
-
-      <div class="footer-brand">
-        SPORTSVN
-      </div>
-
-      <p>
-        Nền tảng thể thao Việt Nam.
-        Tin tức, giải đấu, lịch thi đấu,
-        kết quả và quản lý giải đấu.
-      </p>
-
-    </div>
-
-
-    <div>
-
-      <h4>
-        SportsVN
-      </h4>
-
-      <a href="#news">
-        Tin tức
-      </a>
-
-      <a href="#tournaments">
-        Giải đấu
-      </a>
-
-      <a href="#schedule">
-        Lịch thi đấu
-      </a>
-
-      <a href="#results">
-        Kết quả
-      </a>
-
-    </div>
-
-
-    <div>
-
-      <h4>
-        Thể thao
-      </h4>
-
-      <a href="#sports">
-        Các môn thể thao
-      </a>
-
-      <a href="#athletes">
-        Vận động viên
-      </a>
-
-      <a href="#rankings">
-        Bảng xếp hạng
-      </a>
-
-    </div>
-
-
-    <div>
-
-      <h4>
-        Liên hệ
-      </h4>
-
-      <p>
-        Email:
-        Nguyenquanghao2505@gmail.com
-        <br><br>
-        Điện thoại:
-        0905771177
-        <br><br>
-        Zalo:
-        0905771177
-      </p>
-
-    </div>
-
-  </div>
-
-
-  <div class="footer-bottom">
-
-    <div class="container">
-
-      © 2026 SportsVN. All rights reserved.
-
-    </div>
-
-  </div>
-
-</footer>
-
-
-<!-- =====================================================
-     AUTH MODAL
-===================================================== -->
-
-<div
-  class="modal"
-  id="auth-modal"
-  aria-hidden="true">
-
-  <div
-    class="modal-backdrop"
-    data-close-auth>
-  </div>
-
-
-  <div class="auth-card">
-
-    <button
-      type="button"
-      class="modal-close"
-      data-close-auth
-      aria-label="Đóng">
-      ×
-    </button>
-
-
-    <div class="auth-brand">
-
-      <span>
-        SV
-      </span>
-
-      <div>
-
-        <strong>
-          SPORTSVN
-        </strong>
-
-        <small>
-          Trung tâm thể thao Việt Nam
-        </small>
-
-      </div>
-
-    </div>
-
-
-    <!-- AUTH TABS -->
-
-    <div class="auth-tabs">
-
-      <button
-        type="button"
-        class="auth-tab active"
-        id="auth-login-tab">
-        Đăng nhập
-      </button>
-
-
-      <button
-        type="button"
-        class="auth-tab"
-        id="auth-register-tab">
-        Đăng ký
-      </button>
-
-    </div>
-
-
-    <!-- =================================================
-         LOGIN FORM
-    ================================================= -->
-
-    <form
-      id="login-form"
-      class="auth-form">
-
-      <h2>
-        Đăng nhập SportsVN
-      </h2>
-
-      <p>
-        Đăng nhập để quản lý giải đấu của bạn.
-      </p>
-
-
-      <label>
-
-        Email
-
-        <input
-          id="login-email"
-          type="email"
-          placeholder="Nhập email"
-          autocomplete="email"
-          required>
-
-      </label>
-
-
-      <label>
-
-        Mật khẩu
-
-        <input
-          id="login-password"
-          type="password"
-          placeholder="Nhập mật khẩu"
-          autocomplete="current-password"
-          required>
-
-      </label>
-
-
-      <button
-        type="submit"
-        class="btn btn-primary btn-full">
-
-        ĐĂNG NHẬP
-
-      </button>
-
-
-      <div
-        id="login-message"
-        class="form-message">
-      </div>
-
-    </form>
-
-
-    <!-- =================================================
-         REGISTER FORM
-    ================================================= -->
-
-    <form
-      id="register-form"
-      class="auth-form hidden">
-
-      <h2>
-        Tạo tài khoản SportsVN
-      </h2>
-
-      <p>
-        Đăng ký miễn phí để tạo và quản lý giải đấu.
-      </p>
-
-
-      <label>
-
-        Họ và tên
-
-        <input
-          id="register-name"
-          type="text"
-          placeholder="Nguyễn Văn A"
-          autocomplete="name"
-          required>
-
-      </label>
-
-
-      <label>
-
-        Email
-
-        <input
-          id="register-email"
-          type="email"
-          placeholder="email@example.com"
-          autocomplete="email"
-          required>
-
-      </label>
-
-
-      <label>
-
-        Số điện thoại
-
-        <input
-          id="register-phone"
-          type="tel"
-          placeholder="09xxxxxxxx"
-          autocomplete="tel">
-
-      </label>
-
-
-      <label>
-
-        Mật khẩu
-
-        <input
-          id="register-password"
-          type="password"
-          placeholder="Ít nhất 8 ký tự"
-          autocomplete="new-password"
-          minlength="8"
-          required>
-
-      </label>
-
-
-      <button
-        type="submit"
-        class="btn btn-primary btn-full">
-
-        TẠO TÀI KHOẢN
-
-      </button>
-
-
-      <div
-        id="register-message"
-        class="form-message">
-      </div>
-
-    </form>
-
-  </div>
-
-</div>
-
-
-<!-- =====================================================
-     SEARCH MODAL
-===================================================== -->
-
-<div
-  class="modal"
-  id="search-panel"
-  aria-hidden="true">
-
-  <div
-    class="modal-backdrop"
-    data-close-search>
-  </div>
-
-
-  <div class="auth-card">
-
-    <button
-      type="button"
-      class="modal-close"
-      data-close-search>
-      ×
-    </button>
-
-
-    <h2>
-      Tìm kiếm SportsVN
-    </h2>
-
-    <p>
-      Tìm tin tức, giải đấu, vận động viên...
-    </p>
-
-
-    <input
-      id="search-input"
-      type="search"
-      placeholder="Nhập nội dung cần tìm..."
-      style="width:100%;padding:13px;border:1px solid #ccd6e2;border-radius:8px;">
-
-
-    <br><br>
-
-
-    <button
-      type="button"
-      class="btn btn-primary btn-full"
-      id="search-submit">
-
-      Tìm kiếm
-
-    </button>
-
-  </div>
-
-</div>
-
-
-<!-- =====================================================
-     CTA REGISTER
-===================================================== -->
-
-<script>
-
-document.addEventListener(
-  "DOMContentLoaded",
-  function () {
-
-    const cta =
-      document.getElementById("cta-register");
-
-    const register =
-      document.getElementById("register-btn");
-
-    if (cta && register) {
-
-      cta.addEventListener(
-        "click",
-        function () {
-
-          register.click();
-
-        }
-      );
-
-    }
-
-  }
-);
-
-</script>
-
-
-<!-- =====================================================
-     APP
-===================================================== -->
-
-<script src="app.js"></script>
+  <!-- APP JS -->
+  <script
+    src="./app.js?v=20260822"
+    defer
+  ></script>
 
 </body>
 </html>
