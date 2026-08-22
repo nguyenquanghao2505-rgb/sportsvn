@@ -10,100 +10,654 @@
 
   <meta
     name="description"
-    content="SportsVN - Nền tảng thể thao Việt Nam"
+    content="SportsVN - Nền tảng thể thao Việt Nam. Tin tức, giải đấu, lịch thi đấu, kết quả, vận động viên và quản lý giải đấu."
   >
+
+  <meta name="theme-color" content="#0869df">
 
   <title>SportsVN - Nền tảng thể thao Việt Nam</title>
 
-  <!-- CSS -->
+  <!-- =====================================================
+       CSS
+       ===================================================== -->
+
   <link
     rel="stylesheet"
     href="./styles.css?v=20260823"
   >
 
-  <!-- Supabase -->
+
+  <!-- =====================================================
+       SUPABASE
+       ===================================================== -->
+
   <script
     src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"
   ></script>
 
-  <!-- Cấu hình -->
+
+  <!-- =====================================================
+       CẤU HÌNH SUPABASE
+       ===================================================== -->
+
   <script
     src="./config.js?v=20260823"
   ></script>
+
 </head>
+
 
 <body>
 
-  <!-- ==================================================
-       ỨNG DỤNG
-       ================================================== -->
+  <!-- =====================================================
+       HEADER
+       ===================================================== -->
 
-  <div id="app">
+  <header class="site-header">
 
-    <!-- Nội dung dự phòng.
-         Nếu app.js chưa tải được thì máy tính
-         vẫn không bị trắng hoàn toàn. -->
+    <div class="container header-inner">
 
-    <div
-      style="
-        min-height:100vh;
-        display:flex;
-        align-items:center;
-        justify-content:center;
-        padding:30px;
-        font-family:Arial,sans-serif;
-        text-align:center;
-      "
-    >
+      <!-- LOGO -->
 
-      <div>
+      <a
+        href="#/"
+        class="brand"
+        aria-label="SportsVN Trang chủ"
+      >
 
-        <div
-          style="
-            width:60px;
-            height:60px;
-            margin:0 auto 18px;
-            border-radius:16px;
-            background:#0869df;
-            color:#fff;
-            display:flex;
-            align-items:center;
-            justify-content:center;
-            font-size:20px;
-            font-weight:900;
-          "
-        >
+        <span class="brand-logo">
           SV
-        </div>
+        </span>
 
-        <h1
-          style="
-            margin:0 0 10px;
-            color:#0d2b58;
-          "
-        >
-          SPORTSVN
-        </h1>
+        <span class="brand-text">
 
-        <p
-          style="
-            margin:0;
-            color:#667085;
-          "
+          <strong>
+            SPORTSVN
+          </strong>
+
+          <small>
+            Nền tảng thể thao Việt Nam
+          </small>
+
+        </span>
+
+      </a>
+
+
+      <!-- MENU -->
+
+      <nav
+        class="main-nav"
+        aria-label="Menu chính"
+      >
+
+        <a href="#/" class="active">
+          Trang chủ
+        </a>
+
+        <a href="#news">
+          Tin tức
+        </a>
+
+        <a href="#tournaments">
+          Giải đấu
+        </a>
+
+        <a href="#sports">
+          Môn thể thao
+        </a>
+
+        <a href="#schedule">
+          Lịch thi đấu
+        </a>
+
+        <a href="#results">
+          Kết quả
+        </a>
+
+        <a href="#athletes">
+          Vận động viên
+        </a>
+
+        <a href="#standings">
+          BXH
+        </a>
+
+      </nav>
+
+
+      <!-- KHU VỰC TÀI KHOẢN -->
+
+      <div
+        class="header-actions"
+        id="header-actions"
+      >
+
+        <button
+          type="button"
+          class="btn btn-outline"
+          id="open-login"
         >
-          Đang tải nền tảng thể thao Việt Nam...
-        </p>
+          Đăng nhập
+        </button>
+
+        <button
+          type="button"
+          class="btn btn-primary"
+          id="open-register"
+        >
+          Đăng ký
+        </button>
 
       </div>
+
+    </div>
+
+  </header>
+
+
+
+  <!-- =====================================================
+       THANH ĐANG DIỄN RA
+       ===================================================== -->
+
+  <div class="trending-bar">
+
+    <div class="container trending-inner">
+
+      <strong>
+        🔥 ĐANG DIỄN RA
+      </strong>
+
+      <a href="#tournaments">
+        Đại hội TDTT Đà Nẵng 2026
+      </a>
+
+      <a href="#tournaments">
+        Giải Bóng rổ
+      </a>
+
+      <a href="#tournaments">
+        Giải Bơi
+      </a>
+
+      <a href="#tournaments">
+        Giải Đua thuyền
+      </a>
+
+      <a href="#tournaments">
+        Pickleball
+      </a>
 
     </div>
 
   </div>
 
 
-  <!-- ==================================================
+
+  <!-- =====================================================
+       ỨNG DỤNG CHÍNH
+       ===================================================== -->
+
+  <main id="app">
+
+    <!-- ===================================================
+         HERO
+         =================================================== -->
+
+    <section class="hero">
+
+      <div class="container">
+
+        <div class="hero-card">
+
+          <div class="hero-overlay">
+
+            <span class="hero-label">
+              TIN NỔI BẬT
+            </span>
+
+            <h1>
+              Những giải đấu thể thao
+              đáng chú ý trong năm 2026
+            </h1>
+
+            <p>
+              Cập nhật những thông tin mới nhất
+              từ thể thao Việt Nam.
+            </p>
+
+            <a
+              href="#news"
+              class="hero-link"
+            >
+              Xem tin tức mới nhất →
+            </a>
+
+          </div>
+
+        </div>
+
+      </div>
+
+    </section>
+
+
+
+    <!-- ===================================================
+         TIN NỔI BẬT
+         =================================================== -->
+
+    <section
+      class="section"
+      id="news"
+    >
+
+      <div class="container">
+
+        <div class="section-heading">
+
+          <div>
+
+            <span class="section-kicker">
+              SPORTS NEWS
+            </span>
+
+            <h2>
+              Tin tức thể thao
+            </h2>
+
+          </div>
+
+          <a href="#news">
+            Xem tất cả →
+          </a>
+
+        </div>
+
+
+        <div class="news-grid">
+
+          <article class="news-card">
+
+            <div class="news-image football">
+              ⚽
+            </div>
+
+            <div class="news-content">
+
+              <span>
+                Bóng đá
+              </span>
+
+              <h3>
+                Những giải đấu thể thao
+                đáng chú ý trong năm 2026
+              </h3>
+
+              <p>
+                SportsVN cập nhật những thông tin
+                mới nhất về các giải đấu.
+              </p>
+
+              <small>
+                SportsVN · Hôm nay
+              </small>
+
+            </div>
+
+          </article>
+
+
+          <article class="news-card">
+
+            <div class="news-image basketball">
+              🏀
+            </div>
+
+            <div class="news-content">
+
+              <span>
+                Bóng rổ
+              </span>
+
+              <h3>
+                Sôi động các giải bóng rổ
+                phong trào
+              </h3>
+
+              <p>
+                Những hoạt động thể thao nổi bật
+                đang diễn ra.
+              </p>
+
+              <small>
+                SportsVN · Hôm nay
+              </small>
+
+            </div>
+
+          </article>
+
+
+          <article class="news-card">
+
+            <div class="news-image badminton">
+              🏸
+            </div>
+
+            <div class="news-content">
+
+              <span>
+                Cầu lông
+              </span>
+
+              <h3>
+                Phong trào cầu lông
+                ngày càng phát triển
+              </h3>
+
+              <p>
+                Cập nhật hoạt động của vận động viên
+                và các giải đấu.
+              </p>
+
+              <small>
+                SportsVN · Hôm nay
+              </small>
+
+            </div>
+
+          </article>
+
+
+        </div>
+
+      </div>
+
+    </section>
+
+
+
+    <!-- ===================================================
+         GIẢI ĐẤU
+         =================================================== -->
+
+    <section
+      class="section section-light"
+      id="tournaments"
+    >
+
+      <div class="container">
+
+        <div class="section-heading">
+
+          <div>
+
+            <span class="section-kicker">
+              TOURNAMENTS
+            </span>
+
+            <h2>
+              Giải đấu
+            </h2>
+
+          </div>
+
+          <a href="#tournaments">
+            Xem tất cả →
+          </a>
+
+        </div>
+
+
+        <div class="tournament-grid">
+
+          <article class="tournament-card">
+
+            <span class="tournament-icon">
+              🏀
+            </span>
+
+            <div>
+
+              <h3>
+                Giải Bóng rổ
+              </h3>
+
+              <p>
+                Đại hội Thể dục thể thao
+                thành phố Đà Nẵng 2026
+              </p>
+
+              <span class="status">
+                Đang diễn ra
+              </span>
+
+            </div>
+
+          </article>
+
+
+          <article class="tournament-card">
+
+            <span class="tournament-icon">
+              🏊
+            </span>
+
+            <div>
+
+              <h3>
+                Giải Bơi
+              </h3>
+
+              <p>
+                Đại hội Thể dục thể thao
+                thành phố Đà Nẵng 2026
+              </p>
+
+              <span class="status">
+                Sắp diễn ra
+              </span>
+
+            </div>
+
+          </article>
+
+
+          <article class="tournament-card">
+
+            <span class="tournament-icon">
+              🚣
+            </span>
+
+            <div>
+
+              <h3>
+                Giải Đua thuyền
+              </h3>
+
+              <p>
+                Giải Đua thuyền truyền thống
+                thành phố Đà Nẵng mở rộng
+              </p>
+
+              <span class="status">
+                Sắp diễn ra
+              </span>
+
+            </div>
+
+          </article>
+
+
+          <article class="tournament-card">
+
+            <span class="tournament-icon">
+              🎾
+            </span>
+
+            <div>
+
+              <h3>
+                Pickleball
+              </h3>
+
+              <p>
+                Các giải Pickleball
+                tại Việt Nam
+              </p>
+
+              <span class="status">
+                Hoạt động
+              </span>
+
+            </div>
+
+          </article>
+
+        </div>
+
+      </div>
+
+    </section>
+
+
+
+    <!-- ===================================================
+         CÁC MÔN THỂ THAO
+         =================================================== -->
+
+    <section
+      class="section"
+      id="sports"
+    >
+
+      <div class="container">
+
+        <div class="section-heading">
+
+          <div>
+
+            <span class="section-kicker">
+              SPORTS
+            </span>
+
+            <h2>
+              Môn thể thao
+            </h2>
+
+          </div>
+
+        </div>
+
+
+        <div class="sports-list">
+
+          <a href="#football">
+            ⚽ Bóng đá
+          </a>
+
+          <a href="#basketball">
+            🏀 Bóng rổ
+          </a>
+
+          <a href="#badminton">
+            🏸 Cầu lông
+          </a>
+
+          <a href="#pickleball">
+            🎾 Pickleball
+          </a>
+
+          <a href="#swimming">
+            🏊 Bơi
+          </a>
+
+          <a href="#tennis">
+            🎾 Tennis
+          </a>
+
+          <a href="#table-tennis">
+            🏓 Bóng bàn
+          </a>
+
+          <a href="#taekwondo">
+            🥋 Taekwondo
+          </a>
+
+        </div>
+
+      </div>
+
+    </section>
+
+
+
+    <!-- ===================================================
+         QUẢN LÝ GIẢI ĐẤU
+         =================================================== -->
+
+    <section class="manager-section">
+
+      <div class="container">
+
+        <div class="manager-card">
+
+          <div>
+
+            <span class="section-kicker">
+              SPORTSVN MANAGER
+            </span>
+
+            <h2>
+              Quản lý giải đấu
+              chuyên nghiệp
+            </h2>
+
+            <p>
+              Tạo giải đấu, quản lý vận động viên,
+              bốc thăm tự động, lập lịch thi đấu,
+              cập nhật kết quả và bảng xếp hạng
+              trên cùng một nền tảng.
+            </p>
+
+          </div>
+
+
+          <div class="manager-actions">
+
+            <button
+              type="button"
+              class="btn btn-primary"
+              id="manager-login"
+            >
+              Đăng nhập quản lý
+            </button>
+
+            <button
+              type="button"
+              class="btn btn-outline"
+              id="manager-register"
+            >
+              Tạo tài khoản
+            </button>
+
+          </div>
+
+        </div>
+
+      </div>
+
+    </section>
+
+  </main>
+
+
+
+  <!-- =====================================================
        MODAL ĐĂNG NHẬP / ĐĂNG KÝ
-       ================================================== -->
+       ===================================================== -->
 
   <div
     id="auth-modal"
@@ -124,8 +678,6 @@
       aria-labelledby="auth-title"
     >
 
-      <!-- Nút đóng -->
-
       <button
         type="button"
         class="modal-close"
@@ -136,7 +688,7 @@
       </button>
 
 
-      <!-- Logo -->
+      <!-- LOGO -->
 
       <div class="auth-brand">
 
@@ -159,9 +711,7 @@
       </div>
 
 
-      <!-- ==================================================
-           TAB ĐĂNG NHẬP / ĐĂNG KÝ
-           ================================================== -->
+      <!-- TAB -->
 
       <div class="auth-tabs">
 
@@ -184,9 +734,9 @@
       </div>
 
 
-      <!-- ==================================================
-           FORM ĐĂNG NHẬP
-           ================================================== -->
+      <!-- =================================================
+           ĐĂNG NHẬP
+           ================================================= -->
 
       <form
         id="login-form"
@@ -203,13 +753,13 @@
         </p>
 
 
-        <label>
-
+        <label for="login-email">
           Email
 
           <input
             type="email"
             id="login-email"
+            name="email"
             placeholder="Nhập email"
             autocomplete="email"
             required
@@ -218,13 +768,13 @@
         </label>
 
 
-        <label>
-
+        <label for="login-password">
           Mật khẩu
 
           <input
             type="password"
             id="login-password"
+            name="password"
             placeholder="Nhập mật khẩu"
             autocomplete="current-password"
             required
@@ -250,9 +800,10 @@
       </form>
 
 
-      <!-- ==================================================
-           FORM ĐĂNG KÝ
-           ================================================== -->
+
+      <!-- =================================================
+           ĐĂNG KÝ
+           ================================================= -->
 
       <form
         id="register-form"
@@ -269,13 +820,13 @@
         </p>
 
 
-        <label>
-
+        <label for="register-name">
           Họ và tên
 
           <input
             type="text"
             id="register-name"
+            name="name"
             placeholder="Nguyễn Văn A"
             autocomplete="name"
             required
@@ -284,13 +835,13 @@
         </label>
 
 
-        <label>
-
+        <label for="register-email">
           Email
 
           <input
             type="email"
             id="register-email"
+            name="email"
             placeholder="example@gmail.com"
             autocomplete="email"
             required
@@ -299,13 +850,13 @@
         </label>
 
 
-        <label>
-
+        <label for="register-password">
           Mật khẩu
 
           <input
             type="password"
             id="register-password"
+            name="password"
             placeholder="Tối thiểu 6 ký tự"
             autocomplete="new-password"
             minlength="6"
@@ -315,13 +866,13 @@
         </label>
 
 
-        <label>
-
+        <label for="register-password-confirm">
           Nhập lại mật khẩu
 
           <input
             type="password"
             id="register-password-confirm"
+            name="password_confirm"
             placeholder="Nhập lại mật khẩu"
             autocomplete="new-password"
             minlength="6"
@@ -352,9 +903,119 @@
   </div>
 
 
-  <!-- ==================================================
-       APP JAVASCRIPT
-       ================================================== -->
+
+  <!-- =====================================================
+       FOOTER
+       ===================================================== -->
+
+  <footer class="site-footer">
+
+    <div class="container">
+
+      <div class="footer-grid">
+
+        <div>
+
+          <div class="footer-brand">
+            <span>SV</span>
+
+            <strong>
+              SPORTSVN
+            </strong>
+
+          </div>
+
+          <p>
+            Nền tảng thể thao Việt Nam.
+            Kết nối giải đấu, vận động viên
+            và người yêu thể thao.
+          </p>
+
+        </div>
+
+
+        <div>
+
+          <h3>
+            SportsVN
+          </h3>
+
+          <a href="#news">
+            Tin tức
+          </a>
+
+          <a href="#tournaments">
+            Giải đấu
+          </a>
+
+          <a href="#sports">
+            Môn thể thao
+          </a>
+
+        </div>
+
+
+        <div>
+
+          <h3>
+            Giải đấu
+          </h3>
+
+          <a href="#schedule">
+            Lịch thi đấu
+          </a>
+
+          <a href="#results">
+            Kết quả
+          </a>
+
+          <a href="#standings">
+            Bảng xếp hạng
+          </a>
+
+        </div>
+
+
+        <div>
+
+          <h3>
+            Tài khoản
+          </h3>
+
+          <a href="#login" id="footer-login">
+            Đăng nhập
+          </a>
+
+          <a href="#register" id="footer-register">
+            Đăng ký
+          </a>
+
+        </div>
+
+      </div>
+
+
+      <div class="footer-bottom">
+
+        <span>
+          © 2026 SportsVN. All rights reserved.
+        </span>
+
+        <span>
+          Nền tảng thể thao Việt Nam
+        </span>
+
+      </div>
+
+    </div>
+
+  </footer>
+
+
+
+  <!-- =====================================================
+       APP.JS
+       ===================================================== -->
 
   <script
     src="./app.js?v=20260823"
@@ -362,81 +1023,209 @@
   ></script>
 
 
-  <!-- ==================================================
-       FALLBACK KIỂM TRA APP.JS
-       ================================================== -->
+
+  <!-- =====================================================
+       MỞ MODAL CƠ BẢN
+       ===================================================== -->
 
   <script>
 
-    window.addEventListener(
-      "load",
+    document.addEventListener(
+      "DOMContentLoaded",
       function () {
 
-        setTimeout(
+        const modal =
+          document.getElementById("auth-modal");
+
+        const loginTab =
+          document.getElementById("login-tab");
+
+        const registerTab =
+          document.getElementById("register-tab");
+
+        const loginForm =
+          document.getElementById("login-form");
+
+        const registerForm =
+          document.getElementById("register-form");
+
+
+        function openAuth(mode) {
+
+          if (!modal) return;
+
+          modal.classList.add("open");
+
+          modal.setAttribute(
+            "aria-hidden",
+            "false"
+          );
+
+
+          if (mode === "register") {
+
+            loginForm.classList.add("hidden");
+
+            registerForm.classList.remove("hidden");
+
+            loginTab.classList.remove("active");
+
+            registerTab.classList.add("active");
+
+          } else {
+
+            loginForm.classList.remove("hidden");
+
+            registerForm.classList.add("hidden");
+
+            loginTab.classList.add("active");
+
+            registerTab.classList.remove("active");
+
+          }
+
+        }
+
+
+        function closeAuth() {
+
+          if (!modal) return;
+
+          modal.classList.remove("open");
+
+          modal.setAttribute(
+            "aria-hidden",
+            "true"
+          );
+
+        }
+
+
+        /* ĐĂNG NHẬP */
+
+        document
+          .getElementById("open-login")
+          ?.addEventListener(
+            "click",
+            function () {
+              openAuth("login");
+            }
+          );
+
+
+        /* ĐĂNG KÝ */
+
+        document
+          .getElementById("open-register")
+          ?.addEventListener(
+            "click",
+            function () {
+              openAuth("register");
+            }
+          );
+
+
+        /* QUẢN LÝ */
+
+        document
+          .getElementById("manager-login")
+          ?.addEventListener(
+            "click",
+            function () {
+              openAuth("login");
+            }
+          );
+
+
+        document
+          .getElementById("manager-register")
+          ?.addEventListener(
+            "click",
+            function () {
+              openAuth("register");
+            }
+          );
+
+
+        /* FOOTER */
+
+        document
+          .getElementById("footer-login")
+          ?.addEventListener(
+            "click",
+            function (event) {
+
+              event.preventDefault();
+
+              openAuth("login");
+
+            }
+          );
+
+
+        document
+          .getElementById("footer-register")
+          ?.addEventListener(
+            "click",
+            function (event) {
+
+              event.preventDefault();
+
+              openAuth("register");
+
+            }
+          );
+
+
+        /* TAB */
+
+        loginTab?.addEventListener(
+          "click",
           function () {
+            openAuth("login");
+          }
+        );
 
-            const app =
-              document.getElementById("app");
 
-            /*
-             * Nếu app.js không chạy hoặc lỗi,
-             * hiện thông báo thay vì để trang trắng.
-             */
+        registerTab?.addEventListener(
+          "click",
+          function () {
+            openAuth("register");
+          }
+        );
 
-            if (
-              app &&
-              app.children.length === 1 &&
-              app.querySelector("h1") &&
-              app.querySelector("h1").textContent
-                .includes("SPORTSVN")
-            ) {
 
-              console.warn(
-                "SportsVN: app.js chưa chạy."
+        /* ĐÓNG */
+
+        document
+          .querySelectorAll("[data-close-auth]")
+          .forEach(
+            function (element) {
+
+              element.addEventListener(
+                "click",
+                closeAuth
               );
 
-              const box =
-                document.createElement("div");
+            }
+          );
 
-              box.style.position = "fixed";
-              box.style.left = "50%";
-              box.style.bottom = "20px";
-              box.style.transform =
-                "translateX(-50%)";
 
-              box.style.background =
-                "#fff3cd";
+        /* ESC */
 
-              box.style.color =
-                "#664d03";
+        document.addEventListener(
+          "keydown",
+          function (event) {
 
-              box.style.padding =
-                "12px 18px";
+            if (
+              event.key === "Escape"
+            ) {
 
-              box.style.border =
-                "1px solid #ffecb5";
-
-              box.style.borderRadius =
-                "10px";
-
-              box.style.fontFamily =
-                "Arial,sans-serif";
-
-              box.style.fontSize =
-                "13px";
-
-              box.style.zIndex =
-                "9999";
-
-              box.textContent =
-                "SportsVN chưa tải được app.js. Hãy kiểm tra file app.js.";
-
-              document.body.appendChild(box);
+              closeAuth();
 
             }
 
-          },
-          1500
+          }
         );
 
       }
