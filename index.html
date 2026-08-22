@@ -2,38 +2,109 @@
 <html lang="vi">
 <head>
   <meta charset="UTF-8">
-  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+
+  <meta
+    name="viewport"
+    content="width=device-width, initial-scale=1.0"
+  >
 
   <meta
     name="description"
-    content="SportsVN - Nền tảng thể thao Việt Nam. Tin tức, giải đấu, lịch thi đấu, kết quả và vận động viên."
+    content="SportsVN - Nền tảng thể thao Việt Nam"
   >
-
-  <meta name="theme-color" content="#0869df">
 
   <title>SportsVN - Nền tảng thể thao Việt Nam</title>
 
-  <link rel="stylesheet" href="./styles.css?v=20260823">
+  <!-- CSS -->
+  <link
+    rel="stylesheet"
+    href="./styles.css?v=20260823"
+  >
 
   <!-- Supabase -->
-  <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+  <script
+    src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"
+  ></script>
 
-  <!-- Cấu hình SportsVN -->
-  <script src="./config.js?v=20260823"></script>
+  <!-- Cấu hình -->
+  <script
+    src="./config.js?v=20260823"
+  ></script>
 </head>
 
 <body>
 
-  <!-- =====================================================
-       SPORTS VN APP
-       app.js sẽ tạo giao diện chính tại đây
-       ===================================================== -->
-  <div id="app"></div>
+  <!-- ==================================================
+       ỨNG DỤNG
+       ================================================== -->
+
+  <div id="app">
+
+    <!-- Nội dung dự phòng.
+         Nếu app.js chưa tải được thì máy tính
+         vẫn không bị trắng hoàn toàn. -->
+
+    <div
+      style="
+        min-height:100vh;
+        display:flex;
+        align-items:center;
+        justify-content:center;
+        padding:30px;
+        font-family:Arial,sans-serif;
+        text-align:center;
+      "
+    >
+
+      <div>
+
+        <div
+          style="
+            width:60px;
+            height:60px;
+            margin:0 auto 18px;
+            border-radius:16px;
+            background:#0869df;
+            color:#fff;
+            display:flex;
+            align-items:center;
+            justify-content:center;
+            font-size:20px;
+            font-weight:900;
+          "
+        >
+          SV
+        </div>
+
+        <h1
+          style="
+            margin:0 0 10px;
+            color:#0d2b58;
+          "
+        >
+          SPORTSVN
+        </h1>
+
+        <p
+          style="
+            margin:0;
+            color:#667085;
+          "
+        >
+          Đang tải nền tảng thể thao Việt Nam...
+        </p>
+
+      </div>
+
+    </div>
+
+  </div>
 
 
-  <!-- =====================================================
+  <!-- ==================================================
        MODAL ĐĂNG NHẬP / ĐĂNG KÝ
-       ===================================================== -->
+       ================================================== -->
+
   <div
     id="auth-modal"
     class="modal"
@@ -45,6 +116,7 @@
       data-close-auth
     ></div>
 
+
     <section
       class="auth-card"
       role="dialog"
@@ -52,7 +124,8 @@
       aria-labelledby="auth-title"
     >
 
-      <!-- Đóng -->
+      <!-- Nút đóng -->
+
       <button
         type="button"
         class="modal-close"
@@ -64,17 +137,32 @@
 
 
       <!-- Logo -->
+
       <div class="auth-brand">
-        <span>SV</span>
+
+        <span>
+          SV
+        </span>
 
         <div>
-          <strong>SportsVN</strong>
-          <small>Nền tảng thể thao Việt Nam</small>
+
+          <strong>
+            SportsVN
+          </strong>
+
+          <small>
+            Nền tảng thể thao Việt Nam
+          </small>
+
         </div>
+
       </div>
 
 
-      <!-- Tab -->
+      <!-- ==================================================
+           TAB ĐĂNG NHẬP / ĐĂNG KÝ
+           ================================================== -->
+
       <div class="auth-tabs">
 
         <button
@@ -96,9 +184,10 @@
       </div>
 
 
-      <!-- =================================================
-           ĐĂNG NHẬP
-           ================================================= -->
+      <!-- ==================================================
+           FORM ĐĂNG NHẬP
+           ================================================== -->
+
       <form
         id="login-form"
         class="auth-form"
@@ -109,34 +198,40 @@
         </h2>
 
         <p>
-          Đăng nhập để quản lý tài khoản và giải đấu SportsVN.
+          Đăng nhập để quản lý giải đấu
+          và tài khoản SportsVN.
         </p>
 
+
         <label>
+
           Email
 
           <input
             type="email"
             id="login-email"
-            name="email"
             placeholder="Nhập email"
             autocomplete="email"
             required
           >
+
         </label>
 
+
         <label>
+
           Mật khẩu
 
           <input
             type="password"
             id="login-password"
-            name="password"
             placeholder="Nhập mật khẩu"
             autocomplete="current-password"
             required
           >
+
         </label>
+
 
         <button
           type="submit"
@@ -144,6 +239,7 @@
         >
           ĐĂNG NHẬP
         </button>
+
 
         <div
           id="login-message"
@@ -154,9 +250,10 @@
       </form>
 
 
-      <!-- =================================================
-           ĐĂNG KÝ
-           ================================================= -->
+      <!-- ==================================================
+           FORM ĐĂNG KÝ
+           ================================================== -->
+
       <form
         id="register-form"
         class="auth-form hidden"
@@ -167,62 +264,72 @@
         </h2>
 
         <p>
-          Tạo tài khoản để bắt đầu quản lý giải đấu.
+          Tạo tài khoản để bắt đầu
+          quản lý giải đấu.
         </p>
 
+
         <label>
+
           Họ và tên
 
           <input
             type="text"
             id="register-name"
-            name="name"
             placeholder="Nguyễn Văn A"
             autocomplete="name"
             required
           >
+
         </label>
 
+
         <label>
+
           Email
 
           <input
             type="email"
             id="register-email"
-            name="email"
             placeholder="example@gmail.com"
             autocomplete="email"
             required
           >
+
         </label>
 
+
         <label>
+
           Mật khẩu
 
           <input
             type="password"
             id="register-password"
-            name="password"
             placeholder="Tối thiểu 6 ký tự"
             autocomplete="new-password"
             minlength="6"
             required
           >
+
         </label>
 
+
         <label>
+
           Nhập lại mật khẩu
 
           <input
             type="password"
             id="register-password-confirm"
-            name="password_confirm"
             placeholder="Nhập lại mật khẩu"
             autocomplete="new-password"
             minlength="6"
             required
           >
+
         </label>
+
 
         <button
           type="submit"
@@ -230,6 +337,7 @@
         >
           TẠO TÀI KHOẢN
         </button>
+
 
         <div
           id="register-message"
@@ -240,16 +348,101 @@
       </form>
 
     </section>
+
   </div>
 
 
-  <!-- =====================================================
-       APP.JS
-       ===================================================== -->
+  <!-- ==================================================
+       APP JAVASCRIPT
+       ================================================== -->
+
   <script
     src="./app.js?v=20260823"
     defer
   ></script>
+
+
+  <!-- ==================================================
+       FALLBACK KIỂM TRA APP.JS
+       ================================================== -->
+
+  <script>
+
+    window.addEventListener(
+      "load",
+      function () {
+
+        setTimeout(
+          function () {
+
+            const app =
+              document.getElementById("app");
+
+            /*
+             * Nếu app.js không chạy hoặc lỗi,
+             * hiện thông báo thay vì để trang trắng.
+             */
+
+            if (
+              app &&
+              app.children.length === 1 &&
+              app.querySelector("h1") &&
+              app.querySelector("h1").textContent
+                .includes("SPORTSVN")
+            ) {
+
+              console.warn(
+                "SportsVN: app.js chưa chạy."
+              );
+
+              const box =
+                document.createElement("div");
+
+              box.style.position = "fixed";
+              box.style.left = "50%";
+              box.style.bottom = "20px";
+              box.style.transform =
+                "translateX(-50%)";
+
+              box.style.background =
+                "#fff3cd";
+
+              box.style.color =
+                "#664d03";
+
+              box.style.padding =
+                "12px 18px";
+
+              box.style.border =
+                "1px solid #ffecb5";
+
+              box.style.borderRadius =
+                "10px";
+
+              box.style.fontFamily =
+                "Arial,sans-serif";
+
+              box.style.fontSize =
+                "13px";
+
+              box.style.zIndex =
+                "9999";
+
+              box.textContent =
+                "SportsVN chưa tải được app.js. Hãy kiểm tra file app.js.";
+
+              document.body.appendChild(box);
+
+            }
+
+          },
+          1500
+        );
+
+      }
+    );
+
+  </script>
 
 </body>
 </html>
