@@ -1,9 +1,9 @@
 window.SPORTSVN_CONFIG = {
-  supabaseUrl: 'https://bzqjksmsdtnodcfykggk.supabase.co',
+  SUPABASE_URL: 'https://bzqjksmdtnodcfykggk.supabase.co',
 
-  supabasePublishableKey: 'sb_publishable_Pyxv3k8LgTRyGCXenLWa_HUuRPgli',
+  SUPABASE_ANON_KEY: 'sb_publishable_Pyxv3k8LgTRyGCXenLWa_HUuRPgli',
 
-  adminEmail: 'nguyenquanghao2505@gmail.com',
+  ADMIN_EMAIL: 'nguyenquanghao2505@gmail.com',
 
-  siteUrl: 'https://sportsvn.com'
+  SITE_URL: 'https://sportsvn.com'
 };
