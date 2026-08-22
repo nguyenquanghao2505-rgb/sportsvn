@@ -13,35 +13,59 @@
     content="SportsVN - Nền tảng thể thao Việt Nam. Tin tức, giải đấu, lịch thi đấu, kết quả và vận động viên."
   >
 
+  <meta name="theme-color" content="#0869df">
+
   <title>SportsVN - Nền tảng thể thao Việt Nam</title>
 
-  <!-- CSS -->
-  <link rel="stylesheet" href="./styles.css?v=20260822">
+  <!-- =========================
+       CSS
+  ========================== -->
+  <link
+    rel="stylesheet"
+    href="./styles.css?v=20260822"
+  >
 
-  <!-- Supabase -->
-  <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+  <!-- =========================
+       SUPABASE
+  ========================== -->
+  <script
+    src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"
+  ></script>
 
-  <!-- Cấu hình Supabase -->
-  <script src="./config.js?v=20260822"></script>
+  <!-- =========================
+       CẤU HÌNH SUPABASE
+  ========================== -->
+  <script
+    src="./config.js?v=20260822"
+  ></script>
 </head>
 
 <body>
 
-  <!-- APP -->
+  <!-- ==================================================
+       ỨNG DỤNG CHÍNH
+       app.js sẽ render giao diện vào đây
+  =================================================== -->
   <div id="app"></div>
 
-  <!-- MODAL ĐĂNG NHẬP / ĐĂNG KÝ -->
+
+  <!-- ==================================================
+       MODAL ĐĂNG NHẬP / ĐĂNG KÝ
+  =================================================== -->
   <div
     id="auth-modal"
     class="modal"
     aria-hidden="true"
   >
 
+    <!-- Nền tối -->
     <div
       class="modal-backdrop"
       data-close-auth
     ></div>
 
+
+    <!-- Hộp đăng nhập -->
     <section
       class="auth-card"
       role="dialog"
@@ -49,6 +73,7 @@
       aria-labelledby="auth-title"
     >
 
+      <!-- Nút đóng -->
       <button
         type="button"
         class="modal-close"
@@ -58,16 +83,28 @@
         ×
       </button>
 
+
+      <!-- ==================================================
+           THƯƠNG HIỆU
+      =================================================== -->
       <div class="auth-brand">
+
         <span>SV</span>
 
         <div>
           <strong>SportsVN</strong>
-          <small>Nền tảng thể thao Việt Nam</small>
+
+          <small>
+            Nền tảng thể thao Việt Nam
+          </small>
         </div>
+
       </div>
 
-      <!-- TAB -->
+
+      <!-- ==================================================
+           TAB ĐĂNG NHẬP / ĐĂNG KÝ
+      =================================================== -->
       <div class="auth-tabs">
 
         <button
@@ -88,7 +125,10 @@
 
       </div>
 
-      <!-- ĐĂNG NHẬP -->
+
+      <!-- ==================================================
+           FORM ĐĂNG NHẬP
+      =================================================== -->
       <form
         id="login-form"
         class="auth-form"
@@ -102,30 +142,38 @@
           Đăng nhập để quản lý giải đấu và tài khoản SportsVN.
         </p>
 
-        <label>
+
+        <!-- EMAIL -->
+        <label for="login-email">
           Email
 
           <input
             type="email"
             id="login-email"
+            name="email"
             placeholder="Nhập email"
             autocomplete="email"
             required
           >
         </label>
 
-        <label>
+
+        <!-- MẬT KHẨU -->
+        <label for="login-password">
           Mật khẩu
 
           <input
             type="password"
             id="login-password"
+            name="password"
             placeholder="Nhập mật khẩu"
             autocomplete="current-password"
             required
           >
         </label>
 
+
+        <!-- NÚT ĐĂNG NHẬP -->
         <button
           type="submit"
           class="btn btn-primary btn-full"
@@ -133,14 +181,20 @@
           ĐĂNG NHẬP
         </button>
 
+
+        <!-- THÔNG BÁO -->
         <div
           id="login-message"
           class="form-message"
+          aria-live="polite"
         ></div>
 
       </form>
 
-      <!-- ĐĂNG KÝ -->
+
+      <!-- ==================================================
+           FORM ĐĂNG KÝ
+      =================================================== -->
       <form
         id="register-form"
         class="auth-form hidden"
@@ -154,36 +208,45 @@
           Tạo tài khoản để bắt đầu quản lý giải đấu.
         </p>
 
-        <label>
+
+        <!-- HỌ TÊN -->
+        <label for="register-name">
           Họ và tên
 
           <input
             type="text"
             id="register-name"
+            name="name"
             placeholder="Nguyễn Văn A"
             autocomplete="name"
             required
           >
         </label>
 
-        <label>
+
+        <!-- EMAIL -->
+        <label for="register-email">
           Email
 
           <input
             type="email"
             id="register-email"
+            name="email"
             placeholder="example@gmail.com"
             autocomplete="email"
             required
           >
         </label>
 
-        <label>
+
+        <!-- MẬT KHẨU -->
+        <label for="register-password">
           Mật khẩu
 
           <input
             type="password"
             id="register-password"
+            name="password"
             placeholder="Tối thiểu 6 ký tự"
             autocomplete="new-password"
             minlength="6"
@@ -191,12 +254,15 @@
           >
         </label>
 
-        <label>
+
+        <!-- XÁC NHẬN MẬT KHẨU -->
+        <label for="register-password-confirm">
           Nhập lại mật khẩu
 
           <input
             type="password"
             id="register-password-confirm"
+            name="password_confirm"
             placeholder="Nhập lại mật khẩu"
             autocomplete="new-password"
             minlength="6"
@@ -204,6 +270,8 @@
           >
         </label>
 
+
+        <!-- NÚT ĐĂNG KÝ -->
         <button
           type="submit"
           class="btn btn-primary btn-full"
@@ -211,17 +279,25 @@
           TẠO TÀI KHOẢN
         </button>
 
+
+        <!-- THÔNG BÁO -->
         <div
           id="register-message"
           class="form-message"
+          aria-live="polite"
         ></div>
 
       </form>
 
     </section>
+
   </div>
 
-  <!-- APP JS -->
+
+  <!-- ==================================================
+       JAVASCRIPT CHÍNH
+       defer để HTML tải xong trước khi chạy app.js
+  =================================================== -->
   <script
     src="./app.js?v=20260822"
     defer
