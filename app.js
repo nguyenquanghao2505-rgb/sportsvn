@@ -1,3 +1,14 @@
+// ===============================
+// SUPABASE - SPORTSVN
+// ===============================
+const SUPABASE_URL = "https://bqziksmsdtnodcfykgqk.supabase.co";
+
+const SUPABASE_PUBLISHABLE_KEY = "sb_publishable_PyxvVa3K8LgTRyGCXeNLwA_HUoRPgli";
+
+const supabaseClient = supabase.createClient(
+  SUPABASE_URL,
+  SUPABASE_PUBLISHABLE_KEY
+);
 const menuToggle=document.getElementById("menuToggle");
 const mainNav=document.getElementById("mainNav");
 if(menuToggle){
