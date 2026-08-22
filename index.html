@@ -17,55 +17,56 @@
 
   <title>SportsVN - Nền tảng thể thao Việt Nam</title>
 
-  <!-- =========================
-       CSS
-  ========================== -->
+  <!-- =====================================================
+       SPORTS VN - CSS
+       ===================================================== -->
   <link
     rel="stylesheet"
-    href="./styles.css?v=20260822"
+    href="./styles.css?v=20260823"
   >
 
-  <!-- =========================
+  <!-- =====================================================
        SUPABASE
-  ========================== -->
+       Phải tải Supabase trước app.js
+       ===================================================== -->
   <script
     src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"
   ></script>
 
-  <!-- =========================
+  <!-- =====================================================
        CẤU HÌNH SUPABASE
-  ========================== -->
+       ===================================================== -->
   <script
-    src="./config.js?v=20260822"
+    src="./config.js?v=20260823"
   ></script>
 </head>
 
 <body>
 
-  <!-- ==================================================
+  <!-- =====================================================
        ỨNG DỤNG CHÍNH
-       app.js sẽ render giao diện vào đây
-  =================================================== -->
+       app.js sẽ render toàn bộ giao diện vào đây
+       ===================================================== -->
   <div id="app"></div>
 
 
-  <!-- ==================================================
+  <!-- =====================================================
        MODAL ĐĂNG NHẬP / ĐĂNG KÝ
-  =================================================== -->
+       ===================================================== -->
   <div
     id="auth-modal"
     class="modal"
     aria-hidden="true"
   >
 
-    <!-- Nền tối -->
+    <!-- Lớp nền tối -->
     <div
       class="modal-backdrop"
       data-close-auth
     ></div>
 
 
-    <!-- Hộp đăng nhập -->
+    <!-- Khung đăng nhập -->
     <section
       class="auth-card"
       role="dialog"
@@ -84,9 +85,9 @@
       </button>
 
 
-      <!-- ==================================================
-           THƯƠNG HIỆU
-      =================================================== -->
+      <!-- =================================================
+           LOGO TRONG FORM
+           ================================================= -->
       <div class="auth-brand">
 
         <span>SV</span>
@@ -102,9 +103,9 @@
       </div>
 
 
-      <!-- ==================================================
+      <!-- =================================================
            TAB ĐĂNG NHẬP / ĐĂNG KÝ
-      =================================================== -->
+           ================================================= -->
       <div class="auth-tabs">
 
         <button
@@ -126,9 +127,9 @@
       </div>
 
 
-      <!-- ==================================================
+      <!-- =================================================
            FORM ĐĂNG NHẬP
-      =================================================== -->
+           ================================================= -->
       <form
         id="login-form"
         class="auth-form"
@@ -139,12 +140,12 @@
         </h2>
 
         <p>
-          Đăng nhập để quản lý giải đấu và tài khoản SportsVN.
+          Đăng nhập để quản lý tài khoản và giải đấu
+          trên SportsVN.
         </p>
 
 
-        <!-- EMAIL -->
-        <label for="login-email">
+        <label>
           Email
 
           <input
@@ -158,8 +159,7 @@
         </label>
 
 
-        <!-- MẬT KHẨU -->
-        <label for="login-password">
+        <label>
           Mật khẩu
 
           <input
@@ -173,7 +173,6 @@
         </label>
 
 
-        <!-- NÚT ĐĂNG NHẬP -->
         <button
           type="submit"
           class="btn btn-primary btn-full"
@@ -182,7 +181,6 @@
         </button>
 
 
-        <!-- THÔNG BÁO -->
         <div
           id="login-message"
           class="form-message"
@@ -192,9 +190,9 @@
       </form>
 
 
-      <!-- ==================================================
+      <!-- =================================================
            FORM ĐĂNG KÝ
-      =================================================== -->
+           ================================================= -->
       <form
         id="register-form"
         class="auth-form hidden"
@@ -205,12 +203,11 @@
         </h2>
 
         <p>
-          Tạo tài khoản để bắt đầu quản lý giải đấu.
+          Tạo tài khoản SportsVN để bắt đầu quản lý giải đấu.
         </p>
 
 
-        <!-- HỌ TÊN -->
-        <label for="register-name">
+        <label>
           Họ và tên
 
           <input
@@ -224,8 +221,7 @@
         </label>
 
 
-        <!-- EMAIL -->
-        <label for="register-email">
+        <label>
           Email
 
           <input
@@ -239,8 +235,7 @@
         </label>
 
 
-        <!-- MẬT KHẨU -->
-        <label for="register-password">
+        <label>
           Mật khẩu
 
           <input
@@ -255,8 +250,7 @@
         </label>
 
 
-        <!-- XÁC NHẬN MẬT KHẨU -->
-        <label for="register-password-confirm">
+        <label>
           Nhập lại mật khẩu
 
           <input
@@ -271,7 +265,6 @@
         </label>
 
 
-        <!-- NÚT ĐĂNG KÝ -->
         <button
           type="submit"
           class="btn btn-primary btn-full"
@@ -280,7 +273,6 @@
         </button>
 
 
-        <!-- THÔNG BÁO -->
         <div
           id="register-message"
           class="form-message"
@@ -294,12 +286,12 @@
   </div>
 
 
-  <!-- ==================================================
-       JAVASCRIPT CHÍNH
-       defer để HTML tải xong trước khi chạy app.js
-  =================================================== -->
+  <!-- =====================================================
+       APP.JS
+       defer để chạy sau khi HTML được phân tích
+       ===================================================== -->
   <script
-    src="./app.js?v=20260822"
+    src="./app.js?v=20260823"
     defer
   ></script>
 
