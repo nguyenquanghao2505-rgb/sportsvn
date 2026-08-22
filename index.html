@@ -1,1 +1,50 @@
-<!doctype html><html lang="vi"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1"><title>SportsVN — Quản trị</title><link rel="stylesheet" href="../styles.css"></head><body><div id="admin-app"></div><script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script><script src="../config.js"></script><script type="module" src="admin.js"></script></body></html>
+<!doctype html>
+<html lang="vi">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <meta name="description" content="SportsVN - Nền tảng công nghệ thể thao Việt Nam">
+  <title>SportsVN — Nền tảng thể thao Việt Nam</title>
+  <link rel="stylesheet" href="styles.css">
+  <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+  <script src="config.js"></script>
+</head>
+<body>
+  <div id="app"></div>
+
+  <div id="auth-modal" class="modal" aria-hidden="true">
+    <div class="modal-backdrop" data-close-auth></div>
+    <section class="auth-card" role="dialog" aria-modal="true" aria-labelledby="auth-title">
+      <button class="modal-close" data-close-auth aria-label="Đóng">×</button>
+      <div class="auth-brand"><span>SV</span><div><strong>SPORTSVN</strong><small>Nền tảng thể thao Việt Nam</small></div></div>
+
+      <div class="auth-tabs">
+        <button class="auth-tab active" data-auth-tab="login">Đăng nhập</button>
+        <button class="auth-tab" data-auth-tab="register">Đăng ký</button>
+      </div>
+
+      <form id="login-form" class="auth-form">
+        <h2 id="auth-title">Đăng nhập SportsVN</h2>
+        <p>Đăng nhập để tạo và điều hành giải đấu.</p>
+        <label>Email<input id="login-email" type="email" autocomplete="email" required></label>
+        <label>Mật khẩu<input id="login-password" type="password" autocomplete="current-password" required></label>
+        <button class="btn btn-primary btn-full">ĐĂNG NHẬP</button>
+        <div id="login-message" class="form-message"></div>
+      </form>
+
+      <form id="register-form" class="auth-form hidden">
+        <h2>Tạo tài khoản SportsVN</h2>
+        <p>Đăng ký miễn phí để tạo và quản lý giải đấu.</p>
+        <label>Họ và tên<input id="register-name" type="text" required></label>
+        <label>Email<input id="register-email" type="email" required></label>
+        <label>Mật khẩu<input id="register-password" type="password" minlength="8" required></label>
+        <label>Số điện thoại<input id="register-phone" type="tel"></label>
+        <button class="btn btn-primary btn-full">TẠO TÀI KHOẢN</button>
+        <div id="register-message" class="form-message"></div>
+      </form>
+    </section>
+  </div>
+
+  <script type="module" src="app.js"></script>
+</body>
+</html>
