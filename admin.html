@@ -58,6 +58,7 @@
       color: #777;
       margin: 8px 0 30px;
       font-size: 14px;
+      line-height: 1.5;
     }
 
     label {
@@ -115,7 +116,7 @@
       display: block;
       text-align: right;
       margin-top: -8px;
-      margin-bottom: 18px;
+      margin-bottom: 22px;
       color: #0866d8;
       text-decoration: none;
       font-size: 14px;
@@ -133,6 +134,14 @@
       color: #0866d8;
       text-decoration: none;
       font-size: 14px;
+    }
+
+    .back:hover {
+      text-decoration: underline;
+    }
+
+    .hidden {
+      display: none !important;
     }
 
     .dashboard {
@@ -178,54 +187,15 @@
       background: #bb2d3b;
     }
 
-    .reset-box {
-      display: none;
-    }
-
-    .reset-title {
-      text-align: center;
-      color: #14213d;
-      margin: 0 0 8px;
-      font-size: 25px;
-    }
-
-    .reset-subtitle {
-      text-align: center;
-      color: #777;
-      font-size: 14px;
-      margin-bottom: 28px;
-      line-height: 1.5;
-    }
-
-    .email-display {
-      background: #f1f5f9;
-      border: 1px solid #e2e8f0;
-      border-radius: 9px;
+    .security-note {
+      background: #f1f7ff;
+      border: 1px solid #d5e7ff;
+      border-radius: 10px;
       padding: 12px;
-      text-align: center;
-      color: #334155;
-      font-size: 14px;
       margin-bottom: 20px;
-    }
-
-    .secondary-button {
-      margin-top: 10px;
-      background: #64748b;
-    }
-
-    .secondary-button:hover {
-      background: #475569;
-    }
-
-    .success-box {
-      background: #ecfdf5;
-      border: 1px solid #a7f3d0;
-      color: #047857;
-      border-radius: 9px;
-      padding: 12px;
-      margin-top: 15px;
-      text-align: center;
-      font-size: 14px;
+      font-size: 13px;
+      color: #31527c;
+      line-height: 1.5;
     }
 
     @media (max-width: 700px) {
@@ -264,16 +234,21 @@
 
     <form id="loginForm">
 
-      <label for="email">Email</label>
+      <label for="email">
+        Email
+      </label>
 
       <input
         type="email"
         id="email"
+        placeholder="Nhập email quản trị"
         value="nguyenquanghao2505@gmail.com"
-        readonly
+        required
       >
 
-      <label for="password">Mật khẩu</label>
+      <label for="password">
+        Mật khẩu
+      </label>
 
       <input
         type="password"
@@ -290,7 +265,10 @@
         Quên mật khẩu?
       </a>
 
-      <button type="submit" id="loginButton">
+      <button
+        type="submit"
+        id="loginButton"
+      >
         ĐĂNG NHẬP
       </button>
 
@@ -309,53 +287,68 @@
   <!-- QUÊN MẬT KHẨU -->
   <!-- ============================= -->
 
-  <div class="login-box reset-box" id="forgotBox">
+  <div class="login-box hidden" id="forgotBox">
 
     <div class="logo">SV</div>
 
-    <h1 class="reset-title">
-      Quên mật khẩu
-    </h1>
+    <h1>Khôi phục mật khẩu</h1>
 
-    <div class="reset-subtitle">
-      Hệ thống sẽ gửi liên kết đặt lại mật khẩu
-      đến email quản trị của SportsVN.
+    <div class="subtitle">
+      Nhập email quản trị để nhận liên kết đặt lại mật khẩu.
     </div>
 
-    <div class="email-display">
-      nguyenquanghao2505@gmail.com
+    <div class="security-note">
+      Email khôi phục sẽ được gửi đến
+      <strong>nguyenquanghao2505@gmail.com</strong>.
     </div>
 
-    <button id="sendResetButton">
-      GỬI EMAIL ĐẶT LẠI MẬT KHẨU
-    </button>
+    <form id="forgotForm">
+
+      <label for="forgotEmail">
+        Email
+      </label>
+
+      <input
+        type="email"
+        id="forgotEmail"
+        value="nguyenquanghao2505@gmail.com"
+        required
+      >
+
+      <button
+        type="submit"
+        id="forgotButton"
+      >
+        GỬI LINK KHÔI PHỤC
+      </button>
+
+    </form>
 
     <div id="forgotMessage"></div>
 
-    <button
-      class="secondary-button"
-      id="backToLoginButton"
+    <a
+      href="#"
+      class="back"
+      id="backToLogin"
     >
-      ← QUAY LẠI ĐĂNG NHẬP
-    </button>
+      ← Quay lại đăng nhập
+    </a>
 
   </div>
 
 
   <!-- ============================= -->
-  <!-- ĐẶT LẠI MẬT KHẨU -->
+  <!-- ĐẶT MẬT KHẨU MỚI -->
   <!-- ============================= -->
 
-  <div class="login-box reset-box" id="resetBox">
+  <div class="login-box hidden" id="resetBox">
 
     <div class="logo">SV</div>
 
-    <h1 class="reset-title">
-      Đặt lại mật khẩu
-    </h1>
+    <h1>Đặt mật khẩu mới</h1>
 
-    <div class="reset-subtitle">
-      Nhập mật khẩu mới cho tài khoản Admin SportsVN.
+    <div class="subtitle">
+      Nhập mật khẩu mới cho tài khoản quản trị SportsVN.
     </div>
 
     <form id="resetForm">
@@ -373,7 +366,7 @@
       >
 
       <label for="confirmPassword">
-        Nhập lại mật khẩu
+        Xác nhận mật khẩu
       </label>
 
       <input
@@ -386,9 +379,9 @@
 
       <button
         type="submit"
-        id="updatePasswordButton"
+        id="resetButton"
       >
-        CẬP NHẬT MẬT KHẨU
+        ĐỔI MẬT KHẨU
       </button>
 
     </form>
@@ -456,660 +449,768 @@
 
 <script>
 
-/* =====================================================
-   CẤU HÌNH SUPABASE
-   ===================================================== */
+  /* ==========================================
+     SUPABASE
+     ========================================== */
 
-const SUPABASE_URL =
-  "https://bqzjksmsdtnodcfykggk.supabase.co";
+  const SUPABASE_URL =
+    "https://bqziksmsdtnodcfykgqk.supabase.co";
 
-const SUPABASE_PUBLISHABLE_KEY =
-  "sb_publishable_PyxvVa3K8LgTRyGCXeNLwA_HUoRPgli";
+  const SUPABASE_PUBLISHABLE_KEY =
+    "sb_publishable_PyxvVa3K8LgTRyGCXeNLwA_HUoRPgli";
 
-const ADMIN_EMAIL =
-  "nguyenquanghao2505@gmail.com";
 
-const ADMIN_URL =
-  "https://sportsvn.com/admin";
+  const supabaseClient =
+    supabase.createClient(
+      SUPABASE_URL,
+      SUPABASE_PUBLISHABLE_KEY,
+      {
+        auth: {
+          persistSession: true,
+          autoRefreshToken: true,
+          detectSessionInUrl: true
+        }
+      }
+    );
 
 
-const supabaseClient =
-  supabase.createClient(
-    SUPABASE_URL,
-    SUPABASE_PUBLISHABLE_KEY
-  );
+  /* ==========================================
+     ELEMENT
+     ========================================== */
 
+  const loginBox =
+    document.getElementById("loginBox");
 
-/* =====================================================
-   LẤY ELEMENT
-   ===================================================== */
+  const forgotBox =
+    document.getElementById("forgotBox");
 
-const loginForm =
-  document.getElementById("loginForm");
+  const resetBox =
+    document.getElementById("resetBox");
 
-const loginBox =
-  document.getElementById("loginBox");
+  const dashboard =
+    document.getElementById("dashboard");
 
-const dashboard =
-  document.getElementById("dashboard");
 
-const message =
-  document.getElementById("message");
+  const loginForm =
+    document.getElementById("loginForm");
 
-const loginButton =
-  document.getElementById("loginButton");
+  const forgotForm =
+    document.getElementById("forgotForm");
 
-const logoutButton =
-  document.getElementById("logoutButton");
+  const resetForm =
+    document.getElementById("resetForm");
 
-const forgotPassword =
-  document.getElementById("forgotPassword");
 
-const forgotBox =
-  document.getElementById("forgotBox");
+  const loginButton =
+    document.getElementById("loginButton");
 
-const resetBox =
-  document.getElementById("resetBox");
+  const forgotButton =
+    document.getElementById("forgotButton");
 
-const sendResetButton =
-  document.getElementById("sendResetButton");
+  const resetButton =
+    document.getElementById("resetButton");
 
-const forgotMessage =
-  document.getElementById("forgotMessage");
 
-const backToLoginButton =
-  document.getElementById("backToLoginButton");
+  const logoutButton =
+    document.getElementById("logoutButton");
 
-const resetForm =
-  document.getElementById("resetForm");
 
-const resetMessage =
-  document.getElementById("resetMessage");
+  const message =
+    document.getElementById("message");
 
-const updatePasswordButton =
-  document.getElementById("updatePasswordButton");
+  const forgotMessage =
+    document.getElementById("forgotMessage");
 
+  const resetMessage =
+    document.getElementById("resetMessage");
 
-/* =====================================================
-   THÔNG BÁO
-   ===================================================== */
 
-function showMessage(
-  text,
-  success = false
-) {
+  /* ==========================================
+     HIỂN THỊ BOX
+     ========================================== */
 
-  message.textContent = text;
+  function showLogin() {
 
-  message.style.color =
-    success
-      ? "#198754"
-      : "#dc3545";
-}
+    loginBox.classList.remove("hidden");
+    forgotBox.classList.add("hidden");
+    resetBox.classList.add("hidden");
+    dashboard.style.display = "none";
 
-
-function showForgotMessage(
-  text,
-  success = false
-) {
-
-  forgotMessage.textContent = text;
-
-  forgotMessage.style.color =
-    success
-      ? "#198754"
-      : "#dc3545";
-
-  forgotMessage.style.textAlign = "center";
-
-  forgotMessage.style.marginTop = "15px";
-}
-
-
-function showResetMessage(
-  text,
-  success = false
-) {
-
-  resetMessage.textContent = text;
-
-  resetMessage.style.color =
-    success
-      ? "#198754"
-      : "#dc3545";
-
-  resetMessage.style.textAlign = "center";
-
-  resetMessage.style.marginTop = "15px";
-}
-
-
-/* =====================================================
-   CHUYỂN MÀN HÌNH
-   ===================================================== */
-
-function showLogin() {
-
-  loginBox.style.display = "block";
-
-  forgotBox.style.display = "none";
-
-  resetBox.style.display = "none";
-
-  dashboard.style.display = "none";
-}
-
-
-function showForgot() {
-
-  loginBox.style.display = "none";
-
-  forgotBox.style.display = "block";
-
-  resetBox.style.display = "none";
-
-  dashboard.style.display = "none";
-
-  forgotMessage.textContent = "";
-}
-
-
-function showReset() {
-
-  loginBox.style.display = "none";
-
-  forgotBox.style.display = "none";
-
-  resetBox.style.display = "block";
-
-  dashboard.style.display = "none";
-}
-
-
-/* =====================================================
-   KIỂM TRA QUYỀN ADMIN
-   ===================================================== */
-
-async function checkAdmin(user) {
-
-  if (!user) {
-    return false;
   }
 
 
-  /* Chỉ cho phép email Admin */
+  function showForgot() {
 
-  if (
-    user.email.toLowerCase() !==
-    ADMIN_EMAIL.toLowerCase()
+    loginBox.classList.add("hidden");
+    forgotBox.classList.remove("hidden");
+    resetBox.classList.add("hidden");
+    dashboard.style.display = "none";
+
+  }
+
+
+  function showReset() {
+
+    loginBox.classList.add("hidden");
+    forgotBox.classList.add("hidden");
+    resetBox.classList.remove("hidden");
+    dashboard.style.display = "none";
+
+  }
+
+
+  function showDashboard() {
+
+    loginBox.classList.add("hidden");
+    forgotBox.classList.add("hidden");
+    resetBox.classList.add("hidden");
+    dashboard.style.display = "block";
+
+  }
+
+
+  /* ==========================================
+     MESSAGE
+     ========================================== */
+
+  function showMessage(
+    element,
+    text,
+    success = false
   ) {
 
-    await supabaseClient.auth.signOut();
+    element.textContent = text;
 
-    showMessage(
-      "Tài khoản này không có quyền Admin."
-    );
+    element.style.color =
+      success
+        ? "#198754"
+        : "#dc3545";
 
-    return false;
   }
 
 
-  const {
-    data,
-    error
-  } = await supabaseClient.rpc("is_admin");
+  /* ==========================================
+     KIỂM TRA ADMIN
+     ========================================== */
 
-
-  if (error) {
-
-    console.error(
-      "Lỗi kiểm tra Admin:",
-      error
-    );
-
-    await supabaseClient.auth.signOut();
-
-    showMessage(
-      "Không thể kiểm tra quyền quản trị."
-    );
-
-    return false;
-  }
-
-
-  if (!data) {
-
-    await supabaseClient.auth.signOut();
-
-    showMessage(
-      "Tài khoản này không có quyền Admin."
-    );
-
-    return false;
-  }
-
-
-  loginBox.style.display = "none";
-
-  forgotBox.style.display = "none";
-
-  resetBox.style.display = "none";
-
-  dashboard.style.display = "block";
-
-  return true;
-}
-
-
-/* =====================================================
-   KIỂM TRA SESSION
-   ===================================================== */
-
-async function checkSession() {
-
-  const {
-    data: {
-      session
-    }
-  } =
-    await supabaseClient.auth.getSession();
-
-
-  if (!session) {
-    return;
-  }
-
-
-  /*
-    Nếu đang ở trạng thái khôi phục mật khẩu
-    thì không đưa vào Dashboard.
-  */
-
-  const hash =
-    window.location.hash;
-
-  if (
-    hash.includes("type=recovery") ||
-    hash.includes("access_token")
-  ) {
-
-    showReset();
-
-    return;
-  }
-
-
-  await checkAdmin(
-    session.user
-  );
-}
-
-
-/* =====================================================
-   ĐĂNG NHẬP
-   ===================================================== */
-
-loginForm.addEventListener(
-  "submit",
-  async function(e) {
-
-    e.preventDefault();
-
-
-    const email =
-      document
-        .getElementById("email")
-        .value
-        .trim();
-
-
-    const password =
-      document
-        .getElementById("password")
-        .value;
-
-
-    loginButton.disabled = true;
-
-    loginButton.textContent =
-      "ĐANG ĐĂNG NHẬP...";
-
-
-    showMessage("");
-
-
-    /*
-      Chặn email khác ngay tại giao diện
-    */
-
-    if (
-      email.toLowerCase() !==
-      ADMIN_EMAIL.toLowerCase()
-    ) {
-
-      showMessage(
-        "Chỉ tài khoản Admin được phép đăng nhập."
-      );
-
-      loginButton.disabled = false;
-
-      loginButton.textContent =
-        "ĐĂNG NHẬP";
-
-      return;
-    }
-
+  async function checkAdmin(user) {
 
     const {
       data,
       error
-    } =
-      await supabaseClient.auth.signInWithPassword({
-        email: ADMIN_EMAIL,
-        password
-      });
+    } = await supabaseClient.rpc(
+      "is_admin"
+    );
 
 
     if (error) {
 
       console.error(
-        "Lỗi đăng nhập:",
+        "Lỗi kiểm tra Admin:",
         error
       );
 
+      await supabaseClient.auth.signOut();
+
       showMessage(
-        "Email hoặc mật khẩu không chính xác."
+        message,
+        "Không thể kiểm tra quyền quản trị."
       );
 
-      loginButton.disabled = false;
+      showLogin();
 
-      loginButton.textContent =
-        "ĐĂNG NHẬP";
+      return false;
+    }
+
+
+    if (!data) {
+
+      await supabaseClient.auth.signOut();
+
+      showMessage(
+        message,
+        "Tài khoản này không có quyền Admin."
+      );
+
+      showLogin();
+
+      return false;
+    }
+
+
+    showDashboard();
+
+    return true;
+  }
+
+
+  /* ==========================================
+     KIỂM TRA SESSION
+     ========================================== */
+
+  async function checkSession() {
+
+    const {
+      data: {
+        session
+      }
+    } =
+      await supabaseClient.auth.getSession();
+
+
+    if (!session) {
+
+      showLogin();
+
+      return;
+    }
+
+
+    /*
+      Nếu đang trong quá trình
+      khôi phục mật khẩu thì không
+      tự động đưa vào Dashboard.
+    */
+
+    if (
+      window.location.hash.includes(
+        "type=recovery"
+      )
+    ) {
 
       return;
     }
 
 
     await checkAdmin(
-      data.user
+      session.user
     );
 
-
-    loginButton.disabled = false;
-
-    loginButton.textContent =
-      "ĐĂNG NHẬP";
-
   }
-);
 
 
-/* =====================================================
-   QUÊN MẬT KHẨU
-   ===================================================== */
+  /* ==========================================
+     ĐĂNG NHẬP
+     ========================================== */
 
-forgotPassword.addEventListener(
-  "click",
-  function(e) {
+  loginForm.addEventListener(
+    "submit",
+    async function(e) {
 
-    e.preventDefault();
-
-    showForgot();
-
-  }
-);
+      e.preventDefault();
 
 
-/* =====================================================
-   GỬI EMAIL RESET PASSWORD
-   ===================================================== */
-
-sendResetButton.addEventListener(
-  "click",
-  async function() {
-
-    sendResetButton.disabled = true;
-
-    sendResetButton.textContent =
-      "ĐANG GỬI EMAIL...";
-
-    showForgotMessage("");
+      const email =
+        document
+          .getElementById("email")
+          .value
+          .trim();
 
 
-    const {
-      error
-    } =
-      await supabaseClient.auth
-        .resetPasswordForEmail(
-          ADMIN_EMAIL,
-          {
-            redirectTo:
-              ADMIN_URL
-          }
+      const password =
+        document
+          .getElementById("password")
+          .value;
+
+
+      loginButton.disabled = true;
+
+      loginButton.textContent =
+        "ĐANG ĐĂNG NHẬP...";
+
+
+      showMessage(
+        message,
+        ""
+      );
+
+
+      const {
+        data,
+        error
+      } =
+        await supabaseClient.auth
+          .signInWithPassword({
+            email,
+            password
+          });
+
+
+      if (error) {
+
+        console.error(
+          "Login error:",
+          error
         );
 
-
-    if (error) {
-
-      console.error(
-        "Lỗi gửi email:",
-        error
-      );
-
-      showForgotMessage(
-        "Không thể gửi email. Vui lòng kiểm tra cấu hình Supabase."
-      );
-
-      sendResetButton.disabled = false;
-
-      sendResetButton.textContent =
-        "GỬI EMAIL ĐẶT LẠI MẬT KHẨU";
-
-      return;
-    }
-
-
-    showForgotMessage(
-      "Đã gửi email đặt lại mật khẩu đến " +
-      ADMIN_EMAIL +
-      ". Vui lòng kiểm tra hộp thư.",
-      true
-    );
-
-
-    sendResetButton.disabled = false;
-
-    sendResetButton.textContent =
-      "GỬI EMAIL ĐẶT LẠI MẬT KHẨU";
-
-  }
-);
-
-
-/* =====================================================
-   QUAY LẠI ĐĂNG NHẬP
-   ===================================================== */
-
-backToLoginButton.addEventListener(
-  "click",
-  function() {
-
-    showLogin();
-
-  }
-);
-
-
-/* =====================================================
-   ĐẶT LẠI MẬT KHẨU
-   ===================================================== */
-
-resetForm.addEventListener(
-  "submit",
-  async function(e) {
-
-    e.preventDefault();
-
-
-    const newPassword =
-      document
-        .getElementById("newPassword")
-        .value;
-
-
-    const confirmPassword =
-      document
-        .getElementById("confirmPassword")
-        .value;
-
-
-    showResetMessage("");
-
-
-    if (newPassword.length < 6) {
-
-      showResetMessage(
-        "Mật khẩu phải có ít nhất 6 ký tự."
-      );
-
-      return;
-    }
-
-
-    if (
-      newPassword !==
-      confirmPassword
-    ) {
-
-      showResetMessage(
-        "Hai mật khẩu không giống nhau."
-      );
-
-      return;
-    }
-
-
-    updatePasswordButton.disabled = true;
-
-    updatePasswordButton.textContent =
-      "ĐANG CẬP NHẬT...";
-
-
-    const {
-      error
-    } =
-      await supabaseClient.auth
-        .updateUser({
-          password: newPassword
-        });
-
-
-    if (error) {
-
-      console.error(
-        "Lỗi cập nhật mật khẩu:",
-        error
-      );
-
-      showResetMessage(
-        "Không thể cập nhật mật khẩu. Vui lòng thử lại."
-      );
-
-      updatePasswordButton.disabled = false;
-
-      updatePasswordButton.textContent =
-        "CẬP NHẬT MẬT KHẨU";
-
-      return;
-    }
-
-
-    showResetMessage(
-      "Đổi mật khẩu thành công. Đang chuyển về đăng nhập...",
-      true
-    );
-
-
-    await supabaseClient.auth.signOut();
-
-
-    setTimeout(
-      function() {
-
-        window.location.href =
-          ADMIN_URL;
-
-      },
-      1500
-    );
-
-  }
-);
-
-
-/* =====================================================
-   THEO DÕI AUTH
-   ===================================================== */
-
-supabaseClient.auth.onAuthStateChange(
-  async function(event, session) {
-
-    console.log(
-      "Auth event:",
-      event
-    );
-
-
-    if (
-      event ===
-      "PASSWORD_RECOVERY"
-    ) {
-
-      showReset();
-
-      return;
-    }
-
-
-    if (
-      event ===
-      "SIGNED_IN" &&
-      session
-    ) {
-
-      /*
-        Nếu đang đặt lại mật khẩu
-        thì không chuyển sang Dashboard.
-      */
-
-      const hash =
-        window.location.hash;
-
-      if (
-        hash.includes("type=recovery")
-      ) {
-
-        showReset();
+        showMessage(
+          message,
+          "Email hoặc mật khẩu không chính xác."
+        );
+
+        loginButton.disabled = false;
+
+        loginButton.textContent =
+          "ĐĂNG NHẬP";
 
         return;
       }
 
 
       await checkAdmin(
-        session.user
+        data.user
+      );
+
+
+      loginButton.disabled = false;
+
+      loginButton.textContent =
+        "ĐĂNG NHẬP";
+
+    }
+  );
+
+
+  /* ==========================================
+     MỞ QUÊN MẬT KHẨU
+     ========================================== */
+
+  document
+    .getElementById("forgotPassword")
+    .addEventListener(
+      "click",
+      function(e) {
+
+        e.preventDefault();
+
+        showForgot();
+
+      }
+    );
+
+
+  /* ==========================================
+     GỬI EMAIL KHÔI PHỤC
+     ========================================== */
+
+  forgotForm.addEventListener(
+    "submit",
+    async function(e) {
+
+      e.preventDefault();
+
+
+      const email =
+        document
+          .getElementById("forgotEmail")
+          .value
+          .trim();
+
+
+      forgotButton.disabled = true;
+
+      forgotButton.textContent =
+        "ĐANG GỬI...";
+
+
+      showMessage(
+        forgotMessage,
+        ""
+      );
+
+
+      /*
+        QUAN TRỌNG:
+        Link trong email sẽ quay về:
+
+        https://sportsvn.com/admin
+
+        Không còn localhost:3000
+      */
+
+      const redirectTo =
+        "https://sportsvn.com/admin";
+
+
+      const {
+        error
+      } =
+        await supabaseClient.auth
+          .resetPasswordForEmail(
+            email,
+            {
+              redirectTo
+            }
+          );
+
+
+      if (error) {
+
+        console.error(
+          "Reset password error:",
+          error
+        );
+
+
+        if (
+          error.message
+            .toLowerCase()
+            .includes(
+              "rate limit"
+            )
+        ) {
+
+          showMessage(
+            forgotMessage,
+            "Supabase đang giới hạn số email khôi phục. Anh hãy chờ một thời gian rồi gửi lại."
+          );
+
+        } else {
+
+          showMessage(
+            forgotMessage,
+            "Không thể gửi email khôi phục. Vui lòng thử lại."
+          );
+
+        }
+
+
+        forgotButton.disabled = false;
+
+        forgotButton.textContent =
+          "GỬI LINK KHÔI PHỤC";
+
+        return;
+      }
+
+
+      showMessage(
+        forgotMessage,
+        "Đã gửi email khôi phục. Hãy kiểm tra hộp thư Gmail.",
+        true
+      );
+
+
+      forgotButton.disabled = false;
+
+      forgotButton.textContent =
+        "GỬI LINK KHÔI PHỤC";
+
+    }
+  );
+
+
+  /* ==========================================
+     QUAY LẠI ĐĂNG NHẬP
+     ========================================== */
+
+  document
+    .getElementById("backToLogin")
+    .addEventListener(
+      "click",
+      function(e) {
+
+        e.preventDefault();
+
+        showLogin();
+
+      }
+    );
+
+
+  /* ==========================================
+     ĐẶT MẬT KHẨU MỚI
+     ========================================== */
+
+  resetForm.addEventListener(
+    "submit",
+    async function(e) {
+
+      e.preventDefault();
+
+
+      const password =
+        document
+          .getElementById("newPassword")
+          .value;
+
+
+      const confirmPassword =
+        document
+          .getElementById("confirmPassword")
+          .value;
+
+
+      if (
+        password.length < 6
+      ) {
+
+        showMessage(
+          resetMessage,
+          "Mật khẩu phải có ít nhất 6 ký tự."
+        );
+
+        return;
+      }
+
+
+      if (
+        password !==
+        confirmPassword
+      ) {
+
+        showMessage(
+          resetMessage,
+          "Hai mật khẩu không giống nhau."
+        );
+
+        return;
+      }
+
+
+      resetButton.disabled = true;
+
+      resetButton.textContent =
+        "ĐANG CẬP NHẬT...";
+
+
+      const {
+        data,
+        error
+      } =
+        await supabaseClient.auth
+          .updateUser({
+            password
+          });
+
+
+      if (error) {
+
+        console.error(
+          "Update password error:",
+          error
+        );
+
+
+        showMessage(
+          resetMessage,
+          "Không thể đổi mật khẩu. Link khôi phục có thể đã hết hạn."
+        );
+
+
+        resetButton.disabled = false;
+
+        resetButton.textContent =
+          "ĐỔI MẬT KHẨU";
+
+        return;
+      }
+
+
+      showMessage(
+        resetMessage,
+        "Đổi mật khẩu thành công! Đang chuyển về đăng nhập...",
+        true
+      );
+
+
+      /*
+        Đăng xuất phiên khôi phục
+        để Admin đăng nhập lại bằng
+        mật khẩu mới.
+      */
+
+      await supabaseClient.auth.signOut();
+
+
+      setTimeout(
+        function() {
+
+          /*
+            Xóa toàn bộ tham số
+            recovery khỏi URL.
+          */
+
+          window.history.replaceState(
+            {},
+            document.title,
+            "/admin"
+          );
+
+
+          showLogin();
+
+
+          document
+            .getElementById("password")
+            .focus();
+
+
+        },
+        1500
+      );
+
+    }
+  );
+
+
+  /* ==========================================
+     ĐĂNG XUẤT
+     ========================================== */
+
+  logoutButton.addEventListener(
+    "click",
+    async function() {
+
+      await supabaseClient.auth.signOut();
+
+
+      dashboard.style.display =
+        "none";
+
+
+      loginBox.classList.remove(
+        "hidden"
+      );
+
+
+      loginForm.reset();
+
+
+      document
+        .getElementById("email")
+        .value =
+        "nguyenquanghao2505@gmail.com";
+
+
+      showMessage(
+        message,
+        "Đã đăng xuất thành công.",
+        true
+      );
+
+    }
+  );
+
+
+  /* ==========================================
+     SUPABASE AUTH STATE
+     ========================================== */
+
+  supabaseClient.auth
+    .onAuthStateChange(
+      async function(
+        event,
+        session
+      ) {
+
+        console.log(
+          "Auth event:",
+          event
+        );
+
+
+        /*
+          Đây là sự kiện quan trọng
+          khi người dùng bấm link
+          Reset Password trong Gmail.
+        */
+
+        if (
+          event ===
+          "PASSWORD_RECOVERY"
+        ) {
+
+          showReset();
+
+          return;
+        }
+
+
+        if (
+          event ===
+          "SIGNED_IN" &&
+          session
+        ) {
+
+          /*
+            Nếu đây là phiên khôi phục
+            thì không mở Dashboard.
+          */
+
+          if (
+            window.location.search
+              .includes("code=")
+          ) {
+
+            return;
+          }
+
+
+          await checkAdmin(
+            session.user
+          );
+
+        }
+
+      }
+    );
+
+
+  /* ==========================================
+     XỬ LÝ LINK LỖI
+     ========================================== */
+
+  function checkUrlError() {
+
+    const params =
+      new URLSearchParams(
+        window.location.search
+      );
+
+
+    const errorCode =
+      params.get(
+        "error_code"
+      );
+
+
+    if (
+      errorCode ===
+      "otp_expired"
+    ) {
+
+      showLogin();
+
+
+      showMessage(
+        message,
+        "Link khôi phục mật khẩu đã hết hạn. Anh hãy yêu cầu gửi một link mới."
+      );
+
+
+      /*
+        Xóa lỗi khỏi URL.
+      */
+
+      window.history.replaceState(
+        {},
+        document.title,
+        "/admin"
       );
 
     }
 
   }
-);
 
 
-/* =====================================================
-   KHỞI ĐỘNG
-   ===================================================== */
+  /* ==========================================
+     KHỞI ĐỘNG
+     ========================================== */
 
-checkSession();
+  checkUrlError();
+
+  checkSession();
 
 </script>
 
