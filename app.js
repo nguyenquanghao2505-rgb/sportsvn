@@ -1,183 +1,1007 @@
-import { navItems, sportCategories, newsData, tournamentData, filterNews } from './home-data.mjs';
+/* =========================================================
+   SPORTSVN - APP.JS
+   Trang chủ + Đăng ký + Đăng nhập + Tài khoản
+   ========================================================= */
 
-const cfg = window.SPORTSVN_CONFIG || {};
-const supabaseReady = Boolean(
-  window.supabase &&
-  cfg.SUPABASE_URL &&
-  cfg.SUPABASE_ANON_KEY &&
-  !String(cfg.SUPABASE_URL).includes('YOUR_') &&
-  !String(cfg.SUPABASE_ANON_KEY).includes('YOUR_')
-);
-const sb = supabaseReady ? window.supabase.createClient(cfg.SUPABASE_URL, cfg.SUPABASE_ANON_KEY) : null;
+const CONFIG = window.SPORTSVN_CONFIG || {};
 
-const app = document.querySelector('#app');
+const SUPABASE_READY =
+  CONFIG.SUPABASE_URL &&
+  CONFIG.SUPABASE_ANON_KEY &&
+  !String(CONFIG.SUPABASE_URL).includes("YOUR_") &&
+  !String(CONFIG.SUPABASE_ANON_KEY).includes("YOUR_");
+
+const supabaseClient =
+  SUPABASE_READY && window.supabase
+    ? window.supabase.createClient(
+        CONFIG.SUPABASE_URL,
+        CONFIG.SUPABASE_ANON_KEY
+      )
+    : null;
+
+
+/* =========================================================
+   STATE
+   ========================================================= */
+
 let currentUser = null;
-let activeCategory = 'Tất cả';
+let currentProfile = null;
 
-const esc = (s='') => String(s).replace(/[&<>'"]/g, c => ({
-  '&':'&amp;', '<':'&lt;', '>':'&gt;', "'":'&#39;', '"':'&quot;'
-}[c]));
 
-function render() {
-  app.innerHTML = `
-    <header class="site-header">
-      <div class="container header-inner">
-        <a class="brand" href="#home" aria-label="SportsVN">
-          <span class="brand-mark">SV</span>
-          <span><strong>SPORTSVN</strong><small>Nền tảng thể thao Việt Nam</small></span>
-        </a>
-        <button class="mobile-menu" id="mobile-menu" aria-label="Mở menu">☰</button>
-        <nav class="main-nav" id="main-nav">
-          ${navItems.map((n,i)=>`<a class="${i===0?'active':''}" href="${n.href}">${n.label}</a>`).join('')}
-        </nav>
-        <div class="header-actions">
-          <button class="icon-btn" id="search-btn" title="Tìm kiếm">⌕</button>
-          ${currentUser
-            ? `<div class="user-menu"><button class="user-btn" id="user-btn">${esc(currentUser.user_metadata?.full_name || currentUser.email || 'Tài khoản')} ▾</button><div class="user-dropdown" id="user-dropdown"><a href="admin.html">⚙ Trung tâm điều hành</a><button id="logout-btn">Đăng xuất</button></div></div>`
-            : `<button class="btn btn-outline" data-open-auth="login">Đăng nhập</button><button class="btn btn-primary" data-open-auth="register">Đăng ký</button>`
-          }
-        </div>
-      </div>
-    </header>
+/* =========================================================
+   HELPERS
+   ========================================================= */
 
-    <div class="hotbar"><div class="container hotbar-inner"><b>🔥 ĐANG HOT</b>${['#Bóngđá','#Pickleball','#Bóngchuyền','#Bóngrổ','#Cầulông','#Tennis','#Đại hộiTDTT'].map(x=>`<span>${x}</span>`).join('')}</div></div>
-
-    <main id="main-content">
-      ${hero()}
-      ${newsSection()}
-      ${tournamentSection()}
-      ${sportSection()}
-      ${ctaSection()}
-    </main>
-
-    <footer class="site-footer">
-      <div class="container footer-grid">
-        <div><div class="footer-brand">SPORTSVN</div><p>Nền tảng công nghệ thể thao Việt Nam — nơi kết nối tin tức, vận động viên và giải đấu.</p></div>
-        <div><h4>Khám phá</h4><a href="#news">Tin tức</a><a href="#tournaments">Giải đấu</a><a href="#schedule">Lịch thi đấu</a><a href="#results">Kết quả</a></div>
-        <div><h4>Thể thao</h4>${sportCategories.slice(0,6).map(x=>`<a href="#news">${x}</a>`).join('')}</div>
-        <div><h4>Tham gia SportsVN</h4><p>Tạo tài khoản miễn phí để tổ chức và điều hành giải đấu.</p><button class="btn btn-primary" data-open-auth="register">Tạo tài khoản</button></div>
-      </div>
-      <div class="footer-bottom"><div class="container">© 2026 SportsVN. Nền tảng công nghệ thể thao Việt Nam.</div></div>
-    </footer>
-  `;
-  bind();
+function $(selector) {
+  return document.querySelector(selector);
 }
 
-function hero() {
-  const lead = newsData[0];
-  return `<section class="hero container">
-    <div class="hero-main" style="background-image:url('${lead.image}')">
-      <div class="hero-overlay"></div>
-      <div class="hero-content"><span class="tag">${esc(lead.category)}</span><h1>${esc(lead.title)}</h1><p>${esc(lead.time)} · SportsVN</p><a class="hero-link" href="#news">Xem tin mới nhất →</a></div>
-    </div>
-    <aside class="hero-side">
-      ${newsData.slice(1,4).map(n=>`<article class="side-news"><img src="${n.image}" alt=""><div><span>${esc(n.category)}</span><h3>${esc(n.title)}</h3><small>${esc(n.time)}</small></div></article>`).join('')}
-    </aside>
-  </section>`;
+function $all(selector) {
+  return [...document.querySelectorAll(selector)];
 }
 
-function newsSection() {
-  const filtered = filterNews(newsData, activeCategory);
-  return `<section class="section container" id="news">
-    <div class="section-head"><div><span class="eyebrow">TIN TỨC</span><h2>Tin tức thể thao mới nhất</h2></div><a href="#news">Xem tất cả →</a></div>
-    <div class="category-tabs">
-      ${['Tất cả',...sportCategories.slice(0,7)].map(c=>`<button class="${activeCategory===c?'active':''}" data-category="${esc(c)}">${esc(c)}</button>`).join('')}
-    </div>
-    <div class="news-grid">${filtered.map(n=>`<article class="news-card"><img src="${n.image}" alt=""><div class="news-body"><span>${esc(n.category)}</span><h3>${esc(n.title)}</h3><small>${esc(n.time)}</small></div></article>`).join('')}</div>
-  </section>`;
+function escapeHtml(value = "") {
+  return String(value).replace(/[&<>'"]/g, char => ({
+    "&": "&amp;",
+    "<": "&lt;",
+    ">": "&gt;",
+    "'": "&#39;",
+    '"': "&quot;"
+  }[char]));
 }
 
-function tournamentSection() {
-  return `<section class="section section-soft" id="tournaments"><div class="container">
-    <div class="section-head"><div><span class="eyebrow">GIẢI ĐẤU</span><h2>Giải đấu nổi bật</h2></div><a href="#tournaments">Khám phá giải đấu →</a></div>
-    <div class="tournament-grid">${tournamentData.map(t=>`<article class="tournament-card"><div class="trophy">🏆</div><div><span class="sport-label">${esc(t.sport)}</span><h3>${esc(t.name)}</h3><p>📅 ${esc(t.date)} · <b>${esc(t.status)}</b></p><button class="text-btn">Xem giải đấu →</button></div></article>`).join('')}</div>
-  </div></section>`;
+function normalizeEmail(email = "") {
+  return String(email).trim().toLowerCase();
 }
 
-function sportSection() {
-  return `<section class="section container"><div class="section-head"><div><span class="eyebrow">KHÁM PHÁ</span><h2>Môn thể thao</h2></div></div>
-    <div class="sport-grid">${sportCategories.map((s,i)=>`<a href="#news" class="sport-tile"><span>${['⚽','🏀','🏐','🏸','🥒','🎾','🏊','🥋','🥊','♟️'][i]}</span><strong>${s}</strong><small>Xem tin & giải đấu</small></a>`).join('')}</div>
-  </section>`;
+function showMessage(element, message, type = "") {
+  if (!element) return;
+
+  element.textContent = message;
+  element.className = "form-message";
+
+  if (type) {
+    element.classList.add(type);
+  }
 }
 
-function ctaSection() {
-  return `<section class="cta-section"><div class="container cta-inner"><div><span class="eyebrow">DÀNH CHO BAN TỔ CHỨC</span><h2>Tạo và điều hành giải đấu của bạn trên SportsVN</h2><p>Quản lý VĐV, bốc thăm, lịch thi đấu, kết quả và công khai giải đấu trên một nền tảng.</p></div><button class="btn btn-light" data-open-auth="register">Đăng ký tổ chức giải →</button></div></section>`;
+function clearMessage(element) {
+  if (!element) return;
+  element.textContent = "";
+  element.className = "form-message";
 }
 
-function openAuth(tab='login') {
-  const modal = document.querySelector('#auth-modal');
-  modal.classList.add('show');
-  modal.setAttribute('aria-hidden','false');
-  document.querySelectorAll('.auth-tab').forEach(b=>b.classList.toggle('active', b.dataset.authTab===tab));
-  document.querySelector('#login-form').classList.toggle('hidden', tab!=='login');
-  document.querySelector('#register-form').classList.toggle('hidden', tab!=='register');
+
+/* =========================================================
+   AUTH MODAL
+   ========================================================= */
+
+function openAuth(mode = "login") {
+  const modal = $("#auth-modal");
+
+  if (!modal) return;
+
+  modal.classList.add("show");
+  modal.setAttribute("aria-hidden", "false");
+
+  switchAuthMode(mode);
+
+  document.body.style.overflow = "hidden";
 }
 
 function closeAuth() {
-  const modal = document.querySelector('#auth-modal');
-  modal.classList.remove('show');
-  modal.setAttribute('aria-hidden','true');
+  const modal = $("#auth-modal");
+
+  if (!modal) return;
+
+  modal.classList.remove("show");
+  modal.setAttribute("aria-hidden", "true");
+
+  document.body.style.overflow = "";
+
+  clearMessage($("#login-message"));
+  clearMessage($("#register-message"));
 }
 
-function bind() {
-  document.querySelectorAll('[data-open-auth]').forEach(b=>b.onclick=()=>openAuth(b.dataset.openAuth));
-  document.querySelectorAll('[data-close-auth]').forEach(b=>b.onclick=closeAuth);
-  document.querySelectorAll('[data-auth-tab]').forEach(b=>b.onclick=()=>openAuth(b.dataset.authTab));
-  document.querySelectorAll('[data-category]').forEach(b=>b.onclick=()=>{activeCategory=b.dataset.category;render();location.hash='news';});
-  document.querySelector('#mobile-menu')?.addEventListener('click',()=>document.querySelector('#main-nav').classList.toggle('open'));
-  document.querySelector('#user-btn')?.addEventListener('click',()=>document.querySelector('#user-dropdown').classList.toggle('show'));
-  document.querySelector('#logout-btn')?.addEventListener('click',async()=>{
-    if(sb) await sb.auth.signOut();
-    currentUser=null; render();
-  });
-  document.querySelector('#search-btn')?.addEventListener('click',()=>alert('Tìm kiếm SportsVN sẽ được kết nối với kho tin tức và giải đấu.'));
-  document.querySelector('#login-form')?.addEventListener('submit',login);
-  document.querySelector('#register-form')?.addEventListener('submit',register);
-}
+function switchAuthMode(mode = "login") {
+  const loginForm = $("#login-form");
+  const registerForm = $("#register-form");
 
-async function login(e) {
-  e.preventDefault();
-  const msg=document.querySelector('#login-message');
-  if(!sb){msg.textContent='Supabase chưa được cấu hình trong config.js.';msg.className='form-message error';return;}
-  msg.textContent='Đang đăng nhập...';
-  const {data,error}=await sb.auth.signInWithPassword({
-    email:document.querySelector('#login-email').value.trim(),
-    password:document.querySelector('#login-password').value
-  });
-  if(error){msg.textContent='Email hoặc mật khẩu không chính xác.';msg.className='form-message error';return;}
-  currentUser=data.user; closeAuth(); render();
-}
+  const tabs = $all("[data-auth-tab]");
 
-async function register(e) {
-  e.preventDefault();
-  const msg=document.querySelector('#register-message');
-  if(!sb){msg.textContent='Supabase chưa được cấu hình trong config.js.';msg.className='form-message error';return;}
-  const name=document.querySelector('#register-name').value.trim();
-  const email=document.querySelector('#register-email').value.trim();
-  const password=document.querySelector('#register-password').value;
-  const phone=document.querySelector('#register-phone').value.trim();
-  if(password.length<8){msg.textContent='Mật khẩu phải có ít nhất 8 ký tự.';msg.className='form-message error';return;}
-  msg.textContent='Đang tạo tài khoản...';
-  const {data,error}=await sb.auth.signUp({email,password,options:{data:{full_name:name,phone}}});
-  if(error){msg.textContent=error.message;msg.className='form-message error';return;}
-  if(data.user) {
-    try {
-      await sb.from('profiles').upsert({id:data.user.id,full_name:name,phone,email,role:'organizer'});
-    } catch (_) {}
+  if (!loginForm || !registerForm) return;
+
+  if (mode === "register") {
+    loginForm.classList.add("hidden");
+    registerForm.classList.remove("hidden");
+  } else {
+    registerForm.classList.add("hidden");
+    loginForm.classList.remove("hidden");
   }
-  msg.textContent='Đăng ký thành công. Nếu hệ thống yêu cầu xác minh email, hãy kiểm tra hộp thư.';
-  msg.className='form-message success';
+
+  tabs.forEach(tab => {
+    tab.classList.toggle(
+      "active",
+      tab.dataset.authTab === mode
+    );
+  });
+
+  clearMessage($("#login-message"));
+  clearMessage($("#register-message"));
 }
 
-async function initAuth() {
-  if(!sb) return;
-  const {data}=await sb.auth.getSession();
-  currentUser=data.session?.user || null;
-  sb.auth.onAuthStateChange((_event,session)=>{
-    currentUser=session?.user || null;
-    render();
+
+/* =========================================================
+   PROFILE
+   ========================================================= */
+
+async function loadProfile() {
+  if (!supabaseClient || !currentUser) {
+    currentProfile = null;
+    return null;
+  }
+
+  try {
+    const { data, error } = await supabaseClient
+      .from("profiles")
+      .select("*")
+      .eq("id", currentUser.id)
+      .maybeSingle();
+
+    if (error) {
+      console.error("Không tải được profile:", error);
+      currentProfile = null;
+      return null;
+    }
+
+    currentProfile = data || null;
+
+    return currentProfile;
+  } catch (error) {
+    console.error(error);
+    currentProfile = null;
+    return null;
+  }
+}
+
+
+/* =========================================================
+   CREATE PROFILE
+   ========================================================= */
+
+async function createProfile({
+  id,
+  fullName,
+  phone,
+  email
+}) {
+  if (!supabaseClient) return;
+
+  try {
+    const { error } = await supabaseClient
+      .from("profiles")
+      .upsert(
+        {
+          id,
+          full_name: fullName,
+          phone: phone || "",
+          email: email || "",
+          role: "organizer"
+        },
+        {
+          onConflict: "id"
+        }
+      );
+
+    if (error) {
+      console.error("Không tạo được profile:", error);
+    }
+  } catch (error) {
+    console.error(error);
+  }
+}
+
+
+/* =========================================================
+   REGISTER
+   ========================================================= */
+
+async function registerUser(event) {
+  event.preventDefault();
+
+  const form = event.currentTarget;
+
+  const name = $("#register-name")?.value.trim() || "";
+  const email = normalizeEmail(
+    $("#register-email")?.value || ""
+  );
+  const phone = $("#register-phone")?.value.trim() || "";
+  const password = $("#register-password")?.value || "";
+
+  const message = $("#register-message");
+
+  clearMessage(message);
+
+  if (!name) {
+    showMessage(
+      message,
+      "Vui lòng nhập họ và tên.",
+      "error"
+    );
+    return;
+  }
+
+  if (!email) {
+    showMessage(
+      message,
+      "Vui lòng nhập email.",
+      "error"
+    );
+    return;
+  }
+
+  if (password.length < 8) {
+    showMessage(
+      message,
+      "Mật khẩu phải có ít nhất 8 ký tự.",
+      "error"
+    );
+    return;
+  }
+
+  if (!supabaseClient) {
+    showMessage(
+      message,
+      "Supabase chưa được cấu hình trong config.js.",
+      "error"
+    );
+    return;
+  }
+
+  const submitButton =
+    form.querySelector('button[type="submit"]');
+
+  const oldText = submitButton?.textContent;
+
+  if (submitButton) {
+    submitButton.disabled = true;
+    submitButton.textContent = "ĐANG TẠO TÀI KHOẢN...";
+  }
+
+  try {
+    const { data, error } =
+      await supabaseClient.auth.signUp({
+        email,
+        password,
+        options: {
+          data: {
+            full_name: name,
+            phone
+          }
+        }
+      });
+
+    if (error) {
+      console.error(error);
+
+      showMessage(
+        message,
+        error.message ||
+          "Không thể tạo tài khoản.",
+        "error"
+      );
+
+      return;
+    }
+
+    /*
+      Nếu Supabase đang yêu cầu xác nhận email,
+      data.session có thể chưa tồn tại.
+    */
+
+    if (data?.user) {
+      await createProfile({
+        id: data.user.id,
+        fullName: name,
+        phone,
+        email
+      });
+    }
+
+    if (data?.session) {
+      showMessage(
+        message,
+        "Đăng ký thành công. Đang đăng nhập...",
+        "success"
+      );
+
+      currentUser = data.user;
+
+      await loadProfile();
+
+      setTimeout(() => {
+        closeAuth();
+        updateHeader();
+      }, 700);
+
+    } else {
+      showMessage(
+        message,
+        "Đăng ký thành công. Vui lòng kiểm tra email để xác nhận tài khoản.",
+        "success"
+      );
+
+      form.reset();
+    }
+
+  } catch (error) {
+    console.error(error);
+
+    showMessage(
+      message,
+      "Có lỗi xảy ra khi đăng ký tài khoản.",
+      "error"
+    );
+
+  } finally {
+    if (submitButton) {
+      submitButton.disabled = false;
+      submitButton.textContent =
+        oldText || "ĐĂNG KÝ TÀI KHOẢN";
+    }
+  }
+}
+
+
+/* =========================================================
+   LOGIN
+   ========================================================= */
+
+async function loginUser(event) {
+  event.preventDefault();
+
+  const form = event.currentTarget;
+
+  const email = normalizeEmail(
+    $("#login-email")?.value || ""
+  );
+
+  const password =
+    $("#login-password")?.value || "";
+
+  const message = $("#login-message");
+
+  clearMessage(message);
+
+  if (!email || !password) {
+    showMessage(
+      message,
+      "Vui lòng nhập đầy đủ email và mật khẩu.",
+      "error"
+    );
+    return;
+  }
+
+  if (!supabaseClient) {
+    showMessage(
+      message,
+      "Supabase chưa được cấu hình trong config.js.",
+      "error"
+    );
+    return;
+  }
+
+  const submitButton =
+    form.querySelector('button[type="submit"]');
+
+  const oldText = submitButton?.textContent;
+
+  if (submitButton) {
+    submitButton.disabled = true;
+    submitButton.textContent = "ĐANG ĐĂNG NHẬP...";
+  }
+
+  try {
+    const { data, error } =
+      await supabaseClient.auth.signInWithPassword({
+        email,
+        password
+      });
+
+    if (error) {
+      console.error(error);
+
+      showMessage(
+        message,
+        "Email hoặc mật khẩu không chính xác.",
+        "error"
+      );
+
+      return;
+    }
+
+    currentUser = data.user;
+
+    await loadProfile();
+
+    showMessage(
+      message,
+      "Đăng nhập thành công.",
+      "success"
+    );
+
+    setTimeout(() => {
+      closeAuth();
+      updateHeader();
+    }, 500);
+
+  } catch (error) {
+    console.error(error);
+
+    showMessage(
+      message,
+      "Không thể đăng nhập. Vui lòng thử lại.",
+      "error"
+    );
+
+  } finally {
+    if (submitButton) {
+      submitButton.disabled = false;
+      submitButton.textContent =
+        oldText || "ĐĂNG NHẬP";
+    }
+  }
+}
+
+
+/* =========================================================
+   LOGOUT
+   ========================================================= */
+
+async function logoutUser() {
+  if (!supabaseClient) {
+    currentUser = null;
+    currentProfile = null;
+    updateHeader();
+    return;
+  }
+
+  try {
+    await supabaseClient.auth.signOut();
+  } catch (error) {
+    console.error(error);
+  }
+
+  currentUser = null;
+  currentProfile = null;
+
+  closeUserMenu();
+  updateHeader();
+}
+
+
+/* =========================================================
+   USER MENU
+   ========================================================= */
+
+function getUserName() {
+  if (currentProfile?.full_name) {
+    return currentProfile.full_name;
+  }
+
+  if (currentUser?.user_metadata?.full_name) {
+    return currentUser.user_metadata.full_name;
+  }
+
+  if (currentUser?.email) {
+    return currentUser.email;
+  }
+
+  return "Tài khoản";
+}
+
+function getUserRole() {
+  return currentProfile?.role ||
+    currentUser?.user_metadata?.role ||
+    "organizer";
+}
+
+function updateHeader() {
+  const guestActions = $("#guest-actions");
+  const userMenu = $("#user-menu");
+  const userName = $("#user-name");
+
+  if (!guestActions || !userMenu) return;
+
+  if (currentUser) {
+    guestActions.classList.add("hidden");
+    userMenu.classList.remove("hidden");
+
+    if (userName) {
+      userName.textContent = getUserName();
+    }
+
+    const roleElement = $("#user-role");
+
+    if (roleElement) {
+      roleElement.textContent =
+        getUserRole() === "admin"
+          ? "Quản trị viên"
+          : "Ban tổ chức";
+    }
+
+  } else {
+    guestActions.classList.remove("hidden");
+    userMenu.classList.add("hidden");
+  }
+}
+
+function toggleUserMenu() {
+  const dropdown = $("#user-dropdown");
+
+  if (!dropdown) return;
+
+  dropdown.classList.toggle("show");
+}
+
+function closeUserMenu() {
+  $("#user-dropdown")?.classList.remove("show");
+}
+
+
+/* =========================================================
+   TOURNAMENT ACCESS
+   ========================================================= */
+
+function openTournamentManager() {
+  if (!currentUser) {
+    openAuth("login");
+    return;
+  }
+
+  /*
+    Sau này đây sẽ là trang trung tâm điều hành.
+  */
+
+  window.location.href = "admin.html";
+}
+
+function createTournament() {
+  if (!currentUser) {
+    openAuth("register");
+    return;
+  }
+
+  window.location.href = "admin.html#tournaments";
+}
+
+
+/* =========================================================
+   SEARCH
+   ========================================================= */
+
+function setupSearch() {
+  const searchButton = $("#search-btn");
+  const searchInput = $("#search-input");
+  const searchBox = $("#search-box");
+
+  if (!searchButton) return;
+
+  searchButton.addEventListener("click", () => {
+    if (!searchBox) return;
+
+    searchBox.classList.toggle("show");
+
+    if (searchBox.classList.contains("show")) {
+      searchInput?.focus();
+    }
+  });
+
+  searchInput?.addEventListener("keydown", event => {
+    if (event.key !== "Enter") return;
+
+    const keyword =
+      searchInput.value.trim().toLowerCase();
+
+    if (!keyword) return;
+
+    const cards = $all(
+      ".news-card, .tournament-card, .side-news"
+    );
+
+    let found = false;
+
+    cards.forEach(card => {
+      const text =
+        card.textContent.toLowerCase();
+
+      const match = text.includes(keyword);
+
+      card.style.display = match ? "" : "none";
+
+      if (match) found = true;
+    });
+
+    if (!found) {
+      alert(
+        `Không tìm thấy nội dung phù hợp với "${searchInput.value}".`
+      );
+    }
   });
 }
 
-await initAuth();
-render();
+
+/* =========================================================
+   MOBILE MENU
+   ========================================================= */
+
+function setupMobileMenu() {
+  const menuButton = $(".mobile-menu");
+  const nav = $(".main-nav");
+
+  if (!menuButton || !nav) return;
+
+  menuButton.addEventListener("click", () => {
+    nav.classList.toggle("open");
+  });
+
+  $all(".main-nav a").forEach(link => {
+    link.addEventListener("click", () => {
+      nav.classList.remove("open");
+    });
+  });
+}
+
+
+/* =========================================================
+   AUTH BUTTONS
+   ========================================================= */
+
+function setupAuthButtons() {
+
+  /*
+    Đăng nhập
+  */
+
+  $all('[data-open-auth="login"]').forEach(button => {
+    button.addEventListener("click", event => {
+      event.preventDefault();
+      openAuth("login");
+    });
+  });
+
+  /*
+    Đăng ký
+  */
+
+  $all('[data-open-auth="register"]').forEach(button => {
+    button.addEventListener("click", event => {
+      event.preventDefault();
+      openAuth("register");
+    });
+  });
+
+  /*
+    Đóng modal
+  */
+
+  $all("[data-close-auth]").forEach(element => {
+    element.addEventListener("click", closeAuth);
+  });
+
+  /*
+    Chuyển tab đăng nhập / đăng ký
+  */
+
+  $all("[data-auth-tab]").forEach(button => {
+    button.addEventListener("click", () => {
+      switchAuthMode(button.dataset.authTab);
+    });
+  });
+
+  /*
+    Form
+  */
+
+  $("#login-form")?.addEventListener(
+    "submit",
+    loginUser
+  );
+
+  $("#register-form")?.addEventListener(
+    "submit",
+    registerUser
+  );
+}
+
+
+/* =========================================================
+   HEADER ACCOUNT BUTTON
+   ========================================================= */
+
+function setupUserMenu() {
+
+  $("#user-btn")?.addEventListener(
+    "click",
+    event => {
+      event.stopPropagation();
+      toggleUserMenu();
+    }
+  );
+
+  $("#logout-btn")?.addEventListener(
+    "click",
+    async event => {
+      event.preventDefault();
+      await logoutUser();
+    }
+  );
+
+  $("#manage-tournaments")?.addEventListener(
+    "click",
+    event => {
+      event.preventDefault();
+      openTournamentManager();
+    }
+  );
+
+  $("#create-tournament")?.addEventListener(
+    "click",
+    event => {
+      event.preventDefault();
+      createTournament();
+    }
+  );
+
+  document.addEventListener("click", event => {
+    const menu = $("#user-menu");
+
+    if (!menu) return;
+
+    if (!menu.contains(event.target)) {
+      closeUserMenu();
+    }
+  });
+}
+
+
+/* =========================================================
+   CTA BUTTONS
+   ========================================================= */
+
+function setupCTA() {
+
+  $all("[data-create-tournament]").forEach(button => {
+    button.addEventListener("click", event => {
+      event.preventDefault();
+      createTournament();
+    });
+  });
+
+  /*
+    Các nút "Xem tất cả"
+  */
+
+  $all("[data-go-tournaments]").forEach(button => {
+    button.addEventListener("click", event => {
+      event.preventDefault();
+
+      const section =
+        document.querySelector("#tournaments");
+
+      section?.scrollIntoView({
+        behavior: "smooth"
+      });
+    });
+  });
+}
+
+
+/* =========================================================
+   CATEGORY FILTER
+   ========================================================= */
+
+function setupCategoryTabs() {
+
+  const tabs =
+    $all(".category-tabs button");
+
+  if (!tabs.length) return;
+
+  tabs.forEach(tab => {
+
+    tab.addEventListener("click", () => {
+
+      tabs.forEach(item =>
+        item.classList.remove("active")
+      );
+
+      tab.classList.add("active");
+
+      const category =
+        tab.textContent.trim().toLowerCase();
+
+      const cards =
+        $all(".news-card");
+
+      cards.forEach(card => {
+
+        if (
+          category === "tất cả" ||
+          category === "mới nhất"
+        ) {
+          card.style.display = "";
+          return;
+        }
+
+        const cardText =
+          card.textContent.toLowerCase();
+
+        card.style.display =
+          cardText.includes(category)
+            ? ""
+            : "none";
+      });
+    });
+
+  });
+}
+
+
+/* =========================================================
+   ESC KEY
+   ========================================================= */
+
+function setupKeyboard() {
+
+  document.addEventListener(
+    "keydown",
+    event => {
+
+      if (event.key === "Escape") {
+        closeAuth();
+        closeUserMenu();
+      }
+
+    }
+  );
+}
+
+
+/* =========================================================
+   SUPABASE SESSION
+   ========================================================= */
+
+async function restoreSession() {
+
+  if (!supabaseClient) {
+    currentUser = null;
+    currentProfile = null;
+    updateHeader();
+    return;
+  }
+
+  try {
+
+    const {
+      data,
+      error
+    } = await supabaseClient.auth.getSession();
+
+    if (error) {
+      console.error(
+        "Không lấy được session:",
+        error
+      );
+
+      return;
+    }
+
+    currentUser =
+      data?.session?.user || null;
+
+    if (currentUser) {
+      await loadProfile();
+    } else {
+      currentProfile = null;
+    }
+
+    updateHeader();
+
+  } catch (error) {
+    console.error(error);
+  }
+}
+
+
+/* =========================================================
+   AUTH STATE CHANGE
+   ========================================================= */
+
+function setupAuthState() {
+
+  if (!supabaseClient) return;
+
+  supabaseClient.auth.onAuthStateChange(
+    async (event, session) => {
+
+      currentUser =
+        session?.user || null;
+
+      if (currentUser) {
+        /*
+          PROFILE được tải sau khi auth thay đổi.
+        */
+        setTimeout(async () => {
+          await loadProfile();
+          updateHeader();
+        }, 0);
+
+      } else {
+        currentProfile = null;
+        updateHeader();
+      }
+    }
+  );
+}
+
+
+/* =========================================================
+   INITIALIZE
+   ========================================================= */
+
+async function initSportsVN() {
+
+  /*
+    Các chức năng giao diện
+  */
+
+  setupAuthButtons();
+  setupUserMenu();
+  setupMobileMenu();
+  setupSearch();
+  setupCTA();
+  setupCategoryTabs();
+  setupKeyboard();
+
+  /*
+    Khôi phục tài khoản
+  */
+
+  await restoreSession();
+
+  /*
+    Theo dõi đăng nhập/đăng xuất
+  */
+
+  setupAuthState();
+
+  /*
+    Đảm bảo header đúng trạng thái
+  */
+
+  updateHeader();
+
+  console.log(
+    "SportsVN đã khởi động.",
+    SUPABASE_READY
+      ? "Supabase: OK"
+      : "Supabase: CHƯA CẤU HÌNH"
+  );
+}
+
+
+/* =========================================================
+   START
+   ========================================================= */
+
+if (
+  document.readyState === "loading"
+) {
+  document.addEventListener(
+    "DOMContentLoaded",
+    initSportsVN
+  );
+} else {
+  initSportsVN();
+}
