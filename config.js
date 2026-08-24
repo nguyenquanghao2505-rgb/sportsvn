@@ -1,7 +1,8 @@
 // CẤU HÌNH SUPABASE CHO SPORTSVN
-// Chỉ điền URL và ANON KEY (publishable key) của dự án Supabase.
-// KHÔNG đặt service_role key hoặc mật khẩu vào file này.
+// Publishable key dùng cho frontend.
+// KHÔNG đưa Secret key vào file này.
+
 window.SPORTSVN_SUPABASE = {
-  url: "YOUR_SUPABASE_URL",
-  anonKey: "YOUR_SUPABASE_ANON_KEY"
+  url: "https://bqzjksmsdtnodcfykgqgk.supabase.co",
+  anonKey: "sb_publishable_PyxvVa3K8LgTRyGCXeNLwA_HUoRPgli"
 };
