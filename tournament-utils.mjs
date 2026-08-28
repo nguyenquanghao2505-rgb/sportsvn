@@ -13,3 +13,16 @@ export function validateTournamentForm(data = {}) {
 
   return { ok: true, message: '' };
 }
+
+export function buildTournamentPayload(data = {}, organizerId = null) {
+  return {
+    name: String(data.name || '').trim(),
+    sport: String(data.sport || '').trim(),
+    start_date: String(data.start_date || '').trim(),
+    end_date: String(data.end_date || '').trim() || null,
+    location: String(data.location || '').trim(),
+    status: String(data.status || 'draft').trim() || 'draft',
+    description: String(data.description || '').trim() || null,
+    organizer_id: organizerId || null
+  };
+}

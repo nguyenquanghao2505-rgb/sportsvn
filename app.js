@@ -1134,28 +1134,32 @@ Bản an toàn: không làm trang trắng nếu Supabase/config chưa sẵn sàn
 
 
 /* =========================================================
-   DASHBOARD CONTROLLER
-   Trang index.html hiện tại là dashboard tĩnh, vì vậy bộ điều khiển
-   này xử lý trực tiếp các nút Tạo giải đấu thay vì phụ thuộc #app.
+   DASHBOARD CONTROLLER - SUPABASE THẬT
    ========================================================= */
 (function () {
   'use strict';
 
-  const STORAGE_KEY = 'sportsvn_dashboard_tournaments';
-  const sports = ['Bóng đá', 'Bóng rổ', 'Bóng chuyền', 'Cầu lông', 'Pickleball', 'Tennis', 'Taekwondo', 'Cờ tướng', 'Bơi', 'Đua thuyền'];
+  const CONFIG = window.SPORTSVN_CONFIG || {};
+  const SUPABASE_URL = String(CONFIG.SUPABASE_URL || '').trim();
+  const SUPABASE_ANON_KEY = String(CONFIG.SUPABASE_ANON_KEY || '').trim();
+  const configured = Boolean(
+    window.supabase &&
+    SUPABASE_URL &&
+    SUPABASE_ANON_KEY &&
+    !SUPABASE_ANON_KEY.includes('DAN_PUBLISHABLE')
+  );
 
-  function getStoredTournaments() {
-    try {
-      const value = JSON.parse(localStorage.getItem(STORAGE_KEY) || '[]');
-      return Array.isArray(value) ? value : [];
-    } catch (_) {
-      return [];
-    }
-  }
+  let client = null;
+  let currentUser = null;
+  let tournamentUtils = null;
 
-  function setStoredTournaments(items) {
-    localStorage.setItem(STORAGE_KEY, JSON.stringify(items));
-  }
+  const sports = [
+    'Bóng đá', 'Bóng rổ', 'Bóng chuyền', 'Cầu lông', 'Pickleball',
+    'Tennis', 'Taekwondo', 'Cờ tướng', 'Bơi', 'Đua thuyền'
+  ];
+
+  const $ = (selector, root = document) => root.querySelector(selector);
+  const $$ = (selector, root = document) => Array.from(root.querySelectorAll(selector));
 
   function escapeValue(value) {
     return String(value ?? '')
@@ -1166,9 +1170,214 @@ Bản an toàn: không làm trang trắng nếu Supabase/config chưa sẵn sàn
       .replace(/'/g, '&#039;');
   }
 
-  function createModal() {
-    if (document.getElementById('create-tournament-dashboard')) return;
+  function initials(name) {
+    const parts = String(name || 'SV').trim().split(/\s+/).filter(Boolean);
+    if (!parts.length) return 'SV';
+    if (parts.length === 1) return parts[0].slice(0, 2).toUpperCase();
+    return (parts[0][0] + parts[parts.length - 1][0]).toUpperCase();
+  }
 
+  function userName(user) {
+    return user?.user_metadata?.full_name || user?.user_metadata?.name || user?.email?.split('@')[0] || 'Quản trị viên';
+  }
+
+  function statusLabel(status) {
+    return {
+      draft: 'Bản nháp',
+      upcoming: 'Sắp diễn ra',
+      active: 'Đang diễn ra',
+      completed: 'Đã kết thúc'
+    }[status] || status || 'Bản nháp';
+  }
+
+  function statusClass(status) {
+    return ['draft', 'upcoming', 'active', 'completed'].includes(status) ? status : 'draft';
+  }
+
+  function formatDate(value) {
+    if (!value) return '—';
+    const d = new Date(value + (String(value).length === 10 ? 'T00:00:00' : ''));
+    return Number.isNaN(d.getTime()) ? escapeValue(value) : d.toLocaleDateString('vi-VN');
+  }
+
+  function showToast(message, type = 'success') {
+    let toast = document.getElementById('sportsvn-dashboard-toast');
+    if (!toast) {
+      toast = document.createElement('div');
+      toast.id = 'sportsvn-dashboard-toast';
+      toast.className = 'dashboard-toast';
+      document.body.appendChild(toast);
+    }
+    toast.textContent = message;
+    toast.dataset.type = type;
+    toast.classList.add('show');
+    clearTimeout(showToast.timer);
+    showToast.timer = setTimeout(() => toast.classList.remove('show'), 3000);
+  }
+
+  function setModalMessage(message, type = '') {
+    const el = document.getElementById('tournament-dashboard-message');
+    if (!el) return;
+    el.textContent = message || '';
+    el.className = `tournament-form-message ${type}`.trim();
+  }
+
+  function setAuthMessage(message, type = '') {
+    const el = document.getElementById('dashboard-auth-message');
+    if (!el) return;
+    el.textContent = message || '';
+    el.className = `tournament-form-message ${type}`.trim();
+  }
+
+  function friendlyError(error) {
+    const message = String(error?.message || error || 'Có lỗi xảy ra.');
+    const lower = message.toLowerCase();
+    if (lower.includes('invalid login credentials')) return 'Email hoặc mật khẩu không chính xác.';
+    if (lower.includes('email not confirmed')) return 'Email chưa được xác nhận. Hãy kiểm tra hộp thư.';
+    if (lower.includes('user already registered')) return 'Email này đã được đăng ký.';
+    if (lower.includes('row-level security')) return 'Supabase đang chặn thao tác. Hãy chạy file supabase-tournaments.sql trong Supabase SQL Editor.';
+    if (lower.includes('organizer_id')) return 'Bảng tournaments chưa có cột organizer_id. Hãy chạy file supabase-tournaments.sql.';
+    return message;
+  }
+
+  function createAuthModal() {
+    if (document.getElementById('dashboard-auth-modal')) return;
+    const modal = document.createElement('div');
+    modal.id = 'dashboard-auth-modal';
+    modal.className = 'tournament-modal';
+    modal.hidden = true;
+    modal.innerHTML = `
+      <div class="tournament-modal-card dashboard-auth-card" role="dialog" aria-modal="true" aria-labelledby="dashboard-auth-title">
+        <div class="tournament-modal-head">
+          <div>
+            <h2 id="dashboard-auth-title">Đăng nhập SportsVN</h2>
+            <p>Đăng nhập để quản lý giải đấu của tài khoản này.</p>
+          </div>
+          <button type="button" class="tournament-modal-close" data-close-auth-dashboard aria-label="Đóng">×</button>
+        </div>
+        <form id="dashboard-auth-form" class="tournament-form" novalidate>
+          <div class="tournament-field full">
+            <label for="dashboard-auth-email">Email</label>
+            <input id="dashboard-auth-email" name="email" type="email" autocomplete="email" required placeholder="email@example.com">
+          </div>
+          <div class="tournament-field full">
+            <label for="dashboard-auth-password">Mật khẩu</label>
+            <input id="dashboard-auth-password" name="password" type="password" autocomplete="current-password" required placeholder="Tối thiểu 6 ký tự">
+          </div>
+          <div id="dashboard-auth-message" class="tournament-form-message" aria-live="polite"></div>
+          <div class="tournament-form-actions">
+            <button type="button" class="tournament-cancel" data-auth-mode="register">Đăng ký tài khoản</button>
+            <button type="submit" class="tournament-submit" id="dashboard-auth-submit">Đăng nhập</button>
+          </div>
+        </form>
+      </div>
+    `;
+    document.body.appendChild(modal);
+  }
+
+  function openAuth(mode = 'login') {
+    createAuthModal();
+    const modal = $('#dashboard-auth-modal');
+    const form = $('#dashboard-auth-form');
+    const title = $('#dashboard-auth-title');
+    const submit = $('#dashboard-auth-submit');
+    const switcher = $('[data-auth-mode]', modal);
+    const password = $('#dashboard-auth-password');
+    const nameField = $('#dashboard-auth-name');
+
+    if (mode === 'register' && !nameField) {
+      const passwordField = password?.closest('.tournament-field');
+      if (passwordField) {
+        const nameWrap = document.createElement('div');
+        nameWrap.className = 'tournament-field full';
+        nameWrap.innerHTML = '<label for="dashboard-auth-name">Họ và tên</label><input id="dashboard-auth-name" name="name" type="text" autocomplete="name" placeholder="Nguyễn Văn A">';
+        form.insertBefore(nameWrap, passwordField);
+      }
+    }
+
+    const register = mode === 'register';
+    title.textContent = register ? 'Tạo tài khoản SportsVN' : 'Đăng nhập SportsVN';
+    submit.textContent = register ? 'Đăng ký' : 'Đăng nhập';
+    switcher.textContent = register ? 'Quay lại đăng nhập' : 'Đăng ký tài khoản';
+    switcher.dataset.authMode = register ? 'login' : 'register';
+    form.dataset.mode = mode;
+    setAuthMessage('');
+    modal.hidden = false;
+    document.body.style.overflow = 'hidden';
+    $('#dashboard-auth-email')?.focus();
+  }
+
+  function closeAuth() {
+    const modal = $('#dashboard-auth-modal');
+    if (!modal) return;
+    modal.hidden = true;
+    document.body.style.overflow = '';
+  }
+
+  async function handleAuth(event) {
+    event.preventDefault();
+    if (!client) {
+      setAuthMessage('Chưa kết nối Supabase. Hãy điền Publishable/Anon key trong config.js.', 'error');
+      return;
+    }
+
+    const form = event.currentTarget;
+    const data = new FormData(form);
+    const email = String(data.get('email') || '').trim();
+    const password = String(data.get('password') || '');
+    const name = String(data.get('name') || '').trim();
+    const mode = form.dataset.mode || 'login';
+
+    if (!email || !password) {
+      setAuthMessage('Vui lòng nhập email và mật khẩu.', 'error');
+      return;
+    }
+    if (mode === 'register' && password.length < 6) {
+      setAuthMessage('Mật khẩu phải có ít nhất 6 ký tự.', 'error');
+      return;
+    }
+
+    const button = $('#dashboard-auth-submit');
+    if (button) {
+      button.disabled = true;
+      button.textContent = mode === 'register' ? 'ĐANG ĐĂNG KÝ...' : 'ĐANG ĐĂNG NHẬP...';
+    }
+
+    try {
+      if (mode === 'register') {
+        const { data: result, error } = await client.auth.signUp({
+          email,
+          password,
+          options: { data: { full_name: name || email.split('@')[0] } }
+        });
+        if (error) throw error;
+        if (!result.session) {
+          setAuthMessage('Đăng ký thành công. Hãy xác nhận email rồi đăng nhập.', 'success');
+          return;
+        }
+        currentUser = result.user;
+      } else {
+        const { data: result, error } = await client.auth.signInWithPassword({ email, password });
+        if (error) throw error;
+        currentUser = result.user;
+      }
+      closeAuth();
+      updateUserDisplay();
+      await loadDashboardData();
+      showToast('Đăng nhập thành công.');
+    } catch (error) {
+      console.error('SportsVN auth error:', error);
+      setAuthMessage(friendlyError(error), 'error');
+    } finally {
+      if (button) {
+        button.disabled = false;
+        button.textContent = mode === 'register' ? 'Đăng ký' : 'Đăng nhập';
+      }
+    }
+  }
+
+  function createTournamentModal() {
+    if (document.getElementById('create-tournament-dashboard')) return;
     const modal = document.createElement('div');
     modal.id = 'create-tournament-dashboard';
     modal.className = 'tournament-modal';
@@ -1178,18 +1387,16 @@ Bản an toàn: không làm trang trắng nếu Supabase/config chưa sẵn sàn
         <div class="tournament-modal-head">
           <div>
             <h2 id="create-tournament-title">Tạo giải đấu mới</h2>
-            <p>Nhập thông tin cơ bản để tạo hồ sơ giải đấu trên SportsVN.</p>
+            <p>Nhập thông tin cơ bản để tạo hồ sơ giải đấu thật trên SportsVN.</p>
           </div>
           <button type="button" class="tournament-modal-close" data-close-create-tournament aria-label="Đóng">×</button>
         </div>
-
         <form id="tournament-dashboard-form" class="tournament-form" novalidate>
           <div class="tournament-form-grid">
             <div class="tournament-field full">
               <label for="dashboard-tournament-name">Tên giải đấu <span>*</span></label>
               <input id="dashboard-tournament-name" name="name" type="text" placeholder="Ví dụ: Giải Pickleball Đà Nẵng mở rộng 2026" required>
             </div>
-
             <div class="tournament-field">
               <label for="dashboard-tournament-sport">Môn thể thao <span>*</span></label>
               <select id="dashboard-tournament-sport" name="sport" required>
@@ -1197,40 +1404,33 @@ Bản an toàn: không làm trang trắng nếu Supabase/config chưa sẵn sàn
                 ${sports.map(sport => `<option value="${escapeValue(sport)}">${escapeValue(sport)}</option>`).join('')}
               </select>
             </div>
-
             <div class="tournament-field">
               <label for="dashboard-tournament-location">Địa điểm <span>*</span></label>
               <input id="dashboard-tournament-location" name="location" type="text" placeholder="Ví dụ: Đà Nẵng" required>
             </div>
-
             <div class="tournament-field">
               <label for="dashboard-tournament-start">Ngày bắt đầu <span>*</span></label>
               <input id="dashboard-tournament-start" name="start_date" type="date" required>
             </div>
-
             <div class="tournament-field">
               <label for="dashboard-tournament-end">Ngày kết thúc</label>
               <input id="dashboard-tournament-end" name="end_date" type="date">
             </div>
-
             <div class="tournament-field">
               <label for="dashboard-tournament-status">Trạng thái</label>
               <select id="dashboard-tournament-status" name="status">
                 <option value="draft">Bản nháp</option>
-                <option value="upcoming">Sắp diễn ra</option>
+                <option value="upcoming" selected>Sắp diễn ra</option>
                 <option value="active">Đang diễn ra</option>
                 <option value="completed">Đã kết thúc</option>
               </select>
             </div>
-
             <div class="tournament-field full">
               <label for="dashboard-tournament-description">Mô tả</label>
               <textarea id="dashboard-tournament-description" name="description" placeholder="Thông tin giới thiệu, đối tượng tham dự, nội dung thi đấu..."></textarea>
             </div>
           </div>
-
           <div id="tournament-dashboard-message" class="tournament-form-message" aria-live="polite"></div>
-
           <div class="tournament-form-actions">
             <button type="button" class="tournament-cancel" data-close-create-tournament>Hủy</button>
             <button type="submit" class="tournament-submit" id="tournament-dashboard-submit">Tạo giải đấu</button>
@@ -1238,30 +1438,27 @@ Bản an toàn: không làm trang trắng nếu Supabase/config chưa sẵn sàn
         </form>
       </div>
     `;
-
     document.body.appendChild(modal);
   }
 
-  function openModal() {
-    createModal();
-    const modal = document.getElementById('create-tournament-dashboard');
+  function openCreateTournament() {
+    if (!currentUser) {
+      openAuth('login');
+      return;
+    }
+    createTournamentModal();
+    const modal = $('#create-tournament-dashboard');
     modal.hidden = false;
     document.body.style.overflow = 'hidden';
-    document.getElementById('dashboard-tournament-name')?.focus();
+    setModalMessage('');
+    $('#dashboard-tournament-name')?.focus();
   }
 
-  function closeModal() {
-    const modal = document.getElementById('create-tournament-dashboard');
+  function closeCreateTournament() {
+    const modal = $('#create-tournament-dashboard');
     if (!modal) return;
     modal.hidden = true;
     document.body.style.overflow = '';
-  }
-
-  function showMessage(message, type) {
-    const element = document.getElementById('tournament-dashboard-message');
-    if (!element) return;
-    element.textContent = message;
-    element.className = `tournament-form-message ${type || ''}`.trim();
   }
 
   function readForm(form) {
@@ -1272,54 +1469,60 @@ Bản an toàn: không làm trang trắng nếu Supabase/config chưa sẵn sàn
       location: String(data.get('location') || '').trim(),
       start_date: String(data.get('start_date') || '').trim(),
       end_date: String(data.get('end_date') || '').trim(),
-      status: String(data.get('status') || 'draft').trim(),
+      status: String(data.get('status') || 'upcoming').trim(),
       description: String(data.get('description') || '').trim()
     };
   }
 
-  function validate(data) {
-    if (!data.name) return 'Vui lòng nhập tên giải đấu.';
-    if (!data.sport) return 'Vui lòng chọn môn thể thao.';
-    if (!data.location) return 'Vui lòng nhập địa điểm tổ chức.';
-    if (!data.start_date) return 'Vui lòng chọn ngày bắt đầu.';
-    if (data.end_date && data.end_date < data.start_date) return 'Ngày kết thúc không được trước ngày bắt đầu.';
-    return '';
-  }
-
-  function handleSubmit(event) {
+  async function handleSubmit(event) {
     event.preventDefault();
-    const form = event.currentTarget;
-    const data = readForm(form);
-    const error = validate(data);
-
-    if (error) {
-      showMessage(error, 'error');
+    if (!currentUser) {
+      closeCreateTournament();
+      openAuth('login');
+      return;
+    }
+    if (!client) {
+      setModalMessage('Chưa kết nối Supabase. Hãy điền Publishable/Anon key trong config.js.', 'error');
       return;
     }
 
-    const submit = document.getElementById('tournament-dashboard-submit');
+    const form = event.currentTarget;
+    const data = readForm(form);
+    const validation = tournamentUtils?.validateTournamentForm
+      ? tournamentUtils.validateTournamentForm(data)
+      : { ok: Boolean(data.name && data.sport && data.start_date && data.location), message: 'Vui lòng nhập đầy đủ thông tin bắt buộc.' };
+
+    if (!validation.ok) {
+      setModalMessage(validation.message, 'error');
+      return;
+    }
+
+    const submit = $('#tournament-dashboard-submit');
     if (submit) {
       submit.disabled = true;
       submit.textContent = 'ĐANG TẠO...';
     }
 
-    const item = {
-      id: crypto.randomUUID ? crypto.randomUUID() : `${Date.now()}-${Math.random().toString(16).slice(2)}`,
-      ...data,
-      created_at: new Date().toISOString()
-    };
-
     try {
-      const items = getStoredTournaments();
-      items.unshift(item);
-      setStoredTournaments(items);
+      const payload = tournamentUtils?.buildTournamentPayload
+        ? tournamentUtils.buildTournamentPayload(data, currentUser.id)
+        : { ...data, end_date: data.end_date || null, description: data.description || null, organizer_id: currentUser.id };
 
-      showMessage('Tạo giải đấu thành công.', 'success');
+      const { data: inserted, error } = await client
+        .from('tournaments')
+        .insert(payload)
+        .select('*')
+        .single();
+
+      if (error) throw error;
+
       form.reset();
-      setTimeout(closeModal, 450);
+      closeCreateTournament();
+      await loadDashboardData();
+      showToast(`Đã tạo giải đấu “${inserted?.name || payload.name}” thành công.`);
     } catch (error) {
-      console.error('SportsVN dashboard tournament error:', error);
-      showMessage('Không thể lưu giải đấu trên trình duyệt này.', 'error');
+      console.error('SportsVN create tournament error:', error);
+      setModalMessage(friendlyError(error), 'error');
     } finally {
       if (submit) {
         submit.disabled = false;
@@ -1328,34 +1531,216 @@ Bản an toàn: không làm trang trắng nếu Supabase/config chưa sẵn sàn
     }
   }
 
-  function bindDashboardCreateTournament() {
-    createModal();
+  async function fetchTournaments() {
+    if (!client || !currentUser) return [];
+    const { data, error } = await client
+      .from('tournaments')
+      .select('*')
+      .eq('organizer_id', currentUser.id)
+      .order('created_at', { ascending: false });
+    if (error) throw error;
+    return Array.isArray(data) ? data : [];
+  }
 
-    document.querySelectorAll('[data-action="create-tournament"]').forEach(element => {
-      if (element.dataset.createTournamentBound === '1') return;
-      element.dataset.createTournamentBound = '1';
-      element.addEventListener('click', event => {
+  function sportLogoClass(sport) {
+    return {
+      'Bóng đá': 'football',
+      'Bơi': 'swimming',
+      'Bóng rổ': 'basketball',
+      'Pickleball': 'pickleball'
+    }[sport] || '';
+  }
+
+  function sportIcon(sport) {
+    return {
+      'Bóng đá': '⚽',
+      'Bơi': '🏊',
+      'Bóng rổ': '🏀',
+      'Pickleball': '◉',
+      'Cầu lông': '🏸',
+      'Tennis': '🎾',
+      'Taekwondo': '🥋',
+      'Cờ tướng': '♟️',
+      'Bóng chuyền': '🏐',
+      'Đua thuyền': '🚣'
+    }[sport] || '◈';
+  }
+
+  function renderTournamentRows(items) {
+    const list = document.querySelector('.tournament-list');
+    if (!list) return;
+    if (!currentUser) {
+      list.innerHTML = '<div class="dashboard-empty">Đăng nhập để xem các giải đấu do tài khoản này quản lý.</div>';
+      return;
+    }
+    if (!items.length) {
+      list.innerHTML = '<div class="dashboard-empty">Chưa có giải đấu thật nào. Hãy bấm <strong>+ Tạo giải đấu</strong> để tạo giải đầu tiên.</div>';
+      return;
+    }
+
+    list.innerHTML = items.slice(0, 8).map(item => `
+      <div class="tournament">
+        <div class="sport-logo ${sportLogoClass(item.sport)}">
+          ${sportIcon(item.sport)}
+        </div>
+        <div class="tournament-info">
+          <strong>${escapeValue(item.name)}</strong>
+          <span>${escapeValue(item.sport || '—')} · ${escapeValue(item.location || 'Chưa cập nhật')}</span>
+        </div>
+        <div class="tournament-status">
+          <span class="status ${statusClass(item.status)}">${escapeValue(statusLabel(item.status))}</span>
+          <small>${formatDate(item.start_date)}</small>
+        </div>
+      </div>
+    `).join('');
+  }
+
+  function updateStats(items) {
+    const total = $('.stat-card:nth-child(1) .stat-content strong');
+    if (total) total.textContent = currentUser ? String(items.length) : '0';
+    const label = $('.stat-card:nth-child(1) .stat-content > span');
+    if (label) label.textContent = 'Tổng số giải đấu của tôi';
+    const trend = $('.stat-card:nth-child(1) .stat-content small');
+    if (trend) trend.textContent = currentUser ? 'Dữ liệu thật từ Supabase' : 'Đăng nhập để đồng bộ dữ liệu';
+    const trendBold = trend?.querySelector('b');
+    if (trendBold) trendBold.remove();
+  }
+
+  async function loadDashboardData() {
+    if (!client || !currentUser) {
+      updateStats([]);
+      renderTournamentRows([]);
+      return;
+    }
+    try {
+      const items = await fetchTournaments();
+      updateStats(items);
+      renderTournamentRows(items);
+    } catch (error) {
+      console.error('SportsVN load tournaments error:', error);
+      showToast('Không thể tải dữ liệu giải đấu. ' + friendlyError(error), 'error');
+    }
+  }
+
+  function updateUserDisplay() {
+    const name = userName(currentUser);
+    const avatar = $('.top-user .avatar');
+    const nameEl = $('.top-user-info strong');
+    const subtitle = $('.top-user-info span');
+    if (avatar) avatar.textContent = initials(name);
+    if (nameEl) nameEl.textContent = currentUser ? name : 'Đăng nhập';
+    if (subtitle) subtitle.textContent = currentUser?.email || 'SportsVN';
+  }
+
+  function createLoginButton() {
+    const topUser = $('.top-user');
+    if (!topUser || document.getElementById('dashboard-auth-button')) return;
+    const button = document.createElement('button');
+    button.id = 'dashboard-auth-button';
+    button.className = 'dashboard-login-button';
+    button.type = 'button';
+    button.textContent = 'Đăng nhập';
+    topUser.replaceWith(button);
+    button.addEventListener('click', () => openAuth('login'));
+  }
+
+  function createUserActions() {
+    const topUser = $('.top-user');
+    if (!topUser || topUser.dataset.bound === '1') return;
+    topUser.dataset.bound = '1';
+    topUser.style.cursor = 'pointer';
+    topUser.addEventListener('click', async () => {
+      if (!currentUser) {
+        openAuth('login');
+        return;
+      }
+      if (confirm('Bạn có muốn đăng xuất khỏi SportsVN không?')) {
+        await client?.auth.signOut();
+      }
+    });
+  }
+
+  function bindDashboard() {
+    createAuthModal();
+    createTournamentModal();
+
+    $$('.primary-button, [data-action="create-tournament"]').forEach(button => {
+      if (button.dataset.realCreateBound === '1') return;
+      button.dataset.realCreateBound = '1';
+      button.addEventListener('click', event => {
         event.preventDefault();
-        openModal();
+        openCreateTournament();
       });
     });
 
-    const modal = document.getElementById('create-tournament-dashboard');
-    modal?.querySelectorAll('[data-close-create-tournament]').forEach(element => {
-      element.addEventListener('click', closeModal);
+    $('#tournament-dashboard-form')?.addEventListener('submit', handleSubmit);
+    $('#dashboard-auth-form')?.addEventListener('submit', handleAuth);
+
+    $$('[data-close-create-tournament]').forEach(button => button.addEventListener('click', closeCreateTournament));
+    $$('[data-close-auth-dashboard]').forEach(button => button.addEventListener('click', closeAuth));
+    $('[data-auth-mode]')?.addEventListener('click', event => openAuth(event.currentTarget.dataset.authMode));
+
+    $('#create-tournament-dashboard')?.addEventListener('click', event => {
+      if (event.target.id === 'create-tournament-dashboard') closeCreateTournament();
     });
-    modal?.addEventListener('click', event => {
-      if (event.target === modal) closeModal();
+    $('#dashboard-auth-modal')?.addEventListener('click', event => {
+      if (event.target.id === 'dashboard-auth-modal') closeAuth();
     });
-    modal?.querySelector('#tournament-dashboard-form')?.addEventListener('submit', handleSubmit);
+
     document.addEventListener('keydown', event => {
-      if (event.key === 'Escape') closeModal();
-    });
+      if (event.key === 'Escape') {
+        closeCreateTournament();
+        closeAuth();
+      }
+    }, { once: true });
+
+    createUserActions();
+  }
+
+  async function init() {
+    try {
+      tournamentUtils = await import('./tournament-utils.mjs');
+    } catch (error) {
+      console.error('SportsVN: Không tải được tournament-utils.mjs.', error);
+    }
+
+    bindDashboard();
+
+    if (!configured) {
+      createLoginButton();
+      showToast('SportsVN chưa được cấu hình Supabase. Hãy điền Publishable/Anon key trong config.js.', 'error');
+      return;
+    }
+
+    try {
+      client = window.supabase.createClient(SUPABASE_URL, SUPABASE_ANON_KEY);
+      const { data, error } = await client.auth.getSession();
+      if (error) throw error;
+      currentUser = data.session?.user || null;
+      updateUserDisplay();
+      await loadDashboardData();
+
+      client.auth.onAuthStateChange(async (_event, session) => {
+        currentUser = session?.user || null;
+        updateUserDisplay();
+        await loadDashboardData();
+      });
+    } catch (error) {
+      console.error('SportsVN Supabase init error:', error);
+      showToast('Không thể kết nối Supabase. ' + friendlyError(error), 'error');
+    }
   }
 
   if (document.readyState === 'loading') {
-    document.addEventListener('DOMContentLoaded', bindDashboardCreateTournament, { once: true });
+    document.addEventListener('DOMContentLoaded', init, { once: true });
   } else {
-    bindDashboardCreateTournament();
+    init();
   }
+
+  window.SPORTSVN_DASHBOARD = {
+    openCreateTournament,
+    openLogin: () => openAuth('login'),
+    openRegister: () => openAuth('register'),
+    reload: loadDashboardData
+  };
 })();
