@@ -73,18 +73,11 @@
 
     <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
     <script>
-        // ==========================================
-        // CẤU HÌNH SUPABASE
-        // ==========================================
         const SUPABASE_URL = 'https://bqzjksmsdtnodcfykgkg.supabase.co';
-        const SUPABASE_ANON_KEY = 'sb_publishable_PyxvVa3K8LgTRyGCXeNLwA_HUoRPgli';
+        const SUPABASE_ANON_KEY = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6ImJxemprc21zZHRub2RjZnlrZ2drIiwicm9sZSI6ImFub24iLCJpYXQiOjE3ODczNzkwNTYsImV4cCI6MjEwMjk1NTA1Nn0.nmIhW8qg547V9vcoUCuX8alDIrxH14hkr8nKMRPwLhE';
 
-        // Tạo client - CHỈ KHAI BÁO 1 LẦN DUY NHẤT
         const supabaseClient = window.supabase.createClient(SUPABASE_URL, SUPABASE_ANON_KEY);
 
-        // ==========================================
-        // KIỂM TRA QUYỀN ADMIN
-        // ==========================================
         async function checkAdminRole(userId) {
             try {
                 const { data, error } = await supabaseClient
@@ -92,7 +85,6 @@
                     .select('role')
                     .eq('user_id', userId)
                     .single();
-
                 if (error || !data) return false;
                 return data.role === 'admin';
             } catch (err) {
@@ -101,12 +93,8 @@
             }
         }
 
-        // ==========================================
-        // XỬ LÝ ĐĂNG NHẬP
-        // ==========================================
         async function handleLogin(event) {
             event.preventDefault();
-
             const email = document.getElementById('email').value.trim();
             const password = document.getElementById('password').value;
             const alertEl = document.getElementById('alert');
@@ -114,23 +102,19 @@
             const btnText = document.getElementById('btnText');
             const btnSpinner = document.getElementById('btnSpinner');
 
-            // Reset alert
             alertEl.className = 'alert';
             alertEl.style.display = 'none';
 
-            // Validate
             if (!email || !password) {
                 showAlert('Vui lòng nhập đầy đủ email và mật khẩu.', 'error');
                 return;
             }
 
-            // Disable button + hiện spinner
             btn.disabled = true;
             btnText.style.display = 'none';
             btnSpinner.style.display = 'block';
 
             try {
-                // 1. Đăng nhập với Supabase Auth
                 const { data: authData, error: authError } = await supabaseClient.auth.signInWithPassword({
                     email: email,
                     password: password
@@ -144,19 +128,17 @@
                     return;
                 }
 
-                // 2. Kiểm tra quyền Admin
                 const isAdmin = await checkAdminRole(authData.user.id);
 
                 if (!isAdmin) {
                     await supabaseClient.auth.signOut();
-                    showAlert('⛔ Tài khoản này không có quyền Admin.', 'error');
+                    showAlert('⛔ Tài khoản không có quyền Admin.', 'error');
                     btn.disabled = false;
                     btnText.style.display = 'block';
                     btnSpinner.style.display = 'none';
                     return;
                 }
 
-                // 3. Lưu session vào localStorage
                 localStorage.setItem('sportsvn_admin', JSON.stringify({
                     user: authData.user,
                     isAdmin: true
@@ -164,13 +146,11 @@
 
                 showAlert('✅ Đăng nhập thành công! Đang chuyển hướng...', 'success');
 
-                // 4. Chuyển hướng sau 1 giây
                 setTimeout(() => {
                     window.location.href = 'index.html';
                 }, 1000);
 
             } catch (error) {
-                console.error('Login error:', error);
                 showAlert('❌ Có lỗi xảy ra: ' + error.message, 'error');
                 btn.disabled = false;
                 btnText.style.display = 'block';
@@ -178,9 +158,6 @@
             }
         }
 
-        // ==========================================
-        // HIỂN THỊ THÔNG BÁO
-        // ==========================================
         function showAlert(message, type) {
             const alertEl = document.getElementById('alert');
             alertEl.textContent = message;
@@ -188,9 +165,6 @@
             alertEl.style.display = 'block';
         }
 
-        // ==========================================
-        // HIỆN/ẨN MẬT KHẨU
-        // ==========================================
         function togglePassword() {
             const password = document.getElementById('password');
             const icon = document.getElementById('toggleIcon');
