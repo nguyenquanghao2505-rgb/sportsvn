@@ -1302,7 +1302,12 @@
             await supabaseClient.from('draws').delete().eq('tournament_id', tournamentId);
             const { error } = await supabaseClient.from('draws').insert(records);
             if (error) throw error;
-            showAlert(`✅ Đã lưu ${records.length} VĐV!`, 'success');
+                showAlert(`✅ Đã lưu ${records.length} VĐV! Đang chuyển sang Lịch thi đấu...`, 'success');
+                
+                // Tự động chuyển sang trang lịch thi đấu sau 1.5 giây
+                setTimeout(() => {
+                    window.location.href = 'schedule.html?tournament_id=' + tournamentId;
+                }, 1500);
         } catch (error) {
             console.error(error);
             showAlert('Lỗi lưu: ' + error.message, 'error');
