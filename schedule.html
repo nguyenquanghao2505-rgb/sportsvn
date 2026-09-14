@@ -62,28 +62,31 @@
         }
         .session-header h3 { font-size: 16px; color: #1a1a2e; display: flex; align-items: center; gap: 8px; }
         .session-header .session-time { font-size: 13px; color: #6c757d; font-weight: 600; }
-        .courts-grid { display: grid; grid-template-columns: repeat(auto-fill, minmax(240px, 1fr)); gap: 12px; }
-        .court-card { background: #f8f9fa; border-radius: 10px; padding: 12px; border: 2px solid #e9ecef; min-height: 100px; }
+        .courts-grid { display: grid; grid-template-columns: repeat(auto-fill, minmax(260px, 1fr)); gap: 12px; }
+        .court-card { background: #f8f9fa; border-radius: 10px; padding: 12px; border: 2px solid #e9ecef; }
         .court-card.has-match { background: #fff; border-color: #1a3a7a; }
         .court-card .court-name {
             font-size: 12px; font-weight: 800; color: #1a3a7a;
             text-transform: uppercase; letter-spacing: 0.5px;
-            margin-bottom: 8px; display: flex;
+            margin-bottom: 10px; display: flex;
             align-items: center; justify-content: space-between;
         }
-        .court-card .court-name .time { font-size: 11px; color: #6c757d; font-weight: 600; text-transform: none; }
-        .match-list { display: flex; flex-direction: column; gap: 6px; }
+        .court-card .court-name .count { font-size: 11px; color: #6c757d; font-weight: 600; text-transform: none; }
+        .match-list { display: flex; flex-direction: column; gap: 8px; }
         .match-box {
             background: linear-gradient(135deg, #0d1b3e, #1a3a7a);
             color: #fff; border-radius: 8px; padding: 10px;
             font-size: 12px; line-height: 1.4;
         }
         .match-box .time-slot {
-            display: inline-block; font-size: 10px; padding: 2px 6px;
+            display: inline-block; font-size: 10px; padding: 2px 8px;
             background: rgba(255,255,255,0.25); border-radius: 4px;
             margin-bottom: 6px; font-weight: 800;
         }
-        .match-box .category { font-size: 10px; opacity: 0.85; text-transform: uppercase; letter-spacing: 0.5px; margin-bottom: 6px; font-weight: 700; }
+        .match-box .category {
+            font-size: 10px; opacity: 0.85; text-transform: uppercase;
+            letter-spacing: 0.5px; margin-bottom: 6px; font-weight: 700;
+        }
         .match-box .teams { display: flex; flex-direction: column; gap: 3px; }
         .match-box .team { display: flex; justify-content: space-between; font-weight: 600; }
         .match-box .vs { font-size: 10px; text-align: center; opacity: 0.6; margin: 2px 0; }
@@ -311,7 +314,7 @@
                     <div class="court-card has-match">
                         <div class="court-name">
                             <span>${escapeHtml(venue.court_name || 'Sân ' + venue.court_number)}</span>
-                            <span class="time">${matchesAtCourt.length} trận</span>
+                            <span class="count">${matchesAtCourt.length} trận</span>
                         </div>
                         <div class="match-list">
                             ${matchesAtCourt.map(m => `
@@ -341,7 +344,7 @@
     }
 
     // ==========================================
-    // XẾP LỊCH TỰ ĐỘNG - v5 CHIA SLOT THEO GIỜ
+    // XẾP LỊCH TỰ ĐỘNG - v5
     // ==========================================
     window.autoGenerateSchedule = async function() {
         if (draws.length === 0) { showAlert('Chưa có kết quả bốc thăm!', 'error'); return; }
@@ -364,10 +367,6 @@
             };
             const sessionKeys = ['morning', 'afternoon', 'evening'].slice(0, sessionsPerDay);
 
-            // Số trận tối đa mỗi buổi (dựa trên thời gian)
-            // Sáng 8:00-12:00 = 4h → 4 trận (mỗi trận 60 phút kể cả nghỉ)
-            // Chiều 14:00-18:00 = 4h → 4 trận
-            // Tối 19:00-22:00 = 3h → 3 trận
             const SLOT_DURATION = matchDuration + 15;
             const maxMatchesPerSession = {
                 morning: 4,
@@ -377,7 +376,6 @@
 
             const allMatches = [];
 
-            // Nhóm draws theo category
             const drawsByCategory = {};
             draws.forEach(d => {
                 const cat = d.category || 'Chung';
@@ -395,8 +393,6 @@
                 console.log(`\n📌 "${catName}": ${catDraws.length} VĐV | ${isKnockout ? 'Knockout' : 'Vòng tròn'}`);
 
                 if (isKnockout) {
-                    // ============ KNOCKOUT ============
-                    // Nhóm theo group_name (A, B)
                     const groupDraws = {};
                     catDraws.forEach(d => {
                         const g = d.group_name || 'A';
@@ -409,27 +405,25 @@
                         const groupTeams = groupDraws[groupName];
                         const totalTeams = groupTeams.length;
 
-                        // Bracket size
                         let bracketSize = 1;
                         while (bracketSize < totalTeams) bracketSize *= 2;
                         const numByes = bracketSize - totalTeams;
 
                         console.log(`  Nhóm "${groupName}": ${totalTeams} VĐV → Bracket ${bracketSize} (${numByes} BYE)`);
 
-                        // Tạo Vòng 1: ghép cặp
                         const round1Matches = [];
-                        const usedTeams = [];
                         const byeTeams = [];
+                        const playingTeams = [];
 
-                        // Nếu có BYE, ưu tiên VĐV đầu tiên vào BYE
                         if (numByes > 0) {
                             for (let i = 0; i < numByes; i++) {
                                 byeTeams.push(groupTeams[i]);
-                                usedTeams.push(i);
                             }
                         }
 
-                        const playingTeams = groupTeams.filter((_, i) => !usedTeams.includes(i));
+                        for (let i = numByes; i < totalTeams; i++) {
+                            playingTeams.push(groupTeams[i]);
+                        }
 
                         for (let i = 0; i < playingTeams.length; i += 2) {
                             if (playingTeams[i] && playingTeams[i + 1]) {
@@ -445,7 +439,6 @@
                             }
                         }
 
-                        // Thêm Vòng 1 vào allMatches
                         round1Matches.forEach((m, i) => {
                             allMatches.push({
                                 team_a: m.team_a,
@@ -457,7 +450,6 @@
                             });
                         });
 
-                        // Tạo các vòng tiếp theo
                         let currentRoundTeams = bracketSize / 2;
                         let roundNum = 2;
 
@@ -476,7 +468,6 @@
                                 });
                             }
 
-                            // Tranh hạng 3
                             if (currentRoundTeams === 2) {
                                 allMatches.push({
                                     team_a: `Thua BK 1`,
@@ -496,7 +487,6 @@
                     });
 
                 } else {
-                    // ============ ROUND-ROBIN ============
                     const groups = {};
                     catDraws.forEach(d => {
                         const g = d.group_name || 'A';
@@ -530,9 +520,6 @@
 
             console.log(`\n✅ TỔNG SỐ TRẬN: ${allMatches.length}`);
 
-            // ========================================
-            // TẠO SLOTS THEO GIỜ (4 trận/sân/buổi)
-            // ========================================
             const allSlots = [];
             for (let d = 0; d < numDays; d++) {
                 const matchDate = new Date(startDate);
@@ -545,7 +532,6 @@
                     const maxMatches = maxMatchesPerSession[sessionKey] || 4;
 
                     for (let v = 0; v < venues.length; v++) {
-                        // Tạo NHIỀU slot cho mỗi sân trong 1 buổi
                         for (let m = 0; m < maxMatches; m++) {
                             const startTime = addMinutes(sessionStartTime, m * SLOT_DURATION);
                             const endTime = addMinutes(startTime, matchDuration);
@@ -561,17 +547,12 @@
                 }
             }
 
-            console.log(`📊 Tổng slot: ${allSlots.length}`);
-            console.log(`   = ${numDays} ngày × ${sessionsPerDay} buổi × ${venues.length} sân × 4 trận/buổi`);
+            console.log(`📊 Tổng slot: ${allSlots.length} (${numDays} ngày × ${sessionsPerDay} buổi × ${venues.length} sân × 4 trận/buổi)`);
 
             if (allMatches.length > allSlots.length) {
                 console.warn(`⚠️ CẦN THÊM ${allMatches.length - allSlots.length} slot!`);
-                showAlert(`⚠️ Cần ${allMatches.length} trận nhưng có ${allSlots.length} slot.`, 'error');
             }
 
-            // ========================================
-            // XẾP LỊCH - CHECK TRÙNG VĐV
-            // ========================================
             allMatches.sort((a, b) => (a.round || 1) - (b.round || 1));
 
             const busyAthletes = {};
@@ -661,9 +642,6 @@
         return `Vòng ${matches * 2}`;
     }
 
-    // ==========================================
-    // EXPORT EXCEL
-    // ==========================================
     window.exportScheduleExcel = function() {
         if (schedules.length === 0) { showAlert('Chưa có lịch!', 'error'); return; }
 
@@ -693,7 +671,6 @@
         showAlert('✅ Đã xuất file!', 'success');
     };
 
-    // HELPERS
     function getSessions() {
         const sessionsPerDay = tournament?.sessions_per_day || 2;
         const all = [
