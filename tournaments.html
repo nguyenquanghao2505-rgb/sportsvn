@@ -215,9 +215,10 @@
         }
 
         .badge.draft { background: #e9ecef; color: #6c757d; }
-        .badge.upcoming { background: #fff3cd; color: #856404; }
-        .badge.active { background: #d4edda; color: #155724; }
+        .badge.registration { background: #cfe2ff; color: #084298; }
+        .badge.ongoing { background: #d4edda; color: #155724; }
         .badge.completed { background: #f8d7da; color: #721c24; }
+        .badge.cancelled { background: #e2e3e5; color: #41464b; }
 
         .card-actions {
             display: flex;
@@ -326,9 +327,10 @@
                         <label>Trạng thái</label>
                         <select id="status">
                             <option value="draft">Bản nháp</option>
-                            <option value="upcoming" selected>Sắp diễn ra</option>
-                            <option value="active">Đang diễn ra</option>
+                            <option value="registration" selected>Đăng ký</option>
+                            <option value="ongoing">Đang diễn ra</option>
                             <option value="completed">Đã kết thúc</option>
+                            <option value="cancelled">Đã hủy</option>
                         </select>
                     </div>
 
@@ -604,9 +606,10 @@
     function statusLabel(status) {
         return {
             draft: 'Bản nháp',
-            upcoming: 'Sắp diễn ra',
-            active: 'Đang diễn ra',
-            completed: 'Đã kết thúc'
+            registration: 'Đăng ký',
+            ongoing: 'Đang diễn ra',
+            completed: 'Đã kết thúc',
+            cancelled: 'Đã hủy'
         }[status] || 'Bản nháp';
     }
 
