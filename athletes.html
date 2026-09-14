@@ -31,7 +31,6 @@
         .panel { background: #fff; border-radius: 16px; padding: 24px; margin-bottom: 24px;
                  box-shadow: 0 4px 20px rgba(0,0,0,0.08); }
         .panel-title { font-size: 20px; font-weight: 700; color: #1a1a2e; margin-bottom: 16px; }
-
         .action-bar {
             display: flex; gap: 12px; flex-wrap: wrap; margin-bottom: 20px;
             padding: 16px; background: #f8f9fa; border-radius: 12px;
@@ -41,7 +40,6 @@
             background: #e7f3ff; border-radius: 10px; margin-bottom: 16px;
             font-size: 14px; font-weight: 600; color: #1a3a7a;
         }
-
         .athlete-list { display: flex; flex-direction: column; gap: 10px; }
         .athlete-item {
             background: #f8f9fa; border-radius: 12px; padding: 16px 20px;
@@ -64,6 +62,9 @@
         .btn-icon.delete { background: #e94560; color: #fff; }
         .empty-state { text-align: center; padding: 60px 20px; color: #6c757d; }
         .empty-state i { font-size: 60px; color: #dee2e6; margin-bottom: 16px; display: block; }
+        .empty-state .error-icon { color: #e94560 !important; }
+        .empty-state .error-title { color: #e94560; font-size: 18px; font-weight: 700; margin-bottom: 8px; }
+        .empty-state .error-detail { font-size: 13px; color: #6c757d; margin-top: 8px; padding: 8px 16px; background: #f8f9fa; border-radius: 6px; display: inline-block; }
 
         /* MODAL */
         .modal-overlay {
@@ -101,18 +102,14 @@
         /* IMPORT MODAL */
         .drop-zone {
             border: 3px dashed #1a3a7a; border-radius: 16px; padding: 40px 20px;
-            text-align: center; cursor: pointer; transition: all 0.3s ease;
-            background: #f8f9fa;
+            text-align: center; cursor: pointer; transition: all 0.3s ease; background: #f8f9fa;
         }
         .drop-zone:hover, .drop-zone.dragover { background: #e7f3ff; border-color: #0984e3; }
         .drop-zone i { font-size: 48px; color: #1a3a7a; margin-bottom: 12px; display: block; }
         .drop-zone p { color: #6c757d; font-size: 15px; margin-bottom: 8px; }
         .drop-zone strong { color: #1a3a7a; }
-
-        .preview-table {
-            max-height: 300px; overflow-y: auto; margin-top: 16px;
-            border: 1px solid #e9ecef; border-radius: 10px;
-        }
+        .preview-table { max-height: 300px; overflow-y: auto; margin-top: 16px;
+                         border: 1px solid #e9ecef; border-radius: 10px; }
         .preview-table table { width: 100%; border-collapse: collapse; font-size: 13px; }
         .preview-table th { background: #1a3a7a; color: #fff; padding: 10px; text-align: left;
                             position: sticky; top: 0; }
@@ -183,19 +180,15 @@
         <div class="modal-body">
             <form id="athlete-form" onsubmit="handleSubmit(event)">
                 <input type="hidden" id="athlete-id">
-
                 <div class="form-grid">
                     <div class="form-group full">
                         <label>Họ và tên <span>*</span></label>
                         <input type="text" id="full_name" required placeholder="VD: Nguyễn Văn An">
                     </div>
-
                     <div class="form-group">
                         <label>CLB / Đơn vị</label>
-                        <input type="text" id="club" placeholder="VD: CLB Hà Nội" list="club-list">
-                        <datalist id="club-list"></datalist>
+                        <input type="text" id="club" placeholder="VD: CLB Hà Nội">
                     </div>
-
                     <div class="form-group">
                         <label>Giới tính</label>
                         <select id="gender">
@@ -204,35 +197,28 @@
                             <option value="female">Nữ</option>
                         </select>
                     </div>
-
                     <div class="form-group">
                         <label>Năm sinh</label>
                         <input type="number" id="birth_year" min="1950" max="2020" placeholder="VD: 1995">
                     </div>
-
                     <div class="form-group">
                         <label>Số điện thoại</label>
                         <input type="tel" id="phone" placeholder="VD: 0901234567">
                     </div>
-
                     <div class="form-group full">
                         <label>Email</label>
                         <input type="email" id="email" placeholder="VD: email@example.com">
                     </div>
-
                     <div class="form-group full">
                         <label>Nội dung đăng ký</label>
-                        <input type="text" id="category_names" placeholder="VD: Đơn nam, Đôi nam (cách nhau dấu phẩy)">
+                        <input type="text" id="category_names" placeholder="VD: Đơn nam, Đôi nam">
                     </div>
-
                     <div class="form-group full">
                         <label>Ghi chú</label>
                         <textarea id="notes" rows="2"></textarea>
                     </div>
                 </div>
-
                 <div id="form-message" class="alert"></div>
-
                 <div class="modal-actions">
                     <button type="button" class="btn btn-outline" style="color:#1a1a2e;border-color:#e9ecef;" onclick="closeModal()">Hủy</button>
                     <button type="submit" class="btn btn-primary" id="submit-btn">
@@ -280,7 +266,6 @@
                         <tbody></tbody>
                     </table>
                 </div>
-
                 <div class="modal-actions">
                     <button class="btn btn-outline" style="color:#1a1a2e;border-color:#e9ecef;" onclick="resetImport()">Hủy</button>
                     <button class="btn btn-success" onclick="confirmImport()" id="import-btn">
@@ -292,15 +277,40 @@
     </div>
 </div>
 
-<!-- Thư viện SheetJS -->
 <script src="https://cdn.jsdelivr.net/npm/xlsx@0.18.5/dist/xlsx.full.min.js"></script>
 <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
 <script src="config.js"></script>
 <script>
 (function() {
     'use strict';
+
+    console.log('🚀 athletes.html bắt đầu chạy');
+
     const config = window.SPORTSVN_CONFIG || {};
-    const supabaseClient = window.supabase.createClient(config.SUPABASE_URL, config.SUPABASE_ANON_KEY);
+    if (!config.SUPABASE_URL || !config.SUPABASE_ANON_KEY) {
+        document.getElementById('athlete-list').innerHTML = `
+            <div class="empty-state">
+                <i class="fas fa-exclamation-triangle error-icon"></i>
+                <p class="error-title">Lỗi cấu hình</p>
+                <p>Không tìm thấy cấu hình Supabase trong config.js</p>
+            </div>`;
+        return;
+    }
+
+    let supabaseClient;
+    try {
+        supabaseClient = window.supabase.createClient(config.SUPABASE_URL, config.SUPABASE_ANON_KEY);
+        console.log('✅ Supabase client đã tạo');
+    } catch (e) {
+        console.error('❌ Lỗi tạo Supabase:', e);
+        document.getElementById('athlete-list').innerHTML = `
+            <div class="empty-state">
+                <i class="fas fa-times-circle error-icon"></i>
+                <p class="error-title">Lỗi kết nối Supabase</p>
+                <p>${e.message}</p>
+            </div>`;
+        return;
+    }
 
     let currentUser = null;
     let tournamentId = null;
@@ -308,15 +318,49 @@
     let importData = [];
 
     async function init() {
-        const { data: { session } } = await supabaseClient.auth.getSession();
-        if (!session) { window.location.href = 'login.html'; return; }
-        currentUser = session.user;
+        console.log('🔄 init() bắt đầu');
 
         const urlParams = new URLSearchParams(window.location.search);
         tournamentId = urlParams.get('tournament_id');
+        console.log('📌 Tournament ID:', tournamentId);
+
         if (!tournamentId) {
-            alert('Không tìm thấy ID giải đấu!');
-            window.location.href = 'tournaments.html';
+            document.getElementById('athlete-list').innerHTML = `
+                <div class="empty-state">
+                    <i class="fas fa-exclamation-triangle error-icon"></i>
+                    <p class="error-title">Thiếu ID giải đấu</p>
+                    <p>Vui lòng vào từ trang Quản lý giải đấu.</p>
+                </div>`;
+            return;
+        }
+
+        // Lấy session
+        try {
+            const { data: { session }, error } = await supabaseClient.auth.getSession();
+            console.log('🔐 Session:', session ? 'CÓ' : 'KHÔNG', error);
+
+            if (!session) {
+                document.getElementById('athlete-list').innerHTML = `
+                    <div class="empty-state">
+                        <i class="fas fa-user-lock error-icon"></i>
+                        <p class="error-title">Chưa đăng nhập</p>
+                        <p>Session đã hết hạn. Vui lòng đăng nhập lại.</p>
+                        <p><a href="login.html" style="color: #1a3a7a; font-weight: 700;">→ Đăng nhập ngay</a></p>
+                    </div>`;
+                return;
+            }
+
+            currentUser = session.user;
+            console.log('👤 User:', currentUser.email);
+
+        } catch (e) {
+            console.error('❌ Lỗi getSession:', e);
+            document.getElementById('athlete-list').innerHTML = `
+                <div class="empty-state">
+                    <i class="fas fa-times-circle error-icon"></i>
+                    <p class="error-title">Lỗi kiểm tra đăng nhập</p>
+                    <p>${e.message}</p>
+                </div>`;
             return;
         }
 
@@ -325,46 +369,55 @@
     }
 
     async function loadTournamentInfo() {
-        const { data } = await supabaseClient.from('tournaments')
-            .select('name, sport').eq('id', tournamentId).single();
-        if (data) {
+        try {
+            const { data, error } = await supabaseClient.from('tournaments')
+                .select('name, sport').eq('id', tournamentId).single();
+            if (error) {
+                console.warn('⚠️ Không load được info:', error);
+                return;
+            }
             document.getElementById('tournament-name').textContent = `${data.name} · ${data.sport}`;
+        } catch (e) {
+            console.warn('⚠️ Lỗi tournament info:', e);
         }
     }
 
     async function loadAthletes() {
-    console.log('🔄 Bắt đầu tải VĐV...');
-    try {
-        const { data, error } = await supabaseClient.from('athletes')
-            .select('*').eq('tournament_id', tournamentId).order('created_at', { ascending: true });
-        
-        console.log('📊 Kết quả:', data);
-        console.log('❌ Lỗi:', error);
-        
-        if (error) {
+        console.log('🔄 Bắt đầu tải VĐV...');
+        try {
+            const { data, error } = await supabaseClient.from('athletes')
+                .select('*').eq('tournament_id', tournamentId)
+                .order('created_at', { ascending: true });
+
+            console.log('📊 Kết quả:', data);
+            console.log('❌ Lỗi:', error);
+
+            if (error) {
+                document.getElementById('athlete-list').innerHTML = `
+                    <div class="empty-state">
+                        <i class="fas fa-exclamation-triangle error-icon"></i>
+                        <p class="error-title">Lỗi tải dữ liệu</p>
+                        <p>${error.message}</p>
+                        <p class="error-detail">Mã: ${error.code || 'N/A'} · ${error.hint || ''}</p>
+                    </div>`;
+                return;
+            }
+
+            athletes = data || [];
+            console.log('✅ Có', athletes.length, 'VĐV');
+            renderAthletes();
+            renderStats();
+
+        } catch (e) {
+            console.error('💥 Exception:', e);
             document.getElementById('athlete-list').innerHTML = `
                 <div class="empty-state">
-                    <i class="fas fa-exclamation-triangle" style="color: #e94560;"></i>
-                    <p style="color: #e94560; margin-bottom: 8px;"><strong>Lỗi tải dữ liệu</strong></p>
-                    <p style="font-size: 13px;">${error.message}</p>
-                    <p style="font-size: 12px; color: #6c757d; margin-top: 8px;">Mã lỗi: ${error.code || 'N/A'}</p>
+                    <i class="fas fa-times-circle error-icon"></i>
+                    <p class="error-title">Exception</p>
+                    <p>${e.message}</p>
                 </div>`;
-            return;
         }
-        
-        athletes = data || [];
-        console.log('✅ Có', athletes.length, 'VĐV');
-        renderAthletes();
-        renderStats();
-    } catch (error) {
-        console.error('💥 Exception:', error);
-        document.getElementById('athlete-list').innerHTML = `
-            <div class="empty-state">
-                <i class="fas fa-times-circle" style="color: #e94560;"></i>
-                <p style="color: #e94560;">Exception: ${error.message}</p>
-            </div>`;
     }
-}
 
     function renderStats() {
         const clubs = new Set(athletes.map(a => a.club).filter(Boolean));
@@ -501,9 +554,7 @@
         }
     };
 
-    // ============================
     // IMPORT EXCEL
-    // ============================
     window.openImportModal = function() {
         resetImport();
         document.getElementById('import-modal').classList.add('show');
@@ -550,12 +601,8 @@
                 const sheet = workbook.Sheets[workbook.SheetNames[0]];
                 const jsonData = XLSX.utils.sheet_to_json(sheet, { header: 1, defval: '' });
 
-                if (jsonData.length < 2) {
-                    alert('File Excel trống hoặc không có dữ liệu!');
-                    return;
-                }
+                if (jsonData.length < 2) { alert('File trống!'); return; }
 
-                // Bỏ header, parse dữ liệu
                 importData = jsonData.slice(1).map(row => ({
                     full_name: String(row[1] || '').trim(),
                     club: String(row[2] || '').trim() || null,
@@ -567,14 +614,9 @@
                     notes: String(row[8] || '').trim() || null
                 })).filter(a => a.full_name);
 
-                if (importData.length === 0) {
-                    alert('Không tìm thấy dữ liệu hợp lệ trong file!');
-                    return;
-                }
-
+                if (importData.length === 0) { alert('Không có dữ liệu hợp lệ!'); return; }
                 renderImportPreview();
             } catch (error) {
-                console.error(error);
                 alert('Lỗi đọc file: ' + error.message);
             }
         };
@@ -591,7 +633,6 @@
     function renderImportPreview() {
         document.getElementById('import-preview').style.display = 'block';
         document.getElementById('preview-count').textContent = importData.length;
-
         const tbody = document.querySelector('#preview-table-content tbody');
         tbody.innerHTML = importData.map((a, i) => `
             <tr>
@@ -609,26 +650,20 @@
 
     window.confirmImport = async function() {
         if (importData.length === 0) return;
-        if (!confirm(`Import ${importData.length} VĐV vào giải đấu?`)) return;
+        if (!confirm(`Import ${importData.length} VĐV?`)) return;
 
         const btn = document.getElementById('import-btn');
         btn.disabled = true;
         btn.innerHTML = '<i class="fas fa-spinner fa-spin"></i> Đang import...';
 
         try {
-            const records = importData.map(a => ({
-                ...a,
-                tournament_id: tournamentId
-            }));
-
+            const records = importData.map(a => ({ ...a, tournament_id: tournamentId }));
             const { error } = await supabaseClient.from('athletes').insert(records);
             if (error) throw error;
-
-            showAlert(`✅ Đã import ${records.length} VĐV thành công!`, 'success');
+            showAlert(`✅ Đã import ${records.length} VĐV!`, 'success');
             closeImportModal();
             await loadAthletes();
         } catch (error) {
-            console.error(error);
             alert('Lỗi import: ' + error.message);
         } finally {
             btn.disabled = false;
@@ -636,76 +671,30 @@
         }
     };
 
-    // ============================
-    // EXPORT EXCEL
-    // ============================
     window.exportExcel = function() {
-        if (athletes.length === 0) {
-            alert('Chưa có VĐV nào để xuất!');
-            return;
-        }
-
+        if (athletes.length === 0) { alert('Chưa có VĐV!'); return; }
         const data = athletes.map((a, i) => ({
-            'STT': i + 1,
-            'Họ và tên': a.full_name || '',
-            'CLB/Đơn vị': a.club || '',
+            'STT': i + 1, 'Họ và tên': a.full_name || '', 'CLB/Đơn vị': a.club || '',
             'Giới tính': a.gender === 'male' ? 'Nam' : a.gender === 'female' ? 'Nữ' : '',
-            'Năm sinh': a.birth_year || '',
-            'Điện thoại': a.phone || '',
-            'Email': a.email || '',
-            'Nội dung đăng ký': a.category_names || '',
+            'Năm sinh': a.birth_year || '', 'Điện thoại': a.phone || '',
+            'Email': a.email || '', 'Nội dung đăng ký': a.category_names || '',
             'Ghi chú': a.notes || ''
         }));
-
         const ws = XLSX.utils.json_to_sheet(data);
-        ws['!cols'] = [
-            { wch: 5 }, { wch: 25 }, { wch: 20 }, { wch: 10 },
-            { wch: 10 }, { wch: 15 }, { wch: 25 }, { wch: 25 }, { wch: 20 }
-        ];
-
+        ws['!cols'] = [{ wch: 5 }, { wch: 25 }, { wch: 20 }, { wch: 10 }, { wch: 10 }, { wch: 15 }, { wch: 25 }, { wch: 25 }, { wch: 20 }];
         const wb = XLSX.utils.book_new();
         XLSX.utils.book_append_sheet(wb, ws, 'Danh sách VĐV');
-
-        const fileName = `DanhSachVDV_${new Date().toISOString().slice(0, 10)}.xlsx`;
-        XLSX.writeFile(wb, fileName);
-        showAlert('✅ Đã xuất file Excel!', 'success');
+        XLSX.writeFile(wb, `DanhSachVDV_${new Date().toISOString().slice(0, 10)}.xlsx`);
+        showAlert('✅ Đã xuất file!', 'success');
     };
 
-    // ============================
-    // DOWNLOAD TEMPLATE
-    // ============================
     window.downloadTemplate = function() {
         const template = [
-            {
-                'STT': 1,
-                'Họ và tên': 'Nguyễn Văn An',
-                'CLB/Đơn vị': 'CLB Hà Nội',
-                'Giới tính': 'Nam',
-                'Năm sinh': 1995,
-                'Điện thoại': '0901234567',
-                'Email': 'an@example.com',
-                'Nội dung đăng ký': 'Đơn nam, Đôi nam',
-                'Ghi chú': ''
-            },
-            {
-                'STT': 2,
-                'Họ và tên': 'Trần Thị Bình',
-                'CLB/Đơn vị': 'CLB Đà Nẵng',
-                'Giới tính': 'Nữ',
-                'Năm sinh': 1998,
-                'Điện thoại': '0907654321',
-                'Email': 'binh@example.com',
-                'Nội dung đăng ký': 'Đơn nữ',
-                'Ghi chú': ''
-            }
+            { 'STT': 1, 'Họ và tên': 'Nguyễn Văn An', 'CLB/Đơn vị': 'CLB Hà Nội', 'Giới tính': 'Nam', 'Năm sinh': 1995, 'Điện thoại': '0901234567', 'Email': 'an@example.com', 'Nội dung đăng ký': 'Đơn nam, Đôi nam', 'Ghi chú': '' },
+            { 'STT': 2, 'Họ và tên': 'Trần Thị Bình', 'CLB/Đơn vị': 'CLB Đà Nẵng', 'Giới tính': 'Nữ', 'Năm sinh': 1998, 'Điện thoại': '0907654321', 'Email': 'binh@example.com', 'Nội dung đăng ký': 'Đơn nữ', 'Ghi chú': '' }
         ];
-
         const ws = XLSX.utils.json_to_sheet(template);
-        ws['!cols'] = [
-            { wch: 5 }, { wch: 25 }, { wch: 20 }, { wch: 10 },
-            { wch: 10 }, { wch: 15 }, { wch: 25 }, { wch: 25 }, { wch: 20 }
-        ];
-
+        ws['!cols'] = [{ wch: 5 }, { wch: 25 }, { wch: 20 }, { wch: 10 }, { wch: 10 }, { wch: 15 }, { wch: 25 }, { wch: 25 }, { wch: 20 }];
         const wb = XLSX.utils.book_new();
         XLSX.utils.book_append_sheet(wb, ws, 'Mẫu VĐV');
         XLSX.writeFile(wb, 'MauDanhSachVDV.xlsx');
@@ -726,4 +715,13 @@
     }
 
     function escapeHtml(text) {
-        return String(text || '').replace(/&/g, '
+        return String(text || '').replace(/&/g, '&amp;').replace(/</g, '&lt;')
+            .replace(/>/g, '&gt;').replace(/"/g, '&quot;');
+    }
+
+    init();
+})();
+</script>
+
+</body>
+</html>
