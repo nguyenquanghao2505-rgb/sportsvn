@@ -1,0 +1,425 @@
+<!DOCTYPE html>
+<html lang="vi">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Quản lý nội dung - SportsVN</title>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <style>
+        * { margin: 0; padding: 0; box-sizing: border-box; font-family: 'Segoe UI', system-ui, sans-serif; }
+        body { background: #f0f2f8; min-height: 100vh; padding: 24px; }
+        .container { max-width: 1200px; margin: 0 auto; }
+        .header {
+            background: linear-gradient(135deg, #0d1b3e, #1a3a7a);
+            border-radius: 20px; padding: 32px; color: #fff; margin-bottom: 24px;
+            display: flex; justify-content: space-between; align-items: center; flex-wrap: wrap; gap: 16px;
+        }
+        .header h1 { font-size: 28px; margin-bottom: 8px; }
+        .header p { opacity: 0.85; }
+        .btn { padding: 12px 24px; border-radius: 10px; font-size: 15px; font-weight: 700;
+               cursor: pointer; border: none; transition: all 0.3s ease; text-decoration: none;
+               display: inline-flex; align-items: center; gap: 8px; }
+        .btn-primary { background: #e94560; color: #fff; }
+        .btn-primary:hover { transform: translateY(-2px); box-shadow: 0 8px 20px rgba(233,69,96,0.4); }
+        .btn-outline { background: transparent; color: #fff; border: 2px solid #fff; }
+        .btn-outline:hover { background: #fff; color: #0d1b3e; }
+        .btn-success { background: #00b894; color: #fff; }
+        .btn-warning { background: #fdcb6e; color: #1a1a2e; }
+        .btn-danger { background: #e94560; color: #fff; }
+        .panel { background: #fff; border-radius: 16px; padding: 24px; margin-bottom: 24px;
+                 box-shadow: 0 4px 20px rgba(0,0,0,0.08); }
+        .panel-title { font-size: 20px; font-weight: 700; color: #1a1a2e; margin-bottom: 16px; }
+        .category-list { display: flex; flex-direction: column; gap: 12px; }
+        .category-item {
+            background: #f8f9fa; border-radius: 12px; padding: 18px 22px;
+            display: flex; justify-content: space-between; align-items: center; gap: 16px;
+            border-left: 4px solid #1a3a7a; transition: all 0.2s ease;
+        }
+        .category-item:hover { transform: translateX(4px); box-shadow: 0 4px 12px rgba(0,0,0,0.08); }
+        .category-info { flex: 1; }
+        .category-info h3 { font-size: 16px; color: #1a1a2e; margin-bottom: 6px; }
+        .category-info .meta { font-size: 13px; color: #6c757d; display: flex; gap: 16px; flex-wrap: wrap; }
+        .category-info .meta span { display: flex; align-items: center; gap: 4px; }
+        .category-actions { display: flex; gap: 8px; }
+        .btn-icon {
+            width: 36px; height: 36px; border-radius: 8px; border: none; cursor: pointer;
+            display: flex; align-items: center; justify-content: center; font-size: 14px;
+            transition: all 0.2s ease;
+        }
+        .btn-icon:hover { transform: scale(1.1); }
+        .btn-icon.edit { background: #fdcb6e; color: #1a1a2e; }
+        .btn-icon.delete { background: #e94560; color: #fff; }
+        .btn-icon.draw { background: #00b894; color: #fff; }
+        .empty-state { text-align: center; padding: 60px 20px; color: #6c757d; }
+        .empty-state i { font-size: 60px; color: #dee2e6; margin-bottom: 16px; display: block; }
+
+        /* MODAL */
+        .modal-overlay {
+            display: none; position: fixed; top: 0; left: 0; right: 0; bottom: 0;
+            background: rgba(0,0,0,0.5); z-index: 1000; align-items: center; justify-content: center; padding: 20px;
+        }
+        .modal-overlay.show { display: flex; }
+        .modal-content { background: #fff; border-radius: 20px; max-width: 700px; width: 100%;
+                         max-height: 90vh; overflow-y: auto; animation: slideIn 0.3s ease; }
+        @keyframes slideIn { from { opacity: 0; transform: translateY(-30px); } to { opacity: 1; transform: translateY(0); } }
+        .modal-header { background: linear-gradient(135deg, #0d1b3e, #1a3a7a); color: #fff;
+                        padding: 24px 28px; border-radius: 20px 20px 0 0; display: flex;
+                        justify-content: space-between; align-items: center; }
+        .modal-header h2 { font-size: 20px; }
+        .modal-close { background: none; border: none; color: #fff; font-size: 28px; cursor: pointer; }
+        .modal-body { padding: 28px; }
+        .form-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 18px; }
+        .form-group { display: flex; flex-direction: column; }
+        .form-group.full { grid-column: 1 / -1; }
+        .form-group label { font-weight: 700; font-size: 14px; margin-bottom: 8px; color: #1a1a2e; }
+        .form-group label span { color: #e94560; }
+        .form-group input, .form-group select, .form-group textarea {
+            padding: 12px 16px; border: 2px solid #e9ecef; border-radius: 10px; font-size: 15px; font-family: inherit;
+        }
+        .form-group input:focus, .form-group select:focus, .form-group textarea:focus {
+            border-color: #1a3a7a; outline: none;
+        }
+        .modal-actions { display: flex; gap: 12px; justify-content: flex-end; margin-top: 24px;
+                         padding-top: 20px; border-top: 1px solid #e9ecef; }
+        .alert { padding: 14px 18px; border-radius: 10px; margin-bottom: 16px; display: none; }
+        .alert.show { display: block; }
+        .alert.error { background: #f8d7da; color: #721c24; }
+        .alert.success { background: #d4edda; color: #155724; }
+        @media (max-width: 768px) {
+            .form-grid { grid-template-columns: 1fr; }
+            .category-item { flex-direction: column; align-items: stretch; }
+            .category-actions { justify-content: flex-end; }
+        }
+    </style>
+</head>
+<body>
+
+<div class="container">
+    <div class="header">
+        <div>
+            <h1>📋 Quản lý nội dung thi đấu</h1>
+            <p id="tournament-name">Đang tải...</p>
+        </div>
+        <div style="display: flex; gap: 12px; flex-wrap: wrap;">
+            <a href="tournaments.html" class="btn btn-outline">
+                <i class="fas fa-arrow-left"></i> Quay lại
+            </a>
+            <button class="btn btn-primary" onclick="openCreateModal()">
+                <i class="fas fa-plus"></i> Thêm nội dung
+            </button>
+        </div>
+    </div>
+
+    <div id="alert" class="alert"></div>
+
+    <div class="panel">
+        <div class="panel-title">Danh sách nội dung (<span id="count">0</span>)</div>
+        <div id="category-list" class="category-list">
+            <div class="empty-state">
+                <i class="fas fa-spinner fa-spin"></i>
+                <p>Đang tải...</p>
+            </div>
+        </div>
+    </div>
+</div>
+
+<!-- MODAL -->
+<div class="modal-overlay" id="category-modal">
+    <div class="modal-content">
+        <div class="modal-header">
+            <h2 id="modal-title">Thêm nội dung mới</h2>
+            <button class="modal-close" onclick="closeModal()">×</button>
+        </div>
+        <div class="modal-body">
+            <form id="category-form" onsubmit="handleSubmit(event)">
+                <input type="hidden" id="category-id">
+
+                <div class="form-grid">
+                    <div class="form-group full">
+                        <label>Tên nội dung <span>*</span></label>
+                        <input type="text" id="name" required placeholder="VD: Đồng đội nam, Đơn nữ, Đôi nam nữ...">
+                    </div>
+
+                    <div class="form-group">
+                        <label>Loại nội dung <span>*</span></label>
+                        <select id="category_type" required>
+                            <option value="individual">Cá nhân / Đôi</option>
+                            <option value="team">Đồng đội</option>
+                        </select>
+                    </div>
+
+                    <div class="form-group">
+                        <label>Cách tính điểm <span>*</span></label>
+                        <select id="scoring_type" required onchange="toggleScoringFields()">
+                            <option value="sets">Theo séc (Cầu lông, Tennis...)</option>
+                            <option value="direct">Trực tiếp (Bóng đá, Bóng rổ...)</option>
+                        </select>
+                    </div>
+
+                    <div class="form-group" id="sets-format-group">
+                        <label>Thể thức séc</label>
+                        <select id="sets_format">
+                            <option value="best-of-3">Best of 3 (Thắng 2 séc)</option>
+                            <option value="best-of-5">Best of 5 (Thắng 3 séc)</option>
+                            <option value="best-of-7">Best of 7 (Thắng 4 séc)</option>
+                        </select>
+                    </div>
+
+                    <div class="form-group" id="points-per-set-group">
+                        <label>Điểm mỗi séc</label>
+                        <input type="number" id="points_per_set" value="21" min="1" max="100">
+                    </div>
+
+                    <div class="form-group">
+                        <label>Thời lượng 1 trận (phút)</label>
+                        <input type="number" id="match_duration" value="45" min="15" max="180">
+                    </div>
+
+                    <div class="form-group">
+                        <label>Độ ưu tiên</label>
+                        <input type="number" id="priority" value="1" min="1" max="100">
+                    </div>
+                </div>
+
+                <div id="form-message" class="alert"></div>
+
+                <div class="modal-actions">
+                    <button type="button" class="btn btn-outline" style="color:#1a1a2e;border-color:#e9ecef;" onclick="closeModal()">Hủy</button>
+                    <button type="submit" class="btn btn-primary" id="submit-btn">
+                        <i class="fas fa-save"></i> Lưu nội dung
+                    </button>
+                </div>
+            </form>
+        </div>
+    </div>
+</div>
+
+<script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+<script src="config.js"></script>
+<script>
+(function() {
+    'use strict';
+    const config = window.SPORTSVN_CONFIG || {};
+    const supabaseClient = window.supabase.createClient(config.SUPABASE_URL, config.SUPABASE_ANON_KEY);
+
+    let currentUser = null;
+    let tournamentId = null;
+    let categories = [];
+
+    async function init() {
+        const { data: { session } } = await supabaseClient.auth.getSession();
+        if (!session) { window.location.href = 'login.html'; return; }
+        currentUser = session.user;
+
+        const urlParams = new URLSearchParams(window.location.search);
+        tournamentId = urlParams.get('tournament_id');
+        if (!tournamentId) {
+            alert('Không tìm thấy ID giải đấu!');
+            window.location.href = 'tournaments.html';
+            return;
+        }
+
+        await loadTournamentInfo();
+        await loadCategories();
+    }
+
+    async function loadTournamentInfo() {
+        const { data, error } = await supabaseClient
+            .from('tournaments').select('name, sport').eq('id', tournamentId).single();
+        if (error) { console.error(error); return; }
+        document.getElementById('tournament-name').textContent =
+            `${data.name} · ${data.sport}`;
+    }
+
+    async function loadCategories() {
+        try {
+            const { data, error } = await supabaseClient
+                .from('categories').select('*').eq('tournament_id', tournamentId)
+                .order('priority', { ascending: true });
+            if (error) throw error;
+            categories = data || [];
+            renderCategories();
+        } catch (error) {
+            console.error(error);
+            showAlert('Không tải được danh sách nội dung: ' + error.message, 'error');
+        }
+    }
+
+    function renderCategories() {
+        const container = document.getElementById('category-list');
+        document.getElementById('count').textContent = categories.length;
+
+        if (categories.length === 0) {
+            container.innerHTML = `
+                <div class="empty-state">
+                    <i class="fas fa-list"></i>
+                    <p style="margin-bottom:16px;">Chưa có nội dung nào</p>
+                    <button class="btn btn-primary" onclick="openCreateModal()">
+                        <i class="fas fa-plus"></i> Thêm nội dung đầu tiên
+                    </button>
+                </div>`;
+            return;
+        }
+
+        container.innerHTML = categories.map((c, i) => `
+            <div class="category-item">
+                <div class="category-info">
+                    <h3>${i + 1}. ${escapeHtml(c.name)}</h3>
+                    <div class="meta">
+                        <span><i class="fas fa-${c.category_type === 'team' ? 'users' : 'user'}"></i>
+                            ${c.category_type === 'team' ? 'Đồng đội' : 'Cá nhân/Đôi'}</span>
+                        <span><i class="fas fa-table-tennis"></i>
+                            ${c.scoring_type === 'sets' ? (c.sets_format || 'best-of-3') + ' · ' + c.points_per_set + ' điểm' : 'Trực tiếp'}</span>
+                        <span><i class="fas fa-clock"></i> ${c.match_duration}'</span>
+                        <span><i class="fas fa-flag"></i> Ưu tiên: ${c.priority}</span>
+                    </div>
+                </div>
+                <div class="category-actions">
+                    <button class="btn-icon draw" onclick="goToDraw()" title="Bốc thăm">
+                        <i class="fas fa-dice"></i>
+                    </button>
+                    <button class="btn-icon edit" onclick="openEditModal('${c.id}')" title="Sửa">
+                        <i class="fas fa-edit"></i>
+                    </button>
+                    <button class="btn-icon delete" onclick="deleteCategory('${c.id}')" title="Xóa">
+                        <i class="fas fa-trash"></i>
+                    </button>
+                </div>
+            </div>
+        `).join('');
+    }
+
+    window.toggleScoringFields = function() {
+        const scoringType = document.getElementById('scoring_type').value;
+        const setsGroup = document.getElementById('sets-format-group');
+        const pointsGroup = document.getElementById('points-per-set-group');
+        if (scoringType === 'sets') {
+            setsGroup.style.display = 'flex';
+            pointsGroup.style.display = 'flex';
+        } else {
+            setsGroup.style.display = 'none';
+            pointsGroup.style.display = 'none';
+        }
+    };
+
+    window.openCreateModal = function() {
+        document.getElementById('modal-title').textContent = 'Thêm nội dung mới';
+        document.getElementById('category-form').reset();
+        document.getElementById('category-id').value = '';
+        document.getElementById('points_per_set').value = 21;
+        document.getElementById('match_duration').value = 45;
+        document.getElementById('priority').value = 1;
+        document.getElementById('form-message').className = 'alert';
+        toggleScoringFields();
+        document.getElementById('category-modal').classList.add('show');
+    };
+
+    window.openEditModal = function(id) {
+        const c = categories.find(x => x.id == id);
+        if (!c) return;
+        document.getElementById('modal-title').textContent = 'Sửa nội dung';
+        document.getElementById('category-id').value = c.id;
+        document.getElementById('name').value = c.name || '';
+        document.getElementById('category_type').value = c.category_type || 'individual';
+        document.getElementById('scoring_type').value = c.scoring_type || 'sets';
+        document.getElementById('sets_format').value = c.sets_format || 'best-of-3';
+        document.getElementById('points_per_set').value = c.points_per_set || 21;
+        document.getElementById('match_duration').value = c.match_duration || 45;
+        document.getElementById('priority').value = c.priority || 1;
+        document.getElementById('form-message').className = 'alert';
+        toggleScoringFields();
+        document.getElementById('category-modal').classList.add('show');
+    };
+
+    window.closeModal = function() {
+        document.getElementById('category-modal').classList.remove('show');
+    };
+
+    window.handleSubmit = async function(event) {
+        event.preventDefault();
+        const id = document.getElementById('category-id').value;
+        const scoringType = document.getElementById('scoring_type').value;
+
+        const payload = {
+            tournament_id: tournamentId,
+            name: document.getElementById('name').value.trim(),
+            category_type: document.getElementById('category_type').value,
+            scoring_type: scoringType,
+            sets_format: scoringType === 'sets' ? document.getElementById('sets_format').value : null,
+            points_per_set: scoringType === 'sets' ? parseInt(document.getElementById('points_per_set').value) : null,
+            match_duration: parseInt(document.getElementById('match_duration').value),
+            priority: parseInt(document.getElementById('priority').value)
+        };
+
+        if (!payload.name) {
+            showFormMessage('Vui lòng nhập tên nội dung.', 'error');
+            return;
+        }
+
+        const btn = document.getElementById('submit-btn');
+        btn.disabled = true;
+        btn.innerHTML = '<i class="fas fa-spinner fa-spin"></i> Đang lưu...';
+
+        try {
+            if (id) {
+                const { error } = await supabaseClient.from('categories').update(payload).eq('id', id);
+                if (error) throw error;
+                showAlert('✅ Cập nhật nội dung thành công!', 'success');
+            } else {
+                const { error } = await supabaseClient.from('categories').insert(payload);
+                if (error) throw error;
+                showAlert('✅ Thêm nội dung thành công!', 'success');
+            }
+            closeModal();
+            await loadCategories();
+        } catch (error) {
+            console.error(error);
+            showFormMessage('Lỗi: ' + error.message, 'error');
+        } finally {
+            btn.disabled = false;
+            btn.innerHTML = '<i class="fas fa-save"></i> Lưu nội dung';
+        }
+    };
+
+    window.deleteCategory = async function(id) {
+        const c = categories.find(x => x.id == id);
+        if (!c) return;
+        if (!confirm(`Xóa nội dung "${c.name}"?\n\nHành động này không thể hoàn tác!`)) return;
+        try {
+            const { error } = await supabaseClient.from('categories').delete().eq('id', id);
+            if (error) throw error;
+            showAlert('✅ Đã xóa nội dung!', 'success');
+            await loadCategories();
+        } catch (error) {
+            showAlert('Lỗi xóa: ' + error.message, 'error');
+        }
+    };
+
+    window.goToDraw = function() {
+        window.location.href = 'draw.html?tournament_id=' + tournamentId;
+    };
+
+    function showAlert(message, type) {
+        const el = document.getElementById('alert');
+        el.textContent = message;
+        el.className = 'alert show ' + type;
+        setTimeout(() => { el.className = 'alert'; }, 5000);
+    }
+
+    function showFormMessage(message, type) {
+        const el = document.getElementById('form-message');
+        el.textContent = message;
+        el.className = 'alert show ' + type;
+    }
+
+    function escapeHtml(text) {
+        return String(text || '').replace(/&/g, '&amp;').replace(/</g, '&lt;')
+            .replace(/>/g, '&gt;').replace(/"/g, '&quot;');
+    }
+
+    init();
+})();
+</script>
+
+</body>
+</html>
