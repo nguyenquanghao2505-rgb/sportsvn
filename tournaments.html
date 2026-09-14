@@ -57,7 +57,7 @@
 
         .panel-title { font-size: 20px; font-weight: 700; color: #1a1a2e; margin-bottom: 16px; }
 
-        /* FORM MODAL */
+        /* MODAL */
         .modal-overlay {
             display: none;
             position: fixed;
@@ -74,7 +74,7 @@
         .modal-content {
             background: #fff;
             border-radius: 20px;
-            max-width: 700px;
+            max-width: 800px;
             width: 100%;
             max-height: 90vh;
             overflow-y: auto;
@@ -94,6 +94,9 @@
             display: flex;
             justify-content: space-between;
             align-items: center;
+            position: sticky;
+            top: 0;
+            z-index: 10;
         }
 
         .modal-header h2 { font-size: 20px; }
@@ -109,10 +112,27 @@
 
         .modal-body { padding: 28px; }
 
+        .section-label {
+            font-size: 13px;
+            font-weight: 800;
+            color: #1a3a7a;
+            text-transform: uppercase;
+            letter-spacing: 1px;
+            margin-bottom: 14px;
+            padding-bottom: 8px;
+            border-bottom: 2px solid #e9ecef;
+            display: flex;
+            align-items: center;
+            gap: 8px;
+        }
+
+        .section-label i { font-size: 16px; }
+
         .form-grid {
             display: grid;
             grid-template-columns: 1fr 1fr;
-            gap: 20px;
+            gap: 18px;
+            margin-bottom: 24px;
         }
 
         .form-group { display: flex; flex-direction: column; }
@@ -146,6 +166,18 @@
 
         .form-group textarea { resize: vertical; min-height: 80px; }
 
+        .form-hint {
+            font-size: 12px;
+            color: #6c757d;
+            margin-top: 4px;
+        }
+
+        .time-grid {
+            display: grid;
+            grid-template-columns: 1fr 1fr 1fr;
+            gap: 12px;
+        }
+
         .modal-actions {
             display: flex;
             gap: 12px;
@@ -166,17 +198,17 @@
         .alert.error { background: #f8d7da; color: #721c24; }
         .alert.success { background: #d4edda; color: #155724; }
 
-        /* TOURNAMENT LIST */
+        /* TOURNAMENT CARD */
         .tournament-grid {
             display: grid;
-            grid-template-columns: repeat(auto-fill, minmax(320px, 1fr));
+            grid-template-columns: repeat(auto-fill, minmax(360px, 1fr));
             gap: 20px;
         }
 
         .tournament-card {
             background: #fff;
             border-radius: 16px;
-            padding: 20px;
+            padding: 22px;
             box-shadow: 0 2px 12px rgba(0,0,0,0.06);
             border-left: 5px solid #1a3a7a;
             transition: all 0.3s ease;
@@ -190,20 +222,34 @@
         .tournament-card h3 {
             font-size: 17px;
             color: #1a1a2e;
-            margin-bottom: 12px;
+            margin-bottom: 14px;
             line-height: 1.4;
         }
 
         .tournament-meta {
             display: flex;
             flex-direction: column;
-            gap: 6px;
+            gap: 8px;
             font-size: 14px;
             color: #6c757d;
             margin-bottom: 14px;
         }
 
-        .tournament-meta span { display: flex; align-items: center; gap: 6px; }
+        .tournament-meta span { display: flex; align-items: center; gap: 8px; }
+
+        .tournament-stats {
+            display: grid;
+            grid-template-columns: repeat(3, 1fr);
+            gap: 8px;
+            margin-bottom: 14px;
+            padding: 12px;
+            background: #f8f9fa;
+            border-radius: 10px;
+        }
+
+        .stat-item { text-align: center; }
+        .stat-item .value { font-size: 20px; font-weight: 800; color: #1a3a7a; display: block; }
+        .stat-item .label { font-size: 11px; color: #6c757d; text-transform: uppercase; letter-spacing: 0.5px; }
 
         .badge {
             display: inline-block;
@@ -221,7 +267,8 @@
         .badge.cancelled { background: #e2e3e5; color: #41464b; }
 
         .card-actions {
-            display: flex;
+            display: grid;
+            grid-template-columns: 1fr 1fr;
             gap: 8px;
             margin-top: 14px;
             padding-top: 14px;
@@ -229,18 +276,26 @@
         }
 
         .btn-small {
-            padding: 8px 14px;
+            padding: 10px 14px;
             font-size: 13px;
             border-radius: 8px;
             border: none;
             cursor: pointer;
-            font-weight: 600;
-            flex: 1;
+            font-weight: 700;
+            display: inline-flex;
+            align-items: center;
+            justify-content: center;
+            gap: 6px;
+            transition: all 0.2s ease;
         }
 
+        .btn-small:hover { transform: translateY(-1px); }
+
+        .btn-draw { background: #00b894; color: #fff; }
+        .btn-categories { background: #6c5ce7; color: #fff; }
+        .btn-schedule { background: #fdcb6e; color: #1a1a2e; }
         .btn-edit { background: #fdcb6e; color: #1a1a2e; }
         .btn-delete { background: #e94560; color: #fff; }
-        .btn-draw { background: #00b894; color: #fff; }
 
         .empty-state {
             text-align: center;
@@ -252,6 +307,7 @@
 
         @media (max-width: 768px) {
             .form-grid { grid-template-columns: 1fr; }
+            .time-grid { grid-template-columns: 1fr; }
             .header h1 { font-size: 22px; }
         }
     </style>
@@ -300,10 +356,12 @@
             <form id="tournament-form" onsubmit="handleSubmit(event)">
                 <input type="hidden" id="tournament-id">
 
+                <!-- THÔNG TIN CƠ BẢN -->
+                <div class="section-label"><i class="fas fa-info-circle"></i> Thông tin cơ bản</div>
                 <div class="form-grid">
                     <div class="form-group full">
                         <label>Tên giải đấu <span>*</span></label>
-                        <input type="text" id="name" required placeholder="VD: Giải Bóng đá Đà Nẵng 2026">
+                        <input type="text" id="name" required placeholder="VD: Giải Cầu lông Đà Nẵng 2026">
                     </div>
 
                     <div class="form-group">
@@ -316,10 +374,12 @@
                             <option>Cầu lông</option>
                             <option>Pickleball</option>
                             <option>Tennis</option>
+                            <option>Bóng bàn</option>
                             <option>Taekwondo</option>
                             <option>Bơi</option>
                             <option>Cờ tướng</option>
                             <option>Đua thuyền</option>
+                            <option>Võ thuật khác</option>
                         </select>
                     </div>
 
@@ -348,11 +408,61 @@
                         <label>Địa điểm <span>*</span></label>
                         <input type="text" id="location" required placeholder="VD: Nhà thi đấu Tiên Sơn, Đà Nẵng">
                     </div>
+                </div>
+
+                <!-- CẤU HÌNH THI ĐẤU -->
+                <div class="section-label"><i class="fas fa-cog"></i> Cấu hình thi đấu</div>
+                <div class="form-grid">
+                    <div class="form-group">
+                        <label>Số sân <span>*</span></label>
+                        <input type="number" id="num_venues" min="1" max="15" value="4" required>
+                        <div class="form-hint">Từ 1 đến 15 sân</div>
+                    </div>
+
+                    <div class="form-group">
+                        <label>Số ngày thi đấu <span>*</span></label>
+                        <input type="number" id="num_days" min="1" max="30" value="3" required>
+                        <div class="form-hint">Số ngày tổ chức giải</div>
+                    </div>
+
+                    <div class="form-group">
+                        <label>Số buổi/ngày <span>*</span></label>
+                        <select id="sessions_per_day" required>
+                            <option value="1">1 buổi (Sáng)</option>
+                            <option value="2" selected>2 buổi (Sáng + Chiều)</option>
+                            <option value="3">3 buổi (Sáng + Chiều + Tối)</option>
+                        </select>
+                    </div>
+
+                    <div class="form-group">
+                        <label>Thời lượng 1 trận (phút) <span>*</span></label>
+                        <input type="number" id="match_duration" min="15" max="120" value="45" required>
+                        <div class="form-hint">Thời gian dự kiến mỗi trận</div>
+                    </div>
 
                     <div class="form-group full">
-                        <label>Mô tả</label>
-                        <textarea id="description" placeholder="Thông tin giới thiệu, thể lệ, đối tượng tham dự..."></textarea>
+                        <label>Giờ bắt đầu các buổi</label>
+                        <div class="time-grid">
+                            <div>
+                                <label style="font-size:12px; color:#6c757d; margin-bottom:4px; display:block;">Sáng</label>
+                                <input type="time" id="start_time_morning" value="08:00">
+                            </div>
+                            <div>
+                                <label style="font-size:12px; color:#6c757d; margin-bottom:4px; display:block;">Chiều</label>
+                                <input type="time" id="start_time_afternoon" value="14:00">
+                            </div>
+                            <div>
+                                <label style="font-size:12px; color:#6c757d; margin-bottom:4px; display:block;">Tối</label>
+                                <input type="time" id="start_time_evening" value="19:00">
+                            </div>
+                        </div>
                     </div>
+                </div>
+
+                <!-- MÔ TẢ -->
+                <div class="section-label"><i class="fas fa-file-alt"></i> Mô tả</div>
+                <div class="form-group full">
+                    <textarea id="description" placeholder="Thông tin giới thiệu, thể lệ, đối tượng tham dự..." rows="4"></textarea>
                 </div>
 
                 <div id="form-message" class="alert"></div>
@@ -394,7 +504,7 @@
     }
 
     // ============================
-    // TẢI DANH SÁCH GIẢI ĐẤU
+    // TẢI DANH SÁCH
     // ============================
     async function loadTournaments() {
         try {
@@ -442,7 +552,26 @@
                     <span><i class="fas fa-calendar"></i> ${formatDate(t.start_date)} ${t.end_date ? '→ ' + formatDate(t.end_date) : ''}</span>
                     <span><span class="badge ${t.status || 'draft'}">${statusLabel(t.status)}</span></span>
                 </div>
+
+                <div class="tournament-stats">
+                    <div class="stat-item">
+                        <span class="value">${t.num_venues || 0}</span>
+                        <span class="label">Sân</span>
+                    </div>
+                    <div class="stat-item">
+                        <span class="value">${t.num_days || 0}</span>
+                        <span class="label">Ngày</span>
+                    </div>
+                    <div class="stat-item">
+                        <span class="value">${t.sessions_per_day || 0}</span>
+                        <span class="label">Buổi/ngày</span>
+                    </div>
+                </div>
+
                 <div class="card-actions">
+                    <button class="btn-small btn-categories" onclick="goToCategories('${t.id}')">
+                        <i class="fas fa-list"></i> Nội dung
+                    </button>
                     <button class="btn-small btn-draw" onclick="goToDraw('${t.id}')">
                         <i class="fas fa-dice"></i> Bốc thăm
                     </button>
@@ -464,6 +593,17 @@
         document.getElementById('modal-title').textContent = 'Tạo giải đấu mới';
         document.getElementById('tournament-form').reset();
         document.getElementById('tournament-id').value = '';
+
+        // Reset giá trị mặc định
+        document.getElementById('num_venues').value = 4;
+        document.getElementById('num_days').value = 3;
+        document.getElementById('sessions_per_day').value = 2;
+        document.getElementById('match_duration').value = 45;
+        document.getElementById('start_time_morning').value = '08:00';
+        document.getElementById('start_time_afternoon').value = '14:00';
+        document.getElementById('start_time_evening').value = '19:00';
+        document.getElementById('status').value = 'registration';
+
         document.getElementById('form-message').className = 'alert';
         document.getElementById('tournament-modal').classList.add('show');
     };
@@ -487,6 +627,15 @@
         document.getElementById('end_date').value = t.end_date || '';
         document.getElementById('location').value = t.location || '';
         document.getElementById('description').value = t.description || '';
+
+        document.getElementById('num_venues').value = t.num_venues || 4;
+        document.getElementById('num_days').value = t.num_days || 3;
+        document.getElementById('sessions_per_day').value = t.sessions_per_day || 2;
+        document.getElementById('match_duration').value = t.match_duration || 45;
+        document.getElementById('start_time_morning').value = t.start_time_morning || '08:00';
+        document.getElementById('start_time_afternoon').value = t.start_time_afternoon || '14:00';
+        document.getElementById('start_time_evening').value = t.start_time_evening || '19:00';
+
         document.getElementById('form-message').className = 'alert';
         document.getElementById('tournament-modal').classList.add('show');
     };
@@ -499,7 +648,7 @@
     };
 
     // ============================
-    // HÀM TẠO SLUG TỪ TÊN GIẢI ĐẤU
+    // TẠO SLUG
     // ============================
     function generateSlug(text) {
         const base = String(text || '')
@@ -517,13 +666,14 @@
     }
 
     // ============================
-    // XỬ LÝ SUBMIT FORM
+    // XỬ LÝ SUBMIT
     // ============================
     window.handleSubmit = async function(event) {
         event.preventDefault();
 
         const id = document.getElementById('tournament-id').value;
         const nameValue = document.getElementById('name').value.trim();
+        const numVenues = parseInt(document.getElementById('num_venues').value);
 
         const payload = {
             name: nameValue,
@@ -534,6 +684,13 @@
             end_date: document.getElementById('end_date').value || null,
             location: document.getElementById('location').value.trim(),
             description: document.getElementById('description').value.trim() || null,
+            num_venues: numVenues,
+            num_days: parseInt(document.getElementById('num_days').value),
+            sessions_per_day: parseInt(document.getElementById('sessions_per_day').value),
+            match_duration: parseInt(document.getElementById('match_duration').value),
+            start_time_morning: document.getElementById('start_time_morning').value,
+            start_time_afternoon: document.getElementById('start_time_afternoon').value,
+            start_time_evening: document.getElementById('start_time_evening').value,
             organizer_id: currentUser.id
         };
 
@@ -548,7 +705,7 @@
 
         try {
             if (id) {
-                // CẬP NHẬT - giữ nguyên slug cũ
+                // CẬP NHẬT
                 delete payload.slug;
                 const { error } = await supabaseClient
                     .from('tournaments')
@@ -558,11 +715,18 @@
                 showAlert('✅ Cập nhật giải đấu thành công!', 'success');
             } else {
                 // TẠO MỚI
-                const { error } = await supabaseClient
+                const { data: newTournament, error } = await supabaseClient
                     .from('tournaments')
-                    .insert(payload);
+                    .insert(payload)
+                    .select()
+                    .single();
+
                 if (error) throw error;
-                showAlert('✅ Tạo giải đấu thành công!', 'success');
+
+                // TỰ ĐỘNG TẠO SÂN
+                await createVenues(newTournament.id, numVenues, payload.location);
+
+                showAlert(`✅ Tạo giải đấu thành công! Đã tạo ${numVenues} sân.`, 'success');
             }
 
             closeModal();
@@ -577,7 +741,28 @@
     };
 
     // ============================
-    // XÓA GIẢI ĐẤU
+    // TẠO SÂN TỰ ĐỘNG
+    // ============================
+    async function createVenues(tournamentId, numVenues, venueName) {
+        const venues = [];
+        for (let i = 1; i <= numVenues; i++) {
+            venues.push({
+                tournament_id: tournamentId,
+                venue_name: venueName,
+                court_number: i,
+                court_name: `Sân ${i}`
+            });
+        }
+
+        const { error } = await supabaseClient.from('venues').insert(venues);
+        if (error) {
+            console.error('Create venues error:', error);
+            throw new Error('Không tạo được sân: ' + error.message);
+        }
+    }
+
+    // ============================
+    // XÓA GIẢI
     // ============================
     window.deleteTournament = async function(id) {
         const t = tournaments.find(x => x.id === id);
@@ -586,7 +771,7 @@
             return;
         }
 
-        if (!confirm(`Bạn có chắc muốn xóa giải đấu "${t.name}"?\nHành động này không thể hoàn tác!`)) return;
+        if (!confirm(`Bạn có chắc muốn xóa giải đấu "${t.name}"?\n\nTất cả sân, nội dung, lịch thi đấu của giải này cũng sẽ bị xóa!\n\nHành động này KHÔNG THỂ HOÀN TÁC!`)) return;
 
         try {
             const { error } = await supabaseClient
@@ -603,10 +788,14 @@
     };
 
     // ============================
-    // CHUYỂN ĐẾN TRANG BỐC THĂM
+    // CHUYỂN TRANG
     // ============================
     window.goToDraw = function(id) {
         window.location.href = 'draw.html?tournament_id=' + id;
+    };
+
+    window.goToCategories = function(id) {
+        window.location.href = 'categories.html?tournament_id=' + id;
     };
 
     // ============================
@@ -616,7 +805,7 @@
         const el = document.getElementById('alert');
         el.textContent = message;
         el.className = 'alert show ' + type;
-        setTimeout(() => { el.className = 'alert'; }, 4000);
+        setTimeout(() => { el.className = 'alert'; }, 5000);
     }
 
     function showFormMessage(message, type) {
