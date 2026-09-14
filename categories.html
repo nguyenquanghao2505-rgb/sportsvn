@@ -75,7 +75,7 @@
         .modal-overlay.show { display: flex; }
         .modal-content { background: #fff; border-radius: 20px; max-width: 700px;
                          width: 100%; max-height: 90vh; overflow-y: auto; }
-        .modal-content.large { max-width: 1400px; width: 95%; }
+        .modal-content.large { max-width: 1500px; width: 96%; }
         .modal-header { background: linear-gradient(135deg, #0d1b3e, #1a3a7a); color: #fff;
                         padding: 24px 28px; border-radius: 20px 20px 0 0; display: flex;
                         justify-content: space-between; align-items: center; position: sticky;
@@ -135,6 +135,71 @@
             padding: 3px 8px; background: #00b894; color: #fff;
             border-radius: 4px; font-weight: 700; margin-top: 5px;
         }
+        /* GROUP SECTION */
+        .group-section {
+            background: #fff; border-radius: 12px; padding: 16px;
+            margin-bottom: 20px; border: 2px solid #1a3a7a;
+            box-shadow: 0 2px 10px rgba(0,0,0,0.05);
+        }
+        .group-section h3 {
+            font-size: 16px; font-weight: 800; color: #1a3a7a;
+            margin-bottom: 14px; padding-bottom: 10px;
+            border-bottom: 2px solid #1a3a7a;
+            display: flex; justify-content: space-between; align-items: center;
+        }
+        .group-section h3 .group-count {
+            font-size: 12px; font-weight: 600; background: #e7f3ff;
+            color: #1a3a7a; padding: 3px 10px; border-radius: 12px;
+        }
+        .group-matches-grid {
+            display: grid; grid-template-columns: repeat(auto-fill, minmax(280px, 1fr));
+            gap: 10px;
+        }
+        .group-match {
+            background: #f8f9fa; border-radius: 8px; padding: 10px;
+            border-left: 3px solid #1a3a7a; cursor: pointer;
+            transition: all 0.2s ease; position: relative;
+        }
+        .group-match:hover { background: #fff; transform: translateX(4px);
+                            box-shadow: 0 2px 8px rgba(0,0,0,0.1); }
+        .group-match.completed { border-left-color: #00b894; background: #f0fdf4; }
+        .group-match .match-num {
+            position: absolute; top: 4px; right: 8px;
+            font-size: 9px; color: #999; font-weight: 700;
+        }
+        .group-match .team {
+            padding: 5px 8px; background: #fff; border-radius: 5px;
+            margin-bottom: 3px; font-size: 12px; font-weight: 600;
+            display: flex; justify-content: space-between; align-items: center;
+        }
+        .group-match .team.winner { background: #d4edda; color: #155724; font-weight: 800; }
+        .group-match .team .score { font-size: 11px; font-weight: 800; color: #00b894; }
+        .group-match .vs { text-align: center; color: #999; font-size: 9px; font-weight: 700; margin: 2px 0; }
+        .group-match .result-badge {
+            display: block; text-align: center; font-size: 10px;
+            padding: 2px 6px; background: #00b894; color: #fff;
+            border-radius: 4px; font-weight: 700; margin-top: 4px;
+        }
+        /* STANDINGS */
+        .standings-table {
+            width: 100%; border-collapse: collapse; margin-top: 12px;
+            background: #fff; border-radius: 8px; overflow: hidden;
+        }
+        .standings-table th {
+            background: #1a3a7a; color: #fff; padding: 8px 10px;
+            font-size: 11px; text-transform: uppercase; letter-spacing: 0.5px;
+        }
+        .standings-table td {
+            padding: 8px 10px; font-size: 13px;
+            border-bottom: 1px solid #e9ecef; text-align: center;
+        }
+        .standings-table td:first-child {
+            text-align: left; font-weight: 700; color: #1a1a2e;
+        }
+        .standings-table tr:nth-child(2) td:first-child { color: #00b894; }
+        .standings-table tr:nth-child(3) td:first-child { color: #0984e3; }
+        .standings-table tr:last-child td { border-bottom: none; }
+        /* SCORE MODAL */
         .score-modal-overlay { display: none; position: fixed; top: 0; left: 0; right: 0; bottom: 0;
                                background: rgba(0,0,0,0.7); z-index: 2000; align-items: center;
                                justify-content: center; padding: 20px; }
@@ -184,6 +249,16 @@
         .winner-info small {
             display: block; font-size: 12px;
             font-weight: 600; opacity: 0.9; margin-top: 4px;
+        }
+        .stage-header {
+            background: #fff3cd; padding: 14px 18px; border-radius: 10px;
+            margin: 24px 0 20px; font-weight: 800; color: #856404;
+            border-left: 4px solid #fdcb6e;
+            display: flex; align-items: center; gap: 10px;
+        }
+        .stage-header.knockout {
+            background: #e7f3ff; color: #1a3a7a;
+            border-left-color: #1a3a7a;
         }
         @media (max-width: 768px) {
             .form-grid { grid-template-columns: 1fr; }
@@ -367,7 +442,7 @@
 (function() {
     'use strict';
 
-    console.log('🚀 categories.html v3 - FULL');
+    console.log('🚀 categories.html v4 - VÒNG TRÒN + KNOCKOUT');
 
     const config = window.SPORTSVN_CONFIG || {};
     const supabaseClient = window.supabase.createClient(config.SUPABASE_URL, config.SUPABASE_ANON_KEY);
@@ -406,23 +481,19 @@
     }
 
     async function loadAllData() {
-        // Categories
         const { data: cats } = await supabaseClient.from('categories')
             .select('*').eq('tournament_id', tournamentId)
             .order('priority', { ascending: true });
         categories = cats || [];
 
-        // Draws
         const { data: drawsData } = await supabaseClient.from('draws')
             .select('*').eq('tournament_id', tournamentId);
         allDraws = drawsData || [];
 
-        // Schedules
         const { data: schedsData } = await supabaseClient.from('schedules')
             .select('*').eq('tournament_id', tournamentId);
         allSchedules = schedsData || [];
 
-        // Match scores
         const { data: scoresData } = await supabaseClient.from('match_scores')
             .select('*').eq('tournament_id', tournamentId);
         allMatchScores = scoresData || [];
@@ -528,7 +599,7 @@
     }
 
     // ==========================================
-    // XEM KẾT QUẢ BỐC THĂM - BRACKET
+    // XEM KẾT QUẢ BỐC THĂM
     // ==========================================
     window.viewDrawResult = function(catName) {
         const drawsForCat = allDraws.filter(d => d.category === catName);
@@ -600,17 +671,6 @@
     }
 
     function renderKnockoutBracket(draws, catName, isEditable) {
-        // Nhóm theo vòng và match
-        const matches = {};
-        draws.forEach(d => {
-            const round = d.round_number || 1;
-            const matchNum = d.match_number || 1;
-            const key = `${round}-${matchNum}`;
-            if (!matches[key]) matches[key] = [];
-            matches[key].push(d);
-        });
-
-        // Lấy thông tin category
         const cat = categories.find(c => c.name === catName);
         const totalTeams = draws.filter(d => d.group_name !== 'BYE').length;
         let bracketSize = 1;
@@ -624,29 +684,14 @@
             roundNames.push(fromEnd < standard.length ? standard[fromEnd] : `Vòng ${i + 1}`);
         }
 
-        // Lấy kết quả đã nhập
         const scoresMap = {};
         allMatchScores.filter(s => s.category === catName).forEach(s => {
-            const key = `${s.round_number}-${s.match_number}`;
-            scoresMap[key] = s;
+            scoresMap[`${s.round_number}-${s.match_number}`] = s;
         });
 
-        // Xác định winner của các trận để điền vào vòng sau
-        // Từ scoresMap, mỗi match có winner_name
-        // Cần map winner vào vị trí trong vòng tiếp theo
+        const bracketData = buildFullBracket(draws, catName, totalRounds);
 
         let html = '<div class="bracket-wrap">';
-
-        // Vòng 1: từ draws
-        const round1Matches = {};
-        draws.filter(d => (d.round_number || 1) === 1 || (d.group_name === 'Vòng 1')).forEach(d => {
-            const matchNum = d.match_number || 1;
-            if (!round1Matches[matchNum]) round1Matches[matchNum] = [];
-            round1Matches[matchNum].push(d);
-        });
-
-        // Build toàn bộ bracket từ vòng 1
-        const bracketData = buildFullBracket(draws, catName, totalRounds);
 
         for (let r = 0; r < totalRounds; r++) {
             const roundNum = r + 1;
@@ -669,11 +714,9 @@
                 const hasTeams = teamA || teamB;
                 const isCompleted = !!score;
 
-                // Xác định winner
                 const winnerA = isCompleted && score.winner_name === teamA?.name;
                 const winnerB = isCompleted && score.winner_name === teamB?.name;
 
-                // Điểm hiển thị
                 let scoreA = '', scoreB = '';
                 if (isCompleted && score.score_summary) {
                     const parts = score.score_summary.split(', ');
@@ -720,7 +763,6 @@
     function buildFullBracket(draws, catName, totalRounds) {
         const bracketData = {};
 
-        // Vòng 1: lấy từ draws
         const round1Map = {};
         draws.forEach(d => {
             if (d.group_name === 'BYE') return;
@@ -733,14 +775,12 @@
             }
         });
 
-        // Sắp xếp và đảm bảo có đủ slot
         const round1Matches = [];
         const maxMatchNum = Math.max(...Object.keys(round1Map).map(Number), 0);
         for (let i = 1; i <= maxMatchNum; i++) {
             round1Matches.push(round1Map[i] || { teamA: null, teamB: null });
         }
 
-        // Điền BYE vào các slot trống
         const totalFirstRoundSlots = Math.pow(2, totalRounds - 1);
         while (round1Matches.length < totalFirstRoundSlots) {
             round1Matches.push({ teamA: null, teamB: null });
@@ -748,13 +788,11 @@
 
         bracketData[1] = round1Matches;
 
-        // Lấy kết quả
         const scoresMap = {};
         allMatchScores.filter(s => s.category === catName).forEach(s => {
             scoresMap[`${s.round_number}-${s.match_number}`] = s;
         });
 
-        // Build các vòng tiếp theo
         for (let r = 2; r <= totalRounds; r++) {
             const prevRound = bracketData[r - 1];
             const numMatches = Math.floor(prevRound.length / 2);
@@ -779,7 +817,6 @@
 
     function getWinner(match, round, matchNum, scoresMap) {
         if (!match) return null;
-        // Nếu chỉ có 1 team → BYE → tự động thắng
         if (match.teamA && !match.teamB) return match.teamA;
         if (!match.teamA && match.teamB) return match.teamB;
 
@@ -792,7 +829,7 @@
     }
 
     // ==========================================
-    // ĐIỀU HÀNH TRẬN ĐẤU
+    // ĐIỀU HÀNH TRẬN ĐẤU - CÓ VÒNG TRÒN + KNOCKOUT
     // ==========================================
     window.openControlPanel = function(catName) {
         const drawsForCat = allDraws.filter(d => d.category === catName);
@@ -803,25 +840,26 @@
 
         document.getElementById('control-title').textContent = `🎮 Điều hành - ${catName}`;
 
-        const cat = categories.find(c => c.name === catName);
-        const totalTeams = drawsForCat.filter(d => d.group_name !== 'BYE').length;
-        let bracketSize = 1;
-        while (bracketSize < totalTeams) bracketSize *= 2;
-        const totalRounds = Math.log2(bracketSize);
+        const isKnockout = drawsForCat[0]?.draw_type === 'knockout';
 
         const scoresForCat = allMatchScores.filter(s => s.category === catName);
-        const completedMatches = scoresForCat.length;
 
         document.getElementById('control-info').innerHTML = `
             <i class="fas fa-info-circle"></i> 
             <strong>${escapeHtml(catName)}</strong> · 
-            ${totalTeams} VĐV · 
-            Đã hoàn thành: <strong>${completedMatches}</strong> trận · 
+            ${drawsForCat.length} VĐV · 
+            Đã hoàn thành: <strong>${scoresForCat.length}</strong> trận · 
             <span style="color: #d63031;">Nhấn vào trận để nhập điểm</span>
         `;
 
-        document.getElementById('control-bracket').innerHTML = renderKnockoutBracket(drawsForCat, catName, true);
+        let html = '';
+        if (isKnockout) {
+            html = renderKnockoutBracket(drawsForCat, catName, true);
+        } else {
+            html = renderRoundRobinControl(drawsForCat, catName);
+        }
 
+        document.getElementById('control-bracket').innerHTML = html;
         document.getElementById('control-modal').classList.add('show');
     };
 
@@ -829,11 +867,267 @@
         document.getElementById('control-modal').classList.remove('show');
     };
 
+    function renderRoundRobinControl(draws, catName) {
+        const groups = {};
+        draws.forEach(d => {
+            const g = d.group_name || 'A';
+            if (!groups[g]) groups[g] = [];
+            groups[g].push(d);
+        });
+
+        Object.keys(groups).forEach(g => {
+            groups[g].sort((a, b) => (a.position || 0) - (b.position || 0));
+        });
+
+        let html = '<div class="stage-header"><i class="fas fa-layer-group"></i> GIAI ĐOẠN 1: VÒNG TRÒN CÁC BẢNG</div>';
+
+        // Tạo bảng xếp hạng chung
+        let matchCounter = 1;
+        const groupKeys = Object.keys(groups).sort();
+
+        groupKeys.forEach(groupName => {
+            const groupTeams = groups[groupName];
+            const n = groupTeams.length;
+
+            html += `
+                <div class="group-section">
+                    <h3>
+                        <span>🏆 BẢNG ${escapeHtml(groupName)}</span>
+                        <span class="group-count">${n} VĐV · ${(n * (n - 1)) / 2} trận</span>
+                    </h3>
+                    <div class="group-matches-grid">
+            `;
+
+            for (let i = 0; i < n; i++) {
+                for (let j = i + 1; j < n; j++) {
+                    const teamA = groupTeams[i];
+                    const teamB = groupTeams[j];
+
+                    const existingScore = allMatchScores.find(s =>
+                        s.category === catName &&
+                        s.round_number === 100 &&
+                        s.match_number === matchCounter
+                    );
+
+                    const isCompleted = !!existingScore;
+                    const winnerA = existingScore?.winner_name === teamA.team_name;
+                    const winnerB = existingScore?.winner_name === teamB.team_name;
+
+                    let scoreA = '', scoreB = '';
+                    if (existingScore && existingScore.score_summary) {
+                        const parts = existingScore.score_summary.split(', ');
+                        scoreA = parts.filter(p => { const [a, b] = p.split('-').map(Number); return a > b; }).length;
+                        scoreB = parts.filter(p => { const [a, b] = p.split('-').map(Number); return b > a; }).length;
+                    }
+
+                    html += `
+                        <div class="group-match ${isCompleted ? 'completed' : ''}"
+                             onclick="openScoreModal('${escapeHtml(catName)}', 100, ${matchCounter}, '${escapeHtml(teamA.team_name)}', '${escapeHtml(teamB.team_name)}')">
+                            <span class="match-num">T${i * n + j}</span>
+                            <div class="team ${winnerA ? 'winner' : ''}">
+                                <span>${escapeHtml(teamA.team_name)}</span>
+                                ${scoreA !== '' ? `<span class="score">${scoreA}</span>` : ''}
+                            </div>
+                            <div class="vs">VS</div>
+                            <div class="team ${winnerB ? 'winner' : ''}">
+                                <span>${escapeHtml(teamB.team_name)}</span>
+                                ${scoreB !== '' ? `<span class="score">${scoreB}</span>` : ''}
+                            </div>
+                            ${isCompleted ? `<span class="result-badge">✅ ${escapeHtml(existingScore.winner_name)} thắng</span>` : ''}
+                        </div>
+                    `;
+
+                    matchCounter++;
+                }
+            }
+
+            html += `
+                    </div>
+            `;
+
+            // Bảng xếp hạng
+            const standings = computeStandings(groupName, groupTeams, catName);
+            html += `
+                <table class="standings-table">
+                    <thead>
+                        <tr>
+                            <th style="text-align: left;">VĐV</th>
+                            <th>Tr</th>
+                            <th>T</th>
+                            <th>B</th>
+                            <th>Đ</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        ${standings.map(s => `
+                            <tr>
+                                <td>${escapeHtml(s.name)}</td>
+                                <td>${s.played}</td>
+                                <td>${s.wins}</td>
+                                <td>${s.losses}</td>
+                                <td><strong>${s.points}</strong></td>
+                            </tr>
+                        `).join('')}
+                    </tbody>
+                </table>
+            `;
+
+            html += '</div>';
+        });
+
+        // GIAI ĐOẠN 2: KNOCKOUT
+        if (groupKeys.length >= 2) {
+            let knockoutTeams = groupKeys.length * 2;
+            let bracketSize = 2;
+            while (bracketSize < knockoutTeams) bracketSize *= 2;
+            if (bracketSize > 16) bracketSize = 16;
+
+            html += `<div class="stage-header knockout"><i class="fas fa-trophy"></i> GIAI ĐOẠN 2: VÒNG LOẠI TRỰC TIẾP (Top ${knockoutTeams} đội)</div>`;
+            html += '<div class="bracket-wrap">';
+
+            const totalRounds = Math.log2(bracketSize);
+            const roundNames = [];
+            const standard = ['Chung kết', 'Bán kết', 'Tứ kết', 'Vòng 1/8'];
+            for (let i = 0; i < totalRounds; i++) {
+                const fromEnd = totalRounds - 1 - i;
+                roundNames.push(fromEnd < standard.length ? standard[fromEnd] : `Vòng ${i + 1}`);
+            }
+
+            // Lấy đội nhất/nhì từ mỗi bảng
+            const qualifiedTeams = [];
+            groupKeys.forEach(g => {
+                const standings = computeStandings(g, groups[g], catName);
+                if (standings[0]) qualifiedTeams.push({ name: standings[0].name, rank: 'Nhất bảng ' + g });
+                if (standings[1]) qualifiedTeams.push({ name: standings[1].name, rank: 'Nhì bảng ' + g });
+            });
+
+            for (let r = 0; r < totalRounds; r++) {
+                const roundNum = 200 + r;
+                const numMatches = bracketSize / Math.pow(2, r + 1);
+
+                html += `
+                    <div class="bracket-round">
+                        <h4>${roundNames[r]}</h4>
+                        <div class="bracket-matchups">
+                `;
+
+                for (let m = 0; m < numMatches; m++) {
+                    const matchNum = m + 1;
+                    const score = allMatchScores.find(s =>
+                        s.category === catName &&
+                        s.round_number === roundNum &&
+                        s.match_number === matchNum
+                    );
+
+                    let teamA = null, teamB = null;
+
+                    // Vòng đầu tiên của knockout
+                    if (r === 0) {
+                        const pairIdx1 = m * 2;
+                        const pairIdx2 = m * 2 + 1;
+                        if (qualifiedTeams[pairIdx1]) teamA = { name: qualifiedTeams[pairIdx1].name };
+                        if (qualifiedTeams[pairIdx2]) teamB = { name: qualifiedTeams[pairIdx2].name };
+                    } else {
+                        // Vòng sau: lấy từ winner vòng trước
+                        const prevRoundNum = roundNum - 1;
+                        const prevMatch1 = allMatchScores.find(s =>
+                            s.category === catName && s.round_number === prevRoundNum && s.match_number === m * 2 + 1
+                        );
+                        const prevMatch2 = allMatchScores.find(s =>
+                            s.category === catName && s.round_number === prevRoundNum && s.match_number === m * 2 + 2
+                        );
+                        if (prevMatch1) teamA = { name: prevMatch1.winner_name };
+                        if (prevMatch2) teamB = { name: prevMatch2.winner_name };
+                    }
+
+                    // Nếu có kết quả → override
+                    if (score) {
+                        teamA = score.team_a_name ? { name: score.team_a_name } : teamA;
+                        teamB = score.team_b_name ? { name: score.team_b_name } : teamB;
+                    }
+
+                    const hasBothTeams = teamA && teamB;
+                    const isCompleted = !!score;
+                    const winnerA = isCompleted && score.winner_name === teamA?.name;
+                    const winnerB = isCompleted && score.winner_name === teamB?.name;
+
+                    let scoreA = '', scoreB = '';
+                    if (isCompleted && score.score_summary) {
+                        const parts = score.score_summary.split(', ');
+                        scoreA = parts.filter(p => { const [a, b] = p.split('-').map(Number); return a > b; }).length;
+                        scoreB = parts.filter(p => { const [a, b] = p.split('-').map(Number); return b > a; }).length;
+                    }
+
+                    html += `
+                        <div class="matchup ${isCompleted ? 'completed' : ''} ${!hasBothTeams ? 'empty' : ''}"
+                             onclick="${hasBothTeams && !isCompleted ? `openScoreModal('${escapeHtml(catName)}', ${roundNum}, ${matchNum}, '${escapeHtml(teamA.name)}', '${escapeHtml(teamB.name)}')` : ''}">
+                            <span class="match-number">Trận ${matchNum}</span>
+                            <div class="team ${winnerA ? 'winner' : ''} ${!teamA ? 'bye' : ''}">
+                                <span>${teamA ? escapeHtml(teamA.name) : 'Chờ KQ bảng'}</span>
+                                ${scoreA !== '' ? `<span class="score">${scoreA}</span>` : ''}
+                            </div>
+                            <div class="vs">VS</div>
+                            <div class="team ${winnerB ? 'winner' : ''} ${!teamB ? 'bye' : ''}">
+                                <span>${teamB ? escapeHtml(teamB.name) : 'Chờ KQ bảng'}</span>
+                                ${scoreB !== '' ? `<span class="score">${scoreB}</span>` : ''}
+                            </div>
+                            ${isCompleted ? `<span class="result-badge">✅ ${escapeHtml(score.winner_name)} thắng</span>` : ''}
+                        </div>
+                    `;
+                }
+
+                html += `
+                        </div>
+                    </div>
+                `;
+            }
+
+            html += '</div>';
+        }
+
+        return html;
+    }
+
+    function computeStandings(groupName, groupTeams, catName) {
+        const stats = {};
+        groupTeams.forEach(t => {
+            stats[t.team_name] = {
+                name: t.team_name,
+                played: 0, wins: 0, losses: 0, points: 0
+            };
+        });
+
+        allMatchScores.filter(s => 
+            s.category === catName && s.round_number === 100
+        ).forEach(s => {
+            if (stats[s.team_a_name] && stats[s.team_b_name]) {
+                stats[s.team_a_name].played++;
+                stats[s.team_b_name].played++;
+                if (s.winner_name === s.team_a_name) {
+                    stats[s.team_a_name].wins++;
+                    stats[s.team_a_name].points += 2;
+                    stats[s.team_b_name].losses++;
+                    stats[s.team_b_name].points += 1;
+                } else if (s.winner_name === s.team_b_name) {
+                    stats[s.team_b_name].wins++;
+                    stats[s.team_b_name].points += 2;
+                    stats[s.team_a_name].losses++;
+                    stats[s.team_a_name].points += 1;
+                }
+            }
+        });
+
+        return Object.values(stats).sort((a, b) => {
+            if (b.points !== a.points) return b.points - a.points;
+            return b.wins - a.wins;
+        });
+    }
+
     // ==========================================
     // NHẬP ĐIỂM
     // ==========================================
     window.openScoreModal = function(catName, roundNum, matchNum, teamA, teamB) {
-        if (!teamA || !teamB || teamA === 'null' || teamB === 'null') {
+        if (!teamA || !teamB || teamA === 'null' || teamB === 'null' || teamA === 'undefined' || teamB === 'undefined') {
             alert('Chưa xác định đủ 2 VĐV!');
             return;
         }
@@ -846,11 +1140,15 @@
         const setsToWin = Math.ceil(maxSets / 2);
         const pointsPerSet = cat?.points_per_set || 21;
 
-        document.getElementById('score-title').textContent = `🏸 Nhập điểm - Trận ${matchNum} · Vòng ${roundNum}`;
+        let roundLabel = '';
+        if (roundNum === 100) roundLabel = 'Vòng bảng';
+        else if (roundNum >= 200) roundLabel = 'Knockout';
+        else roundLabel = `Vòng ${roundNum}`;
+
+        document.getElementById('score-title').textContent = `🏸 Nhập điểm - ${roundLabel} · Trận ${matchNum}`;
         document.getElementById('display-team-a').textContent = teamA;
         document.getElementById('display-team-b').textContent = teamB;
 
-        // Tạo các ô nhập điểm
         let html = `
             <div style="background: #e7f3ff; padding: 10px 14px; border-radius: 8px; margin-bottom: 16px; font-size: 13px; color: #1a3a7a; font-weight: 700; text-align: center;">
                 <i class="fas fa-info-circle"></i> Thể thức: ${setsFormat.toUpperCase()} · Điểm/séc: ${pointsPerSet} · Cần thắng ${setsToWin} séc
@@ -874,19 +1172,20 @@
         document.getElementById('score-sets-container').innerHTML = html;
         document.getElementById('winner-info').className = 'winner-info';
 
-        // Load điểm cũ nếu có
         const existingScore = allMatchScores.find(s => 
             s.category === catName && s.round_number === roundNum && s.match_number === matchNum
         );
 
         if (existingScore) {
-            const setKeys = ['set_1', 'set_2', 'set_3', 'set_4', 'set_5'];
+            const setKeys = ['set_1', 'set_2', 'set_3', 'set_4', 'set_5', 'set_6', 'set_7'];
             setKeys.forEach((key, idx) => {
                 const a = existingScore[`${key}_a`];
                 const b = existingScore[`${key}_b`];
-                if (a !== null && b !== null) {
-                    document.getElementById(`set-${idx + 1}-a`).value = a;
-                    document.getElementById(`set-${idx + 1}-b`).value = b;
+                const aEl = document.getElementById(`set-${idx + 1}-a`);
+                const bEl = document.getElementById(`set-${idx + 1}-b`);
+                if (aEl && bEl && a !== null && b !== null) {
+                    aEl.value = a;
+                    bEl.value = b;
                 }
             });
             checkAllSets();
@@ -903,6 +1202,8 @@
     window.checkSetWinner = function(setNum) {
         const a = document.getElementById(`set-${setNum}-a`);
         const b = document.getElementById(`set-${setNum}-b`);
+        if (!a || !b) return;
+
         const valA = parseInt(a.value) || 0;
         const valB = parseInt(b.value) || 0;
 
@@ -923,7 +1224,8 @@
     };
 
     function checkAllSets() {
-        const cat = categories.find(c => c.name === currentScoreMatch?.catName);
+        if (!currentScoreMatch) return;
+        const cat = categories.find(c => c.name === currentScoreMatch.catName);
         const setsFormat = cat?.sets_format || 'best-of-3';
         const maxSets = setsFormat === 'best-of-7' ? 7 : (setsFormat === 'best-of-5' ? 5 : 3);
         const setsToWin = Math.ceil(maxSets / 2);
@@ -948,7 +1250,6 @@
 
         const winnerInfo = document.getElementById('winner-info');
 
-        // Đã đủ séc để xác định winner
         if (winsA >= setsToWin || winsB >= setsToWin) {
             const winner = winsA >= setsToWin ? currentScoreMatch.teamA : currentScoreMatch.teamB;
             const loser = winsA >= setsToWin ? currentScoreMatch.teamB : currentScoreMatch.teamA;
@@ -961,14 +1262,12 @@
             winnerInfo.className = 'winner-info';
         }
 
-        // Disable các séc không cần thiết
         for (let i = 1; i <= maxSets; i++) {
             const aEl = document.getElementById(`set-${i}-a`);
             const bEl = document.getElementById(`set-${i}-b`);
             if (!aEl) continue;
 
             if (winsA >= setsToWin || winsB >= setsToWin) {
-                // Đã có winner → disable tất cả các séc chưa nhập
                 if (aEl.value === '' && bEl.value === '') {
                     aEl.disabled = true;
                     bEl.disabled = true;
@@ -1032,7 +1331,6 @@
         btn.innerHTML = '<i class="fas fa-spinner fa-spin"></i> Đang lưu...';
 
         try {
-            // Xóa kết quả cũ (nếu có)
             await supabaseClient.from('match_scores')
                 .delete()
                 .eq('tournament_id', tournamentId)
@@ -1040,22 +1338,23 @@
                 .eq('round_number', roundNum)
                 .eq('match_number', matchNum);
 
-            // Insert kết quả mới
             const { error } = await supabaseClient.from('match_scores').insert(payload);
             if (error) throw error;
 
-            // Refresh dữ liệu
             const { data: scoresData } = await supabaseClient.from('match_scores')
                 .select('*').eq('tournament_id', tournamentId);
             allMatchScores = scoresData || [];
 
-            // Đóng modal điểm
             closeScoreModal();
 
-            // Refresh modal điều hành nếu đang mở
             if (document.getElementById('control-modal').classList.contains('show')) {
                 const drawsForCat = allDraws.filter(d => d.category === catName);
-                document.getElementById('control-bracket').innerHTML = renderKnockoutBracket(drawsForCat, catName, true);
+                const isKnockout = drawsForCat[0]?.draw_type === 'knockout';
+                if (isKnockout) {
+                    document.getElementById('control-bracket').innerHTML = renderKnockoutBracket(drawsForCat, catName, true);
+                } else {
+                    document.getElementById('control-bracket').innerHTML = renderRoundRobinControl(drawsForCat, catName);
+                }
                 
                 const scoresForCat = allMatchScores.filter(s => s.category === catName);
                 document.getElementById('control-info').innerHTML = `
@@ -1066,10 +1365,9 @@
                 `;
             }
 
-            // Refresh danh sách categories
             renderCategories();
 
-            alert(`✅ Đã lưu kết quả! ${payload.winner_name} thắng ${winsA}-${winsB}`);
+            alert(`✅ Đã lưu kết quả! ${payload.winner_name} thắng ${Math.max(winsA, winsB)}-${Math.min(winsA, winsB)}`);
 
         } catch (error) {
             console.error(error);
