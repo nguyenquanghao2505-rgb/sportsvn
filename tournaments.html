@@ -8,258 +8,115 @@
     <style>
         * { margin: 0; padding: 0; box-sizing: border-box; font-family: 'Segoe UI', system-ui, sans-serif; }
         body { background: #f0f2f8; min-height: 100vh; padding: 24px; }
-
         .container { max-width: 1200px; margin: 0 auto; }
 
         .header {
             background: linear-gradient(135deg, #0d1b3e, #1a3a7a);
-            border-radius: 20px;
-            padding: 32px;
-            color: #fff;
-            margin-bottom: 24px;
-            display: flex;
-            justify-content: space-between;
-            align-items: center;
-            flex-wrap: wrap;
-            gap: 16px;
+            border-radius: 20px; padding: 32px; color: #fff;
+            margin-bottom: 24px; display: flex; justify-content: space-between;
+            align-items: center; flex-wrap: wrap; gap: 16px;
         }
-
         .header h1 { font-size: 28px; margin-bottom: 8px; }
         .header p { opacity: 0.85; }
 
         .btn {
-            padding: 12px 24px;
-            border-radius: 10px;
-            font-size: 15px;
-            font-weight: 700;
-            cursor: pointer;
-            border: none;
-            transition: all 0.3s ease;
-            text-decoration: none;
-            display: inline-flex;
-            align-items: center;
-            gap: 8px;
+            padding: 12px 24px; border-radius: 10px; font-size: 15px; font-weight: 700;
+            cursor: pointer; border: none; transition: all 0.3s ease; text-decoration: none;
+            display: inline-flex; align-items: center; gap: 8px;
         }
-
         .btn-primary { background: #e94560; color: #fff; }
         .btn-primary:hover { transform: translateY(-2px); box-shadow: 0 8px 20px rgba(233,69,96,0.4); }
-
         .btn-outline { background: transparent; color: #fff; border: 2px solid #fff; }
         .btn-outline:hover { background: #fff; color: #0d1b3e; }
 
-        .panel {
-            background: #fff;
-            border-radius: 16px;
-            padding: 24px;
-            margin-bottom: 24px;
-            box-shadow: 0 4px 20px rgba(0,0,0,0.08);
-        }
-
+        .panel { background: #fff; border-radius: 16px; padding: 24px;
+                 margin-bottom: 24px; box-shadow: 0 4px 20px rgba(0,0,0,0.08); }
         .panel-title { font-size: 20px; font-weight: 700; color: #1a1a2e; margin-bottom: 16px; }
 
         /* MODAL */
         .modal-overlay {
-            display: none;
-            position: fixed;
-            top: 0; left: 0; right: 0; bottom: 0;
-            background: rgba(0,0,0,0.5);
-            z-index: 1000;
-            align-items: center;
-            justify-content: center;
-            padding: 20px;
+            display: none; position: fixed; top: 0; left: 0; right: 0; bottom: 0;
+            background: rgba(0,0,0,0.5); z-index: 1000; align-items: center;
+            justify-content: center; padding: 20px;
         }
-
         .modal-overlay.show { display: flex; }
-
         .modal-content {
-            background: #fff;
-            border-radius: 20px;
-            max-width: 800px;
-            width: 100%;
-            max-height: 90vh;
-            overflow-y: auto;
-            animation: slideIn 0.3s ease;
+            background: #fff; border-radius: 20px; max-width: 800px; width: 100%;
+            max-height: 90vh; overflow-y: auto; animation: slideIn 0.3s ease;
         }
-
-        @keyframes slideIn {
-            from { opacity: 0; transform: translateY(-30px); }
-            to { opacity: 1; transform: translateY(0); }
-        }
-
+        @keyframes slideIn { from { opacity: 0; transform: translateY(-30px); } to { opacity: 1; transform: translateY(0); } }
         .modal-header {
-            background: linear-gradient(135deg, #0d1b3e, #1a3a7a);
-            color: #fff;
-            padding: 24px 28px;
-            border-radius: 20px 20px 0 0;
-            display: flex;
-            justify-content: space-between;
-            align-items: center;
-            position: sticky;
-            top: 0;
-            z-index: 10;
+            background: linear-gradient(135deg, #0d1b3e, #1a3a7a); color: #fff;
+            padding: 24px 28px; border-radius: 20px 20px 0 0;
+            display: flex; justify-content: space-between; align-items: center;
+            position: sticky; top: 0; z-index: 10;
         }
-
         .modal-header h2 { font-size: 20px; }
-
-        .modal-close {
-            background: none;
-            border: none;
-            color: #fff;
-            font-size: 28px;
-            cursor: pointer;
-            padding: 0 8px;
-        }
-
+        .modal-close { background: none; border: none; color: #fff; font-size: 28px; cursor: pointer; padding: 0 8px; }
         .modal-body { padding: 28px; }
 
         .section-label {
-            font-size: 13px;
-            font-weight: 800;
-            color: #1a3a7a;
-            text-transform: uppercase;
-            letter-spacing: 1px;
-            margin-bottom: 14px;
-            padding-bottom: 8px;
+            font-size: 13px; font-weight: 800; color: #1a3a7a;
+            text-transform: uppercase; letter-spacing: 1px;
+            margin-bottom: 14px; padding-bottom: 8px;
             border-bottom: 2px solid #e9ecef;
-            display: flex;
-            align-items: center;
-            gap: 8px;
+            display: flex; align-items: center; gap: 8px;
         }
-
         .section-label i { font-size: 16px; }
 
-        .form-grid {
-            display: grid;
-            grid-template-columns: 1fr 1fr;
-            gap: 18px;
-            margin-bottom: 24px;
-        }
-
+        .form-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 18px; margin-bottom: 24px; }
         .form-group { display: flex; flex-direction: column; }
         .form-group.full { grid-column: 1 / -1; }
-
-        .form-group label {
-            font-weight: 700;
-            font-size: 14px;
-            margin-bottom: 8px;
-            color: #1a1a2e;
-        }
-
+        .form-group label { font-weight: 700; font-size: 14px; margin-bottom: 8px; color: #1a1a2e; }
         .form-group label span { color: #e94560; }
-
-        .form-group input,
-        .form-group select,
-        .form-group textarea {
-            padding: 12px 16px;
-            border: 2px solid #e9ecef;
-            border-radius: 10px;
-            font-size: 15px;
-            font-family: inherit;
+        .form-group input, .form-group select, .form-group textarea {
+            padding: 12px 16px; border: 2px solid #e9ecef; border-radius: 10px;
+            font-size: 15px; font-family: inherit;
         }
-
-        .form-group input:focus,
-        .form-group select:focus,
-        .form-group textarea:focus {
-            border-color: #1a3a7a;
-            outline: none;
+        .form-group input:focus, .form-group select:focus, .form-group textarea:focus {
+            border-color: #1a3a7a; outline: none;
         }
-
         .form-group textarea { resize: vertical; min-height: 80px; }
+        .form-hint { font-size: 12px; color: #6c757d; margin-top: 4px; }
 
-        .form-hint {
-            font-size: 12px;
-            color: #6c757d;
-            margin-top: 4px;
-        }
+        .time-grid { display: grid; grid-template-columns: 1fr 1fr 1fr; gap: 12px; }
 
-        .time-grid {
-            display: grid;
-            grid-template-columns: 1fr 1fr 1fr;
-            gap: 12px;
-        }
+        .modal-actions { display: flex; gap: 12px; justify-content: flex-end; margin-top: 24px;
+                         padding-top: 20px; border-top: 1px solid #e9ecef; }
 
-        .modal-actions {
-            display: flex;
-            gap: 12px;
-            justify-content: flex-end;
-            margin-top: 24px;
-            padding-top: 20px;
-            border-top: 1px solid #e9ecef;
-        }
-
-        .alert {
-            padding: 14px 18px;
-            border-radius: 10px;
-            margin-bottom: 16px;
-            display: none;
-        }
-
+        .alert { padding: 14px 18px; border-radius: 10px; margin-bottom: 16px; display: none; }
         .alert.show { display: block; }
         .alert.error { background: #f8d7da; color: #721c24; }
         .alert.success { background: #d4edda; color: #155724; }
 
         /* TOURNAMENT CARD */
         .tournament-grid {
-            display: grid;
-            grid-template-columns: repeat(auto-fill, minmax(360px, 1fr));
-            gap: 20px;
+            display: grid; grid-template-columns: repeat(auto-fill, minmax(380px, 1fr)); gap: 20px;
         }
-
         .tournament-card {
-            background: #fff;
-            border-radius: 16px;
-            padding: 22px;
+            background: #fff; border-radius: 16px; padding: 22px;
             box-shadow: 0 2px 12px rgba(0,0,0,0.06);
-            border-left: 5px solid #1a3a7a;
-            transition: all 0.3s ease;
+            border-left: 5px solid #1a3a7a; transition: all 0.3s ease;
         }
+        .tournament-card:hover { transform: translateY(-4px); box-shadow: 0 8px 25px rgba(0,0,0,0.12); }
+        .tournament-card h3 { font-size: 17px; color: #1a1a2e; margin-bottom: 14px; line-height: 1.4; }
 
-        .tournament-card:hover {
-            transform: translateY(-4px);
-            box-shadow: 0 8px 25px rgba(0,0,0,0.12);
-        }
-
-        .tournament-card h3 {
-            font-size: 17px;
-            color: #1a1a2e;
-            margin-bottom: 14px;
-            line-height: 1.4;
-        }
-
-        .tournament-meta {
-            display: flex;
-            flex-direction: column;
-            gap: 8px;
-            font-size: 14px;
-            color: #6c757d;
-            margin-bottom: 14px;
-        }
-
+        .tournament-meta { display: flex; flex-direction: column; gap: 8px;
+                           font-size: 14px; color: #6c757d; margin-bottom: 14px; }
         .tournament-meta span { display: flex; align-items: center; gap: 8px; }
 
         .tournament-stats {
-            display: grid;
-            grid-template-columns: repeat(3, 1fr);
-            gap: 8px;
-            margin-bottom: 14px;
-            padding: 12px;
-            background: #f8f9fa;
-            border-radius: 10px;
+            display: grid; grid-template-columns: repeat(3, 1fr); gap: 8px;
+            margin-bottom: 14px; padding: 12px; background: #f8f9fa; border-radius: 10px;
         }
-
         .stat-item { text-align: center; }
         .stat-item .value { font-size: 20px; font-weight: 800; color: #1a3a7a; display: block; }
         .stat-item .label { font-size: 11px; color: #6c757d; text-transform: uppercase; letter-spacing: 0.5px; }
 
         .badge {
-            display: inline-block;
-            padding: 4px 12px;
-            border-radius: 20px;
-            font-size: 12px;
-            font-weight: 700;
-            text-transform: uppercase;
+            display: inline-block; padding: 4px 12px; border-radius: 20px;
+            font-size: 12px; font-weight: 700; text-transform: uppercase;
         }
-
         .badge.draft { background: #e9ecef; color: #6c757d; }
         .badge.registration { background: #cfe2ff; color: #084298; }
         .badge.ongoing { background: #d4edda; color: #155724; }
@@ -267,42 +124,23 @@
         .badge.cancelled { background: #e2e3e5; color: #41464b; }
 
         .card-actions {
-            display: grid;
-            grid-template-columns: 1fr 1fr;
-            gap: 8px;
-            margin-top: 14px;
-            padding-top: 14px;
-            border-top: 1px solid #e9ecef;
+            display: grid; grid-template-columns: 1fr 1fr;
+            gap: 8px; margin-top: 14px; padding-top: 14px; border-top: 1px solid #e9ecef;
         }
-
         .btn-small {
-            padding: 10px 14px;
-            font-size: 13px;
-            border-radius: 8px;
-            border: none;
-            cursor: pointer;
-            font-weight: 700;
-            display: inline-flex;
-            align-items: center;
-            justify-content: center;
-            gap: 6px;
-            transition: all 0.2s ease;
+            padding: 10px 14px; font-size: 13px; border-radius: 8px; border: none;
+            cursor: pointer; font-weight: 700; display: inline-flex;
+            align-items: center; justify-content: center; gap: 6px; transition: all 0.2s ease;
         }
-
         .btn-small:hover { transform: translateY(-1px); }
-
         .btn-draw { background: #00b894; color: #fff; }
         .btn-categories { background: #6c5ce7; color: #fff; }
+        .btn-athletes { background: #0984e3; color: #fff; }
         .btn-schedule { background: #fdcb6e; color: #1a1a2e; }
         .btn-edit { background: #fdcb6e; color: #1a1a2e; }
         .btn-delete { background: #e94560; color: #fff; }
 
-        .empty-state {
-            text-align: center;
-            padding: 60px 20px;
-            color: #6c757d;
-        }
-
+        .empty-state { text-align: center; padding: 60px 20px; color: #6c757d; }
         .empty-state i { font-size: 60px; color: #dee2e6; margin-bottom: 16px; display: block; }
 
         @media (max-width: 768px) {
@@ -490,45 +328,30 @@
     let currentUser = null;
     let tournaments = [];
 
-    // ============================
-    // KHỞI TẠO
-    // ============================
     async function init() {
         const { data: { session } } = await supabaseClient.auth.getSession();
-        if (!session) {
-            window.location.href = 'login.html';
-            return;
-        }
+        if (!session) { window.location.href = 'login.html'; return; }
         currentUser = session.user;
         await loadTournaments();
     }
 
-    // ============================
-    // TẢI DANH SÁCH
-    // ============================
     async function loadTournaments() {
         try {
             const { data, error } = await supabaseClient
-                .from('tournaments')
-                .select('*')
+                .from('tournaments').select('*')
                 .order('created_at', { ascending: false });
-
             if (error) throw error;
             tournaments = data || [];
             renderTournaments();
         } catch (error) {
-            console.error('Load error:', error);
-            showAlert('Không tải được danh sách giải đấu: ' + error.message, 'error');
+            console.error(error);
+            showAlert('Không tải được danh sách: ' + error.message, 'error');
         }
     }
 
-    // ============================
-    // HIỂN THỊ DANH SÁCH
-    // ============================
     function renderTournaments() {
         const container = document.getElementById('tournament-list');
-        const countEl = document.getElementById('count');
-        countEl.textContent = tournaments.length;
+        document.getElementById('count').textContent = tournaments.length;
 
         if (tournaments.length === 0) {
             container.innerHTML = `
@@ -538,8 +361,7 @@
                     <button class="btn btn-primary" onclick="openCreateModal()">
                         <i class="fas fa-plus"></i> Tạo giải đấu đầu tiên
                     </button>
-                </div>
-            `;
+                </div>`;
             return;
         }
 
@@ -572,8 +394,14 @@
                     <button class="btn-small btn-categories" onclick="goToCategories('${t.id}')">
                         <i class="fas fa-list"></i> Nội dung
                     </button>
+                    <button class="btn-small btn-athletes" onclick="goToAthletes('${t.id}')">
+                        <i class="fas fa-users"></i> VĐV
+                    </button>
                     <button class="btn-small btn-draw" onclick="goToDraw('${t.id}')">
                         <i class="fas fa-dice"></i> Bốc thăm
+                    </button>
+                    <button class="btn-small btn-schedule" onclick="goToSchedule('${t.id}')">
+                        <i class="fas fa-calendar-alt"></i> Lịch thi
                     </button>
                     <button class="btn-small btn-edit" onclick="openEditModal('${t.id}')">
                         <i class="fas fa-edit"></i> Sửa
@@ -586,15 +414,10 @@
         `).join('');
     }
 
-    // ============================
-    // MỞ MODAL TẠO MỚI
-    // ============================
     window.openCreateModal = function() {
         document.getElementById('modal-title').textContent = 'Tạo giải đấu mới';
         document.getElementById('tournament-form').reset();
         document.getElementById('tournament-id').value = '';
-
-        // Reset giá trị mặc định
         document.getElementById('num_venues').value = 4;
         document.getElementById('num_days').value = 3;
         document.getElementById('sessions_per_day').value = 2;
@@ -603,21 +426,13 @@
         document.getElementById('start_time_afternoon').value = '14:00';
         document.getElementById('start_time_evening').value = '19:00';
         document.getElementById('status').value = 'registration';
-
         document.getElementById('form-message').className = 'alert';
         document.getElementById('tournament-modal').classList.add('show');
     };
 
-    // ============================
-    // MỞ MODAL SỬA
-    // ============================
     window.openEditModal = function(id) {
         const t = tournaments.find(x => x.id === id);
-        if (!t) {
-            alert('Không tìm thấy giải đấu!');
-            return;
-        }
-
+        if (!t) { alert('Không tìm thấy giải đấu!'); return; }
         document.getElementById('modal-title').textContent = 'Sửa giải đấu';
         document.getElementById('tournament-id').value = t.id;
         document.getElementById('name').value = t.name || '';
@@ -627,7 +442,6 @@
         document.getElementById('end_date').value = t.end_date || '';
         document.getElementById('location').value = t.location || '';
         document.getElementById('description').value = t.description || '';
-
         document.getElementById('num_venues').value = t.num_venues || 4;
         document.getElementById('num_days').value = t.num_days || 3;
         document.getElementById('sessions_per_day').value = t.sessions_per_day || 2;
@@ -635,42 +449,24 @@
         document.getElementById('start_time_morning').value = t.start_time_morning || '08:00';
         document.getElementById('start_time_afternoon').value = t.start_time_afternoon || '14:00';
         document.getElementById('start_time_evening').value = t.start_time_evening || '19:00';
-
         document.getElementById('form-message').className = 'alert';
         document.getElementById('tournament-modal').classList.add('show');
     };
 
-    // ============================
-    // ĐÓNG MODAL
-    // ============================
     window.closeModal = function() {
         document.getElementById('tournament-modal').classList.remove('show');
     };
 
-    // ============================
-    // TẠO SLUG
-    // ============================
     function generateSlug(text) {
-        const base = String(text || '')
-            .toLowerCase()
-            .normalize('NFD')
-            .replace(/[\u0300-\u036f]/g, '')
-            .replace(/đ/g, 'd')
-            .replace(/[^a-z0-9\s-]/g, '')
-            .trim()
-            .replace(/\s+/g, '-')
-            .replace(/-+/g, '-')
-            .slice(0, 80);
-
+        const base = String(text || '').toLowerCase().normalize('NFD')
+            .replace(/[\u0300-\u036f]/g, '').replace(/đ/g, 'd')
+            .replace(/[^a-z0-9\s-]/g, '').trim()
+            .replace(/\s+/g, '-').replace(/-+/g, '-').slice(0, 80);
         return (base || 'giai-dau') + '-' + Date.now();
     }
 
-    // ============================
-    // XỬ LÝ SUBMIT
-    // ============================
     window.handleSubmit = async function(event) {
         event.preventDefault();
-
         const id = document.getElementById('tournament-id').value;
         const nameValue = document.getElementById('name').value.trim();
         const numVenues = parseInt(document.getElementById('num_venues').value);
@@ -705,34 +501,21 @@
 
         try {
             if (id) {
-                // CẬP NHẬT
                 delete payload.slug;
-                const { error } = await supabaseClient
-                    .from('tournaments')
-                    .update(payload)
-                    .eq('id', id);
+                const { error } = await supabaseClient.from('tournaments').update(payload).eq('id', id);
                 if (error) throw error;
                 showAlert('✅ Cập nhật giải đấu thành công!', 'success');
             } else {
-                // TẠO MỚI
                 const { data: newTournament, error } = await supabaseClient
-                    .from('tournaments')
-                    .insert(payload)
-                    .select()
-                    .single();
-
+                    .from('tournaments').insert(payload).select().single();
                 if (error) throw error;
-
-                // TỰ ĐỘNG TẠO SÂN
                 await createVenues(newTournament.id, numVenues, payload.location);
-
                 showAlert(`✅ Tạo giải đấu thành công! Đã tạo ${numVenues} sân.`, 'success');
             }
-
             closeModal();
             await loadTournaments();
         } catch (error) {
-            console.error('Save error:', error);
+            console.error(error);
             showFormMessage('Lỗi: ' + error.message, 'error');
         } finally {
             btn.disabled = false;
@@ -740,9 +523,6 @@
         }
     };
 
-    // ============================
-    // TẠO SÂN TỰ ĐỘNG
-    // ============================
     async function createVenues(tournamentId, numVenues, venueName) {
         const venues = [];
         for (let i = 1; i <= numVenues; i++) {
@@ -753,32 +533,16 @@
                 court_name: `Sân ${i}`
             });
         }
-
         const { error } = await supabaseClient.from('venues').insert(venues);
-        if (error) {
-            console.error('Create venues error:', error);
-            throw new Error('Không tạo được sân: ' + error.message);
-        }
+        if (error) throw new Error('Không tạo được sân: ' + error.message);
     }
 
-    // ============================
-    // XÓA GIẢI
-    // ============================
     window.deleteTournament = async function(id) {
         const t = tournaments.find(x => x.id === id);
-        if (!t) {
-            alert('Không tìm thấy giải đấu!');
-            return;
-        }
-
-        if (!confirm(`Bạn có chắc muốn xóa giải đấu "${t.name}"?\n\nTất cả sân, nội dung, lịch thi đấu của giải này cũng sẽ bị xóa!\n\nHành động này KHÔNG THỂ HOÀN TÁC!`)) return;
-
+        if (!t) return;
+        if (!confirm(`Xóa giải đấu "${t.name}"?\n\nTất cả sân, nội dung, VĐV, lịch thi đấu cũng bị xóa!\n\nKHÔNG THỂ HOÀN TÁC!`)) return;
         try {
-            const { error } = await supabaseClient
-                .from('tournaments')
-                .delete()
-                .eq('id', id);
-
+            const { error } = await supabaseClient.from('tournaments').delete().eq('id', id);
             if (error) throw error;
             showAlert('✅ Đã xóa giải đấu!', 'success');
             await loadTournaments();
@@ -790,13 +554,10 @@
     // ============================
     // CHUYỂN TRANG
     // ============================
-    window.goToDraw = function(id) {
-        window.location.href = 'draw.html?tournament_id=' + id;
-    };
-
-    window.goToCategories = function(id) {
-        window.location.href = 'categories.html?tournament_id=' + id;
-    };
+    window.goToDraw = function(id) { window.location.href = 'draw.html?tournament_id=' + id; };
+    window.goToCategories = function(id) { window.location.href = 'categories.html?tournament_id=' + id; };
+    window.goToAthletes = function(id) { window.location.href = 'athletes.html?tournament_id=' + id; };
+    window.goToSchedule = function(id) { window.location.href = 'schedule.html?tournament_id=' + id; };
 
     // ============================
     // HELPERS
@@ -822,23 +583,16 @@
 
     function statusLabel(status) {
         return {
-            draft: 'Bản nháp',
-            registration: 'Đăng ký',
-            ongoing: 'Đang diễn ra',
-            completed: 'Đã kết thúc',
-            cancelled: 'Đã hủy'
+            draft: 'Bản nháp', registration: 'Đăng ký', ongoing: 'Đang diễn ra',
+            completed: 'Đã kết thúc', cancelled: 'Đã hủy'
         }[status] || 'Bản nháp';
     }
 
     function escapeHtml(text) {
-        return String(text || '')
-            .replace(/&/g, '&amp;')
-            .replace(/</g, '&lt;')
-            .replace(/>/g, '&gt;')
-            .replace(/"/g, '&quot;');
+        return String(text || '').replace(/&/g, '&amp;').replace(/</g, '&lt;')
+            .replace(/>/g, '&gt;').replace(/"/g, '&quot;');
     }
 
-    // Chạy
     init();
 })();
 </script>
