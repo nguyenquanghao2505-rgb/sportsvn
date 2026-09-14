@@ -443,13 +443,13 @@
                     <span><span class="badge ${t.status || 'draft'}">${statusLabel(t.status)}</span></span>
                 </div>
                 <div class="card-actions">
-                    <button class="btn-small btn-draw" onclick="goToDraw(${t.id})">
+                    <button class="btn-small btn-draw" onclick="goToDraw('${t.id}')">
                         <i class="fas fa-dice"></i> Bốc thăm
                     </button>
-                    <button class="btn-small btn-edit" onclick="openEditModal(${t.id})">
+                    <button class="btn-small btn-edit" onclick="openEditModal('${t.id}')">
                         <i class="fas fa-edit"></i> Sửa
                     </button>
-                    <button class="btn-small btn-delete" onclick="deleteTournament(${t.id})">
+                    <button class="btn-small btn-delete" onclick="deleteTournament('${t.id}')">
                         <i class="fas fa-trash"></i> Xóa
                     </button>
                 </div>
@@ -473,7 +473,10 @@
     // ============================
     window.openEditModal = function(id) {
         const t = tournaments.find(x => x.id === id);
-        if (!t) return;
+        if (!t) {
+            alert('Không tìm thấy giải đấu!');
+            return;
+        }
 
         document.getElementById('modal-title').textContent = 'Sửa giải đấu';
         document.getElementById('tournament-id').value = t.id;
@@ -510,7 +513,6 @@
             .replace(/-+/g, '-')
             .slice(0, 80);
 
-        // Thêm timestamp để đảm bảo unique
         return (base || 'giai-dau') + '-' + Date.now();
     }
 
@@ -579,7 +581,10 @@
     // ============================
     window.deleteTournament = async function(id) {
         const t = tournaments.find(x => x.id === id);
-        if (!t) return;
+        if (!t) {
+            alert('Không tìm thấy giải đấu!');
+            return;
+        }
 
         if (!confirm(`Bạn có chắc muốn xóa giải đấu "${t.name}"?\nHành động này không thể hoàn tác!`)) return;
 
