@@ -33,9 +33,7 @@
         .btn-success { background: #00b894; color: #fff; }
         .btn-info { background: #0984e3; color: #fff; }
         .btn-warning { background: #fdcb6e; color: #1a1a2e; }
-        .btn-danger { background: #e94560; color: #fff; }
 
-        /* STATS BAR */
         .stats-bar {
             display: grid; grid-template-columns: repeat(auto-fit, minmax(180px, 1fr));
             gap: 16px; margin-bottom: 24px;
@@ -49,26 +47,9 @@
             text-transform: uppercase; letter-spacing: 0.5px;
             margin-bottom: 6px;
         }
-        .stat-card .value {
-            font-size: 26px; font-weight: 800; color: #1a3a7a;
-        }
+        .stat-card .value { font-size: 26px; font-weight: 800; color: #1a3a7a; }
         .stat-card .sub { font-size: 12px; color: #6c757d; margin-top: 4px; }
 
-        /* TABS */
-        .tabs {
-            display: flex; gap: 8px; margin-bottom: 20px;
-            flex-wrap: wrap; background: #fff; padding: 8px;
-            border-radius: 12px; box-shadow: 0 4px 15px rgba(0,0,0,0.06);
-        }
-        .tab {
-            padding: 10px 20px; border-radius: 8px; cursor: pointer;
-            font-weight: 700; font-size: 14px; color: #6c757d;
-            background: transparent; border: none; transition: all 0.2s ease;
-        }
-        .tab:hover { background: #f0f2f8; color: #1a3a7a; }
-        .tab.active { background: #1a3a7a; color: #fff; }
-
-        /* SCHEDULE GRID */
         .schedule-panel {
             background: #fff; border-radius: 16px; padding: 24px;
             box-shadow: 0 4px 20px rgba(0,0,0,0.08);
@@ -92,7 +73,6 @@
         }
         .day-tab small { display: block; font-size: 11px; opacity: 0.7; margin-top: 2px; }
 
-        /* SESSION SECTIONS */
         .session-section {
             margin-bottom: 28px; padding-bottom: 20px;
             border-bottom: 2px dashed #e9ecef;
@@ -112,7 +92,6 @@
             font-size: 13px; color: #6c757d; font-weight: 600;
         }
 
-        /* COURTS GRID */
         .courts-grid {
             display: grid;
             grid-template-columns: repeat(auto-fill, minmax(220px, 1fr));
@@ -122,7 +101,6 @@
             background: #f8f9fa; border-radius: 10px;
             padding: 12px; border: 2px solid #e9ecef;
             min-height: 100px;
-            transition: all 0.2s ease;
         }
         .court-card.has-match { background: #fff; border-color: #1a3a7a; }
         .court-card .court-name {
@@ -161,14 +139,12 @@
             background: rgba(255,255,255,0.2);
             border-radius: 4px; margin-top: 6px; font-weight: 700;
         }
-
         .empty-court {
             color: #adb5bd; font-size: 12px;
             text-align: center; padding: 18px 0;
             font-style: italic;
         }
 
-        /* EMPTY STATE */
         .empty-state {
             text-align: center; padding: 80px 20px; color: #6c757d;
         }
@@ -182,7 +158,6 @@
         }
         .empty-state p { margin-bottom: 20px; font-size: 15px; }
 
-        /* ALERT */
         .alert {
             padding: 14px 18px; border-radius: 10px;
             margin-bottom: 16px; display: none; font-size: 14px;
@@ -192,7 +167,6 @@
         .alert.success { background: #d4edda; color: #155724; }
         .alert.info { background: #cce5ff; color: #004085; }
 
-        /* LOADING */
         .loading {
             text-align: center; padding: 60px 20px; color: #6c757d;
         }
@@ -210,11 +184,10 @@
 <body>
 
 <div class="container">
-    <!-- HEADER -->
     <div class="header">
         <div>
             <h1>📅 Lịch thi đấu</h1>
-            <p id="tournament-name">Đang tải thông tin giải đấu...</p>
+            <p id="tournament-name">Đang tải...</p>
         </div>
         <div class="header-actions">
             <a href="tournaments.html" class="btn btn-outline">
@@ -231,10 +204,8 @@
 
     <div id="alert" class="alert"></div>
 
-    <!-- STATS -->
     <div class="stats-bar" id="stats-bar"></div>
 
-    <!-- MAIN CONTENT -->
     <div class="schedule-panel">
         <div id="loading" class="loading">
             <i class="fas fa-spinner"></i>
@@ -242,10 +213,7 @@
         </div>
 
         <div id="schedule-content" style="display: none;">
-            <!-- DAY TABS -->
             <div class="day-tabs" id="day-tabs"></div>
-
-            <!-- SCHEDULE SECTIONS -->
             <div id="schedule-sections"></div>
         </div>
 
@@ -297,10 +265,8 @@
             return;
         }
 
-        // Setup draw link
         document.getElementById('draw-link').href = `draw.html?tournament_id=${tournamentId}`;
 
-        // Check session
         const { data: { session } } = await supabaseClient.auth.getSession();
         if (!session) {
             window.location.href = 'login.html';
@@ -313,7 +279,6 @@
 
     async function loadData() {
         try {
-            // Load tournament info
             const { data: tour, error: tourErr } = await supabaseClient
                 .from('tournaments').select('*').eq('id', tournamentId).single();
             if (tourErr) throw tourErr;
@@ -322,24 +287,20 @@
             document.getElementById('tournament-name').textContent =
                 `${tournament.name} · ${tournament.num_venues || 0} sân · ${tournament.num_days || 0} ngày · ${tournament.sessions_per_day || 0} buổi/ngày`;
 
-            // Load categories
             const { data: cats } = await supabaseClient
                 .from('categories').select('*').eq('tournament_id', tournamentId);
             categories = cats || [];
 
-            // Load venues
             const { data: vens } = await supabaseClient
                 .from('venues').select('*').eq('tournament_id', tournamentId)
                 .order('court_number');
             venues = vens || [];
 
-            // Load schedules
             const { data: scheds } = await supabaseClient
                 .from('schedules').select('*').eq('tournament_id', tournamentId)
                 .order('match_date').order('start_time');
             schedules = scheds || [];
 
-            // Load draws (để biết có dữ liệu bốc thăm không)
             const { data: drawsData } = await supabaseClient
                 .from('draws').select('*').eq('tournament_id', tournamentId);
             draws = drawsData || [];
@@ -460,11 +421,10 @@
 
     function renderCourtsForSession(sessionSchedules, session) {
         if (venues.length === 0) {
-            return '<div class="empty-court" style="grid-column: 1/-1;">Chưa có sân nào. Vui lòng tạo sân trong giải đấu.</div>';
+            return '<div class="empty-court" style="grid-column: 1/-1;">Chưa có sân nào.</div>';
         }
 
         return venues.map(venue => {
-            // Tìm trận đấu tại sân này trong buổi này
             const matchAtCourt = sessionSchedules.find(s => s.venue_id === venue.id);
 
             if (matchAtCourt) {
@@ -478,13 +438,9 @@
                         <div class="match-box">
                             ${category ? `<div class="category">${escapeHtml(category.name)}</div>` : ''}
                             <div class="teams">
-                                <div class="team">
-                                    <span>${escapeHtml(matchAtCourt.team_a_name || '—')}</span>
-                                </div>
+                                <div class="team"><span>${escapeHtml(matchAtCourt.team_a_name || '—')}</span></div>
                                 <div class="vs">VS</div>
-                                <div class="team">
-                                    <span>${escapeHtml(matchAtCourt.team_b_name || '—')}</span>
-                                </div>
+                                <div class="team"><span>${escapeHtml(matchAtCourt.team_b_name || '—')}</span></div>
                             </div>
                             ${matchAtCourt.round_number ? `<div class="round-badge">Vòng ${matchAtCourt.round_number} · Trận ${matchAtCourt.match_number || ''}</div>` : ''}
                         </div>
@@ -504,41 +460,27 @@
     }
 
     // ==========================================
-    // TỰ ĐỘNG XẾP LỊCH
+    // XẾP LỊCH TỰ ĐỘNG - BẢN ĐÚNG
     // ==========================================
     window.autoGenerateSchedule = async function() {
         if (draws.length === 0) {
-            showAlert('Chưa có kết quả bốc thăm. Vui lòng bốc thăm trước!', 'error');
+            showAlert('Chưa có kết quả bốc thăm!', 'error');
             return;
         }
-
         if (venues.length === 0) {
-            showAlert('Chưa có sân nào. Vui lòng tạo sân trong giải đấu!', 'error');
+            showAlert('Chưa có sân!', 'error');
             return;
         }
 
-        if (!confirm('Tự động xếp lịch thi đấu?\n\nLịch cũ sẽ bị xóa và tạo lại từ kết quả bốc thăm.')) return;
+        if (!confirm('Tự động xếp lịch? Lịch cũ sẽ bị xóa!')) return;
 
         showAlert('⏳ Đang xếp lịch...', 'info');
 
         try {
-            // Xóa lịch cũ
             await supabaseClient.from('schedules').delete().eq('tournament_id', tournamentId);
 
-            // Lấy danh sách categories có draws
-            const categoryMap = new Map();
-            categories.forEach(c => categoryMap.set(c.name, c));
-
-            // Group draws theo category
-            const drawsByCategory = {};
-            draws.forEach(d => {
-                const catName = d.category || 'Chung';
-                if (!drawsByCategory[catName]) drawsByCategory[catName] = [];
-                drawsByCategory[catName].push(d);
-            });
-
             const startDate = new Date(tournament.start_date);
-            const numDays = tournament.num_days || 3;
+            const numDays = tournament.num_days || 5;
             const sessionsPerDay = tournament.sessions_per_day || 2;
             const matchDuration = tournament.match_duration || 45;
             const startTimes = {
@@ -546,17 +488,36 @@
                 afternoon: tournament.start_time_afternoon || '14:00',
                 evening: tournament.start_time_evening || '19:00'
             };
+            const sessionKeys = ['morning', 'afternoon', 'evening'].slice(0, sessionsPerDay);
 
-            const records = [];
-            const catNames = Object.keys(drawsByCategory);
+            // Tổng số slot trong 1 ngày
+            const slotsPerDay = venues.length * sessionsPerDay;
 
-            // Với mỗi category, tạo các trận đấu
-            catNames.forEach((catName, catIdx) => {
-                const cat = categoryMap.get(catName);
+            // ========================================
+            // TẠO TẤT CẢ CÁC TRẬN CẦN THI ĐẤU
+            // ========================================
+            const allMatches = [];
+
+            // Group draws theo category
+            const drawsByCategory = {};
+            draws.forEach(d => {
+                const cat = d.category || 'Chung';
+                if (!drawsByCategory[cat]) drawsByCategory[cat] = [];
+                drawsByCategory[cat].push(d);
+            });
+
+            Object.keys(drawsByCategory).forEach(catName => {
                 const catDraws = drawsByCategory[catName];
+                const cat = categories.find(c => c.name === catName);
 
-                // Nếu là knockout: ghép theo match_number
-                if (catDraws[0]?.draw_type === 'knockout') {
+                // Kiểm tra loại: knockout hay round-robin
+                const isKnockout = catDraws[0]?.draw_type === 'knockout';
+
+                if (isKnockout) {
+                    // ========================================
+                    // KNOCKOUT: Tạo tất cả các vòng đấu
+                    // ========================================
+                    // Vòng 1: từ draws
                     const matchMap = new Map();
                     catDraws.forEach(d => {
                         const key = d.match_number || 1;
@@ -564,101 +525,102 @@
                         matchMap.get(key).push(d);
                     });
 
-                    const matches = [];
+                    // Tạo Vòng 1
+                    const round1Matches = [];
                     matchMap.forEach((teams, matchNum) => {
                         if (teams.length === 2) {
-                            matches.push({
+                            round1Matches.push({
                                 team_a: teams[0].team_name,
                                 team_b: teams[1].team_name,
-                                round: teams[0].round_number || 1,
-                                match_num: matchNum
+                                round: 1,
+                                match_num: matchNum,
+                                category: catName,
+                                cat_id: cat?.id
                             });
                         } else if (teams.length === 1) {
-                            matches.push({
+                            // BYE - tự động vào vòng sau
+                            round1Matches.push({
                                 team_a: teams[0].team_name,
                                 team_b: 'BYE',
-                                round: teams[0].round_number || 1,
-                                match_num: matchNum
+                                round: 1,
+                                match_num: matchNum,
+                                is_bye: true,
+                                category: catName,
+                                cat_id: cat?.id
                             });
                         }
                     });
 
-                    // Xếp các trận vào lịch
-                    matches.forEach((match, idx) => {
-                        const dayOffset = Math.floor(idx / (venues.length * sessionsPerDay));
-                        if (dayOffset >= numDays) return;
+                    // Tính số trận cần cho các vòng tiếp theo
+                    // Số VĐV thực sự thi đấu = tổng VĐV - số BYE
+                    const realMatches = round1Matches.filter(m => !m.is_bye);
+                    const byesCount = round1Matches.filter(m => m.is_bye).length;
+                    
+                    // Số đội vào vòng 2 = số thắng vòng 1 + số BYE
+                    let teamsInNextRound = realMatches.length + byesCount;
+                    
+                    // Tổng số VĐV ban đầu (từ bảng knockout)
+                    const totalTeams = catDraws.length;
+                    
+                    // Bracket size (làm tròn lên lũy thừa 2)
+                    let bracketSize = 2;
+                    while (bracketSize < totalTeams) bracketSize *= 2;
+                    
+                    // Số trận tổng cộng = bracketSize - 1 (mỗi trận loại 1 VĐV)
+                    // Nhưng BYE không phải trận → số trận thực = totalTeams - 1
+                    const totalKnockoutMatches = totalTeams - byesCount; // Số VĐV tham gia thực
+                    
+                    // Tạo các vòng tiếp theo
+                    let currentRoundMatches = round1Matches.filter(m => !m.is_bye).length + byesCount;
+                    let roundNum = 2;
+                    
+                    // Thêm các trận của các vòng sau (chưa có tên VĐV, sẽ điền sau khi có kết quả)
+                    while (currentRoundMatches > 1) {
+                        const matchesInRound = Math.floor(currentRoundMatches / 2);
+                        for (let i = 0; i < matchesInRound; i++) {
+                            allMatches.push({
+                                team_a: 'Chờ kết quả',
+                                team_b: 'Chờ kết quả',
+                                round: roundNum,
+                                match_num: i + 1,
+                                category: catName,
+                                cat_id: cat?.id,
+                                is_placeholder: true
+                            });
+                        }
+                        currentRoundMatches = matchesInRound;
+                        roundNum++;
+                    }
 
-                        const matchDate = new Date(startDate);
-                        matchDate.setDate(matchDate.getDate() + dayOffset);
-
-                        const sessionIdx = Math.floor((idx % (venues.length * sessionsPerDay)) / venues.length);
-                        const venueIdx = idx % venues.length;
-
-                        const sessionKeys = ['morning', 'afternoon', 'evening'].slice(0, sessionsPerDay);
-                        const sessionKey = sessionKeys[sessionIdx] || 'morning';
-
-                        const startTime = startTimes[sessionKey];
-                        const endTime = addMinutes(startTime, matchDuration);
-
-                        records.push({
-                            tournament_id: tournamentId,
-                            category_id: cat?.id || null,
-                            venue_id: venues[venueIdx]?.id || null,
-                            match_date: matchDate.toISOString().slice(0, 10),
-                            session: sessionKey,
-                            start_time: startTime,
-                            end_time: endTime,
-                            round_number: match.round,
-                            match_number: match.match_num,
-                            team_a_name: match.team_a,
-                            team_b_name: match.team_b,
-                            status: 'scheduled'
-                        });
+                    // Thêm Vòng 1 vào đầu
+                    round1Matches.filter(m => !m.is_bye).forEach(m => {
+                        allMatches.push(m);
                     });
+
                 } else {
-                    // Vòng tròn: mỗi cặp đấu 1 trận
-                    // Simplified: ghép mỗi VĐV với VĐV khác trong bảng
+                    // ========================================
+                    // ROUND-ROBIN: Mỗi bảng đấu vòng tròn
+                    // ========================================
                     const groups = {};
                     catDraws.forEach(d => {
-                        if (!groups[d.group_name]) groups[d.group_name] = [];
-                        groups[d.group_name].push(d);
+                        const g = d.group_name || 'A';
+                        if (!groups[g]) groups[g] = [];
+                        groups[g].push(d);
                     });
 
-                    let matchIdx = 0;
                     Object.keys(groups).forEach(groupName => {
                         const groupTeams = groups[groupName];
 
-                        // Round-robin: mỗi cặp 1 trận
+                        // Vòng tròn: n*(n-1)/2 trận
                         for (let i = 0; i < groupTeams.length; i++) {
                             for (let j = i + 1; j < groupTeams.length; j++) {
-                                const dayOffset = Math.floor(matchIdx / (venues.length * sessionsPerDay));
-                                if (dayOffset >= numDays) return;
-
-                                const matchDate = new Date(startDate);
-                                matchDate.setDate(matchDate.getDate() + dayOffset);
-
-                                const sessionIdx = Math.floor((matchIdx % (venues.length * sessionsPerDay)) / venues.length);
-                                const venueIdx = matchIdx % venues.length;
-
-                                const sessionKeys = ['morning', 'afternoon', 'evening'].slice(0, sessionsPerDay);
-                                const sessionKey = sessionKeys[sessionIdx] || 'morning';
-
-                                const startTime = startTimes[sessionKey];
-                                const endTime = addMinutes(startTime, matchDuration);
-
-                                records.push({
-                                    tournament_id: tournamentId,
-                                    category_id: cat?.id || null,
-                                    venue_id: venues[venueIdx]?.id || null,
-                                    match_date: matchDate.toISOString().slice(0, 10),
-                                    session: sessionKey,
-                                    start_time: startTime,
-                                    end_time: endTime,
-                                    round_number: 1,
-                                    match_number: ++matchIdx,
-                                    team_a_name: groupTeams[i].team_name,
-                                    team_b_name: groupTeams[j].team_name,
-                                    status: 'scheduled'
+                                allMatches.push({
+                                    team_a: groupTeams[i].team_name,
+                                    team_b: groupTeams[j].team_name,
+                                    round: 1,
+                                    match_num: allMatches.length + 1,
+                                    category: `${catName} - Bảng ${groupName}`,
+                                    cat_id: cat?.id
                                 });
                             }
                         }
@@ -666,21 +628,70 @@
                 }
             });
 
+            console.log(`📊 Tổng số trận cần xếp: ${allMatches.length}`);
+            console.log(`📊 Số slot/ngày: ${slotsPerDay}, tổng slot: ${slotsPerDay * numDays}`);
+
+            if (allMatches.length > slotsPerDay * numDays) {
+                console.warn('⚠️ Không đủ slot! Cần thêm ngày hoặc sân.');
+            }
+
+            // ========================================
+            // XẾP CÁC TRẬN VÀO SLOT
+            // ========================================
+            const records = [];
+            let matchIdx = 0;
+
+            // Sắp xếp theo vòng (vòng 1 trước, sau đó tứ kết, bán kết, chung kết)
+            allMatches.sort((a, b) => (a.round || 1) - (b.round || 1));
+
+            allMatches.forEach(match => {
+                const dayOffset = Math.floor(matchIdx / slotsPerDay);
+                if (dayOffset >= numDays) return;
+
+                const matchDate = new Date(startDate);
+                matchDate.setDate(matchDate.getDate() + dayOffset);
+
+                const slotInDay = matchIdx % slotsPerDay;
+                const sessionIdx = Math.floor(slotInDay / venues.length);
+                const venueIdx = slotInDay % venues.length;
+
+                const sessionKey = sessionKeys[sessionIdx] || 'morning';
+                const startTime = startTimes[sessionKey];
+                const endTime = addMinutes(startTime, matchDuration);
+
+                records.push({
+                    tournament_id: tournamentId,
+                    category_id: match.cat_id || null,
+                    venue_id: venues[venueIdx]?.id || null,
+                    match_date: matchDate.toISOString().slice(0, 10),
+                    session: sessionKey,
+                    start_time: startTime,
+                    end_time: endTime,
+                    round_number: match.round || 1,
+                    match_number: match.match_num,
+                    team_a_name: match.team_a,
+                    team_b_name: match.team_b,
+                    status: 'scheduled',
+                    notes: match.category || null
+                });
+
+                matchIdx++;
+            });
+
             if (records.length === 0) {
                 showAlert('Không có trận nào để xếp!', 'error');
                 return;
             }
 
-            // Insert
             const { error } = await supabaseClient.from('schedules').insert(records);
             if (error) throw error;
 
-            showAlert(`✅ Đã xếp ${records.length} trận đấu vào lịch!`, 'success');
+            showAlert(`✅ Đã xếp ${records.length} trận! (Gồm cả vòng bảng + tứ kết + bán kết + chung kết)`, 'success');
             await loadData();
 
         } catch (error) {
-            console.error('❌ Lỗi auto schedule:', error);
-            showAlert('Lỗi xếp lịch: ' + error.message, 'error');
+            console.error('❌ Lỗi:', error);
+            showAlert('Lỗi: ' + error.message, 'error');
         }
     };
 
@@ -689,7 +700,7 @@
     // ==========================================
     window.exportScheduleExcel = function() {
         if (schedules.length === 0) {
-            showAlert('Chưa có lịch để xuất!', 'error');
+            showAlert('Chưa có lịch!', 'error');
             return;
         }
 
@@ -702,7 +713,7 @@
                 'Buổi': getSessionLabel(s.session),
                 'Giờ': formatTime(s.start_time),
                 'Sân': venue?.court_name || '',
-                'Nội dung': cat?.name || '',
+                'Nội dung': cat?.name || s.notes || '',
                 'Vòng': s.round_number || '',
                 'Trận': s.match_number || '',
                 'VĐV A': s.team_a_name || '',
@@ -712,28 +723,23 @@
         });
 
         const ws = XLSX.utils.json_to_sheet(data);
-        ws['!cols'] = [
-            { wch: 5 }, { wch: 12 }, { wch: 10 }, { wch: 8 }, { wch: 12 },
-            { wch: 20 }, { wch: 6 }, { wch: 6 }, { wch: 25 }, { wch: 25 }, { wch: 15 }
-        ];
+        ws['!cols'] = [{ wch: 5 }, { wch: 12 }, { wch: 10 }, { wch: 8 }, { wch: 12 }, { wch: 25 }, { wch: 6 }, { wch: 6 }, { wch: 25 }, { wch: 25 }, { wch: 15 }];
 
         const wb = XLSX.utils.book_new();
         XLSX.utils.book_append_sheet(wb, ws, 'Lịch thi đấu');
-        XLSX.writeFile(wb, `LichThiDau_${tournament?.name?.slice(0, 30) || 'giai'}_${new Date().toISOString().slice(0, 10)}.xlsx`);
-        showAlert('✅ Đã xuất file Excel!', 'success');
+        XLSX.writeFile(wb, `LichThiDau_${new Date().toISOString().slice(0, 10)}.xlsx`);
+        showAlert('✅ Đã xuất file!', 'success');
     };
 
-    // ==========================================
     // HELPERS
-    // ==========================================
     function getSessions() {
         const sessionsPerDay = tournament?.sessions_per_day || 2;
-        const allSessions = [
+        const all = [
             { key: 'morning', label: 'Buổi Sáng', icon: 'sun', time: tournament?.start_time_morning || '08:00' },
             { key: 'afternoon', label: 'Buổi Chiều', icon: 'cloud-sun', time: tournament?.start_time_afternoon || '14:00' },
             { key: 'evening', label: 'Buổi Tối', icon: 'moon', time: tournament?.start_time_evening || '19:00' }
         ];
-        return allSessions.slice(0, sessionsPerDay);
+        return all.slice(0, sessionsPerDay);
     }
 
     function getSessionLabel(session) {
@@ -741,12 +747,7 @@
     }
 
     function getStatusLabel(status) {
-        return {
-            scheduled: 'Chưa diễn ra',
-            ongoing: 'Đang diễn ra',
-            completed: 'Đã kết thúc',
-            cancelled: 'Đã hủy'
-        }[status] || 'Chưa diễn ra';
+        return { scheduled: 'Chưa diễn ra', ongoing: 'Đang diễn ra', completed: 'Đã kết thúc', cancelled: 'Đã hủy' }[status] || 'Chưa diễn ra';
     }
 
     function formatDate(dateStr) {
@@ -772,7 +773,7 @@
         const el = document.getElementById('alert');
         el.textContent = message;
         el.className = 'alert show ' + type;
-        if (type !== 'info') setTimeout(() => { el.className = 'alert'; }, 5000);
+        if (type !== 'info') setTimeout(() => { el.className = 'alert'; }, 6000);
     }
 
     function showError(message) {
