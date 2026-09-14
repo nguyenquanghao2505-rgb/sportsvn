@@ -5,12 +5,11 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Bốc thăm tự động - SportsVN</title>
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
-    
     <style>
         * { margin: 0; padding: 0; box-sizing: border-box; font-family: 'Segoe UI', system-ui, sans-serif; }
         body { background: #f0f2f8; min-height: 100vh; padding: 24px; }
 
-        .draw-container { max-width: 1200px; margin: 0 auto; }
+        .draw-container { max-width: 1300px; margin: 0 auto; }
 
         .draw-header {
             background: linear-gradient(135deg, #0d1b3e, #1a3a7a);
@@ -18,10 +17,22 @@
             padding: 32px;
             color: #fff;
             margin-bottom: 24px;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            flex-wrap: wrap;
+            gap: 16px;
         }
 
         .draw-header h1 { font-size: 28px; margin-bottom: 8px; }
         .draw-header p { opacity: 0.85; }
+        .draw-header .btn-outline {
+            background: transparent; color: #fff; border: 2px solid #fff;
+            padding: 12px 24px; border-radius: 10px; font-size: 15px;
+            font-weight: 700; cursor: pointer; text-decoration: none;
+            display: inline-flex; align-items: center; gap: 8px;
+        }
+        .draw-header .btn-outline:hover { background: #fff; color: #0d1b3e; }
 
         .draw-panel {
             background: #fff;
@@ -32,26 +43,15 @@
         }
 
         .panel-title {
-            font-size: 20px;
-            font-weight: 700;
-            color: #1a1a2e;
-            margin-bottom: 16px;
-            display: flex;
-            align-items: center;
-            gap: 10px;
+            font-size: 20px; font-weight: 700; color: #1a1a2e;
+            margin-bottom: 16px; display: flex; align-items: center; gap: 10px;
         }
 
         .step-num {
-            background: #1a3a7a;
-            color: #fff;
-            width: 32px;
-            height: 32px;
-            border-radius: 50%;
-            display: flex;
-            align-items: center;
-            justify-content: center;
-            font-size: 15px;
-            flex-shrink: 0;
+            background: #1a3a7a; color: #fff;
+            width: 32px; height: 32px; border-radius: 50%;
+            display: flex; align-items: center; justify-content: center;
+            font-size: 15px; flex-shrink: 0;
         }
 
         .form-row-add {
@@ -63,131 +63,82 @@
         }
 
         .form-group label {
-            display: block;
-            font-weight: 600;
-            font-size: 14px;
-            margin-bottom: 6px;
-            color: #1a1a2e;
+            display: block; font-weight: 600; font-size: 14px;
+            margin-bottom: 6px; color: #1a1a2e;
         }
 
-        .form-group input,
-        .form-group select {
-            width: 100%;
-            padding: 12px 16px;
-            border: 2px solid #e9ecef;
-            border-radius: 10px;
-            font-size: 15px;
-            font-family: inherit;
+        .form-group input, .form-group select {
+            width: 100%; padding: 12px 16px;
+            border: 2px solid #e9ecef; border-radius: 10px;
+            font-size: 15px; font-family: inherit;
         }
 
-        .form-group input:focus,
-        .form-group select:focus {
-            border-color: #1a3a7a;
-            outline: none;
+        .form-group input:focus, .form-group select:focus {
+            border-color: #1a3a7a; outline: none;
         }
 
         .btn-primary {
             background: linear-gradient(135deg, #0d1b3e, #1a3a7a);
-            color: #fff;
-            border: none;
-            padding: 13px 24px;
-            border-radius: 10px;
-            font-size: 15px;
-            font-weight: 700;
-            cursor: pointer;
+            color: #fff; border: none;
+            padding: 13px 24px; border-radius: 10px;
+            font-size: 15px; font-weight: 700; cursor: pointer;
             transition: all 0.3s ease;
-            display: inline-flex;
-            align-items: center;
-            justify-content: center;
-            gap: 6px;
+            display: inline-flex; align-items: center; justify-content: center; gap: 6px;
         }
-
         .btn-primary:hover { transform: translateY(-2px); box-shadow: 0 8px 20px rgba(26,58,122,0.3); }
         .btn-primary:disabled { opacity: 0.6; cursor: not-allowed; transform: none; }
 
         .btn-success-sm {
             background: linear-gradient(135deg, #00b894, #00a859);
-            color: #fff;
-            border: none;
-            padding: 12px 20px;
-            border-radius: 10px;
-            font-size: 14px;
-            font-weight: 700;
-            cursor: pointer;
+            color: #fff; border: none;
+            padding: 12px 20px; border-radius: 10px;
+            font-size: 14px; font-weight: 700; cursor: pointer;
+            display: inline-flex; align-items: center; justify-content: center; gap: 6px;
             transition: all 0.3s ease;
-            display: inline-flex;
-            align-items: center;
-            justify-content: center;
-            gap: 6px;
         }
-
         .btn-success-sm:hover { transform: translateY(-2px); box-shadow: 0 6px 15px rgba(0,184,148,0.4); }
 
         .btn-danger-sm {
-            background: #e94560;
-            color: #fff;
-            border: none;
-            padding: 10px 18px;
-            border-radius: 10px;
-            font-size: 14px;
-            font-weight: 700;
-            cursor: pointer;
-            display: inline-flex;
-            align-items: center;
-            gap: 6px;
+            background: #e94560; color: #fff; border: none;
+            padding: 10px 18px; border-radius: 10px; font-size: 14px;
+            font-weight: 700; cursor: pointer;
+            display: inline-flex; align-items: center; gap: 6px;
         }
-
         .btn-danger-sm:hover { background: #c73550; }
 
         .btn-warning-sm {
-            background: #fdcb6e;
-            color: #1a1a2e;
-            border: none;
-            padding: 12px 20px;
-            border-radius: 10px;
-            font-size: 14px;
-            font-weight: 700;
-            cursor: pointer;
-            display: inline-flex;
-            align-items: center;
-            gap: 6px;
+            background: #fdcb6e; color: #1a1a2e; border: none;
+            padding: 12px 20px; border-radius: 10px; font-size: 14px;
+            font-weight: 700; cursor: pointer;
+            display: inline-flex; align-items: center; gap: 6px;
         }
-
-        .btn-warning-sm:hover { background: #f0b94a; }
 
         .btn-success {
             background: linear-gradient(135deg, #00b894, #00a859);
-            color: #fff;
-            border: none;
-            padding: 16px 32px;
-            border-radius: 12px;
-            font-size: 17px;
-            font-weight: 800;
-            cursor: pointer;
-            width: 100%;
-            margin-top: 16px;
+            color: #fff; border: none;
+            padding: 16px 32px; border-radius: 12px;
+            font-size: 17px; font-weight: 800; cursor: pointer;
+            width: 100%; margin-top: 16px;
+            display: inline-flex; align-items: center; justify-content: center; gap: 8px;
             transition: all 0.3s ease;
-            display: inline-flex;
-            align-items: center;
-            justify-content: center;
-            gap: 8px;
         }
-
         .btn-success:hover { transform: translateY(-2px); box-shadow: 0 10px 25px rgba(0,184,148,0.4); }
         .btn-success:disabled { opacity: 0.6; cursor: not-allowed; transform: none; }
 
-        /* TEAMS SUMMARY */
-        .teams-summary {
-            display: flex;
-            gap: 12px;
-            flex-wrap: wrap;
-            padding: 12px 16px;
-            background: #f8f9fa;
-            border-radius: 10px;
-            margin-bottom: 16px;
-            font-size: 14px;
+        /* ACTION BAR */
+        .action-bar {
+            display: flex; gap: 12px; flex-wrap: wrap;
+            padding: 14px 16px; background: #f8f9fa;
+            border-radius: 12px; margin-bottom: 16px;
         }
 
+        /* TEAMS SUMMARY */
+        .teams-summary {
+            display: flex; gap: 12px; flex-wrap: wrap;
+            padding: 12px 16px; background: #f8f9fa;
+            border-radius: 10px; margin-bottom: 16px;
+            font-size: 14px;
+        }
         .teams-summary .stat { display: flex; align-items: center; gap: 6px; }
         .teams-summary .stat strong { color: #1a3a7a; }
 
@@ -199,60 +150,42 @@
         }
 
         .team-item {
-            background: #f8f9fa;
-            padding: 12px 14px;
-            border-radius: 10px;
-            border: 2px solid #e9ecef;
-            display: flex;
-            justify-content: space-between;
-            align-items: center;
-            gap: 8px;
+            background: #f8f9fa; padding: 12px 14px;
+            border-radius: 10px; border: 2px solid #e9ecef;
+            display: flex; justify-content: space-between;
+            align-items: center; gap: 8px;
             transition: all 0.2s ease;
         }
-
         .team-item:hover { border-color: #1a3a7a; }
 
         .team-item .team-info { flex: 1; min-width: 0; }
-        .team-item .team-name { font-weight: 700; color: #1a1a2e; font-size: 14px; display: block; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
-        .team-item .team-club { font-size: 12px; color: #6c757d; margin-top: 2px; display: block; }
+        .team-item .team-name {
+            font-weight: 700; color: #1a1a2e; font-size: 14px;
+            display: block; white-space: nowrap; overflow: hidden; text-overflow: ellipsis;
+        }
+        .team-item .team-club {
+            font-size: 12px; color: #6c757d; margin-top: 2px; display: block;
+        }
         .team-item .team-club.has-club { color: #1a3a7a; font-weight: 600; }
 
         .team-item .remove-btn {
-            background: #e94560;
-            color: #fff;
-            border: none;
-            width: 26px;
-            height: 26px;
-            border-radius: 50%;
-            cursor: pointer;
-            font-size: 13px;
+            background: #e94560; color: #fff; border: none;
+            width: 26px; height: 26px; border-radius: 50%;
+            cursor: pointer; font-size: 13px;
+            display: flex; align-items: center; justify-content: center;
             flex-shrink: 0;
-            display: flex;
-            align-items: center;
-            justify-content: center;
         }
-
         .team-item .remove-btn:hover { background: #c73550; }
 
         /* CLUB PROTECTION */
         .checkbox-line {
-            display: flex;
-            align-items: center;
-            gap: 12px;
-            cursor: pointer;
-            padding: 12px 16px;
-            background: #f8f9fa;
-            border-radius: 10px;
+            display: flex; align-items: center; gap: 12px;
+            cursor: pointer; padding: 12px 16px;
+            background: #f8f9fa; border-radius: 10px;
             font-size: 15px;
-            transition: all 0.2s ease;
         }
-
-        .checkbox-line:hover { background: #f0f4ff; }
-
         .checkbox-line input[type="checkbox"] {
-            width: 20px;
-            height: 20px;
-            cursor: pointer;
+            width: 20px; height: 20px; cursor: pointer;
             accent-color: #1a3a7a;
         }
 
@@ -265,109 +198,76 @@
         }
 
         .draw-type-card {
-            background: #fff;
-            border: 2px solid #e9ecef;
-            border-radius: 12px;
-            padding: 16px 18px;
-            cursor: pointer;
-            transition: all 0.2s ease;
-            display: flex;
-            align-items: flex-start;
-            gap: 12px;
+            background: #fff; border: 2px solid #e9ecef;
+            border-radius: 12px; padding: 16px 18px;
+            cursor: pointer; transition: all 0.2s ease;
+            display: flex; align-items: flex-start; gap: 12px;
         }
-
         .draw-type-card:hover { border-color: #1a3a7a; transform: translateY(-2px); }
-        .draw-type-card.selected { border-color: #1a3a7a; background: #f0f4ff; box-shadow: 0 4px 12px rgba(26,58,122,0.15); }
-
-        .draw-type-card input[type="radio"] {
-            margin-top: 4px;
-            width: 18px;
-            height: 18px;
-            accent-color: #1a3a7a;
-            flex-shrink: 0;
+        .draw-type-card.selected {
+            border-color: #1a3a7a; background: #f0f4ff;
+            box-shadow: 0 4px 12px rgba(26,58,122,0.15);
         }
-
+        .draw-type-card input[type="radio"] {
+            margin-top: 4px; width: 18px; height: 18px;
+            accent-color: #1a3a7a; flex-shrink: 0;
+        }
         .draw-type-card .info { flex: 1; }
-        .draw-type-card .info strong { display: block; color: #1a1a2e; font-size: 15px; margin-bottom: 6px; }
-        .draw-type-card .info small { color: #6c757d; font-size: 13px; line-height: 1.5; }
+        .draw-type-card .info strong {
+            display: block; color: #1a1a2e;
+            font-size: 15px; margin-bottom: 6px;
+        }
+        .draw-type-card .info small {
+            color: #6c757d; font-size: 13px; line-height: 1.5;
+        }
 
         /* CONFIG BOXES */
         .config-box {
-            margin-top: 20px;
-            padding: 16px;
-            background: #f8f9fa;
-            border-radius: 12px;
+            margin-top: 20px; padding: 16px;
+            background: #f8f9fa; border-radius: 12px;
         }
 
         /* CUSTOM GROUPS */
         .custom-groups {
-            display: flex;
-            gap: 8px;
-            flex-wrap: wrap;
-            align-items: center;
+            display: flex; gap: 8px; flex-wrap: wrap; align-items: center;
         }
-
         .group-input-wrapper {
-            display: flex;
-            flex-direction: column;
-            gap: 4px;
-            align-items: center;
+            display: flex; flex-direction: column;
+            gap: 4px; align-items: center;
         }
-
         .group-input-wrapper label {
-            font-size: 12px;
-            font-weight: 700;
-            color: #1a3a7a;
+            font-size: 12px; font-weight: 700; color: #1a3a7a;
         }
-
         .group-input {
-            width: 65px;
-            padding: 10px 8px;
-            border: 2px solid #e9ecef;
-            border-radius: 8px;
-            text-align: center;
-            font-weight: 700;
-            font-size: 15px;
+            width: 65px; padding: 10px 8px;
+            border: 2px solid #e9ecef; border-radius: 8px;
+            text-align: center; font-weight: 700; font-size: 15px;
         }
-
         .group-input:focus { border-color: #1a3a7a; outline: none; }
-
         .total-check {
-            font-size: 14px;
-            font-weight: 700;
-            padding: 6px 14px;
-            border-radius: 20px;
-            display: inline-block;
+            font-size: 14px; font-weight: 700;
+            padding: 6px 14px; border-radius: 20px; display: inline-block;
         }
-
         .total-check.ok { background: #d4edda; color: #155724; }
         .total-check.error { background: #f8d7da; color: #721c24; }
 
         /* RESULT */
         .warning-box {
-            padding: 14px 18px;
-            background: #fff3cd;
-            border: 1px solid #ffeaa7;
-            border-left: 4px solid #fdcb6e;
-            border-radius: 10px;
-            color: #856404;
-            margin-bottom: 20px;
-            font-size: 14px;
-            line-height: 1.6;
+            padding: 14px 18px; background: #fff3cd;
+            border: 1px solid #ffeaa7; border-left: 4px solid #fdcb6e;
+            border-radius: 10px; color: #856404;
+            margin-bottom: 20px; font-size: 14px; line-height: 1.6;
         }
 
         .groups-grid {
             display: grid;
             grid-template-columns: repeat(auto-fit, minmax(250px, 1fr));
-            gap: 20px;
-            margin-top: 20px;
+            gap: 20px; margin-top: 20px;
         }
 
         .group-card {
-            background: #fff;
-            border-radius: 16px;
-            overflow: hidden;
-            box-shadow: 0 4px 15px rgba(0,0,0,0.1);
+            background: #fff; border-radius: 16px;
+            overflow: hidden; box-shadow: 0 4px 15px rgba(0,0,0,0.1);
             animation: slideIn 0.5s ease;
         }
 
@@ -378,229 +278,171 @@
 
         .group-header {
             background: linear-gradient(135deg, #0d1b3e, #1a3a7a);
-            color: #fff;
-            padding: 16px 20px;
-            font-size: 18px;
-            font-weight: 800;
-            display: flex;
-            justify-content: space-between;
-            align-items: center;
+            color: #fff; padding: 16px 20px;
+            font-size: 18px; font-weight: 800;
+            display: flex; justify-content: space-between; align-items: center;
         }
-
         .group-header .count {
-            font-size: 13px;
-            font-weight: 600;
-            opacity: 0.85;
+            font-size: 13px; font-weight: 600; opacity: 0.85;
             background: rgba(255,255,255,0.15);
-            padding: 3px 10px;
-            border-radius: 12px;
+            padding: 3px 10px; border-radius: 12px;
         }
 
         .group-teams { padding: 14px; }
-
         .group-team {
-            padding: 12px 14px;
-            background: #f8f9fa;
-            border-radius: 10px;
-            margin-bottom: 8px;
-            display: flex;
-            align-items: center;
-            gap: 12px;
-            transition: all 0.2s ease;
+            padding: 12px 14px; background: #f8f9fa;
+            border-radius: 10px; margin-bottom: 8px;
+            display: flex; align-items: center; gap: 12px;
         }
-
         .group-team:hover { background: #f0f4ff; }
         .group-team:last-child { margin-bottom: 0; }
-
         .group-team .position {
-            width: 28px;
-            height: 28px;
-            background: #1a3a7a;
-            color: #fff;
-            border-radius: 50%;
-            display: flex;
-            align-items: center;
-            justify-content: center;
-            font-size: 13px;
-            font-weight: 700;
-            flex-shrink: 0;
+            width: 28px; height: 28px; background: #1a3a7a;
+            color: #fff; border-radius: 50%;
+            display: flex; align-items: center; justify-content: center;
+            font-size: 13px; font-weight: 700; flex-shrink: 0;
         }
-
         .group-team .team-info { flex: 1; min-width: 0; }
-        .group-team .team-name { font-weight: 700; color: #1a1a2e; font-size: 14px; display: block; }
-        .group-team .team-club { font-size: 12px; color: #6c757d; margin-top: 2px; display: block; }
+        .group-team .team-name {
+            font-weight: 700; color: #1a1a2e; font-size: 14px; display: block;
+        }
+        .group-team .team-club {
+            font-size: 12px; color: #6c757d; margin-top: 2px; display: block;
+        }
         .group-team .team-club.has-club { color: #1a3a7a; font-weight: 600; }
 
-        /* BRACKET (Knock-out) */
+        /* BRACKET */
         .bracket {
-            display: flex;
-            gap: 30px;
-            overflow-x: auto;
-            padding: 20px 0;
-            min-height: 400px;
+            display: flex; gap: 30px; overflow-x: auto;
+            padding: 20px 0; min-height: 400px;
         }
-
         .bracket-round {
-            min-width: 260px;
-            flex-shrink: 0;
-            display: flex;
-            flex-direction: column;
+            min-width: 260px; flex-shrink: 0;
+            display: flex; flex-direction: column;
         }
-
         .bracket-round h4 {
-            text-align: center;
-            color: #1a3a7a;
-            margin-bottom: 20px;
-            font-size: 14px;
-            text-transform: uppercase;
-            letter-spacing: 1px;
-            padding-bottom: 10px;
-            border-bottom: 2px solid #e9ecef;
+            text-align: center; color: #1a3a7a;
+            margin-bottom: 20px; font-size: 14px;
+            text-transform: uppercase; letter-spacing: 1px;
+            padding-bottom: 10px; border-bottom: 2px solid #e9ecef;
         }
-
         .bracket-round .matchups {
-            display: flex;
-            flex-direction: column;
-            justify-content: space-around;
-            flex: 1;
-            gap: 16px;
+            display: flex; flex-direction: column;
+            justify-content: space-around; flex: 1; gap: 16px;
         }
-
         .matchup {
-            background: #fff;
-            border-radius: 12px;
-            padding: 12px;
-            box-shadow: 0 2px 10px rgba(0,0,0,0.08);
-            border-left: 4px solid #1a3a7a;
-            position: relative;
-            transition: all 0.2s ease;
+            background: #fff; border-radius: 12px;
+            padding: 12px; box-shadow: 0 2px 10px rgba(0,0,0,0.08);
+            border-left: 4px solid #1a3a7a; position: relative;
         }
-
-        .matchup:hover { transform: translateX(4px); box-shadow: 0 4px 15px rgba(0,0,0,0.12); }
-
         .matchup .match-number {
-            position: absolute;
-            top: 6px;
-            right: 10px;
-            font-size: 10px;
-            color: #999;
-            font-weight: 700;
+            position: absolute; top: 6px; right: 10px;
+            font-size: 10px; color: #999; font-weight: 700;
         }
-
         .matchup .team {
-            padding: 8px 12px;
-            background: #f8f9fa;
-            border-radius: 6px;
-            margin-bottom: 4px;
-            font-size: 13px;
-            font-weight: 600;
-            color: #1a1a2e;
-            display: flex;
-            justify-content: space-between;
-            align-items: center;
-            gap: 6px;
+            padding: 8px 12px; background: #f8f9fa;
+            border-radius: 6px; margin-bottom: 4px;
+            font-size: 13px; font-weight: 600; color: #1a1a2e;
+            display: flex; justify-content: space-between;
+            align-items: center; gap: 6px;
         }
-
         .matchup .team.bye {
-            background: #e9ecef;
-            color: #6c757d;
-            font-style: italic;
+            background: #e9ecef; color: #6c757d; font-style: italic;
         }
-
         .matchup .team .club-tag {
-            font-size: 10px;
-            color: #1a3a7a;
-            background: #e7eefc;
-            padding: 2px 6px;
-            border-radius: 4px;
-            font-weight: 700;
+            font-size: 10px; color: #1a3a7a; background: #e7eefc;
+            padding: 2px 6px; border-radius: 4px; font-weight: 700;
         }
-
         .matchup .team:last-child { margin-bottom: 0; }
-        .matchup .vs { text-align: center; color: #999; font-size: 10px; margin: 4px 0; font-weight: 700; }
+        .matchup .vs {
+            text-align: center; color: #999;
+            font-size: 10px; margin: 4px 0; font-weight: 700;
+        }
 
-        /* Empty state */
+        /* EMPTY STATE */
         .empty-state {
-            text-align: center;
-            padding: 40px 20px;
-            color: #6c757d;
+            text-align: center; padding: 40px 20px; color: #6c757d;
+        }
+        .empty-state i {
+            font-size: 48px; color: #dee2e6;
+            margin-bottom: 12px; display: block;
         }
 
-        .empty-state i { font-size: 48px; color: #dee2e6; margin-bottom: 12px; display: block; }
-
-        /* Alert */
+        /* ALERT */
         .alert {
-            padding: 14px 18px;
-            border-radius: 10px;
-            margin-top: 16px;
-            display: none;
-            font-size: 14px;
+            padding: 14px 18px; border-radius: 10px;
+            margin-top: 16px; display: none; font-size: 14px;
         }
-
         .alert.show { display: block; }
         .alert.error { background: #f8d7da; color: #721c24; border: 1px solid #f5c6cb; }
         .alert.success { background: #d4edda; color: #155724; border: 1px solid #c3e6cb; }
 
-        /* Result actions */
+        /* RESULT ACTIONS */
         .result-actions {
-            margin-top: 20px;
-            display: flex;
-            gap: 12px;
-            flex-wrap: wrap;
+            margin-top: 20px; display: flex; gap: 12px; flex-wrap: wrap;
         }
 
         /* MODAL */
         .modal-overlay {
-            display: none;
-            position: fixed;
-            top: 0; left: 0; right: 0; bottom: 0;
-            background: rgba(0,0,0,0.5);
-            z-index: 1000;
-            align-items: center;
-            justify-content: center;
-            padding: 20px;
+            display: none; position: fixed; top: 0; left: 0; right: 0; bottom: 0;
+            background: rgba(0,0,0,0.5); z-index: 1000;
+            align-items: center; justify-content: center; padding: 20px;
         }
-
         .modal-overlay.show { display: flex; }
-
         .modal-content {
-            background: #fff;
-            border-radius: 20px;
-            max-width: 700px;
-            width: 100%;
-            animation: slideIn 0.3s ease;
+            background: #fff; border-radius: 20px;
+            max-width: 900px; width: 100%; max-height: 90vh;
+            overflow-y: auto; animation: slideIn 0.3s ease;
         }
-
         .modal-header {
             background: linear-gradient(135deg, #0d1b3e, #1a3a7a);
-            color: #fff;
-            padding: 20px 24px;
+            color: #fff; padding: 24px 28px;
             border-radius: 20px 20px 0 0;
-            display: flex;
-            justify-content: space-between;
-            align-items: center;
+            display: flex; justify-content: space-between; align-items: center;
         }
-
-        .modal-header h2 { font-size: 18px; }
-
+        .modal-header h2 { font-size: 20px; }
         .modal-close {
-            background: none;
-            border: none;
-            color: #fff;
-            font-size: 26px;
-            cursor: pointer;
+            background: none; border: none; color: #fff;
+            font-size: 28px; cursor: pointer;
         }
+        .modal-body { padding: 28px; }
 
-        .modal-body { padding: 24px; }
+        /* DROP ZONE */
+        .drop-zone {
+            border: 3px dashed #1a3a7a; border-radius: 16px;
+            padding: 40px 20px; text-align: center;
+            cursor: pointer; transition: all 0.3s ease; background: #f8f9fa;
+        }
+        .drop-zone:hover, .drop-zone.dragover {
+            background: #e7f3ff; border-color: #0984e3;
+        }
+        .drop-zone i {
+            font-size: 48px; color: #1a3a7a;
+            margin-bottom: 12px; display: block;
+        }
+        .drop-zone p { color: #6c757d; font-size: 15px; margin-bottom: 8px; }
+        .drop-zone strong { color: #1a3a7a; }
+
+        /* PREVIEW TABLE */
+        .preview-table {
+            max-height: 300px; overflow-y: auto; margin-top: 16px;
+            border: 1px solid #e9ecef; border-radius: 10px;
+        }
+        .preview-table table { width: 100%; border-collapse: collapse; font-size: 13px; }
+        .preview-table th {
+            background: #1a3a7a; color: #fff; padding: 10px;
+            text-align: left; position: sticky; top: 0;
+        }
+        .preview-table td { padding: 8px 10px; border-bottom: 1px solid #e9ecef; }
+        .preview-table tr:last-child td { border-bottom: none; }
+        .preview-table tr:nth-child(even) { background: #f8f9fa; }
 
         .modal-actions {
-            display: flex;
-            gap: 12px;
-            justify-content: flex-end;
-            margin-top: 20px;
+            display: flex; gap: 12px; justify-content: flex-end;
+            margin-top: 24px; padding-top: 20px;
+            border-top: 1px solid #e9ecef;
         }
 
-        /* RESPONSIVE */
         @media (max-width: 768px) {
             .form-row-add { grid-template-columns: 1fr; }
             .draw-header h1 { font-size: 22px; }
@@ -608,19 +450,22 @@
             .bracket-round { min-width: 100%; }
         }
     </style>
-    
 </head>
 <body>
 
 <div class="draw-container">
 
-    <!-- HEADER -->
     <div class="draw-header">
-        <h1>🎲 Bốc thăm tự động</h1>
-        <p>Chia đội vào các bảng đấu · Loại trực tiếp · Vòng tròn · SportsVN</p>
+        <div>
+            <h1>🎲 Bốc thăm tự động</h1>
+            <p>Chia đội vào các bảng đấu · Loại trực tiếp · Vòng tròn · SportsVN</p>
+        </div>
+        <a href="tournaments.html" class="btn-outline">
+            <i class="fas fa-arrow-left"></i> Quay lại
+        </a>
     </div>
 
-    <!-- BƯỚC 1: NHẬP DANH SÁCH VĐV/ĐỘI -->
+    <!-- BƯỚC 1: NHẬP DANH SÁCH VĐV -->
     <div class="draw-panel">
         <div class="panel-title">
             <span class="step-num">1</span> Nhập danh sách VĐV / Đội
@@ -631,26 +476,36 @@
                 <label>Tên VĐV / Đội</label>
                 <input type="text" id="team-input" placeholder="VD: Nguyễn Văn An">
             </div>
-
             <div class="form-group">
                 <label>CLB / Đơn vị</label>
                 <input type="text" id="club-input" placeholder="VD: CLB Hà Nội" list="club-list">
                 <datalist id="club-list"></datalist>
             </div>
-
             <div class="form-group">
                 <label>&nbsp;</label>
                 <button class="btn-primary" onclick="addTeam()" style="width: 100%;">
                     <i class="fas fa-plus"></i> Thêm
                 </button>
             </div>
-
             <div class="form-group">
                 <label>&nbsp;</label>
                 <button class="btn-success-sm" onclick="loadSampleTeams()" style="width: 100%;">
-                    <i class="fas fa-magic"></i> 16 VĐV mẫu
+                    <i class="fas fa-magic"></i> 16 mẫu
                 </button>
             </div>
+        </div>
+
+        <!-- ACTION BAR IMPORT/EXPORT -->
+        <div class="action-bar">
+            <button class="btn-success-sm" onclick="openImportModal()">
+                <i class="fas fa-file-import"></i> 📥 Import Excel
+            </button>
+            <button class="btn-primary" onclick="exportTeams()" style="background: #0984e3;">
+                <i class="fas fa-file-export"></i> 📤 Export Excel
+            </button>
+            <button class="btn-warning-sm" onclick="downloadTeamTemplate()">
+                <i class="fas fa-download"></i> 📄 Tải file mẫu
+            </button>
         </div>
 
         <div id="teams-summary" class="teams-summary"></div>
@@ -674,23 +529,13 @@
             <span>🚫 Không cho VĐV <strong>cùng CLB</strong> gặp nhau ở vòng đầu</span>
         </label>
 
-        <div id="protect-options" style="margin-top: 16px; padding: 16px; background: #f8f9fa; border-radius: 12px;">
-            <div class="form-group" style="max-width: 400px;">
-                <label>Ưu tiên gặp nhau ở vòng</label>
-                <select id="meet-round">
-                    <option value="any">Bất kỳ vòng nào (ưu tiên tránh vòng đầu)</option>
-                    <option value="semi" selected>Bán kết trở đi</option>
-                    <option value="final">Chung kết</option>
-                </select>
-            </div>
-            <p style="margin-top: 12px; color: #6c757d; font-size: 13px;">
-                <i class="fas fa-info-circle"></i>
-                Hệ thống sẽ thử tối đa 100 lần để tìm cách chia tốt nhất. Nếu không thể tránh, sẽ có cảnh báo.
-            </p>
-        </div>
+        <p style="margin-top: 12px; color: #6c757d; font-size: 13px;">
+            <i class="fas fa-info-circle"></i>
+            Hệ thống sẽ thử tối đa 200 lần để tìm cách chia tốt nhất. Nếu không thể tránh, sẽ có cảnh báo.
+        </p>
     </div>
 
-    <!-- BƯỚC 3: CHỌN THỂ THỨC BỐC THĂM -->
+    <!-- BƯỚC 3: CHỌN THỂ THỨC -->
     <div class="draw-panel">
         <div class="panel-title">
             <span class="step-num">3</span> Chọn thể thức bốc thăm
@@ -704,7 +549,6 @@
                     <small>Ghép cặp 1-1, thắng đi tiếp, thua loại.<br>VD: 10 đội → 5 cặp đấu vòng 1</small>
                 </div>
             </label>
-
             <label class="draw-type-card" onclick="selectDrawType('round-robin-even')">
                 <input type="radio" name="draw-type" value="round-robin-even">
                 <div class="info">
@@ -712,7 +556,6 @@
                     <small>Chia đều vào các bảng.<br>VD: 10 đội / 2 bảng = 2 bảng × 5 đội</small>
                 </div>
             </label>
-
             <label class="draw-type-card" onclick="selectDrawType('round-robin-custom')">
                 <input type="radio" name="draw-type" value="round-robin-custom">
                 <div class="info">
@@ -720,7 +563,6 @@
                     <small>Tự nhập số đội mỗi bảng.<br>VD: 3+3+4 cho 10 đội</small>
                 </div>
             </label>
-
             <label class="draw-type-card" onclick="selectDrawType('round-robin-single')">
                 <input type="radio" name="draw-type" value="round-robin-single">
                 <div class="info">
@@ -730,7 +572,7 @@
             </label>
         </div>
 
-        <!-- CẤU HÌNH CHIA ĐỀU -->
+        <!-- CONFIG EVEN -->
         <div id="config-even" class="config-box" style="display: none;">
             <div class="form-group" style="max-width: 300px;">
                 <label>Số bảng</label>
@@ -745,15 +587,17 @@
             </div>
         </div>
 
-        <!-- CẤU HÌNH CHIA TÙY CHỈNH -->
+        <!-- CONFIG CUSTOM -->
         <div id="config-custom" class="config-box" style="display: none;">
             <label style="font-weight: 700; margin-bottom: 10px; display: block;">Số đội mỗi bảng</label>
             <div class="custom-groups" id="custom-groups-inputs"></div>
             <div style="margin-top: 12px;">
                 <span id="total-check" class="total-check"></span>
             </div>
+            <button class="btn-primary" onclick="renderCustomGroupsInputs()" style="margin-top: 12px; background: #6c5ce7;">
+                <i class="fas fa-cog"></i> Nhập số bảng
+            </button>
         </div>
-
     </div>
 
     <!-- BƯỚC 4: BỐC THĂM -->
@@ -775,10 +619,8 @@
         <div class="panel-title">
             <span class="step-num">5</span> Kết quả bốc thăm
         </div>
-
         <div id="result-warning" class="warning-box" style="display: none;"></div>
         <div id="result-container"></div>
-
         <div class="result-actions">
             <button class="btn-primary" onclick="window.print()">
                 <i class="fas fa-print"></i> In kết quả
@@ -794,45 +636,67 @@
 
 </div>
 
-<!-- MODAL NHẬP SỐ ĐỘI/BẢNG -->
-<div class="modal-overlay" id="custom-modal">
-    <div class="modal-content" style="max-width: 500px;">
+<!-- MODAL IMPORT EXCEL -->
+<div class="modal-overlay" id="import-modal">
+    <div class="modal-content">
         <div class="modal-header">
-            <h2>Số đội mỗi bảng</h2>
-            <button class="modal-close" onclick="closeCustomModal()">×</button>
+            <h2>📥 Import VĐV từ Excel</h2>
+            <button class="modal-close" onclick="closeImportModal()">×</button>
         </div>
         <div class="modal-body">
-            <div class="form-group">
-                <label>Số bảng</label>
-                <input type="number" id="custom-num-groups" min="2" max="16" value="3">
+            <div class="drop-zone" id="drop-zone" onclick="document.getElementById('file-input').click()">
+                <i class="fas fa-cloud-upload-alt"></i>
+                <p><strong>Kéo file Excel vào đây</strong></p>
+                <p>hoặc</p>
+                <p>Nhấn để chọn file</p>
+                <p style="font-size: 12px; margin-top: 12px;">Hỗ trợ: .xlsx, .xls, .csv</p>
             </div>
-            <div class="modal-actions">
-                <button type="button" class="btn-primary" onclick="closeCustomModal()" style="background: #6c757d;">Hủy</button>
-                <button type="button" class="btn-primary" onclick="applyCustomGroups()">Áp dụng</button>
+            <input type="file" id="file-input" accept=".xlsx,.xls,.csv" style="display: none;" onchange="handleFileSelect(event)">
+
+            <div id="import-preview" style="display: none;">
+                <h3 style="margin: 20px 0 12px; color: #1a3a7a;">📋 Preview (<span id="preview-count">0</span> VĐV)</h3>
+                <div class="preview-table">
+                    <table id="preview-table-content">
+                        <thead>
+                            <tr>
+                                <th>STT</th>
+                                <th>Tên VĐV/Đội</th>
+                                <th>CLB/Đơn vị</th>
+                            </tr>
+                        </thead>
+                        <tbody></tbody>
+                    </table>
+                </div>
+                <div class="modal-actions">
+                    <button class="btn-primary" style="background: #6c757d;" onclick="resetImport()">Hủy</button>
+                    <button class="btn-success-sm" onclick="confirmImport()" id="import-btn">
+                        <i class="fas fa-check"></i> ✅ Xác nhận Import
+                    </button>
+                </div>
             </div>
         </div>
     </div>
 </div>
 
-<!-- PHẦN 2: CSS SẼ ĐƯỢC THÊM VÀO ĐÂY -->
+<script src="https://cdn.jsdelivr.net/npm/xlsx@0.18.5/dist/xlsx.full.min.js"></script>
 <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
 <script src="config.js"></script>
 <script>
 (function() {
     'use strict';
 
-    // ==========================================
-    // CẤU HÌNH
-    // ==========================================
+    console.log('🚀 draw.html bắt đầu chạy');
+
     const config = window.SPORTSVN_CONFIG || {};
     const supabaseClient = window.supabase.createClient(config.SUPABASE_URL, config.SUPABASE_ANON_KEY);
 
-    let teams = [];           // Danh sách VĐV/Đội: [{name, club}]
+    let teams = [];
     let currentDrawType = 'knockout';
-    let lastResult = null;    // Kết quả bốc thăm gần nhất
+    let lastResult = null;
+    let importData = [];
 
     // ==========================================
-    // 1. QUẢN LÝ DANH SÁCH VĐV
+    // QUẢN LÝ DANH SÁCH VĐV
     // ==========================================
     window.addTeam = function() {
         const nameInput = document.getElementById('team-input');
@@ -840,14 +704,10 @@
         const name = nameInput.value.trim();
         const club = clubInput.value.trim();
 
-        if (!name) {
-            showAlert('Vui lòng nhập tên VĐV/Đội.', 'error');
-            return;
-        }
+        if (!name) { showAlert('Vui lòng nhập tên VĐV/Đội.', 'error'); return; }
 
-        // Kiểm tra trùng tên
         if (teams.some(t => t.name === name && t.club === club)) {
-            showAlert('VĐV/Đội này đã có trong danh sách.', 'error');
+            showAlert('VĐV/Đội này đã có.', 'error');
             return;
         }
 
@@ -855,24 +715,16 @@
         nameInput.value = '';
         clubInput.value = '';
         nameInput.focus();
-
         renderTeams();
         updateClubDatalist();
         showAlert('', '');
     };
 
     document.getElementById('team-input').addEventListener('keypress', (e) => {
-        if (e.key === 'Enter') {
-            e.preventDefault();
-            document.getElementById('club-input').focus();
-        }
+        if (e.key === 'Enter') { e.preventDefault(); document.getElementById('club-input').focus(); }
     });
-
     document.getElementById('club-input').addEventListener('keypress', (e) => {
-        if (e.key === 'Enter') {
-            e.preventDefault();
-            window.addTeam();
-        }
+        if (e.key === 'Enter') { e.preventDefault(); window.addTeam(); }
     });
 
     window.removeTeam = function(index) {
@@ -889,24 +741,19 @@
 
     window.loadSampleTeams = function() {
         const sample = [
-            // CLB Hà Nội - 4 VĐV
             { name: 'Nguyễn Văn An', club: 'CLB Hà Nội' },
             { name: 'Trần Văn Bình', club: 'CLB Hà Nội' },
             { name: 'Lê Văn Cường', club: 'CLB Hà Nội' },
             { name: 'Phạm Văn Dũng', club: 'CLB Hà Nội' },
-            // CLB Đà Nẵng - 3 VĐV
             { name: 'Hoàng Văn Em', club: 'CLB Đà Nẵng' },
             { name: 'Vũ Văn Phong', club: 'CLB Đà Nẵng' },
             { name: 'Đặng Văn Giang', club: 'CLB Đà Nẵng' },
-            // CLB TP.HCM - 3 VĐV
             { name: 'Bùi Văn Huy', club: 'CLB TP.HCM' },
             { name: 'Ngô Văn Khánh', club: 'CLB TP.HCM' },
             { name: 'Đinh Văn Linh', club: 'CLB TP.HCM' },
-            // CLB Huế - 3 VĐV
             { name: 'Trương Văn Minh', club: 'CLB Huế' },
             { name: 'Lý Văn Nam', club: 'CLB Huế' },
             { name: 'Hồ Văn Oanh', club: 'CLB Huế' },
-            // CLB Cần Thơ - 3 VĐV
             { name: 'Dương Văn Phúc', club: 'CLB Cần Thơ' },
             { name: 'Tạ Văn Quân', club: 'CLB Cần Thơ' },
             { name: 'Võ Văn Sơn', club: 'CLB Cần Thơ' }
@@ -914,7 +761,7 @@
         teams = [...sample];
         renderTeams();
         updateClubDatalist();
-        showAlert('Đã thêm 16 VĐV mẫu (5 CLB). Nhấn "BỐC THĂM NGAY" để bắt đầu!', 'success');
+        showAlert('Đã thêm 16 VĐV mẫu!', 'success');
     };
 
     function renderTeams() {
@@ -922,18 +769,13 @@
         const summary = document.getElementById('teams-summary');
 
         if (teams.length === 0) {
-            container.innerHTML = '<div class="empty-state" style="grid-column:1/-1;"><i class="fas fa-users"></i><p>Chưa có VĐV/Đội nào. Hãy thêm ở trên.</p></div>';
+            container.innerHTML = '<div class="empty-state" style="grid-column:1/-1;"><i class="fas fa-users"></i><p>Chưa có VĐV/Đội nào.</p></div>';
             summary.innerHTML = '';
             return;
         }
 
-        // Thống kê theo CLB
         const clubCounts = {};
-        teams.forEach(t => {
-            if (t.club) {
-                clubCounts[t.club] = (clubCounts[t.club] || 0) + 1;
-            }
-        });
+        teams.forEach(t => { if (t.club) clubCounts[t.club] = (clubCounts[t.club] || 0) + 1; });
 
         summary.innerHTML = `
             <div class="stat"><i class="fas fa-users"></i> Tổng: <strong>${teams.length} VĐV/Đội</strong></div>
@@ -955,17 +797,173 @@
 
     function updateClubDatalist() {
         const clubs = [...new Set(teams.map(t => t.club).filter(Boolean))];
-        const datalist = document.getElementById('club-list');
-        datalist.innerHTML = clubs.map(c => `<option value="${escapeHtml(c)}">`).join('');
+        document.getElementById('club-list').innerHTML = clubs.map(c => `<option value="${escapeHtml(c)}">`).join('');
     }
 
     // ==========================================
-    // 2. CHỌN THỂ THỨC BỐC THĂM
+    // IMPORT EXCEL
+    // ==========================================
+    window.openImportModal = function() {
+        resetImport();
+        document.getElementById('import-modal').classList.add('show');
+    };
+
+    window.closeImportModal = function() {
+        document.getElementById('import-modal').classList.remove('show');
+        resetImport();
+    };
+
+    function resetImport() {
+        importData = [];
+        document.getElementById('import-preview').style.display = 'none';
+        document.getElementById('file-input').value = '';
+    }
+
+    window.handleFileSelect = function(event) {
+        const file = event.target.files[0];
+        if (file) parseExcelFile(file);
+    };
+
+    function parseExcelFile(file) {
+        const reader = new FileReader();
+        reader.onload = (e) => {
+            try {
+                const data = new Uint8Array(e.target.result);
+                const workbook = XLSX.read(data, { type: 'array' });
+                const sheet = workbook.Sheets[workbook.SheetNames[0]];
+                const jsonData = XLSX.utils.sheet_to_json(sheet, { header: 1, defval: '' });
+
+                if (jsonData.length < 2) {
+                    alert('File Excel trống hoặc không có dữ liệu!');
+                    return;
+                }
+
+                importData = jsonData.slice(1).map(row => ({
+                    name: String(row[1] || '').trim(),
+                    club: String(row[2] || '').trim()
+                })).filter(t => t.name);
+
+                if (importData.length === 0) {
+                    alert('Không tìm thấy dữ liệu hợp lệ!');
+                    return;
+                }
+
+                renderImportPreview();
+            } catch (error) {
+                console.error(error);
+                alert('Lỗi đọc file: ' + error.message);
+            }
+        };
+        reader.readAsArrayBuffer(file);
+    }
+
+    function renderImportPreview() {
+        document.getElementById('import-preview').style.display = 'block';
+        document.getElementById('preview-count').textContent = importData.length;
+
+        const tbody = document.querySelector('#preview-table-content tbody');
+        tbody.innerHTML = importData.map((t, i) => `
+            <tr>
+                <td>${i + 1}</td>
+                <td><strong>${escapeHtml(t.name)}</strong></td>
+                <td>${escapeHtml(t.club || '—')}</td>
+            </tr>
+        `).join('');
+    }
+
+    window.confirmImport = function() {
+        if (importData.length === 0) return;
+        if (!confirm(`Import ${importData.length} VĐV vào danh sách bốc thăm?`)) return;
+
+        let added = 0;
+        importData.forEach(newTeam => {
+            const exists = teams.some(t => t.name === newTeam.name && t.club === newTeam.club);
+            if (!exists) {
+                teams.push(newTeam);
+                added++;
+            }
+        });
+
+        closeImportModal();
+        renderTeams();
+        updateClubDatalist();
+        showAlert(`✅ Đã import ${added} VĐV! (Bỏ qua ${importData.length - added} trùng)`, 'success');
+    };
+
+    // Drag & Drop
+    document.addEventListener('DOMContentLoaded', () => {
+        const dropZone = document.getElementById('drop-zone');
+        if (dropZone) {
+            ['dragenter', 'dragover'].forEach(evt => {
+                dropZone.addEventListener(evt, e => {
+                    e.preventDefault();
+                    dropZone.classList.add('dragover');
+                });
+            });
+            ['dragleave', 'drop'].forEach(evt => {
+                dropZone.addEventListener(evt, e => {
+                    e.preventDefault();
+                    dropZone.classList.remove('dragover');
+                });
+            });
+            dropZone.addEventListener('drop', e => {
+                const file = e.dataTransfer.files[0];
+                if (file) parseExcelFile(file);
+            });
+        }
+    });
+
+    // ==========================================
+    // EXPORT EXCEL
+    // ==========================================
+    window.exportTeams = function() {
+        if (teams.length === 0) { alert('Chưa có VĐV nào để xuất!'); return; }
+
+        const data = teams.map((t, i) => ({
+            'STT': i + 1,
+            'Tên VĐV/Đội': t.name || '',
+            'CLB/Đơn vị': t.club || ''
+        }));
+
+        const ws = XLSX.utils.json_to_sheet(data);
+        ws['!cols'] = [{ wch: 5 }, { wch: 30 }, { wch: 25 }];
+
+        const wb = XLSX.utils.book_new();
+        XLSX.utils.book_append_sheet(wb, ws, 'Danh sách bốc thăm');
+
+        const urlParams = new URLSearchParams(window.location.search);
+        const tid = urlParams.get('tournament_id') || '';
+        const fileName = `DanhSachBocTham_${tid.slice(0, 8)}_${new Date().toISOString().slice(0, 10)}.xlsx`;
+        XLSX.writeFile(wb, fileName);
+        showAlert('✅ Đã xuất file Excel!', 'success');
+    };
+
+    // ==========================================
+    // DOWNLOAD TEMPLATE
+    // ==========================================
+    window.downloadTeamTemplate = function() {
+        const template = [
+            { 'STT': 1, 'Tên VĐV/Đội': 'Nguyễn Văn An', 'CLB/Đơn vị': 'CLB Hà Nội' },
+            { 'STT': 2, 'Tên VĐV/Đội': 'Trần Văn Bình', 'CLB/Đơn vị': 'CLB Hà Nội' },
+            { 'STT': 3, 'Tên VĐV/Đội': 'Lê Văn Cường', 'CLB/Đơn vị': 'CLB Đà Nẵng' },
+            { 'STT': 4, 'Tên VĐV/Đội': 'Phạm Văn Dũng', 'CLB/Đơn vị': 'CLB Đà Nẵng' }
+        ];
+
+        const ws = XLSX.utils.json_to_sheet(template);
+        ws['!cols'] = [{ wch: 5 }, { wch: 30 }, { wch: 25 }];
+
+        const wb = XLSX.utils.book_new();
+        XLSX.utils.book_append_sheet(wb, ws, 'Mẫu bốc thăm');
+        XLSX.writeFile(wb, 'MauDanhSachBocTham.xlsx');
+        showAlert('✅ Đã tải file mẫu!', 'success');
+    };
+
+    // ==========================================
+    // CHỌN THỂ THỨC
     // ==========================================
     window.selectDrawType = function(type) {
         currentDrawType = type;
 
-        // Update UI
         document.querySelectorAll('.draw-type-card').forEach(card => {
             const radio = card.querySelector('input[type="radio"]');
             if (radio.value === type) {
@@ -976,16 +974,13 @@
             }
         });
 
-        // Show/hide config boxes
         document.getElementById('config-even').style.display = (type === 'round-robin-even') ? 'block' : 'none';
         document.getElementById('config-custom').style.display = (type === 'round-robin-custom') ? 'block' : 'none';
 
-        if (type === 'round-robin-custom') {
-            renderCustomGroupsInputs();
-        }
+        if (type === 'round-robin-custom') renderCustomGroupsInputs();
     };
 
-    function renderCustomGroupsInputs() {
+    window.renderCustomGroupsInputs = function() {
         const numGroupsInput = prompt('Nhập số bảng muốn chia:', '3');
         const numGroups = parseInt(numGroupsInput);
         if (!numGroups || numGroups < 2 || numGroups > 16) return;
@@ -1003,16 +998,15 @@
             `;
             container.appendChild(wrapper);
         }
-
         checkCustomTotal();
-    }
+    };
 
     window.checkCustomTotal = function() {
         const inputs = document.querySelectorAll('.group-input');
         const total = Array.from(inputs).reduce((sum, inp) => sum + (parseInt(inp.value) || 0), 0);
         const checkEl = document.getElementById('total-check');
-
         const diff = teams.length - total;
+
         if (diff === 0) {
             checkEl.textContent = `✅ Tổng: ${total}/${teams.length} VĐV — Khớp!`;
             checkEl.className = 'total-check ok';
@@ -1023,7 +1017,7 @@
     };
 
     // ==========================================
-    // 3. BỐC THĂM - HÀM CHÍNH
+    // BỐC THĂM
     // ==========================================
     window.performDraw = function() {
         if (teams.length < 2) {
@@ -1051,7 +1045,7 @@
         }
 
         if (!result) {
-            showAlert('Không thể bốc thăm. Vui lòng kiểm tra lại cấu hình.', 'error');
+            showAlert('Không thể bốc thăm.', 'error');
             return;
         }
 
@@ -1063,40 +1057,30 @@
         if (result.warning) {
             showAlert('⚠️ ' + result.warning, 'error');
         } else {
-            showAlert(`✅ Bốc thăm thành công! Đã sắp xếp ${teams.length} VĐV/Đội.`, 'success');
+            showAlert(`✅ Bốc thăm thành công! ${teams.length} VĐV/Đội.`, 'success');
         }
     };
 
-    // ==========================================
-    // 4. THUẬT TOÁN BỐC THĂM KNOCK-OUT
-    // ==========================================
+    // KNOCKOUT
     function drawKnockout(teams, protectClub) {
         const MAX_ATTEMPTS = 200;
         const size = teams.length;
-
-        // Tính số slot (làm tròn lên lũy thừa 2 gần nhất)
         const bracketSize = nextPowerOfTwo(size);
-        const numByes = bracketSize - size;  // Số VĐV được miễn vòng 1
+        const numByes = bracketSize - size;
 
-        // Thử bốc thăm nhiều lần
         for (let attempt = 0; attempt < MAX_ATTEMPTS; attempt++) {
             const shuffled = shuffleArray([...teams]);
             const rounds = buildKnockoutBracket(shuffled, bracketSize, numByes);
-
             if (!protectClub || !hasSameClubInFirstRound(rounds[0])) {
                 return { type: 'knockout', rounds, bracketSize, numByes };
             }
         }
 
-        // Nếu không tìm được cách chia tốt sau 200 lần → chấp nhận và cảnh báo
         const shuffled = shuffleArray([...teams]);
         const rounds = buildKnockoutBracket(shuffled, bracketSize, numByes);
 
         return {
-            type: 'knockout',
-            rounds,
-            bracketSize,
-            numByes,
+            type: 'knockout', rounds, bracketSize, numByes,
             warning: 'Không thể tránh hoàn toàn. Một số VĐV cùng CLB phải gặp ở vòng đầu.'
         };
     }
@@ -1104,22 +1088,16 @@
     function buildKnockoutBracket(teams, bracketSize, numByes) {
         const rounds = [];
         const firstRound = [];
-
-        // Số cặp đấu vòng 1
         const firstRoundMatches = bracketSize / 2;
 
-        // VĐV được miễn vòng 1 (những người đầu tiên sau khi xáo trộn)
         const byes = teams.slice(0, numByes);
         const playing = teams.slice(numByes);
 
-        // Xếp các cặp đấu vòng 1
         for (let i = 0; i < firstRoundMatches; i++) {
             const teamA = playing[i * 2] || null;
             const teamB = playing[i * 2 + 1] || null;
 
-            // Nếu là cặp miễn (chỉ có 1 hoặc 0 VĐV)
             if (!teamB && byes.length > 0) {
-                // Đưa VĐV miễn vào cặp này
                 firstRound.push({ teamA: byes.shift(), teamB: null, isBye: true });
             } else {
                 firstRound.push({ teamA, teamB, isBye: false });
@@ -1128,20 +1106,14 @@
 
         rounds.push(firstRound);
 
-        // Các vòng tiếp theo (chỉ hiển thị placeholder)
         let roundSize = firstRoundMatches;
-        let roundNum = 2;
-
         while (roundSize > 1) {
             roundSize = roundSize / 2;
             const roundMatches = [];
-
             for (let i = 0; i < roundSize; i++) {
                 roundMatches.push({ teamA: null, teamB: null, isPlaceholder: true });
             }
-
             rounds.push(roundMatches);
-            roundNum++;
         }
 
         return rounds;
@@ -1153,56 +1125,43 @@
         return p;
     }
 
-    // ==========================================
-    // 5. THUẬT TOÁN VÒNG TRÒN CHIA ĐỀU
-    // ==========================================
+    // ROUND ROBIN EVEN
     function drawRoundRobinEven(teams, numGroups, protectClub) {
         const MAX_ATTEMPTS = 200;
-
         for (let attempt = 0; attempt < MAX_ATTEMPTS; attempt++) {
             const shuffled = shuffleArray([...teams]);
             const groups = splitIntoGroups(shuffled, numGroups);
-
             if (!protectClub || !hasSameClubInGroup(groups)) {
                 return { type: 'round-robin', groups, numGroups };
             }
         }
-
         const shuffled = shuffleArray([...teams]);
         const groups = splitIntoGroups(shuffled, numGroups);
-
         return {
-            type: 'round-robin',
-            groups,
-            numGroups,
+            type: 'round-robin', groups, numGroups,
             warning: 'Không thể tránh hoàn toàn. Một số VĐV cùng CLB phải nằm cùng bảng.'
         };
     }
 
-    // ==========================================
-    // 6. THUẬT TOÁN VÒNG TRÒN CHIA TÙY CHỈNH
-    // ==========================================
+    // ROUND ROBIN CUSTOM
     function drawRoundRobinCustom(teams, protectClub) {
         const inputs = document.querySelectorAll('.group-input');
         const groupSizes = Array.from(inputs).map(inp => parseInt(inp.value) || 0);
         const total = groupSizes.reduce((a, b) => a + b, 0);
 
         if (total !== teams.length) {
-            throw new Error(`Tổng số VĐV trong các bảng (${total}) không khớp với số VĐV đã nhập (${teams.length}).`);
+            throw new Error(`Tổng VĐV trong các bảng (${total}) không khớp với VĐV đã nhập (${teams.length}).`);
         }
 
         const MAX_ATTEMPTS = 200;
-
         for (let attempt = 0; attempt < MAX_ATTEMPTS; attempt++) {
             const shuffled = shuffleArray([...teams]);
             const groups = [];
             let idx = 0;
-
             for (const size of groupSizes) {
                 groups.push(shuffled.slice(idx, idx + size));
                 idx += size;
             }
-
             if (!protectClub || !hasSameClubInGroup(groups)) {
                 return { type: 'round-robin', groups, numGroups: groupSizes.length };
             }
@@ -1211,34 +1170,22 @@
         const shuffled = shuffleArray([...teams]);
         const groups = [];
         let idx = 0;
-
         for (const size of groupSizes) {
             groups.push(shuffled.slice(idx, idx + size));
             idx += size;
         }
-
         return {
-            type: 'round-robin',
-            groups,
-            numGroups: groupSizes.length,
-            warning: 'Không thể tránh hoàn toàn. Một số VĐV cùng CLB phải nằm cùng bảng.'
+            type: 'round-robin', groups, numGroups: groupSizes.length,
+            warning: 'Không thể tránh hoàn toàn.'
         };
     }
 
-    // ==========================================
-    // 7. THUẬT TOÁN VÒNG TRÒN 1 BẢNG
-    // ==========================================
+    // ROUND ROBIN SINGLE
     function drawRoundRobinSingle(teams, protectClub) {
-        return {
-            type: 'round-robin',
-            groups: [shuffleArray([...teams])],
-            numGroups: 1
-        };
+        return { type: 'round-robin', groups: [shuffleArray([...teams])], numGroups: 1 };
     }
 
-    // ==========================================
-    // 8. HELPERS
-    // ==========================================
+    // HELPERS
     function shuffleArray(arr) {
         const a = [...arr];
         for (let i = a.length - 1; i > 0; i--) {
@@ -1250,9 +1197,7 @@
 
     function splitIntoGroups(arr, numGroups) {
         const groups = Array.from({ length: numGroups }, () => []);
-        arr.forEach((item, i) => {
-            groups[i % numGroups].push(item);
-        });
+        arr.forEach((item, i) => groups[i % numGroups].push(item));
         return groups;
     }
 
@@ -1275,14 +1220,11 @@
         return false;
     }
 
-    // ==========================================
-    // 9. HIỂN THỊ KẾT QUẢ
-    // ==========================================
+    // RENDER RESULT
     function renderResult(result) {
         const container = document.getElementById('result-container');
         const warningEl = document.getElementById('result-warning');
 
-        // Warning
         if (result.warning) {
             warningEl.style.display = 'block';
             warningEl.innerHTML = '<i class="fas fa-exclamation-triangle"></i> ' + escapeHtml(result.warning);
@@ -1290,7 +1232,6 @@
             warningEl.style.display = 'none';
         }
 
-        // Render theo loại
         if (result.type === 'knockout') {
             container.innerHTML = renderKnockoutHTML(result);
         } else if (result.type === 'round-robin') {
@@ -1300,7 +1241,6 @@
 
     function renderRoundRobinHTML(result) {
         const groupNames = ['A', 'B', 'C', 'D', 'E', 'F', 'G', 'H', 'I', 'J', 'K', 'L', 'M', 'N', 'O', 'P'];
-
         return `
             <div class="groups-grid">
                 ${result.groups.map((group, i) => `
@@ -1328,7 +1268,6 @@
 
     function renderKnockoutHTML(result) {
         const roundNames = getRoundNames(result.rounds.length);
-
         return `
             <div class="bracket">
                 ${result.rounds.map((round, i) => `
@@ -1388,47 +1327,28 @@
     function getRoundNames(totalRounds) {
         const names = [];
         const standard = ['Chung kết', 'Bán kết', 'Tứ kết', 'Vòng 1/8', 'Vòng 1/16', 'Vòng 1/32'];
-
         for (let i = 0; i < totalRounds; i++) {
             const fromEnd = totalRounds - 1 - i;
-            if (fromEnd < standard.length) {
-                names.push(standard[fromEnd]);
-            } else {
-                names.push(`Vòng ${i + 1}`);
-            }
+            names.push(fromEnd < standard.length ? standard[fromEnd] : `Vòng ${i + 1}`);
         }
-
         return names;
     }
 
-    // ==========================================
-    // 10. LƯU VÀO DATABASE
-    // ==========================================
+    // SAVE TO DATABASE
     window.saveToDatabase = async function() {
-        if (!lastResult) {
-            showAlert('Chưa có kết quả để lưu.', 'error');
-            return;
-        }
+        if (!lastResult) { showAlert('Chưa có kết quả.', 'error'); return; }
 
         const { data: { session } } = await supabaseClient.auth.getSession();
-        if (!session) {
-            showAlert('Bạn cần đăng nhập để lưu kết quả.', 'error');
-            return;
-        }
+        if (!session) { showAlert('Cần đăng nhập.', 'error'); return; }
 
-        // Lấy tournament_id từ URL
         const urlParams = new URLSearchParams(window.location.search);
         const tournamentId = urlParams.get('tournament_id');
-
-        if (!tournamentId) {
-            showAlert('Không tìm thấy ID giải đấu. Vào từ trang Quản lý giải đấu.', 'error');
-            return;
-        }
+        if (!tournamentId) { showAlert('Không có ID giải đấu.', 'error'); return; }
 
         const records = [];
+        const groupNames = ['A', 'B', 'C', 'D', 'E', 'F', 'G', 'H', 'I', 'J', 'K', 'L', 'M', 'N', 'O', 'P'];
 
         if (lastResult.type === 'round-robin') {
-            const groupNames = ['A', 'B', 'C', 'D', 'E', 'F', 'G', 'H', 'I', 'J', 'K', 'L', 'M', 'N', 'O', 'P'];
             lastResult.groups.forEach((group, i) => {
                 group.forEach((team, j) => {
                     records.push({
@@ -1473,29 +1393,19 @@
             });
         }
 
-        if (records.length === 0) {
-            showAlert('Không có dữ liệu để lưu.', 'error');
-            return;
-        }
+        if (records.length === 0) { showAlert('Không có dữ liệu để lưu.', 'error'); return; }
 
         const btn = event.target;
         btn.disabled = true;
         btn.innerHTML = '<i class="fas fa-spinner fa-spin"></i> Đang lưu...';
 
         try {
-            // Xóa kết quả cũ của giải này (nếu có)
-            await supabaseClient
-                .from('draws')
-                .delete()
-                .eq('tournament_id', tournamentId);
-
-            // Insert kết quả mới
+            await supabaseClient.from('draws').delete().eq('tournament_id', tournamentId);
             const { error } = await supabaseClient.from('draws').insert(records);
             if (error) throw error;
-
             showAlert(`✅ Đã lưu ${records.length} VĐV vào hệ thống!`, 'success');
         } catch (error) {
-            console.error('Save error:', error);
+            console.error(error);
             showAlert('Lỗi lưu: ' + error.message, 'error');
         } finally {
             btn.disabled = false;
@@ -1503,43 +1413,18 @@
         }
     };
 
-    // ==========================================
-    // 11. HELPERS CHUNG
-    // ==========================================
+    // HELPERS
     function showAlert(message, type) {
         const el = document.getElementById('alert');
-        if (!message) {
-            el.className = 'alert';
-            return;
-        }
+        if (!message) { el.className = 'alert'; return; }
         el.textContent = message;
         el.className = 'alert show ' + type;
     }
 
     function escapeHtml(text) {
-        return String(text || '')
-            .replace(/&/g, '&amp;')
-            .replace(/</g, '&lt;')
-            .replace(/>/g, '&gt;')
-            .replace(/"/g, '&quot;');
+        return String(text || '').replace(/&/g, '&amp;').replace(/</g, '&lt;')
+            .replace(/>/g, '&gt;').replace(/"/g, '&quot;');
     }
-
-    // ==========================================
-    // 12. KHỞI TẠO
-    // ==========================================
-    window.closeCustomModal = function() {
-        document.getElementById('custom-modal').classList.remove('show');
-    };
-
-    window.applyCustomGroups = function() {
-        const numGroups = parseInt(document.getElementById('custom-num-groups').value);
-        if (!numGroups || numGroups < 2 || numGroups > 16) {
-            alert('Số bảng phải từ 2 đến 16.');
-            return;
-        }
-        // Will re-render inputs
-        closeCustomModal();
-    };
 
     // Khởi tạo
     renderTeams();
