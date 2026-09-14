@@ -155,7 +155,7 @@
 (function() {
     'use strict';
 
-    console.log('🚀 schedule.html v5 - CHIA SLOT THEO GIỜ');
+    console.log('🚀 schedule.html v6 - FIX TIMEZONE');
 
     const config = window.SPORTSVN_CONFIG || {};
     if (!config.SUPABASE_URL || !config.SUPABASE_ANON_KEY) {
@@ -344,7 +344,24 @@
     }
 
     // ==========================================
-    // XẾP LỊCH TỰ ĐỘNG - v5
+    // HELPER: FORMAT DATE AN TOÀN (FIX TIMEZONE)
+    // ==========================================
+    function formatDateForDB(date) {
+        const y = date.getFullYear();
+        const m = String(date.getMonth() + 1).padStart(2, '0');
+        const d = String(date.getDate()).padStart(2, '0');
+        return `${y}-${m}-${d}`;
+    }
+
+    function addDaysSafe(baseDate, days) {
+        const newDate = new Date(baseDate.getTime());
+        newDate.setHours(12, 0, 0, 0); // Tránh DST
+        newDate.setDate(newDate.getDate() + days);
+        return newDate;
+    }
+
+    // ==========================================
+    // XẾP LỊCH TỰ ĐỘNG
     // ==========================================
     window.autoGenerateSchedule = async function() {
         if (draws.length === 0) { showAlert('Chưa có kết quả bốc thăm!', 'error'); return; }
@@ -356,7 +373,11 @@
         try {
             await supabaseClient.from('schedules').delete().eq('tournament_id', tournamentId);
 
-            const startDate = new Date(tournament.start_date);
+            // Parse start date AN TOÀN
+            const startDateStr = tournament.start_date;
+            const [y, m, d] = startDateStr.split('-').map(Number);
+            const startDate = new Date(y, m - 1, d, 12, 0, 0, 0); // 12h tránh DST
+
             const numDays = tournament.num_days || 2;
             const sessionsPerDay = tournament.sessions_per_day || 2;
             const matchDuration = tournament.match_duration || 45;
@@ -412,28 +433,28 @@
                         console.log(`  Nhóm "${groupName}": ${totalTeams} VĐV → Bracket ${bracketSize} (${numByes} BYE)`);
 
                         const round1Matches = [];
-                        const byeTeams = [];
-                        const playingTeams = [];
+                        const byes = [];
+                        const playing = [];
 
                         if (numByes > 0) {
                             for (let i = 0; i < numByes; i++) {
-                                byeTeams.push(groupTeams[i]);
+                                byes.push(groupTeams[i]);
                             }
                         }
 
                         for (let i = numByes; i < totalTeams; i++) {
-                            playingTeams.push(groupTeams[i]);
+                            playing.push(groupTeams[i]);
                         }
 
-                        for (let i = 0; i < playingTeams.length; i += 2) {
-                            if (playingTeams[i] && playingTeams[i + 1]) {
+                        for (let i = 0; i < playing.length; i += 2) {
+                            if (playing[i] && playing[i + 1]) {
                                 round1Matches.push({
-                                    team_a: playingTeams[i].team_name,
-                                    team_b: playingTeams[i + 1].team_name
+                                    team_a: playing[i].team_name,
+                                    team_b: playing[i + 1].team_name
                                 });
-                            } else if (playingTeams[i]) {
+                            } else if (playing[i]) {
                                 round1Matches.push({
-                                    team_a: playingTeams[i].team_name,
+                                    team_a: playing[i].team_name,
                                     team_b: 'BYE'
                                 });
                             }
@@ -520,11 +541,11 @@
 
             console.log(`\n✅ TỔNG SỐ TRẬN: ${allMatches.length}`);
 
+            // TẠO SLOTS AN TOÀN
             const allSlots = [];
-            for (let d = 0; d < numDays; d++) {
-                const matchDate = new Date(startDate);
-                matchDate.setDate(matchDate.getDate() + d);
-                const dateStr = matchDate.toISOString().slice(0, 10);
+            for (let dayIdx = 0; dayIdx < numDays; dayIdx++) {
+                const matchDate = addDaysSafe(startDate, dayIdx);
+                const dateStr = formatDateForDB(matchDate);
 
                 for (let s = 0; s < sessionsPerDay; s++) {
                     const sessionKey = sessionKeys[s];
@@ -532,8 +553,8 @@
                     const maxMatches = maxMatchesPerSession[sessionKey] || 4;
 
                     for (let v = 0; v < venues.length; v++) {
-                        for (let m = 0; m < maxMatches; m++) {
-                            const startTime = addMinutes(sessionStartTime, m * SLOT_DURATION);
+                        for (let mm = 0; mm < maxMatches; mm++) {
+                            const startTime = addMinutes(sessionStartTime, mm * SLOT_DURATION);
                             const endTime = addMinutes(startTime, matchDuration);
                             allSlots.push({
                                 date: dateStr,
@@ -547,7 +568,7 @@
                 }
             }
 
-            console.log(`📊 Tổng slot: ${allSlots.length} (${numDays} ngày × ${sessionsPerDay} buổi × ${venues.length} sân × 4 trận/buổi)`);
+            console.log(`📊 Tổng slot: ${allSlots.length}`);
 
             if (allMatches.length > allSlots.length) {
                 console.warn(`⚠️ CẦN THÊM ${allMatches.length - allSlots.length} slot!`);
@@ -691,8 +712,9 @@
 
     function formatDate(dateStr) {
         if (!dateStr) return '—';
-        const d = new Date(dateStr);
-        return d.toLocaleDateString('vi-VN', { day: '2-digit', month: '2-digit', year: 'numeric' });
+        const [y, m, d] = dateStr.split('-').map(Number);
+        const date = new Date(y, m - 1, d);
+        return date.toLocaleDateString('vi-VN', { day: '2-digit', month: '2-digit', year: 'numeric' });
     }
 
     function formatTime(timeStr) {
