@@ -496,14 +496,36 @@
     };
 
     // ============================
+    // HÀM TẠO SLUG TỪ TÊN GIẢI ĐẤU
+    // ============================
+    function generateSlug(text) {
+        const base = String(text || '')
+            .toLowerCase()
+            .normalize('NFD')
+            .replace(/[\u0300-\u036f]/g, '')
+            .replace(/đ/g, 'd')
+            .replace(/[^a-z0-9\s-]/g, '')
+            .trim()
+            .replace(/\s+/g, '-')
+            .replace(/-+/g, '-')
+            .slice(0, 80);
+
+        // Thêm timestamp để đảm bảo unique
+        return (base || 'giai-dau') + '-' + Date.now();
+    }
+
+    // ============================
     // XỬ LÝ SUBMIT FORM
     // ============================
     window.handleSubmit = async function(event) {
         event.preventDefault();
 
         const id = document.getElementById('tournament-id').value;
+        const nameValue = document.getElementById('name').value.trim();
+
         const payload = {
-            name: document.getElementById('name').value.trim(),
+            name: nameValue,
+            slug: generateSlug(nameValue),
             sport: document.getElementById('sport').value,
             status: document.getElementById('status').value,
             start_date: document.getElementById('start_date').value,
@@ -524,7 +546,8 @@
 
         try {
             if (id) {
-                // CẬP NHẬT
+                // CẬP NHẬT - giữ nguyên slug cũ
+                delete payload.slug;
                 const { error } = await supabaseClient
                     .from('tournaments')
                     .update(payload)
