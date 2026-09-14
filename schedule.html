@@ -9,7 +9,6 @@
         * { margin: 0; padding: 0; box-sizing: border-box; font-family: 'Segoe UI', system-ui, sans-serif; }
         body { background: #f0f2f8; min-height: 100vh; padding: 24px; }
         .container { max-width: 1600px; margin: 0 auto; }
-
         .header {
             background: linear-gradient(135deg, #0d1b3e, #1a3a7a);
             border-radius: 20px; padding: 28px 32px; color: #fff;
@@ -19,7 +18,6 @@
         .header h1 { font-size: 26px; margin-bottom: 6px; }
         .header p { opacity: 0.85; font-size: 14px; }
         .header-actions { display: flex; gap: 10px; flex-wrap: wrap; }
-
         .btn {
             padding: 11px 22px; border-radius: 10px; font-size: 14px;
             font-weight: 700; cursor: pointer; border: none;
@@ -54,7 +52,6 @@
             background: #fff; border-radius: 16px; padding: 24px;
             box-shadow: 0 4px 20px rgba(0,0,0,0.08);
         }
-
         .day-tabs {
             display: flex; gap: 8px; margin-bottom: 20px;
             overflow-x: auto; padding-bottom: 8px;
@@ -94,7 +91,7 @@
 
         .courts-grid {
             display: grid;
-            grid-template-columns: repeat(auto-fill, minmax(220px, 1fr));
+            grid-template-columns: repeat(auto-fill, minmax(240px, 1fr));
             gap: 12px;
         }
         .court-card {
@@ -120,8 +117,9 @@
             font-size: 12px; line-height: 1.4;
         }
         .match-box .category {
-            font-size: 10px; opacity: 0.8; text-transform: uppercase;
+            font-size: 10px; opacity: 0.85; text-transform: uppercase;
             letter-spacing: 0.5px; margin-bottom: 6px;
+            font-weight: 700;
         }
         .match-box .teams {
             display: flex; flex-direction: column; gap: 3px;
@@ -429,6 +427,7 @@
 
             if (matchAtCourt) {
                 const category = categories.find(c => c.id === matchAtCourt.category_id);
+                const displayCategory = matchAtCourt.notes || category?.name || '';
                 return `
                     <div class="court-card has-match">
                         <div class="court-name">
@@ -436,7 +435,7 @@
                             <span class="time">${formatTime(matchAtCourt.start_time)}</span>
                         </div>
                         <div class="match-box">
-                            ${category ? `<div class="category">${escapeHtml(category.name)}</div>` : ''}
+                            ${displayCategory ? `<div class="category">${escapeHtml(displayCategory)}</div>` : ''}
                             <div class="teams">
                                 <div class="team"><span>${escapeHtml(matchAtCourt.team_a_name || '—')}</span></div>
                                 <div class="vs">VS</div>
@@ -460,7 +459,7 @@
     }
 
     // ==========================================
-    // XẾP LỊCH TỰ ĐỘNG - BẢN ĐÚNG
+    // XẾP LỊCH TỰ ĐỘNG - BẢN ĐÚNG (FIX)
     // ==========================================
     window.autoGenerateSchedule = async function() {
         if (draws.length === 0) {
@@ -489,16 +488,11 @@
                 evening: tournament.start_time_evening || '19:00'
             };
             const sessionKeys = ['morning', 'afternoon', 'evening'].slice(0, sessionsPerDay);
-
-            // Tổng số slot trong 1 ngày
             const slotsPerDay = venues.length * sessionsPerDay;
 
-            // ========================================
-            // TẠO TẤT CẢ CÁC TRẬN CẦN THI ĐẤU
-            // ========================================
             const allMatches = [];
 
-            // Group draws theo category
+            // Nhóm theo category
             const drawsByCategory = {};
             draws.forEach(d => {
                 const cat = d.category || 'Chung';
@@ -506,18 +500,17 @@
                 drawsByCategory[cat].push(d);
             });
 
+            console.log('📊 Số category:', Object.keys(drawsByCategory).length);
+
             Object.keys(drawsByCategory).forEach(catName => {
                 const catDraws = drawsByCategory[catName];
                 const cat = categories.find(c => c.name === catName);
-
-                // Kiểm tra loại: knockout hay round-robin
                 const isKnockout = catDraws[0]?.draw_type === 'knockout';
 
+                console.log(`\n📊 Category "${catName}": ${catDraws.length} VĐV`);
+
                 if (isKnockout) {
-                    // ========================================
-                    // KNOCKOUT: Tạo tất cả các vòng đấu
-                    // ========================================
-                    // Vòng 1: từ draws
+                    // =============== KNOCKOUT ===============
                     const matchMap = new Map();
                     catDraws.forEach(d => {
                         const key = d.match_number || 1;
@@ -525,7 +518,6 @@
                         matchMap.get(key).push(d);
                     });
 
-                    // Tạo Vòng 1
                     const round1Matches = [];
                     matchMap.forEach((teams, matchNum) => {
                         if (teams.length === 2) {
@@ -537,8 +529,7 @@
                                 category: catName,
                                 cat_id: cat?.id
                             });
-                        } else if (teams.length === 1) {
-                            // BYE - tự động vào vòng sau
+                        } else if (teams.length === 1 && teams[0].group_name !== 'BYE') {
                             round1Matches.push({
                                 team_a: teams[0].team_name,
                                 team_b: 'BYE',
@@ -551,56 +542,49 @@
                         }
                     });
 
-                    // Tính số trận cần cho các vòng tiếp theo
-                    // Số VĐV thực sự thi đấu = tổng VĐV - số BYE
-                    const realMatches = round1Matches.filter(m => !m.is_bye);
-                    const byesCount = round1Matches.filter(m => m.is_bye).length;
-                    
-                    // Số đội vào vòng 2 = số thắng vòng 1 + số BYE
-                    let teamsInNextRound = realMatches.length + byesCount;
-                    
-                    // Tổng số VĐV ban đầu (từ bảng knockout)
-                    const totalTeams = catDraws.length;
-                    
-                    // Bracket size (làm tròn lên lũy thừa 2)
+                    // Tổng VĐV thi đấu thực (không tính BYE)
+                    const totalTeams = catDraws.filter(d => d.group_name !== 'BYE').length;
+                    // Bracket size
                     let bracketSize = 2;
                     while (bracketSize < totalTeams) bracketSize *= 2;
-                    
-                    // Số trận tổng cộng = bracketSize - 1 (mỗi trận loại 1 VĐV)
-                    // Nhưng BYE không phải trận → số trận thực = totalTeams - 1
-                    const totalKnockoutMatches = totalTeams - byesCount; // Số VĐV tham gia thực
-                    
-                    // Tạo các vòng tiếp theo
-                    let currentRoundMatches = round1Matches.filter(m => !m.is_bye).length + byesCount;
+
+                    // Số VĐV vòng 2 = bracketSize / 2
+                    let currentRoundTeams = bracketSize / 2;
                     let roundNum = 2;
-                    
-                    // Thêm các trận của các vòng sau (chưa có tên VĐV, sẽ điền sau khi có kết quả)
-                    while (currentRoundMatches > 1) {
-                        const matchesInRound = Math.floor(currentRoundMatches / 2);
+
+                    // Tạo các vòng tiếp theo
+                    while (currentRoundTeams >= 1) {
+                        const matchesInRound = currentRoundTeams;
+                        let roundName = '';
+                        if (matchesInRound === 1) roundName = 'Chung kết';
+                        else if (matchesInRound === 2) roundName = 'Bán kết';
+                        else if (matchesInRound === 4) roundName = 'Tứ kết';
+                        else if (matchesInRound === 8) roundName = 'Vòng 1/8';
+                        else roundName = `Vòng ${roundNum}`;
+
                         for (let i = 0; i < matchesInRound; i++) {
                             allMatches.push({
                                 team_a: 'Chờ kết quả',
                                 team_b: 'Chờ kết quả',
                                 round: roundNum,
                                 match_num: i + 1,
-                                category: catName,
+                                category: `${catName} - ${roundName}`,
                                 cat_id: cat?.id,
                                 is_placeholder: true
                             });
                         }
-                        currentRoundMatches = matchesInRound;
+                        currentRoundTeams = Math.floor(currentRoundTeams / 2);
                         roundNum++;
+                        if (currentRoundTeams === 0) break;
                     }
 
-                    // Thêm Vòng 1 vào đầu
-                    round1Matches.filter(m => !m.is_bye).forEach(m => {
-                        allMatches.push(m);
-                    });
+                    console.log(`  → ${round1Matches.filter(m => !m.is_bye).length} trận vòng 1 + ${allMatches.length} trận các vòng sau = ${round1Matches.filter(m => !m.is_bye).length + allMatches.length} trận knockout`);
+
+                    // Thêm Vòng 1
+                    round1Matches.filter(m => !m.is_bye).forEach(m => allMatches.push(m));
 
                 } else {
-                    // ========================================
-                    // ROUND-ROBIN: Mỗi bảng đấu vòng tròn
-                    // ========================================
+                    // =============== ROUND-ROBIN ===============
                     const groups = {};
                     catDraws.forEach(d => {
                         const g = d.group_name || 'A';
@@ -608,10 +592,15 @@
                         groups[g].push(d);
                     });
 
+                    console.log(`  → ${Object.keys(groups).length} bảng`);
+
                     Object.keys(groups).forEach(groupName => {
                         const groupTeams = groups[groupName];
+                        // Công thức vòng tròn: n*(n-1)/2
+                        const numMatches = (groupTeams.length * (groupTeams.length - 1)) / 2;
 
-                        // Vòng tròn: n*(n-1)/2 trận
+                        console.log(`    Bảng ${groupName}: ${groupTeams.length} VĐV → ${numMatches} trận`);
+
                         for (let i = 0; i < groupTeams.length; i++) {
                             for (let j = i + 1; j < groupTeams.length; j++) {
                                 allMatches.push({
@@ -628,21 +617,19 @@
                 }
             });
 
-            console.log(`📊 Tổng số trận cần xếp: ${allMatches.length}`);
-            console.log(`📊 Số slot/ngày: ${slotsPerDay}, tổng slot: ${slotsPerDay * numDays}`);
+            console.log(`\n✅ TỔNG SỐ TRẬN CẦN XẾP: ${allMatches.length}`);
+            console.log(`📊 Slot/ngày: ${slotsPerDay}, tổng slot: ${slotsPerDay * numDays}`);
 
             if (allMatches.length > slotsPerDay * numDays) {
-                console.warn('⚠️ Không đủ slot! Cần thêm ngày hoặc sân.');
+                console.warn(`⚠️ CẦN THÊM ${allMatches.length - (slotsPerDay * numDays)} slot! Tăng số ngày hoặc số sân.`);
+                showAlert(`⚠️ Cần ${allMatches.length} trận nhưng chỉ có ${slotsPerDay * numDays} slot. Sẽ xếp ${slotsPerDay * numDays} trận đầu tiên.`, 'error');
             }
 
-            // ========================================
-            // XẾP CÁC TRẬN VÀO SLOT
-            // ========================================
+            // Sắp xếp: vòng bảng trước, knockout sau
+            allMatches.sort((a, b) => (a.round || 1) - (b.round || 1));
+
             const records = [];
             let matchIdx = 0;
-
-            // Sắp xếp theo vòng (vòng 1 trước, sau đó tứ kết, bán kết, chung kết)
-            allMatches.sort((a, b) => (a.round || 1) - (b.round || 1));
 
             allMatches.forEach(match => {
                 const dayOffset = Math.floor(matchIdx / slotsPerDay);
@@ -678,15 +665,23 @@
                 matchIdx++;
             });
 
+            console.log(`📋 Đã chuẩn bị: ${records.length} trận để insert`);
+
             if (records.length === 0) {
                 showAlert('Không có trận nào để xếp!', 'error');
                 return;
             }
 
-            const { error } = await supabaseClient.from('schedules').insert(records);
-            if (error) throw error;
+            // Insert theo batch (tránh quá tải)
+            const BATCH_SIZE = 100;
+            for (let i = 0; i < records.length; i += BATCH_SIZE) {
+                const batch = records.slice(i, i + BATCH_SIZE);
+                const { error } = await supabaseClient.from('schedules').insert(batch);
+                if (error) throw error;
+                console.log(`  ✅ Đã insert batch ${Math.floor(i / BATCH_SIZE) + 1} (${batch.length} trận)`);
+            }
 
-            showAlert(`✅ Đã xếp ${records.length} trận! (Gồm cả vòng bảng + tứ kết + bán kết + chung kết)`, 'success');
+            showAlert(`✅ Đã xếp ${records.length} trận! (Vòng bảng + Tứ kết + Bán kết + Chung kết)`, 'success');
             await loadData();
 
         } catch (error) {
@@ -713,7 +708,7 @@
                 'Buổi': getSessionLabel(s.session),
                 'Giờ': formatTime(s.start_time),
                 'Sân': venue?.court_name || '',
-                'Nội dung': cat?.name || s.notes || '',
+                'Nội dung': s.notes || cat?.name || '',
                 'Vòng': s.round_number || '',
                 'Trận': s.match_number || '',
                 'VĐV A': s.team_a_name || '',
@@ -723,7 +718,7 @@
         });
 
         const ws = XLSX.utils.json_to_sheet(data);
-        ws['!cols'] = [{ wch: 5 }, { wch: 12 }, { wch: 10 }, { wch: 8 }, { wch: 12 }, { wch: 25 }, { wch: 6 }, { wch: 6 }, { wch: 25 }, { wch: 25 }, { wch: 15 }];
+        ws['!cols'] = [{ wch: 5 }, { wch: 12 }, { wch: 10 }, { wch: 8 }, { wch: 12 }, { wch: 30 }, { wch: 6 }, { wch: 6 }, { wch: 25 }, { wch: 25 }, { wch: 15 }];
 
         const wb = XLSX.utils.book_new();
         XLSX.utils.book_append_sheet(wb, ws, 'Lịch thi đấu');
