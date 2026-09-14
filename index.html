@@ -821,7 +821,87 @@
 
     <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
     <script src="config.js"></script>
-    <script src="app.js"></script>
+    <script>
+        // ==========================================
+        // SPORTSVN DASHBOARD - KẾT NỐI SUPABASE
+        // ==========================================
+        (function() {
+            'use strict';
 
+            const config = window.SPORTSVN_CONFIG || {};
+            if (!config.SUPABASE_URL || !config.SUPABASE_ANON_KEY) {
+                console.warn('Chưa cấu hình Supabase trong config.js');
+                return;
+            }
+
+            const supabase = window.supabase.createClient(
+                config.SUPABASE_URL,
+                config.SUPABASE_ANON_KEY
+            );
+
+            // ================================
+            // 1. KIỂM TRA ĐĂNG NHẬP
+            // ================================
+            async function checkAuth() {
+                const { data: { session } } = await supabase.auth.getSession();
+                if (!session) {
+                    window.location.href = 'login.html';
+                    return;
+                }
+
+                // Kiểm tra quyền admin
+                const { data: roleData } = await supabase
+                    .from('user_roles')
+                    .select('role')
+                    .eq('user_id', session.user.id)
+                    .single();
+
+                if (!roleData || roleData.role !== 'admin') {
+                    alert('Tài khoản không có quyền Admin');
+                    await supabase.auth.signOut();
+                    window.location.href = 'login.html';
+                    return;
+                }
+
+                // Cập nhật tên admin
+                const name = session.user.user_metadata?.full_name ||
+                             session.user.email.split('@')[0];
+                const initials = name.split(' ').map(w => w[0]).join('').slice(0, 2).toUpperCase();
+
+                document.querySelectorAll('.avatar').forEach(el => el.textContent = initials);
+                document.querySelectorAll('.user-info strong, .top-user-info strong').forEach(el => el.textContent = name);
+            }
+
+            checkAuth();
+
+            // ================================
+            // 2. XỬ LÝ NÚT TẠO GIẢI ĐẤU
+            // ================================
+            document.querySelectorAll('[data-action="create-tournament"]').forEach(btn => {
+                btn.addEventListener('click', function(e) {
+                    e.preventDefault();
+                    const name = prompt('Nhập tên giải đấu mới:');
+                    if (name) {
+                        alert('Sẽ tạo giải: ' + name + '\n(Tính năng đang phát triển)');
+                    }
+                });
+            });
+
+            // ================================
+            // 3. ĐĂNG XUẤT KHI CLICK VÀO USER
+            // ================================
+            document.querySelector('.top-user')?.addEventListener('click', async function() {
+                if (confirm('Bạn có muốn đăng xuất không?')) {
+                    await supabase.auth.signOut();
+                    window.location.href = 'login.html';
+                }
+            });
+
+            console.log('✅ Dashboard SportsVN đã kết nối Supabase');
+        })();
+    </script>
+
+</body>
+</html>
 </body>
 </html>
