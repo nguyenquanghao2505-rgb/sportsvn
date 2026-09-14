@@ -52,6 +52,22 @@
         .form-group input:focus, .form-group select:focus {
             border-color: #1a3a7a; outline: none;
         }
+        .category-select-box {
+            background: #e7f3ff; border-left: 4px solid #1a3a7a;
+            padding: 16px 20px; border-radius: 12px; margin-bottom: 20px;
+        }
+        .category-select-box label {
+            display: block; font-weight: 700; font-size: 15px;
+            color: #1a3a7a; margin-bottom: 8px;
+        }
+        .category-select-box select {
+            width: 100%; max-width: 500px; padding: 12px 16px;
+            border: 2px solid #1a3a7a; border-radius: 10px;
+            font-size: 15px; font-weight: 600; background: #fff;
+        }
+        .category-select-box .hint {
+            font-size: 13px; color: #6c757d; margin-top: 8px;
+        }
         .btn-primary {
             background: linear-gradient(135deg, #0d1b3e, #1a3a7a);
             color: #fff; border: none; padding: 13px 24px;
@@ -343,8 +359,20 @@
     <!-- BƯỚC 1 -->
     <div class="draw-panel">
         <div class="panel-title">
-            <span class="step-num">1</span> Nhập danh sách VĐV / Đội
+            <span class="step-num">1</span> Chọn nội dung & Nhập danh sách VĐV
         </div>
+
+        <!-- CHỌN NỘI DUNG -->
+        <div class="category-select-box">
+            <label><i class="fas fa-list"></i> Chọn nội dung thi đấu <span style="color: #e94560;">*</span></label>
+            <select id="category-select" onchange="onCategoryChange()">
+                <option value="">-- Đang tải danh sách nội dung... --</option>
+            </select>
+            <div class="hint">
+                <i class="fas fa-info-circle"></i> Kết quả bốc thăm sẽ lưu theo nội dung này
+            </div>
+        </div>
+
         <div class="form-row-add">
             <div class="form-group">
                 <label>Tên VĐV / Đội</label>
@@ -564,16 +592,68 @@
 (function() {
     'use strict';
 
-    console.log('🚀 draw.html bắt đầu chạy');
+    console.log('🚀 draw.html v2 - CHỌN NỘI DUNG');
 
     const config = window.SPORTSVN_CONFIG || {};
     const supabaseClient = window.supabase.createClient(config.SUPABASE_URL, config.SUPABASE_ANON_KEY);
 
+    let tournamentId = null;
+    let currentCategory = '';
     let teams = [];
     let currentDrawType = 'knockout';
     let lastResult = null;
     let importData = [];
+    let categoriesList = [];
 
+    // ==========================================
+    // KHỞI TẠO: LOAD CATEGORIES TỪ DATABASE
+    // ==========================================
+    async function loadCategories() {
+        const urlParams = new URLSearchParams(window.location.search);
+        tournamentId = urlParams.get('tournament_id');
+
+        if (!tournamentId) {
+            alert('Thiếu ID giải đấu!');
+            window.location.href = 'tournaments.html';
+            return;
+        }
+
+        console.log('📌 Tournament ID:', tournamentId);
+
+        const { data, error } = await supabaseClient
+            .from('categories')
+            .select('id, name, category_type, scoring_type')
+            .eq('tournament_id', tournamentId)
+            .order('priority');
+
+        if (error) {
+            console.error('Lỗi load categories:', error);
+            showAlert('Lỗi tải danh sách nội dung: ' + error.message, 'error');
+            return;
+        }
+
+        categoriesList = data || [];
+        const select = document.getElementById('category-select');
+
+        if (categoriesList.length === 0) {
+            select.innerHTML = '<option value="">-- Chưa có nội dung nào. Vào "Nội dung" để tạo --</option>';
+            return;
+        }
+
+        select.innerHTML = '<option value="">-- Chọn nội dung thi đấu --</option>' +
+            categoriesList.map(c => `<option value="${escapeHtml(c.name)}">${escapeHtml(c.name)}</option>`).join('');
+
+        console.log('✅ Loaded', categoriesList.length, 'nội dung');
+    }
+
+    window.onCategoryChange = function() {
+        currentCategory = document.getElementById('category-select').value;
+        console.log('📌 Chọn nội dung:', currentCategory);
+    };
+
+    // ==========================================
+    // QUẢN LÝ VĐV
+    // ==========================================
     window.addTeam = function() {
         const nameInput = document.getElementById('team-input');
         const clubInput = document.getElementById('club-input');
@@ -833,6 +913,10 @@
 
     // DRAW
     window.performDraw = function() {
+        if (!currentCategory) {
+            showAlert('⚠️ Vui lòng chọn nội dung thi đấu trước khi bốc thăm!', 'error');
+            return;
+        }
         if (teams.length < 2) { showAlert('Cần ít nhất 2 VĐV/Đội.', 'error'); return; }
         const protectClub = document.getElementById('protect-club').checked;
         let result;
@@ -848,12 +932,13 @@
             }
         } catch (error) { showAlert('Lỗi bốc thăm: ' + error.message, 'error'); return; }
         if (!result) { showAlert('Không thể bốc thăm.', 'error'); return; }
+        result.categoryName = currentCategory;
         lastResult = result;
         renderResult(result);
         document.getElementById('result-panel').style.display = 'block';
         document.getElementById('result-panel').scrollIntoView({ behavior: 'smooth', block: 'start' });
         if (result.warning) showAlert('⚠️ ' + result.warning, 'error');
-        else showAlert(`✅ Bốc thăm thành công! ${teams.length} VĐV/Đội.`, 'success');
+        else showAlert(`✅ Bốc thăm thành công cho "${currentCategory}"!`, 'success');
     };
 
     function drawKnockout(teams, protectClub) {
@@ -1010,12 +1095,12 @@
         } else { warningEl.style.display = 'none'; }
         let bracketInfo = '';
         if (result.type === 'knockout' && result.description) {
-            bracketInfo = `<div class="bracket-info"><i class="fas fa-info-circle"></i> ${escapeHtml(result.description)}</div>`;
+            bracketInfo = `<div class="bracket-info"><i class="fas fa-info-circle"></i> <strong>${escapeHtml(result.categoryName || '')}</strong> · ${escapeHtml(result.description)}</div>`;
         }
         if (result.type === 'knockout') {
             container.innerHTML = bracketInfo + renderKnockoutHTML(result);
         } else if (result.type === 'round-robin') {
-            container.innerHTML = renderRoundRobinHTML(result);
+            container.innerHTML = `<div class="bracket-info"><i class="fas fa-info-circle"></i> <strong>${escapeHtml(result.categoryName || '')}</strong> · Vòng tròn ${result.numGroups} bảng</div>` + renderRoundRobinHTML(result);
         }
     }
 
@@ -1117,17 +1202,15 @@
     // ==========================================
     window.saveToDatabase = async function() {
         if (!lastResult) { showAlert('Chưa có kết quả.', 'error'); return; }
+        if (!currentCategory) { showAlert('Chưa chọn nội dung.', 'error'); return; }
 
         const { data: { session } } = await supabaseClient.auth.getSession();
         if (!session) { showAlert('Cần đăng nhập.', 'error'); return; }
 
-        const urlParams = new URLSearchParams(window.location.search);
-        const tournamentId = urlParams.get('tournament_id');
         if (!tournamentId) { showAlert('Không có ID giải đấu.', 'error'); return; }
 
         const records = [];
         const groupNames = ['A', 'B', 'C', 'D', 'E', 'F', 'G', 'H', 'I', 'J', 'K', 'L', 'M', 'N', 'O', 'P'];
-        const categoryName = document.querySelector('.bracket-info, .group-header') ? 'Chung' : 'Chung';
 
         if (lastResult.type === 'round-robin') {
             lastResult.groups.forEach((group, i) => {
@@ -1139,7 +1222,7 @@
                         group_name: groupNames[i],
                         position: j + 1,
                         draw_type: 'round-robin',
-                        category: categoryName,
+                        category: currentCategory,
                         created_by: session.user.id
                     });
                 });
@@ -1156,7 +1239,7 @@
                         draw_type: 'knockout',
                         round_number: 1,
                         match_number: i + 1,
-                        category: categoryName,
+                        category: currentCategory,
                         created_by: session.user.id
                     });
                 }
@@ -1170,7 +1253,7 @@
                         draw_type: 'knockout',
                         round_number: 1,
                         match_number: i + 1,
-                        category: categoryName,
+                        category: currentCategory,
                         created_by: session.user.id
                     });
                 }
@@ -1184,13 +1267,17 @@
         btn.innerHTML = '<i class="fas fa-spinner fa-spin"></i> Đang lưu...';
 
         try {
-            await supabaseClient.from('draws').delete().eq('tournament_id', tournamentId);
+            // Chỉ xóa kết quả cũ của CÙNG category
+            await supabaseClient.from('draws')
+                .delete()
+                .eq('tournament_id', tournamentId)
+                .eq('category', currentCategory);
+
             const { error } = await supabaseClient.from('draws').insert(records);
             if (error) throw error;
 
-            showAlert(`✅ Đã lưu ${records.length} VĐV! Đang chuyển sang Lịch thi đấu...`, 'success');
+            showAlert(`✅ Đã lưu ${records.length} VĐV cho "${currentCategory}"! Đang chuyển trang...`, 'success');
 
-            // TỰ ĐỘNG CHUYỂN SANG LỊCH THI ĐẤU SAU 1.5 GIÂY
             setTimeout(() => {
                 window.location.href = 'schedule.html?tournament_id=' + tournamentId;
             }, 1500);
@@ -1215,8 +1302,10 @@
             .replace(/>/g, '&gt;').replace(/"/g, '&quot;');
     }
 
+    // KHỞI TẠO
     renderTeams();
-    console.log('✅ Trang bốc thăm SportsVN đã sẵn sàng');
+    loadCategories();
+    console.log('✅ Trang bốc thăm SportsVN sẵn sàng');
 })();
 </script>
 
