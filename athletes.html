@@ -333,17 +333,38 @@
     }
 
     async function loadAthletes() {
-        try {
-            const { data, error } = await supabaseClient.from('athletes')
-                .select('*').eq('tournament_id', tournamentId).order('created_at', { ascending: true });
-            if (error) throw error;
-            athletes = data || [];
-            renderAthletes();
-            renderStats();
-        } catch (error) {
-            showAlert('Lỗi tải: ' + error.message, 'error');
+    console.log('🔄 Bắt đầu tải VĐV...');
+    try {
+        const { data, error } = await supabaseClient.from('athletes')
+            .select('*').eq('tournament_id', tournamentId).order('created_at', { ascending: true });
+        
+        console.log('📊 Kết quả:', data);
+        console.log('❌ Lỗi:', error);
+        
+        if (error) {
+            document.getElementById('athlete-list').innerHTML = `
+                <div class="empty-state">
+                    <i class="fas fa-exclamation-triangle" style="color: #e94560;"></i>
+                    <p style="color: #e94560; margin-bottom: 8px;"><strong>Lỗi tải dữ liệu</strong></p>
+                    <p style="font-size: 13px;">${error.message}</p>
+                    <p style="font-size: 12px; color: #6c757d; margin-top: 8px;">Mã lỗi: ${error.code || 'N/A'}</p>
+                </div>`;
+            return;
         }
+        
+        athletes = data || [];
+        console.log('✅ Có', athletes.length, 'VĐV');
+        renderAthletes();
+        renderStats();
+    } catch (error) {
+        console.error('💥 Exception:', error);
+        document.getElementById('athlete-list').innerHTML = `
+            <div class="empty-state">
+                <i class="fas fa-times-circle" style="color: #e94560;"></i>
+                <p style="color: #e94560;">Exception: ${error.message}</p>
+            </div>`;
     }
+}
 
     function renderStats() {
         const clubs = new Set(athletes.map(a => a.club).filter(Boolean));
