@@ -1,0 +1,493 @@
+<!DOCTYPE html>
+<html lang="vi">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Bốc thăm tự động - SportsVN</title>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <style>
+        * { margin: 0; padding: 0; box-sizing: border-box; font-family: 'Segoe UI', system-ui, sans-serif; }
+        body { background: #f0f2f8; min-height: 100vh; padding: 24px; }
+
+        .draw-container { max-width: 1200px; margin: 0 auto; }
+
+        .draw-header {
+            background: linear-gradient(135deg, #0d1b3e, #1a3a7a);
+            border-radius: 20px;
+            padding: 32px;
+            color: #fff;
+            margin-bottom: 24px;
+        }
+
+        .draw-header h1 { font-size: 28px; margin-bottom: 8px; }
+        .draw-header p { opacity: 0.85; }
+
+        .draw-panel {
+            background: #fff;
+            border-radius: 16px;
+            padding: 24px;
+            margin-bottom: 24px;
+            box-shadow: 0 4px 20px rgba(0,0,0,0.08);
+        }
+
+        .panel-title { font-size: 20px; font-weight: 700; color: #1a1a2e; margin-bottom: 16px; }
+
+        .form-row { display: grid; grid-template-columns: 2fr 1fr 1fr auto; gap: 16px; align-items: end; }
+
+        .form-group label { display: block; font-weight: 600; font-size: 14px; margin-bottom: 6px; color: #1a1a2e; }
+
+        .form-group input, .form-group select {
+            width: 100%;
+            padding: 12px 16px;
+            border: 2px solid #e9ecef;
+            border-radius: 10px;
+            font-size: 15px;
+        }
+
+        .form-group input:focus, .form-group select:focus {
+            border-color: #1a3a7a;
+            outline: none;
+        }
+
+        .btn-primary {
+            background: linear-gradient(135deg, #0d1b3e, #1a3a7a);
+            color: #fff;
+            border: none;
+            padding: 13px 28px;
+            border-radius: 10px;
+            font-size: 15px;
+            font-weight: 700;
+            cursor: pointer;
+            transition: all 0.3s ease;
+        }
+
+        .btn-primary:hover { transform: translateY(-2px); box-shadow: 0 8px 20px rgba(26,58,122,0.3); }
+        .btn-primary:disabled { opacity: 0.6; cursor: not-allowed; transform: none; }
+
+        .btn-success {
+            background: linear-gradient(135deg, #00b894, #00a859);
+            color: #fff;
+            border: none;
+            padding: 16px 32px;
+            border-radius: 12px;
+            font-size: 17px;
+            font-weight: 800;
+            cursor: pointer;
+            width: 100%;
+            margin-top: 16px;
+            transition: all 0.3s ease;
+        }
+
+        .btn-success:hover { transform: translateY(-2px); box-shadow: 0 10px 25px rgba(0,184,148,0.4); }
+
+        .teams-list {
+            display: grid;
+            grid-template-columns: repeat(auto-fill, minmax(220px, 1fr));
+            gap: 12px;
+            margin-top: 16px;
+        }
+
+        .team-item {
+            background: #f8f9fa;
+            padding: 12px 16px;
+            border-radius: 10px;
+            border: 2px solid #e9ecef;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            font-weight: 600;
+        }
+
+        .team-item .remove-btn {
+            background: #e94560;
+            color: #fff;
+            border: none;
+            width: 28px;
+            height: 28px;
+            border-radius: 50%;
+            cursor: pointer;
+            font-size: 14px;
+        }
+
+        .groups-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(250px, 1fr));
+            gap: 20px;
+            margin-top: 20px;
+        }
+
+        .group-card {
+            background: #fff;
+            border-radius: 16px;
+            overflow: hidden;
+            box-shadow: 0 4px 15px rgba(0,0,0,0.1);
+            animation: slideIn 0.5s ease;
+        }
+
+        @keyframes slideIn {
+            from { opacity: 0; transform: translateY(20px); }
+            to { opacity: 1; transform: translateY(0); }
+        }
+
+        .group-header {
+            background: linear-gradient(135deg, #0d1b3e, #1a3a7a);
+            color: #fff;
+            padding: 16px 20px;
+            font-size: 20px;
+            font-weight: 800;
+        }
+
+        .group-teams { padding: 16px; }
+
+        .group-team {
+            padding: 12px 16px;
+            background: #f8f9fa;
+            border-radius: 10px;
+            margin-bottom: 8px;
+            display: flex;
+            align-items: center;
+            gap: 12px;
+        }
+
+        .group-team .position {
+            width: 28px;
+            height: 28px;
+            background: #1a3a7a;
+            color: #fff;
+            border-radius: 50%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 13px;
+            font-weight: 700;
+        }
+
+        .group-team:last-child { margin-bottom: 0; }
+
+        .empty-state {
+            text-align: center;
+            padding: 40px;
+            color: #6c757d;
+        }
+
+        .alert {
+            padding: 14px 18px;
+            border-radius: 10px;
+            margin-bottom: 16px;
+            display: none;
+        }
+
+        .alert.show { display: block; }
+        .alert.error { background: #f8d7da; color: #721c24; border: 1px solid #f5c6cb; }
+        .alert.success { background: #d4edda; color: #155724; border: 1px solid #c3e6cb; }
+
+        @media (max-width: 768px) {
+            .form-row { grid-template-columns: 1fr; }
+            .draw-header h1 { font-size: 22px; }
+        }
+    </style>
+</head>
+<body>
+
+<div class="draw-container">
+
+    <div class="draw-header">
+        <h1>🎲 Bốc thăm tự động</h1>
+        <p>Chia đội vào các bảng đấu ngẫu nhiên · SportsVN</p>
+    </div>
+
+    <div class="draw-panel">
+        <div class="panel-title">1. Nhập danh sách đội</div>
+
+        <div class="form-row">
+            <div class="form-group">
+                <label>Tên đội</label>
+                <input type="text" id="team-input" placeholder="VD: FC Hà Nội">
+            </div>
+
+            <div class="form-group">
+                <label>Số bảng</label>
+                <select id="num-groups">
+                    <option value="2">2 bảng</option>
+                    <option value="3">3 bảng</option>
+                    <option value="4" selected>4 bảng</option>
+                    <option value="6">6 bảng</option>
+                    <option value="8">8 bảng</option>
+                </select>
+            </div>
+
+            <div class="form-group">
+                <label>Kiểu bốc thăm</label>
+                <select id="draw-type">
+                    <option value="random">Ngẫu nhiên</option>
+                    <option value="seeded">Theo hạt giống</option>
+                </select>
+            </div>
+
+            <button class="btn-primary" onclick="addTeam()">
+                <i class="fas fa-plus"></i> Thêm đội
+            </button>
+        </div>
+
+        <div id="teams-list" class="teams-list"></div>
+
+        <div style="margin-top: 20px; display: flex; gap: 12px; flex-wrap: wrap;">
+            <button class="btn-primary" onclick="loadSampleTeams()">
+                <i class="fas fa-magic"></i> Thêm 16 đội mẫu
+            </button>
+            <button class="btn-primary" onclick="clearTeams()" style="background: #e94560;">
+                <i class="fas fa-trash"></i> Xóa tất cả
+            </button>
+        </div>
+    </div>
+
+    <div class="draw-panel">
+        <div class="panel-title">2. Tiến hành bốc thăm</div>
+        <p style="color: #6c757d; margin-bottom: 16px;">
+            Nhấn nút bên dưới để chia ngẫu nhiên các đội vào các bảng đấu.
+        </p>
+        <button class="btn-success" onclick="performDraw()">
+            <i class="fas fa-dice"></i> BỐC THĂM NGAY
+        </button>
+        <div id="alert" class="alert"></div>
+    </div>
+
+    <div class="draw-panel" id="result-panel" style="display: none;">
+        <div class="panel-title">3. Kết quả bốc thăm</div>
+        <div id="groups-container" class="groups-grid"></div>
+        <div style="margin-top: 20px; display: flex; gap: 12px; flex-wrap: wrap;">
+            <button class="btn-primary" onclick="window.print()">
+                <i class="fas fa-print"></i> In kết quả
+            </button>
+            <button class="btn-primary" onclick="saveToDatabase()" style="background: #00b894;">
+                <i class="fas fa-save"></i> Lưu vào hệ thống
+            </button>
+            <button class="btn-primary" onclick="performDraw()" style="background: #fdcb6e; color: #1a1a2e;">
+                <i class="fas fa-redo"></i> Bốc lại
+            </button>
+        </div>
+    </div>
+
+</div>
+
+<script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+<script src="config.js"></script>
+<script>
+(function() {
+    'use strict';
+
+    const config = window.SPORTSVN_CONFIG || {};
+    const supabaseClient = window.supabase.createClient(config.SUPABASE_URL, config.SUPABASE_ANON_KEY);
+
+    let teams = [];
+    let lastResult = [];
+
+    // ============================
+    // 1. THÊM ĐỘI
+    // ============================
+    window.addTeam = function() {
+        const input = document.getElementById('team-input');
+        const name = input.value.trim();
+
+        if (!name) {
+            showAlert('Vui lòng nhập tên đội.', 'error');
+            return;
+        }
+
+        if (teams.includes(name)) {
+            showAlert('Đội này đã có trong danh sách.', 'error');
+            return;
+        }
+
+        teams.push(name);
+        input.value = '';
+        input.focus();
+        renderTeams();
+        showAlert('', '');
+    };
+
+    document.getElementById('team-input').addEventListener('keypress', (e) => {
+        if (e.key === 'Enter') window.addTeam();
+    });
+
+    // ============================
+    // 2. XÓA ĐỘI
+    // ============================
+    window.removeTeam = function(index) {
+        teams.splice(index, 1);
+        renderTeams();
+    };
+
+    window.clearTeams = function() {
+        if (!confirm('Xóa tất cả đội?')) return;
+        teams = [];
+        renderTeams();
+        document.getElementById('result-panel').style.display = 'none';
+    };
+
+    // ============================
+    // 3. HIỂN THỊ DANH SÁCH
+    // ============================
+    function renderTeams() {
+        const container = document.getElementById('teams-list');
+
+        if (teams.length === 0) {
+            container.innerHTML = '<div class="empty-state">Chưa có đội nào. Hãy thêm đội ở trên.</div>';
+            return;
+        }
+
+        container.innerHTML = teams.map((team, i) => `
+            <div class="team-item">
+                <span>${i + 1}. ${escapeHtml(team)}</span>
+                <button class="remove-btn" onclick="removeTeam(${i})">×</button>
+            </div>
+        `).join('');
+    }
+
+    // ============================
+    // 4. THÊM ĐỘI MẪU
+    // ============================
+    window.loadSampleTeams = function() {
+        const sample = [
+            'FC Hà Nội', 'FC TP.HCM', 'FC Đà Nẵng', 'FC Hải Phòng',
+            'FC Cần Thơ', 'FC Nha Trang', 'FC Huế', 'FC Vinh',
+            'FC Quy Nhơn', 'FC Buôn Ma Thuột', 'FC Đà Lạt', 'FC Mỹ Tho',
+            'FC Long Xuyên', 'FC Cao Lãnh', 'FC Rạch Giá', 'FC Bạc Liêu'
+        ];
+        teams = [...sample];
+        renderTeams();
+        showAlert('Đã thêm 16 đội mẫu. Nhấn "BỐC THĂM NGAY" để bắt đầu!', 'success');
+    };
+
+    // ============================
+    // 5. BỐC THĂM
+    // ============================
+    window.performDraw = function() {
+        const numGroups = parseInt(document.getElementById('num-groups').value);
+        const drawType = document.getElementById('draw-type').value;
+
+        if (teams.length < numGroups) {
+            showAlert(`Cần ít nhất ${numGroups} đội cho ${numGroups} bảng.`, 'error');
+            return;
+        }
+
+        if (teams.length % numGroups !== 0) {
+            const confirm_msg = `Số đội (${teams.length}) không chia hết cho ${numGroups} bảng. Bạn có muốn tiếp tục?`;
+            if (!confirm(confirm_msg)) return;
+        }
+
+        // Trộn ngẫu nhiên
+        const shuffled = [...teams];
+        for (let i = shuffled.length - 1; i > 0; i--) {
+            const j = Math.floor(Math.random() * (i + 1));
+            [shuffled[i], shuffled[j]] = [shuffled[j], shuffled[i]];
+        }
+
+        // Chia bảng
+        const groups = [];
+        for (let i = 0; i < numGroups; i++) {
+            groups.push([]);
+        }
+        shuffled.forEach((team, i) => {
+            groups[i % numGroups].push(team);
+        });
+
+        lastResult = groups;
+        renderGroups(groups);
+        document.getElementById('result-panel').style.display = 'block';
+        showAlert(`✅ Đã bốc thăm thành công! ${teams.length} đội chia vào ${numGroups} bảng.`, 'success');
+    };
+
+    // ============================
+    // 6. HIỂN THỊ KẾT QUẢ
+    // ============================
+    function renderGroups(groups) {
+        const container = document.getElementById('groups-container');
+        const groupNames = ['A', 'B', 'C', 'D', 'E', 'F', 'G', 'H'];
+
+        container.innerHTML = groups.map((group, i) => `
+            <div class="group-card">
+                <div class="group-header">🏆 Bảng ${groupNames[i]}</div>
+                <div class="group-teams">
+                    ${group.map((team, j) => `
+                        <div class="group-team">
+                            <div class="position">${j + 1}</div>
+                            <span>${escapeHtml(team)}</span>
+                        </div>
+                    `).join('')}
+                </div>
+            </div>
+        `).join('');
+    }
+
+    // ============================
+    // 7. LƯU VÀO DATABASE
+    // ============================
+    window.saveToDatabase = async function() {
+        if (lastResult.length === 0) {
+            showAlert('Chưa có kết quả để lưu.', 'error');
+            return;
+        }
+
+        const { data: { session } } = await supabaseClient.auth.getSession();
+        if (!session) {
+            showAlert('Bạn cần đăng nhập để lưu kết quả.', 'error');
+            return;
+        }
+
+        const tournamentId = prompt('Nhập ID giải đấu (số) để lưu kết quả:\nVD: 1');
+        if (!tournamentId) return;
+
+        const groupNames = ['A', 'B', 'C', 'D', 'E', 'F', 'G', 'H'];
+        const records = [];
+
+        lastResult.forEach((group, i) => {
+            group.forEach((team, j) => {
+                records.push({
+                    tournament_id: parseInt(tournamentId),
+                    team_name: team,
+                    group_name: groupNames[i],
+                    position: j + 1,
+                    created_by: session.user.id
+                });
+            });
+        });
+
+        const { error } = await supabaseClient.from('draws').insert(records);
+
+        if (error) {
+            showAlert('Lỗi lưu: ' + error.message, 'error');
+        } else {
+            showAlert('✅ Đã lưu kết quả bốc thăm vào hệ thống!', 'success');
+        }
+    };
+
+    // ============================
+    // 8. HELPERS
+    // ============================
+    function showAlert(message, type) {
+        const el = document.getElementById('alert');
+        if (!message) {
+            el.className = 'alert';
+            return;
+        }
+        el.textContent = message;
+        el.className = 'alert show ' + type;
+    }
+
+    function escapeHtml(text) {
+        return String(text)
+            .replace(/&/g, '&amp;')
+            .replace(/</g, '&lt;')
+            .replace(/>/g, '&gt;')
+            .replace(/"/g, '&quot;');
+    }
+
+    // Khởi tạo
+    renderTeams();
+    console.log('✅ Trang bốc thăm SportsVN đã sẵn sàng');
+})();
+</script>
+
+</body>
+</html>
