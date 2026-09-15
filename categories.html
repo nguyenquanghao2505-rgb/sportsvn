@@ -1426,8 +1426,7 @@ for (let i = 0; i < numGroups; i += 2) {
                         <div class="vs">VS</div>
                         <div class="team ${winnerB ? 'winner' : ''} ${!teamB ? 'bye' : ''}">
                             <span>${teamB ? escapeHtml(teamB.name) : 'Chờ KQ bảng'}</span>
-                            ${teamB && hasBothTeams ? `<button class="edit-btn" onclick="event.stopPropagation(); openEditKnockoutPlayer('${escapeHtml(catName)}', ${roundNum}, ${matchNum}, '${escapeHtml(teamA.name)}', '${escapeHtml(teamB.name)}')" title="Sửa VĐV B"><i class="fas fa-edit"></i></button>` : ''}
-                            ${scoreB !== '' ? `<span class="score">${scoreB}</span>` : ''}
+                            ${teamB && hasBothTeams ? `<button class="edit-btn" onclick="event.stopPropagation(); openEditKnockoutPlayer('${escapeHtml(catName)}', ${roundNum}, ${matchNum}, '${escapeHtml(teamA.name)}', '${escapeHtml(teamB.name)}')" title="Sửa VĐV B"><i class="fas fa-edit"></i></button>` : ''}                            ${scoreB !== '' ? `<span class="score">${scoreB}</span>` : ''}
                         </div>
                         ${isCompleted ? `<span class="result-badge">✅ ${escapeHtml(score.winner_name)} thắng</span>` : ''}
                     </div>
