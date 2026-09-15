@@ -827,11 +827,9 @@ const teamB = match.teamB ? { ...match.teamB, club: allDraws.find(d => d.team_na
                     <div class="matchup ${isCompleted ? 'completed' : ''} ${!hasTeams ? 'empty' : ''}"
                          onclick="${isEditable && hasTeams && teamA && teamB ? `openScoreModal('${escapeHtml(catName)}', ${roundNum}, ${m + 1}, '${escapeHtml(teamA.name)}', '${escapeHtml(teamB.name)}')` : ''}">
 <span class="match-number">Trận ${m + 1}</span>
-                    ${hasTeams && teamA && teamB ? `<button class="edit-btn" onclick="event.stopPropagation(); openEditKnockoutPlayer('${escapeHtml(catName)}', ${roundNum}, ${m + 1}, '${escapeHtml(teamA.name)}', '${escapeHtml(teamB.name)}')" title="Sửa tên trận này">
-                        <i class="fas fa-edit"></i>
-                    </button>` : ''}    <i class="fas fa-edit"></i>
-</button>` : ''}                        <div class="team ${winnerA ? 'winner' : ''} ${!teamA ? 'bye' : ''}">
-                            <span>${teamA ? escapeHtml(teamA.name) : 'Chưa xác định'}</span>
+                    ${hasTeams && teamA && teamB ? `<button class="edit-btn" onclick="event.stopPropagation(); openEditKnockoutPlayer('${escapeHtml(catName)}', ${roundNum}, ${m + 1}, '${escapeHtml(teamA.name)}', '${escapeHtml(teamB.name)}')" title="Sửa">` +
+                                          `<i class="fas fa-edit"></i></button>` : ''}
+                                                                  <div class="team ${winnerA ? 'winner' : ''} ${!teamA ? 'bye' : ''}">
                             ${scoreA !== '' ? `<span class="score">${scoreA}</span>` : ''}
                         </div>
                         <div class="vs">VS</div>
