@@ -993,23 +993,42 @@
                 roundNames.push(fromEnd < standard.length ? standard[fromEnd] : `Vòng ${i + 1}`);
             }
 
-// CHỈ lấy đội nhất/nhì NẾU mỗi bảng đã đấu HẾT vòng tròn
-const qualifiedTeams = [];
+// Lấy đội nhất/nhì - SẮP XẾP THEO SƠ ĐỒ ĐỐI XỨNG
+const groupWinners = [];
+const groupRunners = [];
+
 groupKeys.forEach(g => {
     const standings = computeStandings(g, groups[g], catName);
     const expectedMatches = (groups[g].length * (groups[g].length - 1)) / 2;
     const playedMatches = countPlayedMatchesInGroup(g, groups[g], catName);
     
-    // Chỉ lấy nếu bảng đã đấu hết
     if (playedMatches >= expectedMatches) {
-        if (standings[0]) qualifiedTeams.push({ name: standings[0].name, rank: 'Nhất ' + g });
-        if (standings[1]) qualifiedTeams.push({ name: standings[1].name, rank: 'Nhì ' + g });
+        groupWinners.push({ name: standings[0]?.name || null, rank: 'Nhất ' + g });
+        groupRunners.push({ name: standings[1]?.name || null, rank: 'Nhì ' + g });
     } else {
-        // Chưa xong → 2 slot trống
-        qualifiedTeams.push({ name: null, rank: 'Nhất ' + g + ' (chưa xác định)' });
-        qualifiedTeams.push({ name: null, rank: 'Nhì ' + g + ' (chưa xác định)' });
+        groupWinners.push({ name: null, rank: 'Nhất ' + g + ' (chờ)' });
+        groupRunners.push({ name: null, rank: 'Nhì ' + g + ' (chờ)' });
     }
 });
+
+// Ghép cặp đối xứng: Nhất A vs Nhì B, Nhất B vs Nhì A, Nhất C vs Nhì D...
+const qualifiedTeams = [];
+const numGroups = groupWinners.length;
+
+for (let i = 0; i < numGroups; i += 2) {
+    const g1 = i;
+    const g2 = i + 1;
+    
+    if (g2 < numGroups) {
+        qualifiedTeams.push(groupWinners[g1]);
+        qualifiedTeams.push(groupRunners[g2]);
+        qualifiedTeams.push(groupWinners[g2]);
+        qualifiedTeams.push(groupRunners[g1]);
+    } else {
+        qualifiedTeams.push(groupWinners[g1]);
+        qualifiedTeams.push(groupRunners[g1]);
+    }
+}
 
             for (let r = 0; r < totalRounds; r++) {
                 const roundNum = 200 + r;
