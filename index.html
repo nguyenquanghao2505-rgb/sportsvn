@@ -12,7 +12,7 @@
 <body>
     <div class="app">
 
-        <!-- ===== SIDEBAR ===== -->
+        <!-- SIDEBAR -->
         <aside class="sidebar">
             <div class="brand">
                 <div class="brand-mark">S</div>
@@ -24,43 +24,21 @@
 
             <nav class="main-nav">
                 <div class="nav-title">Tổng quan</div>
-                <a href="#" class="nav-item active">
-                    <span class="nav-icon">🏠</span> Trang chủ
-                </a>
-                <a href="#" class="nav-item">
-                    <span class="nav-icon">🏆</span> Giải đấu
-                </a>
-                <a href="#" class="nav-item">
-                    <span class="nav-icon">👤</span> Vận động viên
-                </a>
-                <a href="#" class="nav-item">
-                    <span class="nav-icon">🏢</span> Đơn vị
-                </a>
+                <a href="#" class="nav-item active"><span class="nav-icon">🏠</span> Trang chủ</a>
+                <a href="#" class="nav-item"><span class="nav-icon">🏆</span> Giải đấu</a>
+                <a href="#" class="nav-item"><span class="nav-icon">👤</span> Vận động viên</a>
+                <a href="#" class="nav-item"><span class="nav-icon">🏢</span> Đơn vị</a>
 
                 <div class="nav-title">Quản lý giải</div>
-                <a href="#" class="nav-item">
-                    <span class="nav-icon">➕</span> Tạo giải đấu
-                </a>
-                <a href="#" class="nav-item">
-                    <span class="nav-icon">📋</span> Danh sách đăng ký
-                </a>
-                <a href="#" class="nav-item">
-                    <span class="nav-icon">🎲</span> Bốc thăm
-                </a>
-                <a href="#" class="nav-item">
-                    <span class="nav-icon">📅</span> Lịch thi đấu
-                </a>
-                <a href="#" class="nav-item">
-                    <span class="nav-icon">✓</span> Kết quả
-                </a>
+                <a href="#" class="nav-item"><span class="nav-icon">➕</span> Tạo giải đấu</a>
+                <a href="#" class="nav-item"><span class="nav-icon">📋</span> Danh sách đăng ký</a>
+                <a href="#" class="nav-item"><span class="nav-icon">🎲</span> Bốc thăm</a>
+                <a href="#" class="nav-item"><span class="nav-icon">📅</span> Lịch thi đấu</a>
+                <a href="#" class="nav-item"><span class="nav-icon">✓</span> Kết quả</a>
 
                 <div class="nav-title">Thông tin</div>
-                <a href="#" class="nav-item">
-                    <span class="nav-icon">📰</span> Tin tức
-                </a>
-                <a href="#" class="nav-item">
-                    <span class="nav-icon">📊</span> Bảng thành tích
-                </a>
+                <a href="#" class="nav-item"><span class="nav-icon">📰</span> Tin tức</a>
+                <a href="#" class="nav-item"><span class="nav-icon">📊</span> Bảng thành tích</a>
             </nav>
 
             <div class="sidebar-bottom">
@@ -82,9 +60,8 @@
             </div>
         </aside>
 
-        <!-- ===== MAIN ===== -->
+        <!-- MAIN -->
         <main class="main">
-
             <!-- TOPBAR -->
             <header class="topbar">
                 <div class="topbar-left">
@@ -99,10 +76,7 @@
                         <span class="search-icon">🔍</span>
                         <input type="text" placeholder="Tìm giải đấu, vận động viên...">
                     </div>
-                    <button class="notification-button">
-                        🔔
-                        <span class="notification-dot"></span>
-                    </button>
+                    <button class="notification-button">🔔<span class="notification-dot"></span></button>
                     <div class="top-user">
                         <div class="top-avatar">N</div>
                         <div class="top-user-info">
@@ -116,20 +90,17 @@
 
             <!-- CONTENT -->
             <div class="content">
-
-                <!-- ===== HERO BANNER ===== -->
+                <!-- BANNER -->
                 <section class="welcome-banner">
                     <div class="welcome-content">
                         <span class="welcome-label">Sports Management Platform</span>
                         <h1>SPORTS<span>VN</span></h1>
                         <p>Kết nối đam mê thể thao — Cập nhật nhanh chóng — Chính xác — Toàn diện</p>
-                        <button class="primary-button" id="openCreateModal">
-                            <span>+</span> Tạo giải đấu
-                        </button>
+                        <button class="primary-button" id="btnCreate">+ Tạo giải đấu</button>
                     </div>
                 </section>
 
-                <!-- ===== STATS CARDS ===== -->
+                <!-- STATS -->
                 <div class="stats-grid">
                     <div class="stat-card">
                         <div class="stat-icon blue">🏆</div>
@@ -165,20 +136,18 @@
                     </div>
                 </div>
 
-                <!-- ===== DASHBOARD 3 COLUMNS ===== -->
+                <!-- DASHBOARD -->
                 <div class="dashboard-grid">
-
-                    <!-- CỘT 1: GIẢI ĐẤU -->
                     <div class="panel">
                         <div class="panel-header">
-                            <h2><span class="icon">🏆</span> Giải đấu đang diễn ra</h2>
+                            <h2>🏆 Giải đấu đang diễn ra</h2>
                             <a href="#">Xem tất cả →</a>
                         </div>
-                        <div class="tournament-list" id="tournamentList">
+                        <div class="tournament-list">
                             <div class="tournament">
                                 <div class="sport-logo football">⚽</div>
                                 <div class="tournament-info">
-                                    <strong>Giải Bóng đá Đại hội TDTT thành phố Đà Nẵng</strong>
+                                    <strong>Giải Bóng đá Đại hội TDTT TP Đà Nẵng</strong>
                                     <span>Bóng đá nam · 16 đội</span>
                                 </div>
                                 <div class="tournament-status">
@@ -189,7 +158,7 @@
                             <div class="tournament">
                                 <div class="sport-logo swimming">🏊</div>
                                 <div class="tournament-info">
-                                    <strong>Giải Bơi Đại hội TDTT thành phố Đà Nẵng</strong>
+                                    <strong>Giải Bơi Đại hội TDTT TP Đà Nẵng</strong>
                                     <span>Bơi · 25 đơn vị</span>
                                 </div>
                                 <div class="tournament-status">
@@ -208,67 +177,37 @@
                                     <small>24/08/2026</small>
                                 </div>
                             </div>
-                            <div class="tournament">
-                                <div class="sport-logo pickleball">🏓</div>
-                                <div class="tournament-info">
-                                    <strong>Giải Pickleball Đại hội TDTT thành phố Đà Nẵng</strong>
-                                    <span>Pickleball · 25 đơn vị</span>
-                                </div>
-                                <div class="tournament-status">
-                                    <span class="status completed">Đã kết thúc</span>
-                                    <small>30/06/2026</small>
-                                </div>
-                            </div>
                         </div>
                     </div>
 
-                    <!-- CỘT 2: TIN TỨC -->
                     <div class="panel">
                         <div class="panel-header">
-                            <h2><span class="icon">📰</span> Tin tức mới nhất</h2>
+                            <h2>📰 Tin tức mới nhất</h2>
                             <a href="#">Xem tất cả →</a>
                         </div>
                         <div class="news-list">
                             <div class="news-item">
-                                <div class="news-thumb">
-                                    <img src="https://images.unsplash.com/photo-1579952363873-27f3bade9f55?w=200&h=150&fit=crop" alt="News">
-                                </div>
+                                <div class="news-thumb"><img src="https://images.unsplash.com/photo-1579952363873-27f3bade9f55?w=200&h=150&fit=crop" alt="News"></div>
                                 <div class="news-content">
-                                    <strong>Khai mạc Giải Bóng đá Đại hội TDTT thành phố Đà Nẵng lần thứ X</strong>
-                                    <p>Sáng 24/8, tại Nhà thi đấu Trung tâm Cung ứng dịch vụ sự nghiệp công phường An Hải...</p>
-                                    <div class="news-meta">
-                                        <span>24/08/2026</span>
-                                        <span class="news-tag">HOT</span>
-                                    </div>
+                                    <strong>Khai mạc Giải Bóng đá Đại hội TDTT TP Đà Nẵng</strong>
+                                    <p>Sáng 24/8, tại Nhà thi đấu Trung tâm Cung ứng dịch vụ...</p>
+                                    <div class="news-meta"><span>24/08/2026</span><span class="news-tag">HOT</span></div>
                                 </div>
                             </div>
                             <div class="news-item">
-                                <div class="news-thumb">
-                                    <img src="https://images.unsplash.com/photo-1530549387789-4c1017266635?w=200&h=150&fit=crop" alt="News">
-                                </div>
+                                <div class="news-thumb"><img src="https://images.unsplash.com/photo-1530549387789-4c1017266635?w=200&h=150&fit=crop" alt="News"></div>
                                 <div class="news-content">
-                                    <strong>Đoàn Đà Nẵng giành 2 HCV tại Giải Đua thuyền truyền thống mở rộng</strong>
-                                    <p>Với tinh thần thi đấu đoàn kết, các vận động viên Đà Nẵng đã xuất sắc giành 2 HCV...</p>
+                                    <strong>Đoàn Đà Nẵng giành 2 HCV tại Giải Đua thuyền</strong>
+                                    <p>Với tinh thần thi đấu đoàn kết, các VĐV Đà Nẵng...</p>
                                     <div class="news-meta"><span>30/08/2026</span></div>
-                                </div>
-                            </div>
-                            <div class="news-item">
-                                <div class="news-thumb">
-                                    <img src="https://images.unsplash.com/photo-1554068865-24cecd4e34b8?w=200&h=150&fit=crop" alt="News">
-                                </div>
-                                <div class="news-content">
-                                    <strong>Hơn 200 VĐV tham gia Giải Pickleball Đại hội TDTT thành phố Đà Nẵng</strong>
-                                    <p>Giải đấu diễn ra từ ngày 27 đến 30/6/2026 tại Cụm sân Pickleball Hòa Phát...</p>
-                                    <div class="news-meta"><span>27/06/2026</span></div>
                                 </div>
                             </div>
                         </div>
                     </div>
 
-                    <!-- CỘT 3: KẾT QUẢ & LIÊN KẾT -->
                     <div class="panel">
                         <div class="panel-header">
-                            <h2><span class="icon">⚽</span> Kết quả giải Bóng đá</h2>
+                            <h2>⚽ Kết quả giải Bóng đá</h2>
                             <a href="#">Xem tất cả →</a>
                         </div>
                         <div class="results-list">
@@ -289,111 +228,53 @@
                                 <div class="result-team" style="text-align:right;">Hải Châu</div>
                                 <div class="result-status">HT</div>
                             </div>
-                            <div class="result-item">
-                                <div class="result-team">Sơn Trà</div>
-                                <div class="result-score">3 - 1</div>
-                                <div class="result-team" style="text-align:right;">Thanh Khê</div>
-                                <div class="result-status">KT</div>
-                            </div>
-                            <div class="result-item">
-                                <div class="result-team">Cẩm Lệ</div>
-                                <div class="result-score">1 - 1</div>
-                                <div class="result-team" style="text-align:right;">Ngũ Hành Sơn</div>
-                                <div class="result-status">HT</div>
-                            </div>
                         </div>
 
                         <div class="panel-header" style="border-top: 1px solid var(--border-light);">
-                            <h2><span class="icon">🔗</span> Liên kết nhanh</h2>
+                            <h2>🔗 Liên kết nhanh</h2>
                         </div>
                         <div class="quick-links">
                             <div class="quick-link-item">
                                 <div class="quick-link-icon blue">🎲</div>
-                                <div class="quick-link-text">
-                                    <strong>Bốc thăm</strong>
-                                    <span>Trực tuyến</span>
-                                </div>
+                                <div class="quick-link-text"><strong>Bốc thăm</strong><span>Trực tuyến</span></div>
                             </div>
                             <div class="quick-link-item">
                                 <div class="quick-link-icon green">📅</div>
-                                <div class="quick-link-text">
-                                    <strong>Lịch thi đấu</strong>
-                                    <span>Chi tiết</span>
-                                </div>
-                            </div>
-                            <div class="quick-link-item">
-                                <div class="quick-link-icon orange">👤</div>
-                                <div class="quick-link-text">
-                                    <strong>Thành viên</strong>
-                                    <span>Đăng ký</span>
-                                </div>
-                            </div>
-                            <div class="quick-link-item">
-                                <div class="quick-link-icon purple">📄</div>
-                                <div class="quick-link-text">
-                                    <strong>Tài liệu</strong>
-                                    <span>Biểu mẫu</span>
-                                </div>
+                                <div class="quick-link-text"><strong>Lịch thi đấu</strong><span>Chi tiết</span></div>
                             </div>
                         </div>
                     </div>
                 </div>
 
-                <!-- ===== UPCOMING BAR ===== -->
+                <!-- UPCOMING -->
                 <div class="upcoming-bar">
-                    <div class="upcoming-title">
-                        <span>📅</span> Giải đấu sắp tới
-                    </div>
+                    <div class="upcoming-title"><span>📅</span> Giải đấu sắp tới</div>
                     <div class="upcoming-item">
                         <div class="upcoming-icon" style="background:#fff3e0; color:#f57c00;">🏀</div>
-                        <div class="upcoming-info">
-                            <strong>Bóng rổ U16</strong>
-                            <span>24/08 - 28/08</span>
-                        </div>
+                        <div class="upcoming-info"><strong>Bóng rổ U16</strong><span>24/08 - 28/08</span></div>
                     </div>
                     <div class="upcoming-item">
                         <div class="upcoming-icon" style="background:#e0f7fa; color:#00acc1;">🏊</div>
-                        <div class="upcoming-info">
-                            <strong>Bơi</strong>
-                            <span>27/08 - 29/08</span>
-                        </div>
+                        <div class="upcoming-info"><strong>Bơi</strong><span>27/08 - 29/08</span></div>
                     </div>
                     <div class="upcoming-item">
                         <div class="upcoming-icon" style="background:#fff8e1; color:#fbc02d;">♟️</div>
-                        <div class="upcoming-info">
-                            <strong>Cờ tướng trẻ</strong>
-                            <span>23/06 - 02/07</span>
-                        </div>
-                    </div>
-                    <div class="upcoming-item">
-                        <div class="upcoming-icon" style="background:#fce4ec; color:#e91e63;">🎱</div>
-                        <div class="upcoming-info">
-                            <strong>Bi sắt</strong>
-                            <span>12/09 - 15/09</span>
-                        </div>
-                    </div>
-                    <div class="upcoming-item">
-                        <div class="upcoming-icon" style="background:#e3f2fd; color:#1976d2;">🥋</div>
-                        <div class="upcoming-info">
-                            <strong>Vovinam</strong>
-                            <span>20/09 - 24/09</span>
-                        </div>
+                        <div class="upcoming-info"><strong>Cờ tướng trẻ</strong><span>23/06 - 02/07</span></div>
                     </div>
                 </div>
-
             </div>
         </main>
     </div>
 
-    <!-- ===== MODAL TẠO GIẢI ĐẤU ===== -->
+    <!-- MODAL TẠO GIẢI ĐẤU (đặt sẵn trong HTML, không tạo bằng JS) -->
     <div class="tournament-modal" id="tournamentModal" hidden>
         <div class="tournament-modal-card">
             <div class="tournament-modal-head">
                 <div>
                     <h2>Tạo giải đấu mới</h2>
-                    <p>Điền thông tin để tạo giải đấu trên hệ thống</p>
+                    <p>Điền thông tin để tạo giải đấu</p>
                 </div>
-                <button class="tournament-modal-close" id="closeModal">×</button>
+                <button class="tournament-modal-close" id="closeModal" type="button">×</button>
             </div>
             <form class="tournament-form" id="tournamentForm">
                 <div class="tournament-form-grid">
@@ -429,10 +310,6 @@
                         <label>Số đội tham gia</label>
                         <input type="number" name="teams" placeholder="VD: 16" min="2">
                     </div>
-                    <div class="tournament-field">
-                        <label>Đơn vị tổ chức</label>
-                        <input type="text" name="organizer" placeholder="VD: Sở VHTT Đà Nẵng">
-                    </div>
                     <div class="tournament-field full">
                         <label>Mô tả</label>
                         <textarea name="description" placeholder="Mô tả ngắn về giải đấu..."></textarea>
@@ -447,169 +324,109 @@
         </div>
     </div>
 
-    <!-- ===== SUPABASE CLIENT ===== -->
-    <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
-
-    <!-- ===== SCRIPT XỬ LÝ ===== -->
+    <!-- SCRIPT ĐƠN GIẢN - KHÔNG PHỤ THUỘC SUPABASE -->
     <script>
-        // ===== CẤU HÌNH SUPABASE =====
-        const SUPABASE_URL = 'https://bqzjksmsdtnodcfykggk.supabase.co';
-        const SUPABASE_ANON_KEY = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6ImJxemprc21zZHRub2RjZnlrZ2drIiwicm9sZSI6ImFub24iLCJpYXQiOjE3ODczNzkwNTYsImV4cCI6MjEwMjk1NTA1Nn0.nmIhW8qg547V9vcoUCuX8alDIrxH14hkr8nKMRPwLhE';
+        (function() {
+            console.log('🚀 SportsVN script loaded');
 
-        const supabaseClient = window.supabase.createClient(SUPABASE_URL, SUPABASE_ANON_KEY);
+            // Đợi DOM load xong
+            document.addEventListener('DOMContentLoaded', function() {
+                console.log('✅ DOM ready');
 
-        document.addEventListener('DOMContentLoaded', function() {
-            // ===== LẤY CÁC ELEMENT =====
-            const modal = document.getElementById('tournamentModal');
-            const closeBtn = document.getElementById('closeModal');
-            const cancelBtn = document.getElementById('cancelModal');
-            const form = document.getElementById('tournamentForm');
-            const formMessage = document.getElementById('formMessage');
-            const submitBtn = document.getElementById('submitBtn');
-            const openBtn = document.getElementById('openCreateModal');
-            const tournamentList = document.getElementById('tournamentList');
-            const statTournaments = document.getElementById('statTournaments');
+                // Lấy các element
+                var modal = document.getElementById('tournamentModal');
+                var btnCreate = document.getElementById('btnCreate');
+                var closeBtn = document.getElementById('closeModal');
+                var cancelBtn = document.getElementById('cancelModal');
+                var form = document.getElementById('tournamentForm');
+                var formMessage = document.getElementById('formMessage');
 
-            // ===== HÀM MỞ/ĐÓNG MODAL =====
-            function openModal() {
-                modal.hidden = false;
-                document.body.style.overflow = 'hidden';
-            }
+                console.log('Modal:', modal);
+                console.log('Button:', btnCreate);
 
-            function closeModal() {
-                modal.hidden = true;
-                document.body.style.overflow = '';
-                form.reset();
-                formMessage.textContent = '';
-                formMessage.className = 'tournament-form-message';
-            }
+                if (!modal || !btnCreate) {
+                    console.error('❌ Không tìm thấy element!');
+                    return;
+                }
 
-            openBtn.addEventListener('click', openModal);
-            closeBtn.addEventListener('click', closeModal);
-            cancelBtn.addEventListener('click', closeModal);
-            modal.addEventListener('click', e => { if (e.target === modal) closeModal(); });
-            document.addEventListener('keydown', e => { if (e.key === 'Escape' && !modal.hidden) closeModal(); });
+                // Hàm mở modal
+                function openModal() {
+                    console.log('📂 Mở modal');
+                    modal.hidden = false;
+                    modal.style.display = 'flex';
+                    document.body.style.overflow = 'hidden';
+                }
 
-            // ===== XỬ LÝ SUBMIT FORM =====
-            form.addEventListener('submit', async function(e) {
-                e.preventDefault();
+                // Hàm đóng modal
+                function closeModal() {
+                    console.log('📁 Đóng modal');
+                    modal.hidden = true;
+                    modal.style.display = 'none';
+                    document.body.style.overflow = '';
+                    form.reset();
+                    formMessage.textContent = '';
+                    formMessage.className = 'tournament-form-message';
+                }
 
-                const formData = new FormData(form);
-                const data = Object.fromEntries(formData);
+                // Gắn sự kiện click
+                btnCreate.addEventListener('click', function(e) {
+                    e.preventDefault();
+                    openModal();
+                });
 
-                // Chuyển đổi kiểu dữ liệu
-                if (data.teams) data.teams = parseInt(data.teams);
+                closeBtn.addEventListener('click', closeModal);
+                cancelBtn.addEventListener('click', closeModal);
 
-                // Hiển thị trạng thái đang lưu
-                formMessage.textContent = '⏳ Đang lưu...';
-                formMessage.className = 'tournament-form-message';
-                submitBtn.disabled = true;
+                // Click ra ngoài
+                modal.addEventListener('click', function(e) {
+                    if (e.target === modal) closeModal();
+                });
 
-                try {
-                    // Gửi dữ liệu lên Supabase
-                    const { data: result, error } = await supabaseClient
-                        .from('tournaments')
-                        .insert([data])
-                        .select();
+                // Nhấn ESC
+                document.addEventListener('keydown', function(e) {
+                    if (e.key === 'Escape' && !modal.hidden) closeModal();
+                });
 
-                    if (error) throw error;
+                // Submit form (demo, không lưu DB)
+                form.addEventListener('submit', function(e) {
+                    e.preventDefault();
+                    console.log('📝 Form submitted');
 
-                    // Thành công
-                    formMessage.textContent = '✓ Tạo giải đấu thành công!';
+                    var formData = new FormData(form);
+                    var name = formData.get('name');
+
+                    formMessage.textContent = '✓ Tạo giải đấu thành công: ' + name;
                     formMessage.className = 'tournament-form-message success';
 
-                    setTimeout(() => {
+                    // Tăng số đếm
+                    var stat = document.getElementById('statTournaments');
+                    if (stat) {
+                        var current = parseInt(stat.textContent) || 0;
+                        stat.textContent = current + 1;
+                    }
+
+                    setTimeout(function() {
                         closeModal();
-                        showToast('✓ Đã tạo giải đấu: ' + data.name);
-                        loadTournaments(); // Tải lại danh sách
+                        showToast('✓ Đã tạo: ' + name);
                     }, 1500);
+                });
 
-                } catch (error) {
-                    console.error('Lỗi:', error);
-                    formMessage.textContent = '❌ Lỗi: ' + error.message;
-                    formMessage.className = 'tournament-form-message error';
-                } finally {
-                    submitBtn.disabled = false;
+                // Toast
+                function showToast(msg) {
+                    var toast = document.createElement('div');
+                    toast.className = 'dashboard-toast';
+                    toast.textContent = msg;
+                    document.body.appendChild(toast);
+                    setTimeout(function() { toast.classList.add('show'); }, 100);
+                    setTimeout(function() {
+                        toast.classList.remove('show');
+                        setTimeout(function() { toast.remove(); }, 300);
+                    }, 3000);
                 }
+
+                console.log('✅ Tất cả sự kiện đã được gắn');
             });
-
-            // ===== TẢI DANH SÁCH GIẢI ĐẤU TỪ SUPABASE =====
-            async function loadTournaments() {
-                try {
-                    const { data, error } = await supabaseClient
-                        .from('tournaments')
-                        .select('*')
-                        .order('created_at', { ascending: false })
-                        .limit(10);
-
-                    if (error) throw error;
-
-                    // Cập nhật số lượng giải đấu
-                    if (statTournaments) {
-                        statTournaments.textContent = data.length;
-                    }
-
-                    // Nếu có dữ liệu, hiển thị lên danh sách
-                    if (data && data.length > 0) {
-                        renderTournaments(data);
-                    }
-                } catch (error) {
-                    console.error('Lỗi tải dữ liệu:', error);
-                }
-            }
-
-            // ===== RENDER DANH SÁCH GIẢI ĐẤU =====
-            function renderTournaments(tournaments) {
-                if (!tournamentList) return;
-
-                // Lấy 4 giải đấu mới nhất
-                const latest = tournaments.slice(0, 4);
-
-                tournamentList.innerHTML = latest.map(t => {
-                    const sportIcons = {
-                        'Bóng đá': { icon: '⚽', class: 'football' },
-                        'Bóng rổ': { icon: '🏀', class: 'basketball' },
-                        'Bơi': { icon: '🏊', class: 'swimming' },
-                        'Pickleball': { icon: '🏓', class: 'pickleball' },
-                        'Cầu lông': { icon: '🏸', class: 'badminton' },
-                        'Cờ tướng': { icon: '♟️', class: 'chess' }
-                    };
-                    const sport = sportIcons[t.sport] || { icon: '🏆', class: 'football' };
-                    const startDate = t.start_date ? new Date(t.start_date).toLocaleDateString('vi-VN') : '';
-
-                    return `
-                        <div class="tournament">
-                            <div class="sport-logo ${sport.class}">${sport.icon}</div>
-                            <div class="tournament-info">
-                                <strong>${t.name}</strong>
-                                <span>${t.sport} · ${t.teams || 0} đội</span>
-                            </div>
-                            <div class="tournament-status">
-                                <span class="status upcoming">Sắp diễn ra</span>
-                                <small>${startDate}</small>
-                            </div>
-                        </div>
-                    `;
-                }).join('');
-            }
-
-            // ===== TOAST THÔNG BÁO =====
-            function showToast(message) {
-                const toast = document.createElement('div');
-                toast.className = 'dashboard-toast';
-                toast.textContent = message;
-                document.body.appendChild(toast);
-
-                setTimeout(() => toast.classList.add('show'), 100);
-                setTimeout(() => {
-                    toast.classList.remove('show');
-                    setTimeout(() => toast.remove(), 300);
-                }, 3000);
-            }
-
-            // ===== TẢI DỮ LIỆU KHI MỞ TRANG =====
-            loadTournaments();
-        });
+        })();
     </script>
 </body>
 </html>
