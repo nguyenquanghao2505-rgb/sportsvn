@@ -1243,12 +1243,12 @@ window.openEditKnockoutPlayer = async function(catName, roundNum, matchNum, team
                                 <button class="edit-btn" onclick="event.stopPropagation(); openEditGroupPlayer('${escapeHtml(catName)}', '${escapeHtml(teamA.team_name)}', '${escapeHtml(teamA.club || '')}')" title="Sửa VĐV này trong cả bảng">    <i class="fas fa-edit"></i>
 </button>
                             <div class="team ${winnerA ? 'winner' : ''}">
-                                <span>${escapeHtml(teamA.team_name)}</span>
+<span><strong>${escapeHtml(teamA.team_name)}</strong>${teamA.club ? ` <small style="color:#1a3a7a;font-weight:600;">(${escapeHtml(teamA.club)})</small>` : ''}</span>
                                 ${scoreA !== '' ? `<span class="score">${scoreA}</span>` : ''}
                             </div>
                             <div class="vs">VS</div>
                             <div class="team ${winnerB ? 'winner' : ''}">
-                    <span>${escapeHtml(teamB.team_name)}</span>
+<span><strong>${escapeHtml(teamB.team_name)}</strong>${teamB.club ? ` <small style="color:#1a3a7a;font-weight:600;">(${escapeHtml(teamB.club)})</small>` : ''}</span>
                     <button class="edit-btn" style="position: static; margin-left: 6px; display: inline-flex;" onclick="event.stopPropagation(); openEditGroupPlayer('${escapeHtml(catName)}', '${escapeHtml(teamB.team_name)}', '${escapeHtml(teamB.club || '')}')" title="Sửa VĐV B"><i class="fas fa-edit"></i></button>
                                 ${scoreB !== '' ? `<span class="score">${scoreB}</span>` : ''}
                             </div>
@@ -1270,7 +1270,8 @@ window.openEditKnockoutPlayer = async function(catName, roundNum, matchNum, team
                 <table class="standings-table">
                     <thead>
                         <tr>
-                            <th style="text-align: left;">VĐV</th>
+<th style="text-align: left;">VĐV</th>
+<th style="text-align: left;">Đơn vị</th>
                             <th>Tr</th>
                             <th>T</th>
                             <th>B</th>
@@ -1281,6 +1282,7 @@ window.openEditKnockoutPlayer = async function(catName, roundNum, matchNum, team
                         ${standings.map(s => `
                             <tr>
                                 <td>${escapeHtml(s.name)}</td>
+                                <td style="text-align: left; font-size: 12px; color: #6c757d;">${escapeHtml(s.club || '—')}</td>
                                 <td>${s.played}</td>
                                 <td>${s.wins}</td>
                                 <td>${s.losses}</td>
@@ -1516,6 +1518,7 @@ function countPlayedMatchesInGroup(groupName, groupTeams, catName) {
         groupTeams.forEach(t => {
             stats[t.team_name] = {
                 name: t.team_name,
+                club: t.club || '',
                 played: 0, wins: 0, losses: 0, points: 0
             };
         });
