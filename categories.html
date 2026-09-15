@@ -1248,7 +1248,8 @@ window.openEditKnockoutPlayer = async function(catName, roundNum, matchNum, team
                             </div>
                             <div class="vs">VS</div>
                             <div class="team ${winnerB ? 'winner' : ''}">
-                                <span>${escapeHtml(teamB.team_name)}</span>
+                    <span>${escapeHtml(teamB.team_name)}</span>
+                    <button class="edit-btn" style="position: static; margin-left: 6px; display: inline-flex;" onclick="event.stopPropagation(); openEditGroupPlayer('${escapeHtml(catName)}', '${escapeHtml(teamB.team_name)}', '${escapeHtml(teamB.club || '')}')" title="Sửa VĐV B"><i class="fas fa-edit"></i></button>
                                 ${scoreB !== '' ? `<span class="score">${scoreB}</span>` : ''}
                             </div>
                             ${isCompleted ? `<span class="result-badge">✅ ${escapeHtml(existingScore.winner_name)} thắng</span>` : ''}
