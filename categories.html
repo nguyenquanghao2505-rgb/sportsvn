@@ -135,6 +135,49 @@
             padding: 3px 8px; background: #00b894; color: #fff;
             border-radius: 4px; font-weight: 700; margin-top: 5px;
         }
+                .matchup .edit-btn {
+            position: absolute;
+            top: 4px;
+            left: 8px;
+            background: #0984e3;
+            color: #fff;
+            border: none;
+            width: 22px;
+            height: 22px;
+            border-radius: 4px;
+            cursor: pointer;
+            font-size: 10px;
+            display: none;
+            align-items: center;
+            justify-content: center;
+            transition: all 0.2s ease;
+        }
+        .matchup:hover .edit-btn {
+            display: flex;
+        }
+        .matchup .edit-btn:hover {
+            background: #0770c9;
+            transform: scale(1.15);
+        }
+        .group-match .edit-btn {
+            position: absolute;
+            top: 2px;
+            left: 6px;
+            background: #0984e3;
+            color: #fff;
+            border: none;
+            width: 20px;
+            height: 20px;
+            border-radius: 4px;
+            cursor: pointer;
+            font-size: 9px;
+            display: none;
+            align-items: center;
+            justify-content: center;
+        }
+        .group-match:hover .edit-btn {
+            display: flex;
+        }
         /* GROUP SECTION */
         .group-section {
             background: #fff; border-radius: 12px; padding: 16px;
@@ -408,7 +451,55 @@
         </div>
     </div>
 </div>
-
+<!-- MODAL CHỈNH SỬA VĐV TRONG TRẬN -->
+<div class="modal-overlay" id="edit-player-modal">
+    <div class="modal-content" style="max-width: 600px;">
+        <div class="modal-header" style="background: linear-gradient(135deg, #0984e3, #1a3a7a);">
+            <h2>✏️ Chỉnh sửa VĐV trong trận</h2>
+            <button class="modal-close" onclick="closeEditPlayerModal()">×</button>
+        </div>
+        <div class="modal-body">
+            <div id="edit-player-info" style="background: #e7f3ff; padding: 12px 16px; border-radius: 8px; margin-bottom: 20px; font-size: 13px; color: #1a3a7a; font-weight: 700;">
+                <!-- Info sẽ được load -->
+            </div>
+            
+            <div class="form-grid">
+                <!-- VĐV A -->
+                <div class="form-group full">
+                    <label style="color: #e94560;">🔵 VĐV A</label>
+                </div>
+                <div class="form-group">
+                    <label>Tên VĐV A</label>
+                    <input type="text" id="edit-team-a-name" placeholder="Nhập tên VĐV A">
+                </div>
+                <div class="form-group">
+                    <label>CLB/Đơn vị A</label>
+                    <input type="text" id="edit-team-a-club" placeholder="Nhập CLB/Đơn vị A">
+                </div>
+                
+                <!-- VĐV B -->
+                <div class="form-group full" style="margin-top: 10px;">
+                    <label style="color: #0984e3;">🔴 VĐV B</label>
+                </div>
+                <div class="form-group">
+                    <label>Tên VĐV B</label>
+                    <input type="text" id="edit-team-b-name" placeholder="Nhập tên VĐV B">
+                </div>
+                <div class="form-group">
+                    <label>CLB/Đơn vị B</label>
+                    <input type="text" id="edit-team-b-club" placeholder="Nhập CLB/Đơn vị B">
+                </div>
+            </div>
+            
+            <div class="modal-actions">
+                <button class="btn btn-outline" style="color: #1a1a2e; border-color: #e9ecef;" onclick="closeEditPlayerModal()">Hủy</button>
+                <button class="btn btn-primary" onclick="saveEditPlayer()">
+                    <i class="fas fa-save"></i> Lưu thay đổi
+                </button>
+            </div>
+        </div>
+    </div>
+</div>
 <!-- MODAL NHẬP ĐIỂM -->
 <div class="score-modal-overlay" id="score-modal">
     <div class="score-modal-content">
@@ -709,8 +800,8 @@
                 const matchKey = `${roundNum}-${m + 1}`;
                 const score = scoresMap[matchKey];
 
-                const teamA = match.teamA || null;
-                const teamB = match.teamB || null;
+               const teamA = match.teamA ? { ...match.teamA, club: allDraws.find(d => d.team_name === match.teamA.name)?.club || '' } : null;
+const teamB = match.teamB ? { ...match.teamB, club: allDraws.find(d => d.team_name === match.teamB.name)?.club || '' } : null;
                 const hasTeams = teamA || teamB;
                 const isCompleted = !!score;
 
@@ -735,8 +826,10 @@
                 html += `
                     <div class="matchup ${isCompleted ? 'completed' : ''} ${!hasTeams ? 'empty' : ''}"
                          onclick="${isEditable && hasTeams && teamA && teamB ? `openScoreModal('${escapeHtml(catName)}', ${roundNum}, ${m + 1}, '${escapeHtml(teamA.name)}', '${escapeHtml(teamB.name)}')` : ''}">
-                        <span class="match-number">Trận ${m + 1}</span>
-                        <div class="team ${winnerA ? 'winner' : ''} ${!teamA ? 'bye' : ''}">
+<span class="match-number">Trận ${m + 1}</span>
+${hasTeams ? `<button class="edit-btn" onclick="event.stopPropagation(); openEditPlayerModal('${escapeHtml(catName)}', ${roundNum}, ${m + 1}, '${escapeHtml(teamA?.name || '')}', '${escapeHtml(teamB?.name || '')}')" title="Sửa tên VĐV">
+    <i class="fas fa-edit"></i>
+</button>` : ''}                        <div class="team ${winnerA ? 'winner' : ''} ${!teamA ? 'bye' : ''}">
                             <span>${teamA ? escapeHtml(teamA.name) : 'Chưa xác định'}</span>
                             ${scoreA !== '' ? `<span class="score">${scoreA}</span>` : ''}
                         </div>
@@ -862,6 +955,135 @@
         document.getElementById('control-bracket').innerHTML = html;
         document.getElementById('control-modal').classList.add('show');
     };
+// ==========================================
+// CHỈNH SỬA VĐV TRONG TRẬN
+// ==========================================
+let currentEditPlayer = null;
+
+window.openEditPlayerModal = function(catName, roundNum, matchNum, teamAName, teamBName) {
+    currentEditPlayer = { catName, roundNum, matchNum, teamAName, teamBName };
+    
+    // Tìm CLB của 2 VĐV
+    let teamAClub = '';
+    let teamBClub = '';
+    
+    // Tìm trong draws
+    const drawA = allDraws.find(d => d.team_name === teamAName && d.category === catName);
+    const drawB = allDraws.find(d => d.team_name === teamBName && d.category === catName);
+    
+    if (drawA) teamAClub = drawA.club || '';
+    if (drawB) teamBClub = drawB.club || '';
+    
+    // Điền thông tin
+    document.getElementById('edit-team-a-name').value = teamAName;
+    document.getElementById('edit-team-a-club').value = teamAClub;
+    document.getElementById('edit-team-b-name').value = teamBName;
+    document.getElementById('edit-team-b-club').value = teamBClub;
+    
+    // Info
+    let roundLabel = roundNum === 100 ? 'Vòng bảng' : (roundNum >= 200 ? `Vòng KO ${roundNum - 199}` : `Vòng ${roundNum}`);
+    document.getElementById('edit-player-info').innerHTML = `
+        <i class="fas fa-info-circle"></i> 
+        <strong>${escapeHtml(catName)}</strong> · 
+        ${roundLabel} · Trận ${matchNum}
+    `;
+    
+    document.getElementById('edit-player-modal').classList.add('show');
+};
+
+window.closeEditPlayerModal = function() {
+    document.getElementById('edit-player-modal').classList.remove('show');
+    currentEditPlayer = null;
+};
+
+window.saveEditPlayer = async function() {
+    if (!currentEditPlayer) return;
+    
+    const { catName, roundNum, matchNum, teamAName, teamBName } = currentEditPlayer;
+    
+    const newTeamAName = document.getElementById('edit-team-a-name').value.trim();
+    const newTeamAClub = document.getElementById('edit-team-a-club').value.trim();
+    const newTeamBName = document.getElementById('edit-team-b-name').value.trim();
+    const newTeamBClub = document.getElementById('edit-team-b-club').value.trim();
+    
+    if (!newTeamAName || !newTeamBName) {
+        alert('Tên VĐV không được để trống!');
+        return;
+    }
+    
+    try {
+        // 1. Update bảng draws (dữ liệu gốc)
+        if (teamAName) {
+            await supabaseClient.from('draws')
+                .update({ team_name: newTeamAName, club: newTeamAClub || null })
+                .eq('tournament_id', tournamentId)
+                .eq('category', catName)
+                .eq('team_name', teamAName);
+        }
+        if (teamBName) {
+            await supabaseClient.from('draws')
+                .update({ team_name: newTeamBName, club: newTeamBClub || null })
+                .eq('tournament_id', tournamentId)
+                .eq('category', catName)
+                .eq('team_name', teamBName);
+        }
+        
+        // 2. Update bảng schedules (nếu có)
+        await supabaseClient.from('schedules')
+            .update({ team_a_name: newTeamAName })
+            .eq('tournament_id', tournamentId)
+            .eq('team_a_name', teamAName);
+        
+        await supabaseClient.from('schedules')
+            .update({ team_b_name: newTeamBName })
+            .eq('tournament_id', tournamentId)
+            .eq('team_b_name', teamBName);
+        
+        // 3. Update bảng match_scores (nếu có kết quả)
+        await supabaseClient.from('match_scores')
+            .update({ team_a_name: newTeamAName })
+            .eq('tournament_id', tournamentId)
+            .eq('category', catName)
+            .eq('team_a_name', teamAName);
+        
+        await supabaseClient.from('match_scores')
+            .update({ team_b_name: newTeamBName })
+            .eq('tournament_id', tournamentId)
+            .eq('category', catName)
+            .eq('team_b_name', teamBName);
+        
+        // Update winner nếu có
+        await supabaseClient.from('match_scores')
+            .update({ winner_name: newTeamAName })
+            .eq('tournament_id', tournamentId)
+            .eq('category', catName)
+            .eq('winner_name', teamAName);
+        
+        await supabaseClient.from('match_scores')
+            .update({ winner_name: newTeamBName })
+            .eq('tournament_id', tournamentId)
+            .eq('category', catName)
+            .eq('winner_name', teamBName);
+        
+        // Refresh data
+        await loadAllData();
+        
+        // Đóng modal
+        closeEditPlayerModal();
+        
+        // Refresh control panel
+        if (document.getElementById('control-modal').classList.contains('show')) {
+            closeControlModal();
+            setTimeout(() => openControlPanel(catName), 100);
+        }
+        
+        alert('✅ Đã lưu thay đổi!');
+        
+    } catch (error) {
+        console.error(error);
+        alert('Lỗi lưu: ' + error.message);
+    }
+};
 
     window.closeControlModal = function() {
         document.getElementById('control-modal').classList.remove('show');
@@ -924,6 +1146,9 @@
                         <div class="group-match ${isCompleted ? 'completed' : ''}"
                              onclick="openScoreModal('${escapeHtml(catName)}', 100, ${matchCounter}, '${escapeHtml(teamA.team_name)}', '${escapeHtml(teamB.team_name)}')">
                             <span class="match-num">T${i * n + j}</span>
+<button class="edit-btn" onclick="event.stopPropagation(); openEditPlayerModal('${escapeHtml(catName)}', 100, ${matchCounter}, '${escapeHtml(teamA.team_name)}', '${escapeHtml(teamB.team_name)}')" title="Sửa tên VĐV">
+    <i class="fas fa-edit"></i>
+</button>
                             <div class="team ${winnerA ? 'winner' : ''}">
                                 <span>${escapeHtml(teamA.team_name)}</span>
                                 ${scoreA !== '' ? `<span class="score">${scoreA}</span>` : ''}
