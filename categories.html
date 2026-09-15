@@ -993,13 +993,23 @@
                 roundNames.push(fromEnd < standard.length ? standard[fromEnd] : `Vòng ${i + 1}`);
             }
 
-            // Lấy đội nhất/nhì từ mỗi bảng
-            const qualifiedTeams = [];
-            groupKeys.forEach(g => {
-                const standings = computeStandings(g, groups[g], catName);
-                if (standings[0]) qualifiedTeams.push({ name: standings[0].name, rank: 'Nhất bảng ' + g });
-                if (standings[1]) qualifiedTeams.push({ name: standings[1].name, rank: 'Nhì bảng ' + g });
-            });
+// CHỈ lấy đội nhất/nhì NẾU mỗi bảng đã đấu HẾT vòng tròn
+const qualifiedTeams = [];
+groupKeys.forEach(g => {
+    const standings = computeStandings(g, groups[g], catName);
+    const expectedMatches = (groups[g].length * (groups[g].length - 1)) / 2;
+    const playedMatches = countPlayedMatchesInGroup(g, groups[g], catName);
+    
+    // Chỉ lấy nếu bảng đã đấu hết
+    if (playedMatches >= expectedMatches) {
+        if (standings[0]) qualifiedTeams.push({ name: standings[0].name, rank: 'Nhất ' + g });
+        if (standings[1]) qualifiedTeams.push({ name: standings[1].name, rank: 'Nhì ' + g });
+    } else {
+        // Chưa xong → 2 slot trống
+        qualifiedTeams.push({ name: null, rank: 'Nhất ' + g + ' (chưa xác định)' });
+        qualifiedTeams.push({ name: null, rank: 'Nhì ' + g + ' (chưa xác định)' });
+    }
+});
 
             for (let r = 0; r < totalRounds; r++) {
                 const roundNum = 200 + r;
@@ -1082,11 +1092,86 @@
                 `;
             }
 
+    // THÊM TRẬN TRANH HẠNG 3
+    if (typeof numMatches !== 'undefined' && numMatches === 2) {
+        const finalRoundNum = 200 + totalRounds - 1;
+        const semiRoundNum = 200 + totalRounds - 2;
+        
+        const semi1 = allMatchScores.find(s =>
+            s.category === catName && s.round_number === semiRoundNum && s.match_number === 1
+        );
+        const semi2 = allMatchScores.find(s =>
+            s.category === catName && s.round_number === semiRoundNum && s.match_number === 2
+        );
+
+        let teamA3 = null, teamB3 = null;
+        if (semi1 && semi2) {
+            const loser1 = semi1.winner_name === semi1.team_a_name ? semi1.team_b_name : semi1.team_a_name;
+            const loser2 = semi2.winner_name === semi2.team_a_name ? semi2.team_b_name : semi2.team_a_name;
+            teamA3 = { name: loser1 };
+            teamB3 = { name: loser2 };
+        }
+
+        const thirdScore = allMatchScores.find(s =>
+            s.category === catName && s.round_number === finalRoundNum && s.match_number === 99
+        );
+
+        const is3rdDone = !!thirdScore;
+        const winA3 = is3rdDone && thirdScore.winner_name === teamA3?.name;
+        const winB3 = is3rdDone && thirdScore.winner_name === teamB3?.name;
+
+        let sA3 = '', sB3 = '';
+        if (is3rdDone && thirdScore.score_summary) {
+            const parts = thirdScore.score_summary.split(', ');
+            sA3 = parts.filter(p => { const [a, b] = p.split('-').map(Number); return a > b; }).length;
+            sB3 = parts.filter(p => { const [a, b] = p.split('-').map(Number); return b > a; }).length;
+        }
+
+        html += `
+            <div class="bracket-round" style="background: #fff8f0;">
+                <h4 style="color: #e67e22; border-bottom-color: #e67e22;">🥉 TRANH HẠNG 3</h4>
+                <div class="bracket-matchups">
+                    <div class="matchup ${is3rdDone ? 'completed' : ''} ${!teamA3 || !teamB3 ? 'empty' : ''}"
+                         style="border-left-color: #e67e22;"
+                         onclick="${teamA3 && teamB3 && !is3rdDone ? `openScoreModal('${escapeHtml(catName)}', ${finalRoundNum}, 99, '${escapeHtml(teamA3.name)}', '${escapeHtml(teamB3.name)}')` : ''}">
+                        <div class="team ${winA3 ? 'winner' : ''}">
+                            <span>${teamA3 ? escapeHtml(teamA3.name) : 'Chờ thua BK'}</span>
+                            ${sA3 !== '' ? `<span class="score">${sA3}</span>` : ''}
+                        </div>
+                        <div class="vs">VS</div>
+                        <div class="team ${winB3 ? 'winner' : ''}">
+                            <span>${teamB3 ? escapeHtml(teamB3.name) : 'Chờ thua BK'}</span>
+                            ${sB3 !== '' ? `<span class="score">${sB3}</span>` : ''}
+                        </div>
+                        ${is3rdDone ? `<span class="result-badge" style="background: #e67e22;">🥉 ${escapeHtml(thirdScore.winner_name)} thắng</span>` : ''}
+                    </div>
+                </div>
+            </div>
+        `;
+    }
+
             html += '</div>';
         }
 
         return html;
     }
+function countPlayedMatchesInGroup(groupName, groupTeams, catName) {
+    let count = 0;
+    groupTeams.forEach((tA, i) => {
+        groupTeams.forEach((tB, j) => {
+            if (j > i) {
+                const played = allMatchScores.find(s =>
+                    s.category === catName &&
+                    s.round_number === 100 &&
+                    ((s.team_a_name === tA.team_name && s.team_b_name === tB.team_name) ||
+                     (s.team_a_name === tB.team_name && s.team_b_name === tA.team_name))
+                );
+                if (played) count++;
+            }
+        });
+    });
+    return count;
+}
 
     function computeStandings(groupName, groupTeams, catName) {
         const stats = {};
