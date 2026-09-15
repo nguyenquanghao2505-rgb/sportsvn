@@ -123,7 +123,7 @@
                         <span class="welcome-label">Sports Management Platform</span>
                         <h1>SPORTS<span>VN</span></h1>
                         <p>Kết nối đam mê thể thao — Cập nhật nhanh chóng — Chính xác — Toàn diện</p>
-                        <button class="primary-button">
+                        <button class="primary-button" id="openCreateModal">
                             <span>+</span> Tạo giải đấu
                         </button>
                     </div>
@@ -135,7 +135,7 @@
                         <div class="stat-icon blue">🏆</div>
                         <div class="stat-content">
                             <span>Tổng số giải đấu</span>
-                            <strong>24</strong>
+                            <strong id="statTournaments">24</strong>
                             <small><b>↑ +12%</b> so với tháng trước</small>
                         </div>
                     </div>
@@ -174,7 +174,7 @@
                             <h2><span class="icon">🏆</span> Giải đấu đang diễn ra</h2>
                             <a href="#">Xem tất cả →</a>
                         </div>
-                        <div class="tournament-list">
+                        <div class="tournament-list" id="tournamentList">
                             <div class="tournament">
                                 <div class="sport-logo football">⚽</div>
                                 <div class="tournament-info">
@@ -384,5 +384,232 @@
             </div>
         </main>
     </div>
+
+    <!-- ===== MODAL TẠO GIẢI ĐẤU ===== -->
+    <div class="tournament-modal" id="tournamentModal" hidden>
+        <div class="tournament-modal-card">
+            <div class="tournament-modal-head">
+                <div>
+                    <h2>Tạo giải đấu mới</h2>
+                    <p>Điền thông tin để tạo giải đấu trên hệ thống</p>
+                </div>
+                <button class="tournament-modal-close" id="closeModal">×</button>
+            </div>
+            <form class="tournament-form" id="tournamentForm">
+                <div class="tournament-form-grid">
+                    <div class="tournament-field full">
+                        <label>Tên giải đấu <span>*</span></label>
+                        <input type="text" name="name" placeholder="VD: Giải Bóng đá Đại hội TDTT" required>
+                    </div>
+                    <div class="tournament-field">
+                        <label>Môn thể thao <span>*</span></label>
+                        <select name="sport" required>
+                            <option value="">-- Chọn môn --</option>
+                            <option value="Bóng đá">Bóng đá</option>
+                            <option value="Bóng rổ">Bóng rổ</option>
+                            <option value="Bơi">Bơi</option>
+                            <option value="Pickleball">Pickleball</option>
+                            <option value="Cầu lông">Cầu lông</option>
+                            <option value="Cờ tướng">Cờ tướng</option>
+                        </select>
+                    </div>
+                    <div class="tournament-field">
+                        <label>Địa điểm <span>*</span></label>
+                        <input type="text" name="location" placeholder="VD: Đà Nẵng" required>
+                    </div>
+                    <div class="tournament-field">
+                        <label>Ngày bắt đầu <span>*</span></label>
+                        <input type="date" name="start_date" required>
+                    </div>
+                    <div class="tournament-field">
+                        <label>Ngày kết thúc <span>*</span></label>
+                        <input type="date" name="end_date" required>
+                    </div>
+                    <div class="tournament-field">
+                        <label>Số đội tham gia</label>
+                        <input type="number" name="teams" placeholder="VD: 16" min="2">
+                    </div>
+                    <div class="tournament-field">
+                        <label>Đơn vị tổ chức</label>
+                        <input type="text" name="organizer" placeholder="VD: Sở VHTT Đà Nẵng">
+                    </div>
+                    <div class="tournament-field full">
+                        <label>Mô tả</label>
+                        <textarea name="description" placeholder="Mô tả ngắn về giải đấu..."></textarea>
+                    </div>
+                </div>
+                <div class="tournament-form-message" id="formMessage"></div>
+                <div class="tournament-form-actions">
+                    <button type="button" class="tournament-cancel" id="cancelModal">Hủy</button>
+                    <button type="submit" class="tournament-submit" id="submitBtn">Tạo giải đấu</button>
+                </div>
+            </form>
+        </div>
+    </div>
+
+    <!-- ===== SUPABASE CLIENT ===== -->
+    <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+
+    <!-- ===== SCRIPT XỬ LÝ ===== -->
+    <script>
+        // ===== CẤU HÌNH SUPABASE =====
+        const SUPABASE_URL = 'https://bqzjksmsdtnodcfykggk.supabase.co';
+        const SUPABASE_ANON_KEY = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6ImJxemprc21zZHRub2RjZnlrZ2drIiwicm9sZSI6ImFub24iLCJpYXQiOjE3ODczNzkwNTYsImV4cCI6MjEwMjk1NTA1Nn0.nmIhW8qg547V9vcoUCuX8alDIrxH14hkr8nKMRPwLhE';
+
+        const supabaseClient = window.supabase.createClient(SUPABASE_URL, SUPABASE_ANON_KEY);
+
+        document.addEventListener('DOMContentLoaded', function() {
+            // ===== LẤY CÁC ELEMENT =====
+            const modal = document.getElementById('tournamentModal');
+            const closeBtn = document.getElementById('closeModal');
+            const cancelBtn = document.getElementById('cancelModal');
+            const form = document.getElementById('tournamentForm');
+            const formMessage = document.getElementById('formMessage');
+            const submitBtn = document.getElementById('submitBtn');
+            const openBtn = document.getElementById('openCreateModal');
+            const tournamentList = document.getElementById('tournamentList');
+            const statTournaments = document.getElementById('statTournaments');
+
+            // ===== HÀM MỞ/ĐÓNG MODAL =====
+            function openModal() {
+                modal.hidden = false;
+                document.body.style.overflow = 'hidden';
+            }
+
+            function closeModal() {
+                modal.hidden = true;
+                document.body.style.overflow = '';
+                form.reset();
+                formMessage.textContent = '';
+                formMessage.className = 'tournament-form-message';
+            }
+
+            openBtn.addEventListener('click', openModal);
+            closeBtn.addEventListener('click', closeModal);
+            cancelBtn.addEventListener('click', closeModal);
+            modal.addEventListener('click', e => { if (e.target === modal) closeModal(); });
+            document.addEventListener('keydown', e => { if (e.key === 'Escape' && !modal.hidden) closeModal(); });
+
+            // ===== XỬ LÝ SUBMIT FORM =====
+            form.addEventListener('submit', async function(e) {
+                e.preventDefault();
+
+                const formData = new FormData(form);
+                const data = Object.fromEntries(formData);
+
+                // Chuyển đổi kiểu dữ liệu
+                if (data.teams) data.teams = parseInt(data.teams);
+
+                // Hiển thị trạng thái đang lưu
+                formMessage.textContent = '⏳ Đang lưu...';
+                formMessage.className = 'tournament-form-message';
+                submitBtn.disabled = true;
+
+                try {
+                    // Gửi dữ liệu lên Supabase
+                    const { data: result, error } = await supabaseClient
+                        .from('tournaments')
+                        .insert([data])
+                        .select();
+
+                    if (error) throw error;
+
+                    // Thành công
+                    formMessage.textContent = '✓ Tạo giải đấu thành công!';
+                    formMessage.className = 'tournament-form-message success';
+
+                    setTimeout(() => {
+                        closeModal();
+                        showToast('✓ Đã tạo giải đấu: ' + data.name);
+                        loadTournaments(); // Tải lại danh sách
+                    }, 1500);
+
+                } catch (error) {
+                    console.error('Lỗi:', error);
+                    formMessage.textContent = '❌ Lỗi: ' + error.message;
+                    formMessage.className = 'tournament-form-message error';
+                } finally {
+                    submitBtn.disabled = false;
+                }
+            });
+
+            // ===== TẢI DANH SÁCH GIẢI ĐẤU TỪ SUPABASE =====
+            async function loadTournaments() {
+                try {
+                    const { data, error } = await supabaseClient
+                        .from('tournaments')
+                        .select('*')
+                        .order('created_at', { ascending: false })
+                        .limit(10);
+
+                    if (error) throw error;
+
+                    // Cập nhật số lượng giải đấu
+                    if (statTournaments) {
+                        statTournaments.textContent = data.length;
+                    }
+
+                    // Nếu có dữ liệu, hiển thị lên danh sách
+                    if (data && data.length > 0) {
+                        renderTournaments(data);
+                    }
+                } catch (error) {
+                    console.error('Lỗi tải dữ liệu:', error);
+                }
+            }
+
+            // ===== RENDER DANH SÁCH GIẢI ĐẤU =====
+            function renderTournaments(tournaments) {
+                if (!tournamentList) return;
+
+                // Lấy 4 giải đấu mới nhất
+                const latest = tournaments.slice(0, 4);
+
+                tournamentList.innerHTML = latest.map(t => {
+                    const sportIcons = {
+                        'Bóng đá': { icon: '⚽', class: 'football' },
+                        'Bóng rổ': { icon: '🏀', class: 'basketball' },
+                        'Bơi': { icon: '🏊', class: 'swimming' },
+                        'Pickleball': { icon: '🏓', class: 'pickleball' },
+                        'Cầu lông': { icon: '🏸', class: 'badminton' },
+                        'Cờ tướng': { icon: '♟️', class: 'chess' }
+                    };
+                    const sport = sportIcons[t.sport] || { icon: '🏆', class: 'football' };
+                    const startDate = t.start_date ? new Date(t.start_date).toLocaleDateString('vi-VN') : '';
+
+                    return `
+                        <div class="tournament">
+                            <div class="sport-logo ${sport.class}">${sport.icon}</div>
+                            <div class="tournament-info">
+                                <strong>${t.name}</strong>
+                                <span>${t.sport} · ${t.teams || 0} đội</span>
+                            </div>
+                            <div class="tournament-status">
+                                <span class="status upcoming">Sắp diễn ra</span>
+                                <small>${startDate}</small>
+                            </div>
+                        </div>
+                    `;
+                }).join('');
+            }
+
+            // ===== TOAST THÔNG BÁO =====
+            function showToast(message) {
+                const toast = document.createElement('div');
+                toast.className = 'dashboard-toast';
+                toast.textContent = message;
+                document.body.appendChild(toast);
+
+                setTimeout(() => toast.classList.add('show'), 100);
+                setTimeout(() => {
+                    toast.classList.remove('show');
+                    setTimeout(() => toast.remove(), 300);
+                }, 3000);
+            }
+
+            // ===== TẢI DỮ LIỆU KHI MỞ TRANG =====
+            loadTournaments();
+        });
+    </script>
 </body>
 </html>
