@@ -1418,16 +1418,17 @@ for (let i = 0; i < numGroups; i += 2) {
                         <div class="matchup ${isCompleted ? 'completed' : ''} ${!hasBothTeams ? 'empty' : ''}"
                              onclick="${hasBothTeams && !isCompleted ? `openScoreModal('${escapeHtml(catName)}', ${roundNum}, ${matchNum}, '${escapeHtml(teamA.name)}', '${escapeHtml(teamB.name)}')` : ''}">
                             <span class="match-number">Trận ${matchNum}</span>
-                                                ${hasBothTeams ? `<button class="edit-btn" onclick="event.stopPropagation(); openEditKnockoutPlayer('${escapeHtml(catName)}', ${roundNum}, ${matchNum}, '${escapeHtml(teamA.name)}', '${escapeHtml(teamB.name)}')" title="Sửa tên trận này"><i class="fas fa-edit"></i></button>` : ''}
-                            <div class="team ${winnerA ? 'winner' : ''} ${!teamA ? 'bye' : ''}">
-                                <span>${teamA ? escapeHtml(teamA.name) : 'Chờ KQ bảng'}</span>
-                                ${scoreA !== '' ? `<span class="score">${scoreA}</span>` : ''}
-                            </div>
-                            <div class="vs">VS</div>
-                            <div class="team ${winnerB ? 'winner' : ''} ${!teamB ? 'bye' : ''}">
-                                <span>${teamB ? escapeHtml(teamB.name) : 'Chờ KQ bảng'}</span>
-                                ${scoreB !== '' ? `<span class="score">${scoreB}</span>` : ''}
-                            </div>
+<div class="team ${winnerA ? 'winner' : ''} ${!teamA ? 'bye' : ''}">
+    <span>${teamA ? escapeHtml(teamA.name) : 'Chờ KQ bảng'}</span>
+    ${teamA && hasBothTeams ? `<button class="edit-btn" style="position: static; margin-left: 6px; display: inline-flex;" onclick="event.stopPropagation(); openEditKnockoutPlayer('${escapeHtml(catName)}', ${roundNum}, ${matchNum}, '${escapeHtml(teamA.name)}', '${escapeHtml(teamB.name)}')" title="Sửa VĐV A"><i class="fas fa-edit"></i></button>` : ''}
+    ${scoreA !== '' ? `<span class="score">${scoreA}</span>` : ''}
+</div>
+<div class="vs">VS</div>
+<div class="team ${winnerB ? 'winner' : ''} ${!teamB ? 'bye' : ''}">
+    <span>${teamB ? escapeHtml(teamB.name) : 'Chờ KQ bảng'}</span>
+    ${teamB && hasBothTeams ? `<button class="edit-btn" style="position: static; margin-left: 6px; display: inline-flex;" onclick="event.stopPropagation(); openEditKnockoutPlayer('${escapeHtml(catName)}', ${roundNum}, ${matchNum}, '${escapeHtml(teamA.name)}', '${escapeHtml(teamB.name)}')" title="Sửa VĐV B"><i class="fas fa-edit"></i></button>` : ''}
+    ${scoreB !== '' ? `<span class="score">${scoreB}</span>` : ''}
+</div>
                             ${isCompleted ? `<span class="result-badge">✅ ${escapeHtml(score.winner_name)} thắng</span>` : ''}
                         </div>
                     `;
