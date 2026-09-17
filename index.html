@@ -152,25 +152,25 @@
             <!-- CONTENT -->
             <section class="content">
 
-<!-- HERO BANNER với nút đổi ảnh (chỉ admin thấy) -->
-<section class="welcome-banner" id="bannerSection">
-    <div class="welcome-content">
-        <span class="welcome-label">SPORTS MANAGEMENT PLATFORM</span>
-        <h1>SPORTS<span>VN</span></h1>
-        <p>Kết nối đam mê thể thao — Cập nhật nhanh chóng — Chính xác — Toàn diện</p>
-        <a href="tournaments.html" class="primary-button">
-            <span>＋</span> Tạo giải đấu
-        </a>
-    </div>
+                <!-- HERO BANNER với nút đổi ảnh (chỉ admin thấy) -->
+                <section class="welcome-banner" id="bannerSection">
+                    <div class="welcome-content">
+                        <span class="welcome-label">SPORTS MANAGEMENT PLATFORM</span>
+                        <h1>SPORTS<span>VN</span></h1>
+                        <p>Kết nối đam mê thể thao — Cập nhật nhanh chóng — Chính xác — Toàn diện</p>
+                        <a href="tournaments.html" class="primary-button">
+                            <span>＋</span> Tạo giải đấu
+                        </a>
+                    </div>
 
-    <!-- Nút đổi ảnh bìa - MẶC ĐỊNH ẨN, chỉ hiện khi là admin -->
-    <button class="change-banner-btn" id="changeBannerBtn" title="Đổi ảnh bìa" style="display: none;">
-        📷 Đổi ảnh bìa
-    </button>
-    
-    <!-- Input file ẩn -->
-    <input type="file" id="bannerInput" accept="image/*" style="display: none;">
-</section>
+                    <!-- Nút đổi ảnh bìa - MẶC ĐỊNH ẨN, chỉ hiện khi là admin -->
+                    <button class="change-banner-btn" id="changeBannerBtn" title="Đổi ảnh bìa" style="display: none;">
+                        📷 Đổi ảnh bìa
+                    </button>
+                    
+                    <!-- Input file ẩn -->
+                    <input type="file" id="bannerInput" accept="image/*" style="display: none;">
+                </section>
 
 
                 <!-- STATISTICS -->
@@ -500,6 +500,9 @@
                 config.SUPABASE_ANON_KEY
             );
 
+            // Email admin duy nhất được đổi ảnh bìa
+            const ADMIN_EMAIL = 'nguyenquanghao2505@gmail.com';
+
             // ================================
             // 1. KIỂM TRA ĐĂNG NHẬP
             // ================================
@@ -529,12 +532,25 @@
 
                 document.querySelectorAll('.avatar').forEach(el => el.textContent = initials);
                 document.querySelectorAll('.user-info strong, .top-user-info strong').forEach(el => el.textContent = name);
+
+                // ==========================================
+                // 2. KIỂM TRA EMAIL - CHỈ ADMIN MỚI THẤY NÚT ĐỔI ẢNH BÌA
+                // ==========================================
+                const userEmail = session.user.email;
+                const changeBannerBtn = document.getElementById('changeBannerBtn');
+
+                if (changeBannerBtn && userEmail === ADMIN_EMAIL) {
+                    changeBannerBtn.style.display = 'inline-flex';
+                    console.log('✅ Admin đã đăng nhập - Hiện nút đổi ảnh bìa');
+                } else {
+                    console.log('ℹ️ Người dùng thường - Ẩn nút đổi ảnh bìa');
+                }
             }
 
             checkAuth();
 
             // ================================
-            // 2. ĐĂNG XUẤT KHI CLICK VÀO USER
+            // 3. ĐĂNG XUẤT KHI CLICK VÀO USER
             // ================================
             document.querySelector('.top-user')?.addEventListener('click', async function() {
                 if (confirm('Bạn có muốn đăng xuất không?')) {
@@ -547,7 +563,7 @@
         })();
 
         // ==========================================
-        // ĐỔI ẢNH BÌA (LƯU VÀO LOCALSTORAGE)
+        // 4. ĐỔI ẢNH BÌA (CHỈ ADMIN MỚI DÙNG ĐƯỢC)
         // ==========================================
         (function() {
             'use strict';
@@ -562,14 +578,14 @@
                     return;
                 }
                 
-                // Load ảnh đã lưu từ localStorage
+                // Load ảnh đã lưu từ localStorage (áp dụng cho mọi user)
                 var savedBanner = localStorage.getItem('sportsvn_banner');
                 if (savedBanner) {
                     bannerSection.style.backgroundImage = 
                         'linear-gradient(90deg, rgba(13, 71, 161, 0.75) 0%, rgba(23, 105, 255, 0.3) 50%, transparent 100%), url(' + savedBanner + ')';
                 }
                 
-                // Click nút đổi ảnh
+                // Click nút đổi ảnh (chỉ hoạt động khi nút hiện)
                 changeBtn.addEventListener('click', function(e) {
                     e.stopPropagation();
                     fileInput.click();
