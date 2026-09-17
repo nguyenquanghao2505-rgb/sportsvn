@@ -153,17 +153,14 @@
             <!-- CONTENT -->
             <section class="content">
 
-                <!-- HERO BANNER - DÙNG THẺ IMG ĐỂ HIỂN THỊ ỔN ĐỊNH -->
+                <!-- HERO BANNER -->
                 <section class="welcome-banner" id="bannerSection">
-                    <!-- Ảnh banner dùng thẻ img -->
                     <img src="banner.jpg" alt="SportsVN Banner" class="banner-image" id="bannerImage">
                     
-                    <!-- Nút đổi ảnh bìa - Ẩn mặc định, chỉ hiện khi admin -->
                     <button class="change-banner-btn" id="changeBannerBtn" title="Đổi ảnh bìa">
                         📷 Đổi ảnh bìa
                     </button>
                     
-                    <!-- Input file ẩn -->
                     <input type="file" id="bannerInput" accept="image/*" style="display: none;">
                 </section>
 
@@ -563,7 +560,6 @@
         (function() {
             'use strict';
             
-            // Khởi tạo Supabase client riêng cho phần này
             const config = window.SPORTSVN_CONFIG || {};
             if (!config.SUPABASE_URL || !config.SUPABASE_ANON_KEY) {
                 console.warn('Chưa cấu hình Supabase');
@@ -603,7 +599,6 @@
                             return;
                         }
                         
-                        // Lọc chỉ lấy file ảnh (bỏ qua .emptyFolderPlaceholder)
                         var imageFiles = (data || []).filter(function(f) {
                             return f.name && 
                                    !f.name.startsWith('.') && 
@@ -611,7 +606,6 @@
                         });
                         
                         if (imageFiles.length > 0) {
-                            // Lấy ảnh mới nhất
                             const { data: urlData } = supabase
                                 .storage
                                 .from('banners')
@@ -656,38 +650,34 @@
                         return;
                     }
                     
-                    // Hiển thị trạng thái
                     var originalText = changeBtn.innerHTML;
                     changeBtn.innerHTML = '⏳ Đang tải...';
                     changeBtn.disabled = true;
                     
                     try {
-                        // Đặt tên file duy nhất
                         var ext = file.name.split('.').pop().toLowerCase();
                         var fileName = 'banner-' + Date.now() + '.' + ext;
                         
-                        // Upload lên Supabase Storage
+                        // ✅ FIX: Đổi upsert thành TRUE để tránh lỗi RLS
                         const { data, error } = await supabase
                             .storage
                             .from('banners')
                             .upload(fileName, file, {
                                 cacheControl: '3600',
-                                upsert: false,
+                                upsert: true,
                                 contentType: file.type
                             });
                         
                         if (error) throw error;
                         
-                        // Lấy URL public
                         const { data: urlData } = supabase
                             .storage
                             .from('banners')
                             .getPublicUrl(fileName);
                         
-                        // Cập nhật ảnh hiển thị
                         bannerImage.src = urlData.publicUrl;
                         
-                        // Xóa ảnh cũ (chỉ giữ ảnh mới nhất)
+                        // Xóa ảnh cũ
                         try {
                             const { data: oldFiles } = await supabase
                                 .storage
@@ -726,9 +716,6 @@
                     }
                 });
                 
-                // ==========================================
-                // TOAST THÔNG BÁO
-                // ==========================================
                 function showToast(message) {
                     var toast = document.createElement('div');
                     toast.className = 'dashboard-toast';
