@@ -32,8 +32,8 @@
     
     /* --- CẤU HÌNH BANNER (THAY ẢNH NỀN TẠI ĐÂY) --- */
     /* Thay URL bên dưới bằng ảnh nền thể thao của bạn */
-    --banner-bg-image: url('https://images.unsplash.com/photo-1461896836934-ffe607ba8211?q=80&w=2070&auto=format&fit=crop');
-    /* Màu overlay cho banner */
+--banner-bg-image: url('banner.jpg');
+   /* Màu overlay cho banner */
     --banner-overlay: linear-gradient(135deg, rgba(13, 71, 161, 0.85) 0%, rgba(23, 105, 255, 0.6) 100%);
     
     --sidebar-width: 260px;
