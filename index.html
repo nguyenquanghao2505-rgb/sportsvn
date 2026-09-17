@@ -163,8 +163,8 @@
                         </a>
                     </div>
 
-                    <!-- Nút đổi ảnh bìa - MẶC ĐỊNH ẨN, chỉ hiện khi là admin -->
-                    <button class="change-banner-btn" id="changeBannerBtn" title="Đổi ảnh bìa" style="display: none;">
+                    <!-- Nút đổi ảnh bìa - Ẩn mặc định bằng CSS, hiện khi có class .visible -->
+                    <button class="change-banner-btn" id="changeBannerBtn" title="Đổi ảnh bìa">
                         📷 Đổi ảnh bìa
                     </button>
                     
@@ -540,7 +540,7 @@
                 const changeBannerBtn = document.getElementById('changeBannerBtn');
 
                 if (changeBannerBtn && userEmail === ADMIN_EMAIL) {
-                    changeBannerBtn.style.display = 'inline-flex';
+                    changeBannerBtn.classList.add('visible');
                     console.log('✅ Admin đã đăng nhập - Hiện nút đổi ảnh bìa');
                 } else {
                     console.log('ℹ️ Người dùng thường - Ẩn nút đổi ảnh bìa');
