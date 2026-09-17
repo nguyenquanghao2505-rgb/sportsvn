@@ -76,7 +76,7 @@
 
                 <div class="nav-title">THÔNG TIN</div>
 
-                <a href="#" class="nav-item">
+                <a href="news.html" class="nav-item">
                     <span class="nav-icon">▰</span>
                     <span>Tin thể thao</span>
                 </a>
@@ -279,10 +279,10 @@
                                 <h2>📰 Tin tức mới nhất</h2>
                                 <p>Cập nhật tin tức thể thao</p>
                             </div>
-                            <a href="#">Xem tất cả →</a>
+                            <a href="news.html">Xem tất cả →</a>
                         </div>
 
-                        <div class="news-list">
+                        <div class="news-list" id="homeNewsList">
                             <div class="news-item">
                                 <div class="news-thumb">
                                     <img src="https://images.unsplash.com/photo-1579952363873-27f3bade9f55?w=200&h=150&fit=crop" alt="News">
@@ -732,6 +732,57 @@
                     setTimeout(function() { toast.remove(); }, 300);
                 }, 3500);
             }
+
+            // ==========================================
+            // 4. LOAD TIN TỨC MỚI NHẤT TỪ SUPABASE
+            // ==========================================
+            async function loadHomeNews() {
+                try {
+                    const { data, error } = await supabase
+                        .from('news')
+                        .select('*')
+                        .order('created_at', { ascending: false })
+                        .limit(3);
+
+                    if (error) {
+                        console.warn('Lỗi load tin tức:', error);
+                        return;
+                    }
+
+                    if (!data || data.length === 0) {
+                        console.log('ℹ️ Chưa có tin tức, giữ nguyên tin mẫu');
+                        return;
+                    }
+
+                    const newsList = document.getElementById('homeNewsList');
+                    if (!newsList) return;
+
+                    newsList.innerHTML = data.map(news => `
+                        <div class="news-item">
+                            <div class="news-thumb">
+                                ${news.image_url ? 
+                                    `<img src="${news.image_url}" alt="${news.title}">` :
+                                    `<div style="width:100%;height:100%;display:flex;align-items:center;justify-content:center;font-size:32px;background:#f3f4f6;">📰</div>`
+                                }
+                            </div>
+                            <div class="news-content">
+                                <strong>${news.title}</strong>
+                                <p>${news.summary || ''}</p>
+                                <div class="news-meta">
+                                    <span>${new Date(news.created_at).toLocaleDateString('vi-VN')}</span>
+                                    ${news.is_hot ? '<span class="news-tag">HOT</span>' : ''}
+                                </div>
+                            </div>
+                        </div>
+                    `).join('');
+
+                    console.log('✅ Đã load ' + data.length + ' tin tức mới nhất');
+                } catch (err) {
+                    console.warn('Lỗi load tin tức:', err);
+                }
+            }
+
+            loadHomeNews();
 
             console.log('✅ Dashboard SportsVN đã kết nối Supabase');
         });
