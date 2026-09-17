@@ -389,12 +389,15 @@ img { max-width: 100%; display: block; }
 }
 
 /* =========================================================
-   HERO BANNER - CHỈ CÒN ẢNH NỀN VÀ NÚT ĐỔI ẢNH
+   HERO BANNER - HIỂN THỊ FULL ẢNH, KHÔNG BỊ CẮT
    ========================================================= */
 
 .welcome-banner {
     position: relative;
-    min-height: 280px;
+    /* Tỷ lệ ảnh gốc 2200x720 ~ 3.05:1 - Banner sẽ tự động giữ đúng tỷ lệ */
+    aspect-ratio: 2200 / 720;
+    min-height: 240px;
+    max-height: 480px;
     border-radius: var(--radius-xl);
     overflow: hidden;
     margin-bottom: 24px;
@@ -405,7 +408,6 @@ img { max-width: 100%; display: block; }
     background-repeat: no-repeat;
 }
 
-/* Bỏ gradient vì không cần overlay nữa */
 .welcome-banner::before {
     display: none;
 }
@@ -892,7 +894,7 @@ select:focus-visible, textarea:focus-visible {
     .search-box { display: none; }
     .top-user-info, .top-user .arrow { display: none; }
     .content { padding: 16px 20px 32px; }
-    .welcome-banner { min-height: 240px; background-position: center center; }
+    .welcome-banner { min-height: 220px; max-height: 320px; }
     .dashboard-grid { grid-template-columns: 1fr; }
     .dashboard-grid > .panel:nth-child(3) { grid-column: auto; }
 }
@@ -904,7 +906,7 @@ select:focus-visible, textarea:focus-visible {
     .topbar-cta { padding: 6px 12px; font-size: 11px; }
     .topbar-cta span { font-size: 14px; }
     .content { padding: 12px 14px 28px; }
-    .welcome-banner { min-height: 180px; border-radius: var(--radius-lg); }
+    .welcome-banner { min-height: 180px; max-height: 240px; border-radius: var(--radius-lg); }
     .change-banner-btn { bottom: 12px; right: 12px; padding: 8px 14px; font-size: 11px; }
     .stats-grid { grid-template-columns: 1fr; gap: 12px; }
     .stat-card { min-height: 100px; padding: 16px; }
