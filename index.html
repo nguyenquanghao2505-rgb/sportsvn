@@ -81,6 +81,11 @@
                     <span>Tin thể thao</span>
                 </a>
 
+                <a href="videos.html" class="nav-item">
+                    <span class="nav-icon">🎬</span>
+                    <span>Video</span>
+                </a>
+
                 <a href="#" class="nav-item">
                     <span class="nav-icon">▥</span>
                     <span>Bảng thành tích</span>
@@ -566,9 +571,6 @@
                 return;
             }
 
-            // ==========================================
-            // LOAD BANNER - SẮP XẾP LẠI ĐỂ LẤY ẢNH MỚI NHẤT
-            // ==========================================
             async function loadBanner() {
                 try {
                     const { data, error } = await supabase
@@ -629,17 +631,11 @@
 
             loadBanner();
 
-            // ==========================================
-            // CLICK NÚT ĐỔI ẢNH
-            // ==========================================
             changeBtn.addEventListener('click', function(e) {
                 e.stopPropagation();
                 fileInput.click();
             });
 
-            // ==========================================
-            // UPLOAD ẢNH
-            // ==========================================
             fileInput.addEventListener('change', async function(e) {
                 var file = e.target.files[0];
                 if (!file) return;
@@ -733,7 +729,6 @@
 
             // ==========================================
             // 4. LOAD TIN TỨC MỚI NHẤT TỪ SUPABASE
-            // ✅ ĐÃ SỬA: BỌC MỖI TIN TRONG THẺ <a>
             // ==========================================
             async function loadHomeNews() {
                 try {
@@ -756,7 +751,6 @@
                     const newsList = document.getElementById('homeNewsList');
                     if (!newsList) return;
 
-                    // ✅ MỖI TIN ĐƯỢC BỌC TRONG THẺ <a> ĐỂ CLICK ĐƯỢC
                     newsList.innerHTML = data.map(news => `
                         <a href="news-detail.html?id=${news.id}" class="news-item-link">
                             <div class="news-item">
