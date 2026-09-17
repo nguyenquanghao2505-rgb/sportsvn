@@ -1,0 +1,1059 @@
+<!DOCTYPE html>
+<html lang="vi">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Quản lý Tin tức - SportsVN</title>
+    <link rel="stylesheet" href="styles.css">
+    <style>
+        /* ===== STYLE RIÊNG CHO TRANG NEWS ===== */
+        .news-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 24px;
+            flex-wrap: wrap;
+            gap: 16px;
+        }
+        
+        .news-header h1 {
+            font-size: 24px;
+            font-weight: 800;
+            color: var(--text-dark);
+        }
+        
+        .news-header p {
+            color: var(--text-muted);
+            font-size: 13px;
+            margin-top: 4px;
+        }
+        
+        .news-tabs {
+            display: flex;
+            gap: 8px;
+            margin-bottom: 20px;
+            background: #f3f4f6;
+            padding: 6px;
+            border-radius: 12px;
+            width: fit-content;
+        }
+        
+        .news-tab {
+            padding: 10px 20px;
+            border-radius: 8px;
+            font-size: 13px;
+            font-weight: 700;
+            color: var(--text-muted);
+            cursor: pointer;
+            transition: all 0.2s ease;
+            border: 0;
+            background: transparent;
+        }
+        
+        .news-tab.active {
+            background: #fff;
+            color: var(--primary);
+            box-shadow: 0 2px 8px rgba(0, 0, 0, 0.08);
+        }
+        
+        .news-tab:hover:not(.active) {
+            color: var(--text-dark);
+        }
+        
+        /* ===== GRID TIN TỨC ===== */
+        .news-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fill, minmax(320px, 1fr));
+            gap: 20px;
+        }
+        
+        .news-card {
+            background: #fff;
+            border-radius: 16px;
+            overflow: hidden;
+            box-shadow: 0 1px 3px rgba(0, 0, 0, 0.08);
+            border: 1px solid var(--border);
+            transition: all 0.25s ease;
+            display: flex;
+            flex-direction: column;
+        }
+        
+        .news-card:hover {
+            transform: translateY(-4px);
+            box-shadow: 0 12px 24px rgba(0, 0, 0, 0.1);
+        }
+        
+        .news-card-image {
+            width: 100%;
+            height: 180px;
+            object-fit: cover;
+            background: #e5e7eb;
+        }
+        
+        .news-card-body {
+            padding: 18px;
+            flex: 1;
+            display: flex;
+            flex-direction: column;
+        }
+        
+        .news-card-category {
+            display: inline-block;
+            padding: 4px 10px;
+            background: var(--primary-light);
+            color: var(--primary);
+            border-radius: 20px;
+            font-size: 10px;
+            font-weight: 800;
+            text-transform: uppercase;
+            letter-spacing: 0.5px;
+            width: fit-content;
+            margin-bottom: 10px;
+        }
+        
+        .news-card-category.hot {
+            background: #fee2e2;
+            color: #dc2626;
+        }
+        
+        .news-card-title {
+            font-size: 15px;
+            font-weight: 800;
+            color: var(--text-dark);
+            line-height: 1.4;
+            margin-bottom: 8px;
+            display: -webkit-box;
+            -webkit-line-clamp: 2;
+            -webkit-box-orient: vertical;
+            overflow: hidden;
+        }
+        
+        .news-card-summary {
+            font-size: 12px;
+            color: var(--text-muted);
+            line-height: 1.6;
+            margin-bottom: 14px;
+            display: -webkit-box;
+            -webkit-line-clamp: 3;
+            -webkit-box-orient: vertical;
+            overflow: hidden;
+            flex: 1;
+        }
+        
+        .news-card-footer {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            padding-top: 12px;
+            border-top: 1px solid var(--border-light);
+            font-size: 10.5px;
+            color: var(--text-light);
+        }
+        
+        .news-card-actions {
+            display: flex;
+            gap: 6px;
+        }
+        
+        .btn-icon {
+            width: 32px;
+            height: 32px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            border-radius: 8px;
+            border: 0;
+            cursor: pointer;
+            font-size: 14px;
+            transition: all 0.2s ease;
+        }
+        
+        .btn-edit {
+            background: #e3f2fd;
+            color: #1769ff;
+        }
+        
+        .btn-edit:hover {
+            background: #1769ff;
+            color: #fff;
+        }
+        
+        .btn-delete {
+            background: #fee2e2;
+            color: #dc2626;
+        }
+        
+        .btn-delete:hover {
+            background: #dc2626;
+            color: #fff;
+        }
+        
+        /* ===== FORM ĐĂNG TIN ===== */
+        .news-form-container {
+            background: #fff;
+            border-radius: 16px;
+            padding: 32px;
+            box-shadow: 0 1px 3px rgba(0, 0, 0, 0.08);
+            border: 1px solid var(--border);
+            max-width: 900px;
+            margin: 0 auto;
+        }
+        
+        .news-form-title {
+            font-size: 20px;
+            font-weight: 800;
+            color: var(--text-dark);
+            margin-bottom: 24px;
+            display: flex;
+            align-items: center;
+            gap: 10px;
+        }
+        
+        .news-form-grid {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 20px;
+        }
+        
+        .news-form-full {
+            grid-column: 1 / -1;
+        }
+        
+        .news-form-label {
+            display: block;
+            font-size: 13px;
+            font-weight: 700;
+            color: var(--text-dark);
+            margin-bottom: 8px;
+        }
+        
+        .news-form-label span {
+            color: #dc2626;
+        }
+        
+        .news-form-input,
+        .news-form-textarea,
+        .news-form-select {
+            width: 100%;
+            padding: 12px 14px;
+            border: 1.5px solid var(--border);
+            border-radius: 10px;
+            background: #f9fafb;
+            font-size: 13.5px;
+            color: var(--text);
+            outline: none;
+            transition: all 0.2s ease;
+            font-family: inherit;
+        }
+        
+        .news-form-input:focus,
+        .news-form-textarea:focus,
+        .news-form-select:focus {
+            background: #fff;
+            border-color: var(--primary);
+            box-shadow: 0 0 0 4px rgba(23, 105, 255, 0.1);
+        }
+        
+        .news-form-textarea {
+            resize: vertical;
+            min-height: 100px;
+        }
+        
+        .news-form-textarea.content {
+            min-height: 200px;
+            font-family: 'Inter', sans-serif;
+            line-height: 1.7;
+        }
+        
+        /* ===== UPLOAD ẢNH ===== */
+        .image-upload-area {
+            border: 2px dashed var(--border);
+            border-radius: 12px;
+            padding: 30px;
+            text-align: center;
+            cursor: pointer;
+            transition: all 0.25s ease;
+            background: #fafbfc;
+            position: relative;
+            min-height: 200px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            flex-direction: column;
+            gap: 10px;
+        }
+        
+        .image-upload-area:hover {
+            border-color: var(--primary);
+            background: var(--primary-light);
+        }
+        
+        .image-upload-area.has-image {
+            padding: 0;
+            border-style: solid;
+            overflow: hidden;
+        }
+        
+        .image-upload-area img {
+            width: 100%;
+            height: 300px;
+            object-fit: cover;
+            display: block;
+        }
+        
+        .image-upload-icon {
+            font-size: 48px;
+            color: var(--primary);
+        }
+        
+        .image-upload-text {
+            font-size: 14px;
+            font-weight: 700;
+            color: var(--text-dark);
+        }
+        
+        .image-upload-hint {
+            font-size: 11px;
+            color: var(--text-muted);
+        }
+        
+        .image-remove-btn {
+            position: absolute;
+            top: 12px;
+            right: 12px;
+            width: 36px;
+            height: 36px;
+            background: rgba(220, 38, 38, 0.9);
+            color: #fff;
+            border: 0;
+            border-radius: 50%;
+            cursor: pointer;
+            font-size: 18px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            transition: all 0.2s ease;
+            z-index: 10;
+        }
+        
+        .image-remove-btn:hover {
+            background: #dc2626;
+            transform: scale(1.1);
+        }
+        
+        .checkbox-group {
+            display: flex;
+            align-items: center;
+            gap: 10px;
+            padding: 14px;
+            background: #f9fafb;
+            border-radius: 10px;
+            border: 1.5px solid var(--border);
+            cursor: pointer;
+        }
+        
+        .checkbox-group input[type="checkbox"] {
+            width: 18px;
+            height: 18px;
+            cursor: pointer;
+        }
+        
+        .checkbox-group label {
+            font-size: 13px;
+            font-weight: 600;
+            color: var(--text-dark);
+            cursor: pointer;
+        }
+        
+        .form-actions {
+            display: flex;
+            justify-content: flex-end;
+            gap: 12px;
+            margin-top: 28px;
+            padding-top: 20px;
+            border-top: 1px solid var(--border-light);
+        }
+        
+        .btn {
+            padding: 12px 24px;
+            border-radius: 10px;
+            font-size: 13.5px;
+            font-weight: 700;
+            cursor: pointer;
+            transition: all 0.2s ease;
+            border: 0;
+            display: inline-flex;
+            align-items: center;
+            gap: 8px;
+        }
+        
+        .btn-primary {
+            background: linear-gradient(135deg, var(--primary) 0%, #4d94ff 100%);
+            color: #fff;
+            box-shadow: 0 4px 12px rgba(23, 105, 255, 0.3);
+        }
+        
+        .btn-primary:hover:not(:disabled) {
+            transform: translateY(-2px);
+            box-shadow: 0 6px 20px rgba(23, 105, 255, 0.4);
+        }
+        
+        .btn-primary:disabled {
+            opacity: 0.6;
+            cursor: wait;
+        }
+        
+        .btn-secondary {
+            background: #f3f4f6;
+            color: #4b5563;
+        }
+        
+        .btn-secondary:hover {
+            background: #e5e7eb;
+        }
+        
+        /* ===== EMPTY STATE ===== */
+        .empty-state {
+            text-align: center;
+            padding: 60px 20px;
+            color: var(--text-muted);
+        }
+        
+        .empty-state-icon {
+            font-size: 64px;
+            margin-bottom: 16px;
+            opacity: 0.5;
+        }
+        
+        .empty-state h3 {
+            font-size: 18px;
+            color: var(--text-dark);
+            margin-bottom: 8px;
+        }
+        
+        .empty-state p {
+            font-size: 13px;
+        }
+        
+        /* ===== FORM MESSAGE ===== */
+        .form-message {
+            padding: 14px 18px;
+            border-radius: 10px;
+            font-size: 13px;
+            font-weight: 600;
+            margin-bottom: 20px;
+            display: none;
+        }
+        
+        .form-message.show {
+            display: block;
+        }
+        
+        .form-message.success {
+            background: #ecfdf5;
+            color: #059669;
+            border: 1px solid #a7f3d0;
+        }
+        
+        .form-message.error {
+            background: #fef2f2;
+            color: #dc2626;
+            border: 1px solid #fecaca;
+        }
+        
+        /* ===== RESPONSIVE ===== */
+        @media (max-width: 900px) {
+            .news-form-grid {
+                grid-template-columns: 1fr;
+            }
+            .news-grid {
+                grid-template-columns: 1fr;
+            }
+        }
+        
+        @media (max-width: 640px) {
+            .news-form-container {
+                padding: 20px;
+            }
+            .news-header h1 {
+                font-size: 20px;
+            }
+            .news-tabs {
+                width: 100%;
+                overflow-x: auto;
+            }
+        }
+    </style>
+</head>
+
+<body>
+
+    <div class="app">
+
+        <!-- SIDEBAR -->
+        <aside class="sidebar">
+            <div class="brand">
+                <div class="brand-mark">S</div>
+                <div class="brand-text">
+                    <strong>SportsVN</strong>
+                    <span>Nền tảng thể thao</span>
+                </div>
+            </div>
+
+            <nav class="main-nav">
+                <div class="nav-title">TỔNG QUAN</div>
+                <a href="index.html" class="nav-item"><span class="nav-icon">⌂</span><span>Trang chủ</span></a>
+                <a href="tournaments.html" class="nav-item"><span class="nav-icon">◈</span><span>Giải đấu</span></a>
+                <a href="#" class="nav-item"><span class="nav-icon">♙</span><span>Vận động viên</span></a>
+                <a href="#" class="nav-item"><span class="nav-icon">▣</span><span>Đơn vị</span></a>
+
+                <div class="nav-title">QUẢN LÝ GIẢI</div>
+                <a href="tournaments.html" class="nav-item"><span class="nav-icon">＋</span><span>Tạo giải đấu</span></a>
+                <a href="#" class="nav-item"><span class="nav-icon">☷</span><span>Danh sách đăng ký</span></a>
+                <a href="draw.html" class="nav-item"><span class="nav-icon">◇</span><span>Bốc thăm</span></a>
+                <a href="#" class="nav-item"><span class="nav-icon">▤</span><span>Lịch thi đấu</span></a>
+                <a href="#" class="nav-item"><span class="nav-icon">✓</span><span>Kết quả</span></a>
+
+                <div class="nav-title">THÔNG TIN</div>
+                <a href="news.html" class="nav-item active"><span class="nav-icon">▰</span><span>Tin thể thao</span></a>
+                <a href="#" class="nav-item"><span class="nav-icon">▥</span><span>Bảng thành tích</span></a>
+            </nav>
+
+            <div class="sidebar-bottom">
+                <div class="help-box">
+                    <div class="help-icon">?</div>
+                    <div>
+                        <strong>Cần hỗ trợ?</strong>
+                        <span>Liên hệ SportsVN</span>
+                    </div>
+                </div>
+                <div class="user-mini">
+                    <div class="avatar">H</div>
+                    <div class="user-info">
+                        <strong>Quản trị viên</strong>
+                        <span>SportsVN</span>
+                    </div>
+                    <button class="more-button">⋮</button>
+                </div>
+            </div>
+        </aside>
+
+
+        <!-- MAIN -->
+        <main class="main">
+
+            <header class="topbar">
+                <div class="topbar-left">
+                    <button class="mobile-menu" id="mobileMenu">☰</button>
+                    <div class="topbar-brand">
+                        <span class="topbar-label">SPORTS MANAGEMENT PLATFORM</span>
+                        <h1 class="topbar-title-main">SPORTS<span>VN</span></h1>
+                        <p class="topbar-subtitle">Quản lý tin tức & sự kiện thể thao</p>
+                    </div>
+                </div>
+
+                <div class="topbar-right">
+                    <a href="index.html" class="topbar-cta" style="background: #f3f4f6; color: #4b5563; box-shadow: none;">
+                        ← Về trang chủ
+                    </a>
+                    <div class="top-user">
+                        <div class="avatar">H</div>
+                        <div class="top-user-info">
+                            <strong>Quản trị viên</strong>
+                            <span>SportsVN</span>
+                        </div>
+                        <span class="arrow">▾</span>
+                    </div>
+                </div>
+            </header>
+
+
+            <section class="content">
+
+                <!-- HEADER -->
+                <div class="news-header">
+                    <div>
+                        <h1>📰 Quản lý Tin tức</h1>
+                        <p>Đăng tin, chỉnh sửa và quản lý tin tức thể thao</p>
+                    </div>
+                </div>
+
+                <!-- TABS -->
+                <div class="news-tabs">
+                    <button class="news-tab active" data-tab="list">📋 Danh sách tin</button>
+                    <button class="news-tab" data-tab="create">➕ Đăng tin mới</button>
+                </div>
+
+                <!-- TAB 1: DANH SÁCH TIN -->
+                <div id="tabList" class="tab-content">
+                    <div class="news-grid" id="newsGrid">
+                        <!-- Tin tức sẽ được load ở đây -->
+                    </div>
+                </div>
+
+                <!-- TAB 2: ĐĂNG TIN -->
+                <div id="tabCreate" class="tab-content" style="display: none;">
+                    <div class="news-form-container">
+                        <h2 class="news-form-title">➕ Đăng tin tức mới</h2>
+                        
+                        <div class="form-message" id="formMessage"></div>
+
+                        <form id="newsForm">
+                            <div class="news-form-grid">
+                                
+                                <!-- ẢNH BÌA -->
+                                <div class="news-form-full">
+                                    <label class="news-form-label">Ảnh bìa tin tức <span>*</span></label>
+                                    <div class="image-upload-area" id="imageUploadArea">
+                                        <div class="image-upload-icon">📷</div>
+                                        <div class="image-upload-text">Nhấn để chọn ảnh</div>
+                                        <div class="image-upload-hint">JPG, PNG - Tối đa 5MB</div>
+                                    </div>
+                                    <input type="file" id="newsImageInput" accept="image/*" style="display: none;">
+                                </div>
+
+                                <!-- TIÊU ĐỀ -->
+                                <div class="news-form-full">
+                                    <label class="news-form-label">Tiêu đề <span>*</span></label>
+                                    <input type="text" class="news-form-input" id="newsTitle" 
+                                           placeholder="VD: Khai mạc Giải Bóng đá Đại hội TDTT..." required>
+                                </div>
+
+                                <!-- DANH MỤC -->
+                                <div>
+                                    <label class="news-form-label">Danh mục</label>
+                                    <select class="news-form-select" id="newsCategory">
+                                        <option value="Tin thể thao">Tin thể thao</option>
+                                        <option value="Giải đấu">Giải đấu</option>
+                                        <option value="Sự kiện">Sự kiện</option>
+                                        <option value="Thành tích">Thành tích</option>
+                                        <option value="Thông báo">Thông báo</option>
+                                    </select>
+                                </div>
+
+                                <!-- HOT -->
+                                <div>
+                                    <label class="news-form-label">Đánh dấu</label>
+                                    <div class="checkbox-group">
+                                        <input type="checkbox" id="newsHot">
+                                        <label for="newsHot">🔥 Đánh dấu là tin HOT</label>
+                                    </div>
+                                </div>
+
+                                <!-- MÔ TẢ NGẮN -->
+                                <div class="news-form-full">
+                                    <label class="news-form-label">Mô tả ngắn</label>
+                                    <textarea class="news-form-textarea" id="newsSummary" 
+                                              placeholder="Tóm tắt ngắn về tin tức (hiển thị ở danh sách)..."></textarea>
+                                </div>
+
+                                <!-- NỘI DUNG -->
+                                <div class="news-form-full">
+                                    <label class="news-form-label">Nội dung chi tiết</label>
+                                    <textarea class="news-form-textarea content" id="newsContent" 
+                                              placeholder="Nội dung đầy đủ của tin tức..."></textarea>
+                                </div>
+
+                            </div>
+
+                            <div class="form-actions">
+                                <button type="button" class="btn btn-secondary" id="cancelBtn">Hủy</button>
+                                <button type="submit" class="btn btn-primary" id="submitBtn">
+                                    💾 Đăng tin
+                                </button>
+                            </div>
+                        </form>
+                    </div>
+                </div>
+
+            </section>
+
+            <footer class="footer">
+                <span>© 2026 SportsVN</span>
+                <span>Nền tảng công nghệ thể thao Việt Nam</span>
+            </footer>
+
+        </main>
+    </div>
+
+
+    <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+    <script src="config.js"></script>
+    <script>
+        // ==========================================
+        // QUẢN LÝ TIN TỨC - SUPABASE
+        // ==========================================
+        
+        let supabase = null;
+        let currentSession = null;
+        let currentEditingId = null;
+        let uploadedImageUrl = null;
+
+        const ADMIN_EMAIL = 'nguyenquanghao2505@gmail.com';
+
+        document.addEventListener('DOMContentLoaded', async function() {
+            'use strict';
+
+            const config = window.SPORTSVN_CONFIG || {};
+            if (!config.SUPABASE_URL || !config.SUPABASE_ANON_KEY) {
+                console.error('Chưa cấu hình Supabase');
+                return;
+            }
+
+            supabase = window.supabase.createClient(
+                config.SUPABASE_URL,
+                config.SUPABASE_ANON_KEY
+            );
+
+            // ===== KIỂM TRA ĐĂNG NHẬP =====
+            async function checkAuth() {
+                const { data: { session } } = await supabase.auth.getSession();
+                if (!session) {
+                    window.location.href = 'login.html';
+                    return false;
+                }
+                currentSession = session;
+
+                const { data: roleData } = await supabase
+                    .from('user_roles')
+                    .select('role')
+                    .eq('user_id', session.user.id)
+                    .single();
+
+                if (!roleData || roleData.role !== 'admin') {
+                    alert('Tài khoản không có quyền Admin');
+                    await supabase.auth.signOut();
+                    window.location.href = 'login.html';
+                    return false;
+                }
+
+                const name = session.user.user_metadata?.full_name ||
+                             session.user.email.split('@')[0];
+                const initials = name.split(' ').map(w => w[0]).join('').slice(0, 2).toUpperCase();
+
+                document.querySelectorAll('.avatar').forEach(el => el.textContent = initials);
+                document.querySelectorAll('.user-info strong, .top-user-info strong').forEach(el => el.textContent = name);
+
+                return true;
+            }
+
+            const isAuth = await checkAuth();
+            if (!isAuth) return;
+
+            // ===== TABS =====
+            const tabs = document.querySelectorAll('.news-tab');
+            const tabList = document.getElementById('tabList');
+            const tabCreate = document.getElementById('tabCreate');
+
+            tabs.forEach(tab => {
+                tab.addEventListener('click', () => {
+                    tabs.forEach(t => t.classList.remove('active'));
+                    tab.classList.add('active');
+
+                    if (tab.dataset.tab === 'list') {
+                        tabList.style.display = 'block';
+                        tabCreate.style.display = 'none';
+                        loadNews();
+                    } else {
+                        tabList.style.display = 'none';
+                        tabCreate.style.display = 'block';
+                        resetForm();
+                    }
+                });
+            });
+
+            // ===== LOAD DANH SÁCH TIN =====
+            async function loadNews() {
+                const grid = document.getElementById('newsGrid');
+                grid.innerHTML = '<div class="empty-state"><p>⏳ Đang tải...</p></div>';
+
+                const { data, error } = await supabase
+                    .from('news')
+                    .select('*')
+                    .order('created_at', { ascending: false });
+
+                if (error) {
+                    grid.innerHTML = '<div class="empty-state"><p>❌ Lỗi: ' + error.message + '</p></div>';
+                    return;
+                }
+
+                if (!data || data.length === 0) {
+                    grid.innerHTML = `
+                        <div class="empty-state" style="grid-column: 1/-1;">
+                            <div class="empty-state-icon">📰</div>
+                            <h3>Chưa có tin tức nào</h3>
+                            <p>Nhấn tab "Đăng tin mới" để bắt đầu</p>
+                        </div>
+                    `;
+                    return;
+                }
+
+                grid.innerHTML = data.map(news => `
+                    <div class="news-card">
+                        ${news.image_url ? 
+                            `<img src="${news.image_url}" class="news-card-image" alt="${news.title}">` :
+                            `<div class="news-card-image" style="display:flex;align-items:center;justify-content:center;font-size:48px;">📰</div>`
+                        }
+                        <div class="news-card-body">
+                            <span class="news-card-category ${news.is_hot ? 'hot' : ''}">
+                                ${news.is_hot ? '🔥 HOT' : news.category || 'Tin thể thao'}
+                            </span>
+                            <h3 class="news-card-title">${news.title}</h3>
+                            <p class="news-card-summary">${news.summary || 'Chưa có mô tả'}</p>
+                            <div class="news-card-footer">
+                                <span>${new Date(news.created_at).toLocaleDateString('vi-VN')}</span>
+                                <div class="news-card-actions">
+                                    <button class="btn-icon btn-edit" onclick="editNews('${news.id}')" title="Sửa">✏️</button>
+                                    <button class="btn-icon btn-delete" onclick="deleteNews('${news.id}')" title="Xóa">🗑️</button>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                `).join('');
+            }
+
+            // ===== UPLOAD ẢNH =====
+            const imageUploadArea = document.getElementById('imageUploadArea');
+            const newsImageInput = document.getElementById('newsImageInput');
+
+            imageUploadArea.addEventListener('click', () => {
+                if (uploadedImageUrl) return; // Đã có ảnh
+                newsImageInput.click();
+            });
+
+            newsImageInput.addEventListener('change', async function(e) {
+                const file = e.target.files[0];
+                if (!file) return;
+
+                if (!file.type.startsWith('image/')) {
+                    alert('Vui lòng chọn file ảnh');
+                    return;
+                }
+
+                if (file.size > 5 * 1024 * 1024) {
+                    alert('Ảnh quá lớn! Vui lòng chọn ảnh dưới 5MB');
+                    return;
+                }
+
+                // Hiển thị preview
+                const reader = new FileReader();
+                reader.onload = (event) => {
+                    imageUploadArea.classList.add('has-image');
+                    imageUploadArea.innerHTML = `
+                        <img src="${event.target.result}" alt="Preview">
+                        <button type="button" class="image-remove-btn" onclick="removeImage(event)">×</button>
+                    `;
+                };
+                reader.readAsDataURL(file);
+
+                // Upload lên Supabase
+                try {
+                    imageUploadArea.style.opacity = '0.5';
+                    const ext = file.name.split('.').pop().toLowerCase();
+                    const fileName = 'news-' + Date.now() + '.' + ext;
+
+                    const { data, error } = await supabase
+                        .storage
+                        .from('news-images')
+                        .upload(fileName, file, {
+                            cacheControl: '3600',
+                            upsert: true,
+                            contentType: file.type
+                        });
+
+                    if (error) throw error;
+
+                    const { data: urlData } = supabase
+                        .storage
+                        .from('news-images')
+                        .getPublicUrl(fileName);
+
+                    uploadedImageUrl = urlData.publicUrl;
+                    imageUploadArea.style.opacity = '1';
+                    console.log('✅ Đã upload ảnh:', uploadedImageUrl);
+
+                } catch (err) {
+                    console.error('Lỗi upload ảnh:', err);
+                    alert('Lỗi upload ảnh: ' + err.message);
+                    imageUploadArea.style.opacity = '1';
+                }
+            });
+
+            // ===== XÓA ẢNH =====
+            window.removeImage = function(event) {
+                event.stopPropagation();
+                uploadedImageUrl = null;
+                newsImageInput.value = '';
+                imageUploadArea.classList.remove('has-image');
+                imageUploadArea.innerHTML = `
+                    <div class="image-upload-icon">📷</div>
+                    <div class="image-upload-text">Nhấn để chọn ảnh</div>
+                    <div class="image-upload-hint">JPG, PNG - Tối đa 5MB</div>
+                `;
+            };
+
+            // ===== SUBMIT FORM =====
+            const newsForm = document.getElementById('newsForm');
+            const formMessage = document.getElementById('formMessage');
+            const submitBtn = document.getElementById('submitBtn');
+
+            newsForm.addEventListener('submit', async function(e) {
+                e.preventDefault();
+
+                const title = document.getElementById('newsTitle').value.trim();
+                const category = document.getElementById('newsCategory').value;
+                const isHot = document.getElementById('newsHot').checked;
+                const summary = document.getElementById('newsSummary').value.trim();
+                const content = document.getElementById('newsContent').value.trim();
+
+                if (!title) {
+                    showMessage('error', 'Vui lòng nhập tiêu đề tin tức');
+                    return;
+                }
+
+                if (!uploadedImageUrl) {
+                    showMessage('error', 'Vui lòng chọn ảnh bìa cho tin tức');
+                    return;
+                }
+
+                submitBtn.disabled = true;
+                submitBtn.innerHTML = '⏳ Đang lưu...';
+
+                const newsData = {
+                    title: title,
+                    summary: summary,
+                    content: content,
+                    image_url: uploadedImageUrl,
+                    category: category,
+                    is_hot: isHot,
+                    author_email: currentSession.user.email
+                };
+
+                let result;
+                if (currentEditingId) {
+                    // Cập nhật
+                    result = await supabase
+                        .from('news')
+                        .update(newsData)
+                        .eq('id', currentEditingId)
+                        .select();
+                } else {
+                    // Tạo mới
+                    result = await supabase
+                        .from('news')
+                        .insert([newsData])
+                        .select();
+                }
+
+                if (result.error) {
+                    showMessage('error', '❌ Lỗi: ' + result.error.message);
+                    submitBtn.disabled = false;
+                    submitBtn.innerHTML = '💾 Đăng tin';
+                    return;
+                }
+
+                showMessage('success', '✅ ' + (currentEditingId ? 'Cập nhật' : 'Đăng tin') + ' thành công!');
+
+                setTimeout(() => {
+                    // Chuyển sang tab danh sách
+                    document.querySelector('[data-tab="list"]').click();
+                }, 1500);
+
+                submitBtn.disabled = false;
+                submitBtn.innerHTML = '💾 Đăng tin';
+            });
+
+            // ===== RESET FORM =====
+            function resetForm() {
+                newsForm.reset();
+                currentEditingId = null;
+                uploadedImageUrl = null;
+                newsImageInput.value = '';
+                imageUploadArea.classList.remove('has-image');
+                imageUploadArea.innerHTML = `
+                    <div class="image-upload-icon">📷</div>
+                    <div class="image-upload-text">Nhấn để chọn ảnh</div>
+                    <div class="image-upload-hint">JPG, PNG - Tối đa 5MB</div>
+                `;
+                formMessage.className = 'form-message';
+                document.querySelector('.news-form-title').textContent = '➕ Đăng tin tức mới';
+                submitBtn.innerHTML = '💾 Đăng tin';
+            }
+
+            document.getElementById('cancelBtn').addEventListener('click', () => {
+                document.querySelector('[data-tab="list"]').click();
+            });
+
+            // ===== SỬA TIN =====
+            window.editNews = async function(id) {
+                const { data, error } = await supabase
+                    .from('news')
+                    .select('*')
+                    .eq('id', id)
+                    .single();
+
+                if (error || !data) {
+                    alert('Không tìm thấy tin tức');
+                    return;
+                }
+
+                currentEditingId = id;
+                uploadedImageUrl = data.image_url;
+
+                document.getElementById('newsTitle').value = data.title || '';
+                document.getElementById('newsCategory').value = data.category || 'Tin thể thao';
+                document.getElementById('newsHot').checked = data.is_hot || false;
+                document.getElementById('newsSummary').value = data.summary || '';
+                document.getElementById('newsContent').value = data.content || '';
+
+                if (data.image_url) {
+                    imageUploadArea.classList.add('has-image');
+                    imageUploadArea.innerHTML = `
+                        <img src="${data.image_url}" alt="Preview">
+                        <button type="button" class="image-remove-btn" onclick="removeImage(event)">×</button>
+                    `;
+                }
+
+                document.querySelector('.news-form-title').textContent = '✏️ Chỉnh sửa tin tức';
+                submitBtn.innerHTML = '💾 Cập nhật';
+
+                // Chuyển sang tab đăng tin
+                document.querySelector('[data-tab="create"]').click();
+            };
+
+            // ===== XÓA TIN =====
+            window.deleteNews = async function(id) {
+                if (!confirm('Bạn có chắc muốn xóa tin tức này?')) return;
+
+                const { error } = await supabase
+                    .from('news')
+                    .delete()
+                    .eq('id', id);
+
+                if (error) {
+                    alert('Lỗi xóa tin: ' + error.message);
+                    return;
+                }
+
+                alert('✅ Đã xóa tin tức');
+                loadNews();
+            };
+
+            // ===== HIỂN THỊ THÔNG BÁO =====
+            function showMessage(type, text) {
+                formMessage.className = 'form-message show ' + type;
+                formMessage.textContent = text;
+                setTimeout(() => {
+                    formMessage.className = 'form-message';
+                }, 5000);
+            }
+
+            // Load lần đầu
+            loadNews();
+
+            console.log('✅ Trang Quản lý Tin tức đã sẵn sàng');
+        });
+    </script>
+
+</body>
+</html>
