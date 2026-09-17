@@ -76,7 +76,7 @@
 
                 <div class="nav-title">THÔNG TIN</div>
 
-                <a href="news.html" class="nav-item">
+                <a href="news-list.html" class="nav-item">
                     <span class="nav-icon">▰</span>
                     <span>Tin thể thao</span>
                 </a>
@@ -279,7 +279,7 @@
                                 <h2>📰 Tin tức mới nhất</h2>
                                 <p>Cập nhật tin tức thể thao</p>
                             </div>
-                            <a href="news.html">Xem tất cả →</a>
+                            <a href="news-list.html">Xem tất cả →</a>
                         </div>
 
                         <div class="news-list" id="homeNewsList">
@@ -595,7 +595,6 @@
                         return;
                     }
 
-                    // ✅ SẮP XẾP: File "banner-{timestamp}" ưu tiên (do hệ thống tạo)
                     imageFiles.sort(function(a, b) {
                         var aIsSystem = a.name.startsWith('banner-');
                         var bIsSystem = b.name.startsWith('banner-');
@@ -681,7 +680,6 @@
 
                     bannerImage.src = urlData.publicUrl;
 
-                    // Xóa ảnh cũ
                     try {
                         const { data: oldFiles } = await supabase
                             .storage
@@ -735,6 +733,7 @@
 
             // ==========================================
             // 4. LOAD TIN TỨC MỚI NHẤT TỪ SUPABASE
+            // ✅ ĐÃ SỬA: BỌC MỖI TIN TRONG THẺ <a>
             // ==========================================
             async function loadHomeNews() {
                 try {
@@ -757,23 +756,26 @@
                     const newsList = document.getElementById('homeNewsList');
                     if (!newsList) return;
 
+                    // ✅ MỖI TIN ĐƯỢC BỌC TRONG THẺ <a> ĐỂ CLICK ĐƯỢC
                     newsList.innerHTML = data.map(news => `
-                        <div class="news-item">
-                            <div class="news-thumb">
-                                ${news.image_url ? 
-                                    `<img src="${news.image_url}" alt="${news.title}">` :
-                                    `<div style="width:100%;height:100%;display:flex;align-items:center;justify-content:center;font-size:32px;background:#f3f4f6;">📰</div>`
-                                }
-                            </div>
-                            <div class="news-content">
-                                <strong>${news.title}</strong>
-                                <p>${news.summary || ''}</p>
-                                <div class="news-meta">
-                                    <span>${new Date(news.created_at).toLocaleDateString('vi-VN')}</span>
-                                    ${news.is_hot ? '<span class="news-tag">HOT</span>' : ''}
+                        <a href="news-detail.html?id=${news.id}" class="news-item-link">
+                            <div class="news-item">
+                                <div class="news-thumb">
+                                    ${news.image_url ? 
+                                        `<img src="${news.image_url}" alt="${news.title}">` :
+                                        `<div style="width:100%;height:100%;display:flex;align-items:center;justify-content:center;font-size:32px;background:#f3f4f6;">📰</div>`
+                                    }
+                                </div>
+                                <div class="news-content">
+                                    <strong>${news.title}</strong>
+                                    <p>${news.summary || ''}</p>
+                                    <div class="news-meta">
+                                        <span>${new Date(news.created_at).toLocaleDateString('vi-VN')}</span>
+                                        ${news.is_hot ? '<span class="news-tag">HOT</span>' : ''}
+                                    </div>
                                 </div>
                             </div>
-                        </div>
+                        </a>
                     `).join('');
 
                     console.log('✅ Đã load ' + data.length + ' tin tức mới nhất');
