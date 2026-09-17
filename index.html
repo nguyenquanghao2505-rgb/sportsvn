@@ -152,23 +152,25 @@
             <!-- CONTENT -->
             <section class="content">
 
-                <!-- WELCOME -->
-                <div class="welcome">
-                    <div>
+                <!-- HERO BANNER với ảnh bìa -->
+                <section class="welcome-banner" id="bannerSection">
+                    <div class="welcome-content">
                         <span class="welcome-label">SPORTS MANAGEMENT PLATFORM</span>
-                        <h1>Chào mừng đến với SportsVN</h1>
-                        <p>
-                            Quản lý giải đấu, vận động viên,
-                            lịch thi đấu và kết quả thể thao
-                            trên một nền tảng duy nhất.
-                        </p>
+                        <h1>SPORTS<span>VN</span></h1>
+                        <p>Kết nối đam mê thể thao — Cập nhật nhanh chóng — Chính xác — Toàn diện</p>
+                        <a href="tournaments.html" class="primary-button">
+                            <span>＋</span> Tạo giải đấu
+                        </a>
                     </div>
 
-                    <a href="tournaments.html" class="primary-button" style="text-decoration: none; display: inline-flex; align-items: center; gap: 8px;">
-                        <span>＋</span>
-                        Tạo giải đấu
-                    </a>
-                </div>
+                    <!-- Nút đổi ảnh bìa -->
+                    <button class="change-banner-btn" id="changeBannerBtn" title="Đổi ảnh bìa">
+                        📷 Đổi ảnh bìa
+                    </button>
+                    
+                    <!-- Input file ẩn -->
+                    <input type="file" id="bannerInput" accept="image/*" style="display: none;">
+                </section>
 
 
                 <!-- STATISTICS -->
@@ -213,22 +215,20 @@
                 </div>
 
 
-                <!-- TWO COLUMN -->
+                <!-- DASHBOARD 3 CỘT -->
                 <div class="dashboard-grid">
 
-                    <!-- TOURNAMENTS -->
+                    <!-- CỘT 1: GIẢI ĐẤU -->
                     <section class="panel">
-
                         <div class="panel-header">
                             <div>
-                                <h2>Giải đấu đang diễn ra</h2>
+                                <h2>🏆 Giải đấu đang diễn ra</h2>
                                 <p>Các giải đấu mới nhất trên hệ thống</p>
                             </div>
-                            <a href="tournaments.html">Xem tất cả</a>
+                            <a href="tournaments.html">Xem tất cả →</a>
                         </div>
 
                         <div class="tournament-list">
-
                             <div class="tournament">
                                 <div class="sport-logo football">⚽</div>
                                 <div class="tournament-info">
@@ -276,170 +276,194 @@
                                     <small>30/06/2026</small>
                                 </div>
                             </div>
-
                         </div>
-
                     </section>
 
 
-                    <!-- QUICK ACTIONS -->
+                    <!-- CỘT 2: TIN TỨC -->
                     <section class="panel">
-
                         <div class="panel-header">
                             <div>
-                                <h2>Thao tác nhanh</h2>
-                                <p>Truy cập nhanh các chức năng</p>
+                                <h2>📰 Tin tức mới nhất</h2>
+                                <p>Cập nhật tin tức thể thao</p>
+                            </div>
+                            <a href="#">Xem tất cả →</a>
+                        </div>
+
+                        <div class="news-list">
+                            <div class="news-item">
+                                <div class="news-thumb">
+                                    <img src="https://images.unsplash.com/photo-1579952363873-27f3bade9f55?w=200&h=150&fit=crop" alt="News">
+                                </div>
+                                <div class="news-content">
+                                    <strong>Khai mạc Giải Bóng đá Đại hội TDTT TP Đà Nẵng lần thứ X</strong>
+                                    <p>Sáng 24/8, tại Nhà thi đấu Trung tâm Cung ứng dịch vụ sự nghiệp công phường An Hải...</p>
+                                    <div class="news-meta">
+                                        <span>24/08/2026</span>
+                                        <span class="news-tag">HOT</span>
+                                    </div>
+                                </div>
+                            </div>
+
+                            <div class="news-item">
+                                <div class="news-thumb">
+                                    <img src="https://images.unsplash.com/photo-1530549387789-4c1017266635?w=200&h=150&fit=crop" alt="News">
+                                </div>
+                                <div class="news-content">
+                                    <strong>Đoàn Đà Nẵng giành 2 HCV tại Giải Đua thuyền truyền thống</strong>
+                                    <p>Với tinh thần thi đấu đoàn kết, các vận động viên Đà Nẵng đã xuất sắc giành 2 HCV...</p>
+                                    <div class="news-meta"><span>30/08/2026</span></div>
+                                </div>
+                            </div>
+
+                            <div class="news-item">
+                                <div class="news-thumb">
+                                    <img src="https://images.unsplash.com/photo-1554068865-24cecd4e34b8?w=200&h=150&fit=crop" alt="News">
+                                </div>
+                                <div class="news-content">
+                                    <strong>Hơn 200 VĐV tham gia Giải Pickleball Đại hội TDTT TP Đà Nẵng</strong>
+                                    <p>Giải đấu diễn ra từ ngày 27 đến 30/6/2026 tại Cụm sân Pickleball Hòa Phát...</p>
+                                    <div class="news-meta"><span>27/06/2026</span></div>
+                                </div>
+                            </div>
+                        </div>
+                    </section>
+
+
+                    <!-- CỘT 3: KẾT QUẢ + LIÊN KẾT -->
+                    <section class="panel">
+                        <div class="panel-header">
+                            <div>
+                                <h2>⚽ Kết quả giải Bóng đá</h2>
+                            </div>
+                            <a href="#">Xem tất cả →</a>
+                        </div>
+
+                        <div class="results-list">
+                            <div class="result-tabs">
+                                <div class="result-tab active">Hôm nay</div>
+                                <div class="result-tab">Hôm qua</div>
+                                <div class="result-tab">Ngày mai</div>
+                            </div>
+
+                            <div class="result-item">
+                                <div class="result-team">QH 1</div>
+                                <div class="result-score">2 - 1</div>
+                                <div class="result-team" style="text-align:right;">QH 2</div>
+                                <div class="result-status">KT</div>
+                            </div>
+
+                            <div class="result-item">
+                                <div class="result-team">An Hải</div>
+                                <div class="result-score">0 - 0</div>
+                                <div class="result-team" style="text-align:right;">Hải Châu</div>
+                                <div class="result-status">HT</div>
+                            </div>
+
+                            <div class="result-item">
+                                <div class="result-team">Sơn Trà</div>
+                                <div class="result-score">3 - 1</div>
+                                <div class="result-team" style="text-align:right;">Thanh Khê</div>
+                                <div class="result-status">KT</div>
+                            </div>
+
+                            <div class="result-item">
+                                <div class="result-team">Cẩm Lệ</div>
+                                <div class="result-score">1 - 1</div>
+                                <div class="result-team" style="text-align:right;">Ngũ Hành Sơn</div>
+                                <div class="result-status">HT</div>
                             </div>
                         </div>
 
-                        <div class="quick-actions">
-
-                            <a href="tournaments.html" class="quick-action" style="text-decoration: none;">
-                                <span class="quick-icon blue">＋</span>
-                                <span>
-                                    <strong>Tạo giải đấu</strong>
-                                    <small>Tạo giải thể thao mới</small>
-                                </span>
-                                <b>›</b>
-                            </a>
-
-                            <button class="quick-action">
-                                <span class="quick-icon green">♙</span>
-                                <span>
-                                    <strong>Thêm vận động viên</strong>
-                                    <small>Đăng ký VĐV</small>
-                                </span>
-                                <b>›</b>
-                            </button>
-
-                            <a href="draw.html" class="quick-action" style="text-decoration: none;">
-                                <span class="quick-icon orange">◇</span>
-                                <span>
-                                    <strong>Bốc thăm tự động</strong>
-                                    <small>Tạo bảng đấu tự động</small>
-                                </span>
-                                <b>›</b>
-                            </a>
-
-                            <button class="quick-action">
-                                <span class="quick-icon purple">▤</span>
-                                <span>
-                                    <strong>Lập lịch thi đấu</strong>
-                                    <small>Quản lý lịch thi đấu</small>
-                                </span>
-                                <b>›</b>
-                            </button>
-
+                        <div class="panel-header" style="border-top: 1px solid var(--border-light); margin-top: 8px;">
+                            <div>
+                                <h2>🔗 Liên kết nhanh</h2>
+                            </div>
                         </div>
 
+                        <div class="quick-links">
+                            <a href="draw.html" class="quick-link-item" style="text-decoration: none;">
+                                <div class="quick-link-icon blue">◇</div>
+                                <div class="quick-link-text">
+                                    <strong>Bốc thăm</strong>
+                                    <span>Trực tuyến</span>
+                                </div>
+                            </a>
+
+                            <a href="tournaments.html" class="quick-link-item" style="text-decoration: none;">
+                                <div class="quick-link-icon green">▤</div>
+                                <div class="quick-link-text">
+                                    <strong>Lịch thi đấu</strong>
+                                    <span>Chi tiết</span>
+                                </div>
+                            </a>
+
+                            <button class="quick-link-item">
+                                <div class="quick-link-icon orange">♙</div>
+                                <div class="quick-link-text">
+                                    <strong>Thành viên</strong>
+                                    <span>Đăng ký</span>
+                                </div>
+                            </button>
+
+                            <button class="quick-link-item">
+                                <div class="quick-link-icon purple">▰</div>
+                                <div class="quick-link-text">
+                                    <strong>Tài liệu</strong>
+                                    <span>Biểu mẫu</span>
+                                </div>
+                            </button>
+                        </div>
                     </section>
 
                 </div>
 
 
-                <!-- LOWER GRID -->
-                <div class="lower-grid">
+                <!-- UPCOMING BAR -->
+                <div class="upcoming-bar">
+                    <div class="upcoming-title">
+                        <span>📅</span> Giải đấu sắp tới
+                    </div>
 
-                    <!-- RECENT MATCHES -->
-                    <section class="panel">
-
-                        <div class="panel-header">
-                            <div>
-                                <h2>Trận đấu gần đây</h2>
-                                <p>Kết quả cập nhật mới nhất</p>
-                            </div>
-                            <a href="#">Xem tất cả</a>
+                    <div class="upcoming-item">
+                        <div class="upcoming-icon" style="background:#fff3e0; color:#f57c00;">🏀</div>
+                        <div class="upcoming-info">
+                            <strong>Bóng rổ U16</strong>
+                            <span>24/08 - 28/08/2026</span>
                         </div>
+                    </div>
 
-                        <div class="matches">
-
-                            <div class="match">
-                                <div class="match-time">
-                                    <strong>10:30</strong>
-                                    <span>Hôm nay</span>
-                                </div>
-                                <div class="teams">
-                                    <span>An Hải</span>
-                                    <b>2 - 1</b>
-                                    <span>Hải Châu</span>
-                                </div>
-                                <span class="result-win">Đã kết thúc</span>
-                            </div>
-
-                            <div class="match">
-                                <div class="match-time">
-                                    <strong>14:00</strong>
-                                    <span>Hôm nay</span>
-                                </div>
-                                <div class="teams">
-                                    <span>Sơn Trà</span>
-                                    <b>3 - 3</b>
-                                    <span>Thanh Khê</span>
-                                </div>
-                                <span class="result-draw">Hòa</span>
-                            </div>
-
-                            <div class="match">
-                                <div class="match-time">
-                                    <strong>16:30</strong>
-                                    <span>Hôm nay</span>
-                                </div>
-                                <div class="teams">
-                                    <span>Liên Chiểu</span>
-                                    <b>1 - 0</b>
-                                    <span>Ngũ Hành Sơn</span>
-                                </div>
-                                <span class="result-win">Đã kết thúc</span>
-                            </div>
-
+                    <div class="upcoming-item">
+                        <div class="upcoming-icon" style="background:#e0f7fa; color:#00acc1;">🏊</div>
+                        <div class="upcoming-info">
+                            <strong>Bơi</strong>
+                            <span>27/08 - 29/08/2026</span>
                         </div>
+                    </div>
 
-                    </section>
-
-
-                    <!-- ACTIVITY -->
-                    <section class="panel">
-
-                        <div class="panel-header">
-                            <div>
-                                <h2>Hoạt động gần đây</h2>
-                                <p>Hoạt động trên hệ thống</p>
-                            </div>
+                    <div class="upcoming-item">
+                        <div class="upcoming-icon" style="background:#fff8e1; color:#fbc02d;">♟️</div>
+                        <div class="upcoming-info">
+                            <strong>Cờ tướng trẻ</strong>
+                            <span>23/06 - 02/07/2026</span>
                         </div>
+                    </div>
 
-                        <div class="activity-list">
-
-                            <div class="activity-item">
-                                <div class="activity-dot blue"></div>
-                                <div>
-                                    <strong>Đã tạo giải đấu mới</strong>
-                                    <span>Giải Bơi Đại hội TDTT</span>
-                                    <small>10 phút trước</small>
-                                </div>
-                            </div>
-
-                            <div class="activity-item">
-                                <div class="activity-dot green"></div>
-                                <div>
-                                    <strong>Thêm vận động viên</strong>
-                                    <span>Nguyễn Văn An</span>
-                                    <small>32 phút trước</small>
-                                </div>
-                            </div>
-
-                            <div class="activity-item">
-                                <div class="activity-dot orange"></div>
-                                <div>
-                                    <strong>Hoàn thành bốc thăm</strong>
-                                    <span>Giải Bóng rổ</span>
-                                    <small>1 giờ trước</small>
-                                </div>
-                            </div>
-
+                    <div class="upcoming-item">
+                        <div class="upcoming-icon" style="background:#fce4ec; color:#e91e63;">🎱</div>
+                        <div class="upcoming-info">
+                            <strong>Bi sắt</strong>
+                            <span>12/09 - 15/09/2026</span>
                         </div>
+                    </div>
 
-                    </section>
-
+                    <div class="upcoming-item">
+                        <div class="upcoming-icon" style="background:#e3f2fd; color:#1976d2;">🥋</div>
+                        <div class="upcoming-info">
+                            <strong>Vovinam</strong>
+                            <span>20/09 - 24/09/2026</span>
+                        </div>
+                    </div>
                 </div>
 
             </section>
@@ -486,7 +510,6 @@
                     return;
                 }
 
-                // Kiểm tra quyền admin
                 const { data: roleData } = await supabase
                     .from('user_roles')
                     .select('role')
@@ -500,7 +523,6 @@
                     return;
                 }
 
-                // Cập nhật tên admin
                 const name = session.user.user_metadata?.full_name ||
                              session.user.email.split('@')[0];
                 const initials = name.split(' ').map(w => w[0]).join('').slice(0, 2).toUpperCase();
@@ -522,6 +544,83 @@
             });
 
             console.log('✅ Dashboard SportsVN đã kết nối Supabase');
+        })();
+
+        // ==========================================
+        // ĐỔI ẢNH BÌA (LƯU VÀO LOCALSTORAGE)
+        // ==========================================
+        (function() {
+            'use strict';
+            
+            document.addEventListener('DOMContentLoaded', function() {
+                var bannerSection = document.getElementById('bannerSection');
+                var changeBtn = document.getElementById('changeBannerBtn');
+                var fileInput = document.getElementById('bannerInput');
+                
+                if (!bannerSection || !changeBtn || !fileInput) {
+                    console.warn('Không tìm thấy element banner');
+                    return;
+                }
+                
+                // Load ảnh đã lưu từ localStorage
+                var savedBanner = localStorage.getItem('sportsvn_banner');
+                if (savedBanner) {
+                    bannerSection.style.backgroundImage = 
+                        'linear-gradient(90deg, rgba(13, 71, 161, 0.75) 0%, rgba(23, 105, 255, 0.3) 50%, transparent 100%), url(' + savedBanner + ')';
+                }
+                
+                // Click nút đổi ảnh
+                changeBtn.addEventListener('click', function(e) {
+                    e.stopPropagation();
+                    fileInput.click();
+                });
+                
+                // Xử lý file được chọn
+                fileInput.addEventListener('change', function(e) {
+                    var file = e.target.files[0];
+                    if (!file) return;
+                    
+                    if (!file.type.startsWith('image/')) {
+                        alert('Vui lòng chọn file ảnh (JPG, PNG, GIF...)');
+                        return;
+                    }
+                    
+                    if (file.size > 5 * 1024 * 1024) {
+                        alert('Ảnh quá lớn! Vui lòng chọn ảnh dưới 5MB.');
+                        return;
+                    }
+                    
+                    var reader = new FileReader();
+                    reader.onload = function(event) {
+                        var imageData = event.target.result;
+                        
+                        bannerSection.style.backgroundImage = 
+                            'linear-gradient(90deg, rgba(13, 71, 161, 0.75) 0%, rgba(23, 105, 255, 0.3) 50%, transparent 100%), url(' + imageData + ')';
+                        
+                        try {
+                            localStorage.setItem('sportsvn_banner', imageData);
+                            showToast('✓ Đã đổi ảnh bìa thành công!');
+                        } catch (err) {
+                            console.error('Lỗi lưu ảnh:', err);
+                            alert('Ảnh quá lớn để lưu. Vui lòng chọn ảnh nhỏ hơn.');
+                        }
+                    };
+                    reader.readAsDataURL(file);
+                });
+                
+                function showToast(message) {
+                    var toast = document.createElement('div');
+                    toast.className = 'dashboard-toast';
+                    toast.textContent = message;
+                    document.body.appendChild(toast);
+                    
+                    setTimeout(function() { toast.classList.add('show'); }, 100);
+                    setTimeout(function() {
+                        toast.classList.remove('show');
+                        setTimeout(function() { toast.remove(); }, 300);
+                    }, 3000);
+                }
+            });
         })();
     </script>
 
