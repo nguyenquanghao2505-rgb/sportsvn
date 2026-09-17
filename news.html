@@ -682,9 +682,10 @@
     <script>
         // ==========================================
         // QUẢN LÝ TIN TỨC - SUPABASE
+        // ✅ ĐÃ SỬA: Đổi biến supabase -> supabaseClient
         // ==========================================
         
-        let supabase = null;
+        let supabaseClient = null;
         let currentSession = null;
         let currentEditingId = null;
         let uploadedImageUrl = null;
@@ -700,21 +701,22 @@
                 return;
             }
 
-            supabase = window.supabase.createClient(
+            // ✅ TẠO CLIENT VỚI TÊN BIẾN MỚI
+            supabaseClient = window.supabase.createClient(
                 config.SUPABASE_URL,
                 config.SUPABASE_ANON_KEY
             );
 
             // ===== KIỂM TRA ĐĂNG NHẬP =====
             async function checkAuth() {
-                const { data: { session } } = await supabase.auth.getSession();
+                const { data: { session } } = await supabaseClient.auth.getSession();
                 if (!session) {
                     window.location.href = 'login.html';
                     return false;
                 }
                 currentSession = session;
 
-                const { data: roleData } = await supabase
+                const { data: roleData } = await supabaseClient
                     .from('user_roles')
                     .select('role')
                     .eq('user_id', session.user.id)
@@ -722,7 +724,7 @@
 
                 if (!roleData || roleData.role !== 'admin') {
                     alert('Tài khoản không có quyền Admin');
-                    await supabase.auth.signOut();
+                    await supabaseClient.auth.signOut();
                     window.location.href = 'login.html';
                     return false;
                 }
@@ -767,7 +769,7 @@
                 const grid = document.getElementById('newsGrid');
                 grid.innerHTML = '<div class="empty-state"><p>⏳ Đang tải...</p></div>';
 
-                const { data, error } = await supabase
+                const { data, error } = await supabaseClient
                     .from('news')
                     .select('*')
                     .order('created_at', { ascending: false });
@@ -817,7 +819,7 @@
             const newsImageInput = document.getElementById('newsImageInput');
 
             imageUploadArea.addEventListener('click', () => {
-                if (uploadedImageUrl) return; // Đã có ảnh
+                if (uploadedImageUrl) return;
                 newsImageInput.click();
             });
 
@@ -835,7 +837,7 @@
                     return;
                 }
 
-                // Hiển thị preview
+                // Preview
                 const reader = new FileReader();
                 reader.onload = (event) => {
                     imageUploadArea.classList.add('has-image');
@@ -852,7 +854,7 @@
                     const ext = file.name.split('.').pop().toLowerCase();
                     const fileName = 'news-' + Date.now() + '.' + ext;
 
-                    const { data, error } = await supabase
+                    const { data, error } = await supabaseClient
                         .storage
                         .from('news-images')
                         .upload(fileName, file, {
@@ -863,7 +865,7 @@
 
                     if (error) throw error;
 
-                    const { data: urlData } = supabase
+                    const { data: urlData } = supabaseClient
                         .storage
                         .from('news-images')
                         .getPublicUrl(fileName);
@@ -931,15 +933,13 @@
 
                 let result;
                 if (currentEditingId) {
-                    // Cập nhật
-                    result = await supabase
+                    result = await supabaseClient
                         .from('news')
                         .update(newsData)
                         .eq('id', currentEditingId)
                         .select();
                 } else {
-                    // Tạo mới
-                    result = await supabase
+                    result = await supabaseClient
                         .from('news')
                         .insert([newsData])
                         .select();
@@ -955,7 +955,6 @@
                 showMessage('success', '✅ ' + (currentEditingId ? 'Cập nhật' : 'Đăng tin') + ' thành công!');
 
                 setTimeout(() => {
-                    // Chuyển sang tab danh sách
                     document.querySelector('[data-tab="list"]').click();
                 }, 1500);
 
@@ -986,7 +985,7 @@
 
             // ===== SỬA TIN =====
             window.editNews = async function(id) {
-                const { data, error } = await supabase
+                const { data, error } = await supabaseClient
                     .from('news')
                     .select('*')
                     .eq('id', id)
@@ -1017,7 +1016,6 @@
                 document.querySelector('.news-form-title').textContent = '✏️ Chỉnh sửa tin tức';
                 submitBtn.innerHTML = '💾 Cập nhật';
 
-                // Chuyển sang tab đăng tin
                 document.querySelector('[data-tab="create"]').click();
             };
 
@@ -1025,7 +1023,7 @@
             window.deleteNews = async function(id) {
                 if (!confirm('Bạn có chắc muốn xóa tin tức này?')) return;
 
-                const { error } = await supabase
+                const { error } = await supabaseClient
                     .from('news')
                     .delete()
                     .eq('id', id);
