@@ -115,18 +115,21 @@
         <!-- MAIN -->
         <main class="main">
 
-            <!-- HEADER -->
+            <!-- TOPBAR MỚI - CHỨA NỘI DUNG BANNER CŨ -->
             <header class="topbar">
-
                 <div class="topbar-left">
                     <button class="mobile-menu" id="mobileMenu" aria-label="Mở menu">☰</button>
-                    <div>
-                        <div class="page-title">Tổng quan</div>
-                        <div class="breadcrumb">SportsVN / Trang chủ</div>
+                    <div class="topbar-brand">
+                        <span class="topbar-label">SPORTS MANAGEMENT PLATFORM</span>
+                        <h1 class="topbar-title-main">SPORTS<span>VN</span></h1>
+                        <p class="topbar-subtitle">Kết nối đam mê thể thao — Cập nhật nhanh chóng — Chính xác — Toàn diện</p>
                     </div>
                 </div>
 
                 <div class="topbar-right">
+                    <a href="tournaments.html" class="topbar-cta">
+                        <span>＋</span> Tạo giải đấu
+                    </a>
 
                     <button class="icon-button" title="Thông báo">
                         ♢
@@ -143,27 +146,16 @@
                         </div>
                         <span class="arrow">▾</span>
                     </div>
-
                 </div>
-
             </header>
 
 
             <!-- CONTENT -->
             <section class="content">
 
-                <!-- HERO BANNER với nút đổi ảnh (chỉ admin thấy) -->
+                <!-- HERO BANNER - CHỈ CÒN ẢNH NỀN VÀ NÚT ĐỔI ẢNH -->
                 <section class="welcome-banner" id="bannerSection">
-                    <div class="welcome-content">
-                        <span class="welcome-label">SPORTS MANAGEMENT PLATFORM</span>
-                        <h1>SPORTS<span>VN</span></h1>
-                        <p>Kết nối đam mê thể thao — Cập nhật nhanh chóng — Chính xác — Toàn diện</p>
-                        <a href="tournaments.html" class="primary-button">
-                            <span>＋</span> Tạo giải đấu
-                        </a>
-                    </div>
-
-                    <!-- Nút đổi ảnh bìa - Ẩn mặc định bằng CSS, hiện khi có class .visible -->
+                    <!-- Nút đổi ảnh bìa - Ẩn mặc định, chỉ hiện khi admin -->
                     <button class="change-banner-btn" id="changeBannerBtn" title="Đổi ảnh bìa">
                         📷 Đổi ảnh bìa
                     </button>
@@ -581,8 +573,7 @@
                 // Load ảnh đã lưu từ localStorage (áp dụng cho mọi user)
                 var savedBanner = localStorage.getItem('sportsvn_banner');
                 if (savedBanner) {
-                    bannerSection.style.backgroundImage = 
-                        'linear-gradient(90deg, rgba(13, 71, 161, 0.75) 0%, rgba(23, 105, 255, 0.3) 50%, transparent 100%), url(' + savedBanner + ')';
+                    bannerSection.style.backgroundImage = 'url(' + savedBanner + ')';
                 }
                 
                 // Click nút đổi ảnh (chỉ hoạt động khi nút hiện)
@@ -610,8 +601,7 @@
                     reader.onload = function(event) {
                         var imageData = event.target.result;
                         
-                        bannerSection.style.backgroundImage = 
-                            'linear-gradient(90deg, rgba(13, 71, 161, 0.75) 0%, rgba(23, 105, 255, 0.3) 50%, transparent 100%), url(' + imageData + ')';
+                        bannerSection.style.backgroundImage = 'url(' + imageData + ')';
                         
                         try {
                             localStorage.setItem('sportsvn_banner', imageData);
