@@ -1,4 +1,4 @@
-[
+window.VIETNAM_PROVINCES = [
     {
         "matinhBNV": "01",
         "matinhTMS": "101",
@@ -13521,4 +13521,4 @@
             }
         ]
     }
-]
+];
