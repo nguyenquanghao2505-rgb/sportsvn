@@ -7,6 +7,7 @@
     <title>SportsVN - Nền tảng thể thao Việt Nam</title>
     <link rel="stylesheet" href="styles.css">
     <script src="football.js" defer></script>
+    <script src="provinces.js" defer></script>
 </head>
 
 <body>
@@ -26,36 +27,43 @@
 
             <nav class="main-nav">
 
-                <div class="nav-title">TỔNG QUAN</div>
+                <!-- NHÓM 1: CHÍNH -->
+                <div class="nav-title">📌 CHÍNH</div>
 
                 <a href="index.html" class="nav-item active">
-                    <span class="nav-icon">⌂</span>
+                    <span class="nav-icon">🏠</span>
                     <span>Trang chủ</span>
                 </a>
 
                 <a href="tournaments.html" class="nav-item">
-                    <span class="nav-icon">◈</span>
+                    <span class="nav-icon">🏆</span>
                     <span>Giải đấu</span>
                 </a>
 
-                <a href="#" class="nav-item">
-                    <span class="nav-icon">♙</span>
-                    <span>Vận động viên</span>
+                <a href="news-list.html" class="nav-item">
+                    <span class="nav-icon">📰</span>
+                    <span>Tin thể thao</span>
                 </a>
 
-                <a href="#" class="nav-item">
-                    <span class="nav-icon">▣</span>
-                    <span>Đơn vị</span>
+                <a href="videos.html" class="nav-item">
+                    <span class="nav-icon">🎬</span>
+                    <span>Video</span>
                 </a>
 
-                <div class="nav-title">QUẢN LÝ GIẢI</div>
+                <a href="photos.html" class="nav-item">
+                    <span class="nav-icon">📸</span>
+                    <span>Hình ảnh</span>
+                </a>
+
+                <!-- NHÓM 2: QUẢN LÝ GIẢI -->
+                <div class="nav-title">🎯 QUẢN LÝ GIẢI</div>
 
                 <a href="tournaments.html" class="nav-item" data-action="create-tournament">
-                    <span class="nav-icon">＋</span>
+                    <span class="nav-icon">➕</span>
                     <span>Tạo giải đấu</span>
                 </a>
 
-                <a href="#" class="nav-item">
+                <a href="registrations.html" class="nav-item">
                     <span class="nav-icon">☷</span>
                     <span>Danh sách đăng ký</span>
                 </a>
@@ -65,30 +73,69 @@
                     <span>Bốc thăm</span>
                 </a>
 
-                <a href="#" class="nav-item">
-                    <span class="nav-icon">▤</span>
-                    <span>Lịch thi đấu</span>
+                <a href="schedule.html" class="nav-item">
+                    <span class="nav-icon">📅</span>
+                    <span>Xếp lịch thi đấu</span>
                 </a>
 
-                <a href="#" class="nav-item">
+                <a href="results.html" class="nav-item">
                     <span class="nav-icon">✓</span>
                     <span>Kết quả</span>
                 </a>
 
-                <div class="nav-title">THÔNG TIN</div>
-
-                <a href="news-list.html" class="nav-item">
-                    <span class="nav-icon">▰</span>
-                    <span>Tin thể thao</span>
+                <a href="booking.html" class="nav-item">
+                    <span class="nav-icon">🏟️</span>
+                    <span>Đặt sân</span>
                 </a>
 
-                <a href="videos.html" class="nav-item">
-                    <span class="nav-icon">🎬</span>
-                    <span>Video</span>
+                <!-- NHÓM 3: DỊCH VỤ -->
+                <div class="nav-title">🛒 DỊCH VỤ</div>
+
+                <a href="shop.html" class="nav-item">
+                    <span class="nav-icon">🛍️</span>
+                    <span>Mua sắm</span>
                 </a>
 
-                <a href="#" class="nav-item">
-                    <span class="nav-icon">▥</span>
+                <a href="payment.html" class="nav-item">
+                    <span class="nav-icon">💳</span>
+                    <span>Thanh toán</span>
+                </a>
+
+                <a href="lucky-wheel.html" class="nav-item">
+                    <span class="nav-icon">🎰</span>
+                    <span>Vòng quay may mắn</span>
+                </a>
+
+                <a href="ads.html" class="nav-item">
+                    <span class="nav-icon">📢</span>
+                    <span>Quảng cáo</span>
+                </a>
+
+                <a href="register-shop.html" class="nav-item">
+                    <span class="nav-icon">🏪</span>
+                    <span>Đăng ký Shop</span>
+                </a>
+
+                <!-- NHÓM 4: HỖ TRỢ -->
+                <div class="nav-title">📚 HỖ TRỢ</div>
+
+                <a href="guide.html" class="nav-item">
+                    <span class="nav-icon">📖</span>
+                    <span>Hướng dẫn tổ chức giải</span>
+                </a>
+
+                <a href="sponsors.html" class="nav-item">
+                    <span class="nav-icon">🤝</span>
+                    <span>Nhà tài trợ</span>
+                </a>
+
+                <a href="contact.html" class="nav-item">
+                    <span class="nav-icon">📞</span>
+                    <span>Liên hệ</span>
+                </a>
+
+                <a href="ranking.html" class="nav-item">
+                    <span class="nav-icon">📊</span>
                     <span>Bảng thành tích</span>
                 </a>
 
@@ -328,7 +375,7 @@
                     </section>
 
 
-                    <!-- CỘT 3: KẾT QUẢ BÓNG ĐÁ - PANEL MỚI -->
+                    <!-- CỘT 3: KẾT QUẢ BÓNG ĐÁ -->
                     <section class="panel">
                         <div class="panel-header">
                             <div>
@@ -338,7 +385,6 @@
                         </div>
 
                         <div class="results-list">
-                            <!-- TABS CHỌN GIẢI ĐẤU -->
                             <div class="result-tabs" id="footballLeagueTabs">
                                 <div class="result-tab active" data-league="4328">NHA</div>
                                 <div class="result-tab" data-league="4335">La Liga</div>
@@ -346,13 +392,11 @@
                                 <div class="result-tab" data-league="4564">V.League</div>
                             </div>
 
-                            <!-- TABS TRẠNG THÁI -->
                             <div class="result-tabs" id="footballStatusTabs" style="margin-top:8px;">
                                 <div class="result-tab active" data-status="upcoming">Sắp tới</div>
                                 <div class="result-tab" data-status="recent">Gần đây</div>
                             </div>
 
-                            <!-- DANH SÁCH TRẬN ĐẤU -->
                             <div id="footballMatches">
                                 <div style="text-align:center;padding:30px;color:#6b7280;font-size:12px;">
                                     ⏳ Đang tải...
@@ -375,29 +419,29 @@
                                 </div>
                             </a>
 
-                            <a href="tournaments.html" class="quick-link-item" style="text-decoration: none;">
-                                <div class="quick-link-icon green">▤</div>
+                            <a href="booking.html" class="quick-link-item" style="text-decoration: none;">
+                                <div class="quick-link-icon green">🏟️</div>
                                 <div class="quick-link-text">
-                                    <strong>Lịch thi đấu</strong>
-                                    <span>Chi tiết</span>
+                                    <strong>Đặt sân</strong>
+                                    <span>Online</span>
                                 </div>
                             </a>
 
-                            <button class="quick-link-item">
-                                <div class="quick-link-icon orange">♙</div>
+                            <a href="shop.html" class="quick-link-item" style="text-decoration: none;">
+                                <div class="quick-link-icon orange">🛍️</div>
                                 <div class="quick-link-text">
-                                    <strong>Thành viên</strong>
-                                    <span>Đăng ký</span>
+                                    <strong>Mua sắm</strong>
+                                    <span>Sản phẩm</span>
                                 </div>
-                            </button>
+                            </a>
 
-                            <button class="quick-link-item">
-                                <div class="quick-link-icon purple">▰</div>
+                            <a href="lucky-wheel.html" class="quick-link-item" style="text-decoration: none;">
+                                <div class="quick-link-icon purple">🎰</div>
                                 <div class="quick-link-text">
-                                    <strong>Tài liệu</strong>
-                                    <span>Biểu mẫu</span>
+                                    <strong>Vòng quay</strong>
+                                    <span>May mắn</span>
                                 </div>
-                            </button>
+                            </a>
                         </div>
                     </section>
 
@@ -528,7 +572,7 @@
 
                 if (changeBannerBtn && userEmail === ADMIN_EMAIL) {
                     changeBannerBtn.classList.add('visible');
-                    console.log('✅ Admin đã đăng nhập - Hiện nút đổi ảnh bìa');
+                    console.log('✅ Admin đã đăng nhập');
                 }
             }
 
@@ -751,7 +795,7 @@
             loadHomeNews();
 
             // ==========================================
-            // 5. LOAD KẾT QUẢ BÓNG ĐÁ TỪ THESPORTSDB
+            // 5. LOAD KẾT QUẢ BÓNG ĐÁ
             // ==========================================
             let currentLeague = '4328';
             let currentStatus = 'upcoming';
@@ -813,7 +857,6 @@
                 }
             }
 
-            // Sự kiện tabs League
             document.querySelectorAll('#footballLeagueTabs .result-tab').forEach(tab => {
                 tab.addEventListener('click', () => {
                     document.querySelectorAll('#footballLeagueTabs .result-tab').forEach(t => t.classList.remove('active'));
@@ -823,7 +866,6 @@
                 });
             });
 
-            // Sự kiện tabs Status
             document.querySelectorAll('#footballStatusTabs .result-tab').forEach(tab => {
                 tab.addEventListener('click', () => {
                     document.querySelectorAll('#footballStatusTabs .result-tab').forEach(t => t.classList.remove('active'));
@@ -833,8 +875,19 @@
                 });
             });
 
-            // Load lần đầu
             setTimeout(() => loadFootballMatches(), 500);
+
+            // ==========================================
+            // 6. MOBILE MENU TOGGLE
+            // ==========================================
+            const mobileMenu = document.getElementById('mobileMenu');
+            const sidebar = document.querySelector('.sidebar');
+            
+            if (mobileMenu && sidebar) {
+                mobileMenu.addEventListener('click', () => {
+                    sidebar.classList.toggle('open');
+                });
+            }
 
             console.log('✅ Dashboard SportsVN đã kết nối Supabase');
         });
