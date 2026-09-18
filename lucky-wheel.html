@@ -1,0 +1,809 @@
+<!DOCTYPE html>
+<html lang="vi">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Vòng quay may mắn - SportsVN</title>
+    <link rel="stylesheet" href="styles.css">
+    <script src="sidebar.js" defer></script>
+    <style>
+        .wheel-header {
+            text-align: center;
+            margin-bottom: 32px;
+        }
+        .wheel-header h1 {
+            font-size: 32px;
+            font-weight: 900;
+            color: var(--text-dark);
+            margin-bottom: 8px;
+        }
+        .wheel-header p {
+            color: var(--text-muted);
+            font-size: 15px;
+        }
+
+        /* TABS */
+        .wheel-tabs {
+            display: flex;
+            gap: 8px;
+            margin-bottom: 28px;
+            background: #f3f4f6;
+            padding: 6px;
+            border-radius: 12px;
+            width: fit-content;
+            margin-left: auto;
+            margin-right: auto;
+            flex-wrap: wrap;
+            justify-content: center;
+        }
+        .wheel-tab {
+            padding: 12px 20px;
+            border-radius: 8px;
+            font-size: 13px;
+            font-weight: 700;
+            color: var(--text-muted);
+            cursor: pointer;
+            border: 0;
+            background: transparent;
+            transition: all 0.2s;
+        }
+        .wheel-tab.active {
+            background: #fff;
+            color: var(--primary);
+            box-shadow: 0 2px 8px rgba(0, 0, 0, 0.08);
+        }
+
+        /* CONTENT PANELS */
+        .wheel-panel {
+            max-width: 900px;
+            margin: 0 auto;
+            background: #fff;
+            border-radius: 20px;
+            padding: 40px 32px;
+            border: 1px solid var(--border);
+            box-shadow: 0 4px 20px rgba(0, 0, 0, 0.06);
+            text-align: center;
+        }
+        .wheel-panel[hidden] {
+            display: none;
+        }
+        .wheel-panel-title {
+            font-size: 22px;
+            font-weight: 800;
+            color: var(--text-dark);
+            margin-bottom: 8px;
+        }
+        .wheel-panel-desc {
+            color: var(--text-muted);
+            font-size: 14px;
+            margin-bottom: 32px;
+        }
+
+        /* WHEEL CONTAINER */
+        .wheel-container {
+            position: relative;
+            width: 450px;
+            height: 450px;
+            margin: 0 auto 32px;
+            max-width: 100%;
+        }
+        #wheelImg-drink {
+            width: 100%;
+            height: 100%;
+            border-radius: 50%;
+            display: block;
+            box-shadow: 0 8px 40px rgba(0, 0, 0, 0.2);
+            transition: transform 6s cubic-bezier(0.17, 0.67, 0.12, 0.99);
+            transform-origin: center center;
+        }
+
+        /* MŨI TÊN VÀNG CỐ ĐỊNH (chỉ kết quả) */
+        .wheel-arrow-fixed {
+            position: absolute;
+            top: -20px;
+            left: 50%;
+            transform: translateX(-50%);
+            z-index: 20;
+            pointer-events: none;
+        }
+        .wheel-arrow-fixed svg {
+            filter: drop-shadow(0 4px 8px rgba(0, 0, 0, 0.3));
+        }
+
+        /* NÚT QUAY */
+        .wheel-center-drink {
+            position: absolute;
+            top: 50%;
+            left: 50%;
+            transform: translate(-50%, -50%);
+            width: 100px;
+            height: 100px;
+            border-radius: 50%;
+            background: linear-gradient(135deg, #ef4444 0%, #f97316 100%);
+            color: #fff;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 15px;
+            font-weight: 900;
+            border: 6px solid #fff;
+            box-shadow: 0 6px 20px rgba(239, 68, 68, 0.5), 0 0 0 4px rgba(239, 68, 68, 0.2);
+            z-index: 5;
+            cursor: pointer;
+            text-align: center;
+            line-height: 1.2;
+            transition: all 0.2s;
+        }
+        .wheel-center-drink:hover {
+            transform: translate(-50%, -50%) scale(1.08);
+            box-shadow: 0 8px 28px rgba(239, 68, 68, 0.6), 0 0 0 4px rgba(239, 68, 68, 0.3);
+        }
+        .wheel-center-drink:active {
+            transform: translate(-50%, -50%) scale(0.95);
+        }
+        .wheel-center-drink.spinning {
+            cursor: not-allowed;
+            animation: pulse 0.8s infinite;
+        }
+        @keyframes pulse {
+            0%, 100% { transform: translate(-50%, -50%) scale(1); }
+            50% { transform: translate(-50%, -50%) scale(1.1); }
+        }
+
+        /* RESULT */
+        .wheel-result {
+            min-height: 90px;
+            padding: 24px;
+            background: #f9fafb;
+            border-radius: 16px;
+            border: 2px dashed var(--border);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            margin-bottom: 24px;
+            transition: all 0.4s;
+        }
+        .wheel-result.winner {
+            background: linear-gradient(135deg, #ecfdf5, #d1fae5);
+            border-color: var(--green);
+            border-style: solid;
+            animation: winnerPop 0.6s ease;
+        }
+        @keyframes winnerPop {
+            0% { transform: scale(1); }
+            50% { transform: scale(1.05); }
+            100% { transform: scale(1); }
+        }
+        .wheel-result-text {
+            font-size: 18px;
+            font-weight: 800;
+            color: var(--text-dark);
+        }
+        .wheel-result.winner .wheel-result-text {
+            font-size: 24px;
+            color: var(--green);
+        }
+
+        /* BUTTON */
+        .wheel-btn {
+            padding: 14px 32px;
+            background: linear-gradient(135deg, #ef4444 0%, #f97316 100%);
+            color: #fff;
+            border: 0;
+            border-radius: 12px;
+            font-size: 15px;
+            font-weight: 700;
+            cursor: pointer;
+            box-shadow: 0 4px 16px rgba(239, 68, 68, 0.3);
+            transition: all 0.2s;
+        }
+        .wheel-btn:hover:not(:disabled) {
+            transform: translateY(-2px);
+            box-shadow: 0 6px 24px rgba(239, 68, 68, 0.4);
+        }
+        .wheel-btn:disabled {
+            opacity: 0.6;
+            cursor: not-allowed;
+        }
+        .wheel-btn.secondary {
+            background: #f3f4f6;
+            color: #4b5563;
+            box-shadow: none;
+            margin-left: 8px;
+        }
+
+        /* SOUND TOGGLE */
+        .sound-toggle {
+            display: inline-flex;
+            align-items: center;
+            gap: 8px;
+            padding: 10px 16px;
+            background: #f3f4f6;
+            border-radius: 10px;
+            font-size: 13px;
+            font-weight: 700;
+            color: var(--text);
+            cursor: pointer;
+            margin-bottom: 20px;
+            transition: all 0.2s;
+            border: 0;
+        }
+        .sound-toggle:hover {
+            background: var(--primary-light);
+            color: var(--primary);
+        }
+
+        /* DANH SÁCH KẾT QUẢ */
+        .result-history {
+            margin-top: 24px;
+            padding: 20px;
+            background: #f9fafb;
+            border-radius: 12px;
+            border: 1px solid var(--border-light);
+            text-align: left;
+        }
+        .result-history h4 {
+            font-size: 14px;
+            font-weight: 800;
+            color: var(--text-dark);
+            margin-bottom: 12px;
+        }
+        .result-history-item {
+            padding: 8px 12px;
+            background: #fff;
+            border-radius: 8px;
+            font-size: 13px;
+            color: var(--text);
+            margin-bottom: 6px;
+            border-left: 3px solid var(--primary);
+        }
+
+        @media (max-width: 640px) {
+            .wheel-header h1 { font-size: 24px; }
+            .wheel-panel { padding: 24px 16px; }
+            .wheel-container { width: 320px; height: 320px; }
+            .wheel-center-drink { width: 80px; height: 80px; font-size: 13px; }
+            .wheel-tab { padding: 10px 14px; font-size: 12px; }
+        }
+    </style>
+</head>
+
+<body>
+
+    <div class="app">
+
+        <!-- Sidebar tự động render bởi sidebar.js -->
+
+        <main class="main">
+
+            <header class="topbar">
+                <div class="topbar-left">
+                    <button class="mobile-menu" id="mobileMenu">☰</button>
+                    <div class="topbar-brand">
+                        <span class="topbar-label">SPORTS MANAGEMENT PLATFORM</span>
+                        <h1 class="topbar-title-main">SPORTS<span>VN</span></h1>
+                        <p class="topbar-subtitle">Vòng quay may mắn</p>
+                    </div>
+                </div>
+
+                <div class="topbar-right">
+                    <a href="index.html" class="topbar-cta" style="background: #f3f4f6; color: #4b5563; box-shadow: none;">
+                        ← Về trang chủ
+                    </a>
+                </div>
+            </header>
+
+            <section class="content">
+
+                <div class="wheel-header">
+                    <h1>🎰 Vòng quay may mắn</h1>
+                    <p>2 chế độ: Trúng thưởng & Quậy Sát Phạt</p>
+                </div>
+
+                <!-- SOUND TOGGLE -->
+                <div style="text-align: center;">
+                    <button class="sound-toggle" id="soundToggle">
+                        🔊 <span id="soundStatus">Âm thanh: BẬT</span>
+                    </button>
+                </div>
+
+                <!-- TABS -->
+                <div class="wheel-tabs">
+                    <button class="wheel-tab active" data-tab="winner">🎯 Trúng thưởng</button>
+                    <button class="wheel-tab" data-tab="drink">🍻 Quậy Sát Phạt</button>
+                </div>
+
+                <!-- TAB 1: TRÚNG THƯỞNG -->
+                <div id="panel-winner" class="wheel-panel">
+                    <h2 class="wheel-panel-title">🎯 Vòng quay trúng thưởng</h2>
+                    <p class="wheel-panel-desc">Nhập tên người tham gia — Quay để chọn người may mắn</p>
+
+                    <div style="max-width: 500px; margin: 0 auto 20px; display: flex; gap: 8px;">
+                        <input type="text" id="inputName" placeholder="Nhập tên người tham gia..." style="flex: 1; padding: 12px 14px; border: 1.5px solid var(--border); border-radius: 10px; background: #f9fafb; font-size: 14px; outline: none; font-family: inherit;">
+                        <button class="wheel-btn" id="btnAddName" style="padding: 12px 20px; margin: 0;">+ Thêm</button>
+                    </div>
+
+                    <div style="font-size: 13px; color: var(--text-muted); margin-bottom: 8px;">
+                        Danh sách (<span id="countNames">0</span> người):
+                    </div>
+                    <div id="nameList" style="display: flex; flex-wrap: wrap; gap: 8px; justify-content: center; min-height: 40px; margin-bottom: 24px;">
+                        <span style="color: var(--text-light); font-size: 13px; font-style: italic;">Chưa có ai trong danh sách</span>
+                    </div>
+
+                    <div class="wheel-container">
+                        <canvas id="wheelCanvas-winner" width="450" height="450" style="width: 100%; height: 100%; border-radius: 50%; box-shadow: 0 8px 32px rgba(0, 0, 0, 0.15), 0 0 0 8px #fff, 0 0 0 10px var(--primary-light);"></canvas>
+                        <div class="wheel-arrow-fixed">
+                            <svg width="50" height="60" viewBox="0 0 50 60">
+                                <polygon points="25,60 0,0 50,0" fill="#fbbf24" stroke="#fff" stroke-width="3"/>
+                                <circle cx="25" cy="15" r="8" fill="#fff"/>
+                            </svg>
+                        </div>
+                        <div class="wheel-center-drink" data-action="winner" style="background: linear-gradient(135deg, #1769ff 0%, #4d94ff 100%); box-shadow: 0 6px 20px rgba(23, 105, 255, 0.5), 0 0 0 4px rgba(23, 105, 255, 0.2);">QUAY<br>NGAY</div>
+                    </div>
+
+                    <div class="wheel-result" id="result-winner">
+                        <span class="wheel-result-text">Thêm người tham gia rồi nhấn "QUAY NGAY"</span>
+                    </div>
+
+                    <button class="wheel-btn" id="btnSpinWinner" style="background: linear-gradient(135deg, #1769ff 0%, #4d94ff 100%);">🎯 Quay chọn người</button>
+                    <button class="wheel-btn secondary" id="btnResetWinner">↻ Reset</button>
+                </div>
+
+                <!-- TAB 2: QUẬY SÁT PHẠT -->
+                <div id="panel-drink" class="wheel-panel" hidden>
+                    <h2 class="wheel-panel-title">🍻 Vòng quay Quậy Sát Phạt</h2>
+                    <p class="wheel-panel-desc">Vòng quay "tửu lượng" cho các buổi nhậu — Ai quay trúng thì làm theo!</p>
+
+                    <div class="wheel-container">
+                        <img id="wheelImg-drink" src="wheel-drink.png" alt="Vòng quay Quậy Sát Phạt">
+                        <div class="wheel-arrow-fixed">
+                            <svg width="60" height="70" viewBox="0 0 60 70">
+                                <polygon points="30,70 0,0 60,0" fill="#fbbf24" stroke="#fff" stroke-width="4"/>
+                                <circle cx="30" cy="20" r="10" fill="#fff"/>
+                            </svg>
+                        </div>
+                        <div class="wheel-center-drink" data-action="drink">QUAY<br>NGAY</div>
+                    </div>
+
+                    <div class="wheel-result" id="result-drink">
+                        <span class="wheel-result-text">Nhấn "QUAY NGAY" để bắt đầu quậy!</span>
+                    </div>
+
+                    <button class="wheel-btn" id="btnSpinDrink">🍻 QUẬY SÁT PHẠT</button>
+                    <button class="wheel-btn secondary" id="btnResetDrink">↻ Reset</button>
+
+                    <!-- LỊCH SỬ -->
+                    <div class="result-history" id="historyDrink" style="display: none;">
+                        <h4>📋 Lịch sử quay</h4>
+                        <div id="historyList"></div>
+                    </div>
+                </div>
+
+            </section>
+
+            <footer class="footer">
+                <span>© 2026 SportsVN</span>
+                <span>Nền tảng công nghệ thể thao Việt Nam</span>
+            </footer>
+
+        </main>
+
+    </div>
+
+    <script>
+        // ==========================================
+        // LUCKY WHEEL - 2 CHẾ ĐỘ + ÂM THANH
+        // ==========================================
+
+        // ================================
+        // 0. AUDIO SYSTEM (Web Audio API)
+        // ================================
+        let audioContext = null;
+        let soundEnabled = true;
+
+        function initAudio() {
+            if (!audioContext) {
+                audioContext = new (window.AudioContext || window.webkitAudioContext)();
+            }
+            if (audioContext.state === 'suspended') {
+                audioContext.resume();
+            }
+            return audioContext;
+        }
+
+        function playTick() {
+            if (!soundEnabled) return;
+            try {
+                const ctx = initAudio();
+                const osc = ctx.createOscillator();
+                const gain = ctx.createGain();
+                osc.type = 'square';
+                osc.frequency.setValueAtTime(800, ctx.currentTime);
+                osc.frequency.exponentialRampToValueAtTime(400, ctx.currentTime + 0.03);
+                gain.gain.setValueAtTime(0.08, ctx.currentTime);
+                gain.gain.exponentialRampToValueAtTime(0.001, ctx.currentTime + 0.05);
+                osc.connect(gain);
+                gain.connect(ctx.destination);
+                osc.start(ctx.currentTime);
+                osc.stop(ctx.currentTime + 0.05);
+            } catch (e) {}
+        }
+
+        function playDing() {
+            if (!soundEnabled) return;
+            try {
+                const ctx = initAudio();
+                const osc1 = ctx.createOscillator();
+                const gain1 = ctx.createGain();
+                osc1.type = 'sine';
+                osc1.frequency.setValueAtTime(523.25, ctx.currentTime);
+                gain1.gain.setValueAtTime(0.15, ctx.currentTime);
+                gain1.gain.exponentialRampToValueAtTime(0.001, ctx.currentTime + 0.8);
+                osc1.connect(gain1);
+                gain1.connect(ctx.destination);
+                osc1.start(ctx.currentTime);
+                osc1.stop(ctx.currentTime + 0.8);
+
+                const osc2 = ctx.createOscillator();
+                const gain2 = ctx.createGain();
+                osc2.type = 'sine';
+                osc2.frequency.setValueAtTime(659.25, ctx.currentTime);
+                gain2.gain.setValueAtTime(0.12, ctx.currentTime);
+                gain2.gain.exponentialRampToValueAtTime(0.001, ctx.currentTime + 0.9);
+                osc2.connect(gain2);
+                gain2.connect(ctx.destination);
+                osc2.start(ctx.currentTime);
+                osc2.stop(ctx.currentTime + 0.9);
+            } catch (e) {}
+        }
+
+        document.getElementById('soundToggle').addEventListener('click', () => {
+            soundEnabled = !soundEnabled;
+            document.getElementById('soundStatus').textContent = 'Âm thanh: ' + (soundEnabled ? 'BẬT' : 'TẮT');
+            if (soundEnabled) playTick();
+        });
+
+        document.body.addEventListener('click', () => { initAudio(); }, { once: true });
+
+        // ================================
+        // 1. TAB SWITCHING
+        // ================================
+        document.addEventListener('DOMContentLoaded', function() {
+            'use strict';
+
+            const tabs = document.querySelectorAll('.wheel-tab');
+            const panels = {
+                winner: document.getElementById('panel-winner'),
+                drink: document.getElementById('panel-drink')
+            };
+
+            tabs.forEach(tab => {
+                tab.addEventListener('click', () => {
+                    tabs.forEach(t => t.classList.remove('active'));
+                    tab.classList.add('active');
+                    Object.keys(panels).forEach(key => {
+                        panels[key].hidden = (key !== tab.dataset.tab);
+                    });
+                });
+            });
+
+            // ================================
+            // 2. VÒNG QUAY TRÚNG THƯỞNG
+            // ================================
+            const winnerCanvas = document.getElementById('wheelCanvas-winner');
+            const winnerCtx = winnerCanvas.getContext('2d');
+            let participants = [];
+            let isSpinningWinner = false;
+            let currentRotationWinner = 0;
+
+            const winnerColors = ['#1769ff', '#10b981', '#f59e0b', '#8b5cf6', '#ef4444', '#06b6d4', '#ec4899', '#84cc16', '#f97316', '#a855f7'];
+
+            function drawWinnerWheel(rotation = 0) {
+                const size = 450;
+                const centerX = size / 2;
+                const centerY = size / 2;
+                const radius = size / 2 - 10;
+
+                winnerCtx.clearRect(0, 0, size, size);
+
+                if (participants.length === 0) {
+                    winnerCtx.beginPath();
+                    winnerCtx.arc(centerX, centerY, radius, 0, Math.PI * 2);
+                    winnerCtx.fillStyle = '#f3f4f6';
+                    winnerCtx.fill();
+                    winnerCtx.strokeStyle = '#e5e7eb';
+                    winnerCtx.lineWidth = 3;
+                    winnerCtx.stroke();
+
+                    winnerCtx.fillStyle = '#9ca3af';
+                    winnerCtx.font = 'bold 16px Inter, sans-serif';
+                    winnerCtx.textAlign = 'center';
+                    winnerCtx.fillText('Chưa có người tham gia', centerX, centerY);
+                    return;
+                }
+
+                const numSegments = participants.length;
+                const anglePerSegment = (Math.PI * 2) / numSegments;
+
+                for (let i = 0; i < numSegments; i++) {
+                    const startAngle = i * anglePerSegment + rotation;
+                    const endAngle = (i + 1) * anglePerSegment + rotation;
+
+                    winnerCtx.beginPath();
+                    winnerCtx.moveTo(centerX, centerY);
+                    winnerCtx.arc(centerX, centerY, radius, startAngle, endAngle);
+                    winnerCtx.closePath();
+                    winnerCtx.fillStyle = winnerColors[i % winnerColors.length];
+                    winnerCtx.fill();
+                    winnerCtx.strokeStyle = '#fff';
+                    winnerCtx.lineWidth = 3;
+                    winnerCtx.stroke();
+
+                    winnerCtx.save();
+                    winnerCtx.translate(centerX, centerY);
+                    winnerCtx.rotate(startAngle + anglePerSegment / 2);
+                    winnerCtx.textAlign = 'right';
+                    winnerCtx.fillStyle = '#fff';
+                    winnerCtx.font = 'bold 14px Inter, sans-serif';
+                    const name = participants[i];
+                    const displayName = name.length > 12 ? name.slice(0, 12) + '...' : name;
+                    winnerCtx.fillText(displayName, radius - 20, 5);
+                    winnerCtx.restore();
+                }
+            }
+
+            function addParticipant() {
+                const input = document.getElementById('inputName');
+                const name = input.value.trim();
+                if (!name) return;
+                if (participants.includes(name)) {
+                    alert('Tên này đã có trong danh sách!');
+                    return;
+                }
+                participants.push(name);
+                input.value = '';
+                renderNameList();
+                drawWinnerWheel(currentRotationWinner * Math.PI / 180);
+                playTick();
+            }
+
+            window.removeParticipant = function(index) {
+                participants.splice(index, 1);
+                renderNameList();
+                drawWinnerWheel(currentRotationWinner * Math.PI / 180);
+                playTick();
+            };
+
+            function renderNameList() {
+                const list = document.getElementById('nameList');
+                document.getElementById('countNames').textContent = participants.length;
+
+                if (participants.length === 0) {
+                    list.innerHTML = '<span style="color: var(--text-light); font-size: 13px; font-style: italic;">Chưa có ai trong danh sách</span>';
+                    return;
+                }
+
+                list.innerHTML = participants.map((name, i) => `
+                    <span style="padding: 6px 12px; background: var(--primary-light); color: var(--primary); border-radius: 20px; font-size: 13px; font-weight: 700; display: inline-flex; align-items: center; gap: 6px;">
+                        ${name}
+                        <span style="cursor: pointer; font-size: 16px; line-height: 1;" onclick="removeParticipant(${i})">×</span>
+                    </span>
+                `).join('');
+            }
+
+            document.getElementById('btnAddName').addEventListener('click', addParticipant);
+            document.getElementById('inputName').addEventListener('keypress', (e) => {
+                if (e.key === 'Enter') addParticipant();
+            });
+
+            function spinWinner() {
+                if (isSpinningWinner) return;
+                if (participants.length < 2) {
+                    alert('Cần ít nhất 2 người tham gia!');
+                    return;
+                }
+
+                isSpinningWinner = true;
+                const resultEl = document.getElementById('result-winner');
+                resultEl.className = 'wheel-result';
+                resultEl.innerHTML = '<span class="wheel-result-text">🎯 Đang quay...</span>';
+
+                const btn = document.getElementById('btnSpinWinner');
+                btn.disabled = true;
+                document.querySelector('.wheel-center-drink[data-action="winner"]').classList.add('spinning');
+
+                const winnerIndex = Math.floor(Math.random() * participants.length);
+                const winner = participants[winnerIndex];
+
+                const anglePerSegment = 360 / participants.length;
+                const targetAngle = 360 * 8 + (360 - (winnerIndex * anglePerSegment + anglePerSegment / 2));
+
+                const startTime = Date.now();
+                const duration = 5000;
+                const startRotation = currentRotationWinner;
+                const totalRotation = targetAngle;
+
+                let lastTickTime = 0;
+                function animate() {
+                    const elapsed = Date.now() - startTime;
+                    const progress = Math.min(elapsed / duration, 1);
+                    const eased = 1 - Math.pow(1 - progress, 3);
+                    currentRotationWinner = startRotation + totalRotation * eased;
+                    drawWinnerWheel(currentRotationWinner * Math.PI / 180);
+
+                    const now = Date.now();
+                    const tickInterval = 50 + progress * 200;
+                    if (now - lastTickTime > tickInterval) {
+                        playTick();
+                        lastTickTime = now;
+                    }
+
+                    if (progress < 1) {
+                        requestAnimationFrame(animate);
+                    } else {
+                        isSpinningWinner = false;
+                        btn.disabled = false;
+                        document.querySelector('.wheel-center-drink[data-action="winner"]').classList.remove('spinning');
+                        playDing();
+                        resultEl.className = 'wheel-result winner';
+                        resultEl.innerHTML = `<span class="wheel-result-text">🎉 Người thắng: ${winner} 🎉</span>`;
+                    }
+                }
+                animate();
+            }
+
+            document.getElementById('btnSpinWinner').addEventListener('click', spinWinner);
+            document.querySelector('.wheel-center-drink[data-action="winner"]').addEventListener('click', spinWinner);
+
+            document.getElementById('btnResetWinner').addEventListener('click', () => {
+                if (isSpinningWinner) return;
+                if (!confirm('Xóa tất cả người tham gia?')) return;
+                participants = [];
+                currentRotationWinner = 0;
+                renderNameList();
+                drawWinnerWheel(0);
+                document.getElementById('result-winner').className = 'wheel-result';
+                document.getElementById('result-winner').innerHTML = '<span class="wheel-result-text">Thêm người tham gia rồi nhấn "QUAY NGAY"</span>';
+            });
+
+            drawWinnerWheel(0);
+
+            // ================================
+            // 3. VÒNG QUAY QUẬY SÁT PHẠT
+            // ================================
+            const drinkImg = document.getElementById('wheelImg-drink');
+            const drinkItems = [
+                'Uống 1 ly',
+                'Nam uống 100%',
+                'Trái hay phải uống',
+                'Bên phải uống',
+                'Chỉ định 1 người uống',
+                'Uống 1/2 ly',
+                'Nữ uống 100%',
+                'Quay lần nữa',
+                'Uống 2 ly',
+                'Cả bàn cùng dzô!',
+                'Chọn 1 người cùng uống',
+                'Mặc áo màu uống',
+                'Qua luật (Khỏi uống)',
+                'Người đối diện uống',
+                'Nhìn mọi người uống',
+                'Bên trái uống'
+            ];
+            let isSpinningDrink = false;
+            let currentRotationDrink = 0;
+            let drinkHistory = [];
+
+            // Số ô trên ảnh — dựa vào ảnh: 12 ô chính
+            // Ảnh có 12 ô, mỗi ô 30 độ
+            // Mũi tên vàng ở trên cùng (12 giờ) = 0 độ
+            // Ô 1 (Uống 1 ly) bắt đầu từ -15° đến 15° (tâm 0°)
+            // Vậy để trỏ vào ô i, cần xoay ảnh sao cho tâm ô i trùng 0° (12 giờ)
+            // Góc xoay = -i * 30° + 360°*n
+
+            const DRINK_SEGMENTS = 12;
+            const DRINK_ITEMS_12 = [
+                'Uống 1 ly',           // ô 1 - tâm 0°
+                'Nam uống 100%',       // ô 2 - tâm 30°
+                'Trái hay phải uống',  // ô 3 - tâm 60°
+                'Bên phải uống',       // ô 4 - tâm 90°
+                'Chỉ định 1 người uống', // ô 5 - tâm 120°
+                'Uống 1/2 ly',         // ô 6 - tâm 150°
+                'Nữ uống 100%',        // ô 7 - tâm 180°
+                'Quay lần nữa',        // ô 8 - tâm 210°
+                'Uống 2 ly',           // ô 9 - tâm 240°
+                'Cả bàn cùng dzô!',    // ô 10 - tâm 270°
+                'Chọn 1 người cùng uống', // ô 11 - tâm 300°
+                'Mặc áo màu uống'      // ô 12 - tâm 330°
+            ];
+
+            function spinDrink() {
+                if (isSpinningDrink) return;
+                isSpinningDrink = true;
+
+                const resultEl = document.getElementById('result-drink');
+                resultEl.className = 'wheel-result';
+                resultEl.innerHTML = '<span class="wheel-result-text">🍻 Đang quay...</span>';
+
+                const btn = document.getElementById('btnSpinDrink');
+                btn.disabled = true;
+                document.querySelector('.wheel-center-drink[data-action="drink"]').classList.add('spinning');
+
+                // Chọn ô ngẫu nhiên
+                const winnerIndex = Math.floor(Math.random() * DRINK_SEGMENTS);
+                const winner = DRINK_ITEMS_12[winnerIndex];
+
+                // Tính góc xoay để ô winnerIndex trỏ lên trên (12 giờ)
+                const anglePerSegment = 360 / DRINK_SEGMENTS;
+                // Tâm ô i ở góc i*30°. Muốn đưa về 0° → xoay -i*30°
+                // Thêm 5 vòng (1800°) cho đẹp
+                const targetRotation = currentRotationDrink + (360 * 5) + (360 - (winnerIndex * anglePerSegment)) % 360;
+
+                // Set transition và xoay ảnh
+                drinkImg.style.transition = 'transform 6s cubic-bezier(0.17, 0.67, 0.12, 0.99)';
+                drinkImg.style.transform = `rotate(${targetRotation}deg)`;
+                currentRotationDrink = targetRotation;
+
+                // Phát tiếng tick trong lúc quay
+                let tickCount = 0;
+                const maxTicks = 60;
+                const tickInterval = setInterval(() => {
+                    playTick();
+                    tickCount++;
+                    if (tickCount >= maxTicks) clearInterval(tickInterval);
+                }, 100);
+
+                // Sau 6 giây, dừng và hiện kết quả
+                setTimeout(() => {
+                    isSpinningDrink = false;
+                    btn.disabled = false;
+                    document.querySelector('.wheel-center-drink[data-action="drink"]').classList.remove('spinning');
+
+                    playDing();
+                    resultEl.className = 'wheel-result winner';
+                    resultEl.innerHTML = `<span class="wheel-result-text">🎉 ${winner} 🎉</span>`;
+
+                    // Thêm vào lịch sử
+                    drinkHistory.unshift(winner);
+                    renderDrinkHistory();
+                }, 6100);
+            }
+
+            function renderDrinkHistory() {
+                const historyEl = document.getElementById('historyDrink');
+                const listEl = document.getElementById('historyList');
+
+                if (drinkHistory.length === 0) {
+                    historyEl.style.display = 'none';
+                    return;
+                }
+
+                historyEl.style.display = 'block';
+                listEl.innerHTML = drinkHistory.slice(0, 5).map((item, i) => `
+                    <div class="result-history-item">
+                        <strong>#${drinkHistory.length - i}</strong> — ${item}
+                    </div>
+                `).join('');
+            }
+
+            document.getElementById('btnSpinDrink').addEventListener('click', spinDrink);
+            document.querySelector('.wheel-center-drink[data-action="drink"]').addEventListener('click', spinDrink);
+
+            document.getElementById('btnResetDrink').addEventListener('click', () => {
+                if (isSpinningDrink) return;
+                if (!confirm('Reset vòng quay về ban đầu?')) return;
+                currentRotationDrink = 0;
+                drinkImg.style.transition = 'transform 0.5s';
+                drinkImg.style.transform = 'rotate(0deg)';
+                drinkHistory = [];
+                renderDrinkHistory();
+                document.getElementById('result-drink').className = 'wheel-result';
+                document.getElementById('result-drink').innerHTML = '<span class="wheel-result-text">Nhấn "QUAY NGAY" để bắt đầu quậy!</span>';
+            });
+
+            console.log('✅ Trang Vòng quay may mắn đã sẵn sàng');
+        });
+    </script>
+
+</body>
+</html>
