@@ -441,7 +441,522 @@
     <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
     <script src="config.js"></script>
     <script src="provinces.js"></script>
-    <!-- PHẦN 2: SCRIPT SẼ ĐƯỢC THÊM VÀO ĐÂY -->
+<script>
+(function() {
+    'use strict';
+
+    // ==========================================
+    // CẤU HÌNH
+    // ==========================================
+    let supabaseClient = null;
+    let currentSession = null;
+    let allVenues = [];
+    let uploadedImages = [];
+    let isAdmin = false;
+
+    const ADMIN_EMAIL = 'nguyenquanghao2505@gmail.com';
+    const STORAGE_BUCKET = 'sports-images';
+
+    // ==========================================
+    // KHỞI TẠO
+    // ==========================================
+    document.addEventListener('DOMContentLoaded', async function() {
+        const config = window.SPORTSVN_CONFIG || {};
+        if (!config.SUPABASE_URL || !config.SUPABASE_ANON_KEY) {
+            console.error('❌ Chưa cấu hình Supabase trong config.js');
+            return;
+        }
+
+        supabaseClient = window.supabase.createClient(
+            config.SUPABASE_URL,
+            config.SUPABASE_ANON_KEY
+        );
+
+        await checkAuth();
+        loadProvinces();
+        await loadVenues();
+        bindEvents();
+    });
+
+    // ==========================================
+    // 1. KIỂM TRA ĐĂNG NHẬP ADMIN
+    // ==========================================
+    async function checkAuth() {
+        try {
+            const { data: { session } } = await supabaseClient.auth.getSession();
+            if (!session) return;
+
+            currentSession = session;
+
+            // Cách 1: Kiểm tra qua email
+            if (session.user.email === ADMIN_EMAIL) {
+                isAdmin = true;
+            } else {
+                // Cách 2: Kiểm tra qua bảng user_roles
+                const { data: roleData } = await supabaseClient
+                    .from('user_roles')
+                    .select('role')
+                    .eq('user_id', session.user.id)
+                    .eq('role', 'admin')
+                    .maybeSingle();
+                
+                if (roleData) isAdmin = true;
+            }
+
+            if (isAdmin) {
+                document.getElementById('addVenueBtn').classList.add('visible');
+                console.log('✅ Admin - Đã hiện nút "Thêm sân mới"');
+            } else {
+                console.log('ℹ️ User thường - Không có quyền thêm sân');
+            }
+        } catch (e) {
+            console.warn('⚠️ Lỗi check auth:', e);
+        }
+    }
+
+    // ==========================================
+    // 2. LOAD TỈNH THÀNH VÀO DROPDOWN
+    // ==========================================
+    function loadProvinces() {
+        const provinceFilter = document.getElementById('provinceFilter');
+        const venueProvince = document.getElementById('venueProvince');
+
+        if (window.VIETNAM_PROVINCES && Array.isArray(window.VIETNAM_PROVINCES)) {
+            window.VIETNAM_PROVINCES.forEach(p => {
+                // Filter dropdown
+                const opt1 = document.createElement('option');
+                opt1.value = p.name;
+                opt1.textContent = p.name;
+                provinceFilter.appendChild(opt1);
+
+                // Form dropdown
+                const opt2 = document.createElement('option');
+                opt2.value = p.name;
+                opt2.textContent = p.name;
+                venueProvince.appendChild(opt2);
+            });
+            console.log('✅ Đã load', window.VIETNAM_PROVINCES.length, 'tỉnh thành');
+        } else {
+            console.warn('⚠️ Chưa có file provinces.js hoặc window.VIETNAM_PROVINCES');
+        }
+    }
+
+    // ==========================================
+    // 3. LOAD DANH SÁCH SÂN TỪ SUPABASE
+    // ==========================================
+    async function loadVenues() {
+        const grid = document.getElementById('venueGrid');
+
+        try {
+            const { data, error } = await supabaseClient
+                .from('sports_venues')
+                .select('*')
+                .eq('status', 'active')
+                .order('created_at', { ascending: false });
+
+            if (error) throw error;
+
+            allVenues = data || [];
+            renderVenues(allVenues);
+            console.log('✅ Đã load', allVenues.length, 'sân');
+
+        } catch (err) {
+            console.error('❌ Lỗi load sân:', err);
+            grid.innerHTML = `
+                <div class="empty-state">
+                    <div class="empty-state-icon">❌</div>
+                    <h3>Không thể tải danh sách sân</h3>
+                    <p>Lỗi: ${escapeHtml(err.message)}</p>
+                </div>
+            `;
+        }
+    }
+
+    // ==========================================
+    // 4. RENDER DANH SÁCH SÂN
+    // ==========================================
+    function renderVenues(venues) {
+        const grid = document.getElementById('venueGrid');
+        document.getElementById('venueCount').textContent = venues.length;
+
+        if (!venues || venues.length === 0) {
+            grid.innerHTML = `
+                <div class="empty-state">
+                    <div class="empty-state-icon">🏟️</div>
+                    <h3>Chưa có sân nào</h3>
+                    <p>Hãy thêm sân mới hoặc thử tìm kiếm với từ khóa khác</p>
+                </div>
+            `;
+            return;
+        }
+
+        const sportIcons = {
+            'Bóng đá': '⚽',
+            'Bóng rổ': '🏀',
+            'Bơi': '🏊',
+            'Pickleball': '🏓',
+            'Cầu lông': '🏸',
+            'Tennis': '🎾',
+            'Bóng bàn': '🏓',
+            'Khác': '🏆'
+        };
+
+        grid.innerHTML = venues.map(venue => {
+            const imageUrl = venue.images && venue.images.length > 0 
+                ? venue.images[0] 
+                : null;
+
+            const price = venue.price_per_hour 
+                ? Number(venue.price_per_hour).toLocaleString('vi-VN') + 'đ' 
+                : 'Liên hệ';
+
+            const icon = sportIcons[venue.sport_type] || '🏆';
+
+            return `
+                <div class="venue-card">
+                    ${imageUrl 
+                        ? `<img src="${escapeHtml(imageUrl)}" alt="${escapeHtml(venue.name)}" class="venue-image" onerror="this.style.display='none'; this.nextElementSibling.style.display='flex';"><div class="venue-image-placeholder" style="display:none;">${icon}</div>`
+                        : `<div class="venue-image-placeholder">${icon}</div>`
+                    }
+                    <div class="venue-body">
+                        <span class="venue-sport">${icon} ${escapeHtml(venue.sport_type || 'Thể thao')}</span>
+                        <h3 class="venue-name">${escapeHtml(venue.name)}</h3>
+                        <div class="venue-address">
+                            📍 ${escapeHtml(venue.address || '')}${venue.district ? ', ' + escapeHtml(venue.district) : ''}${venue.province ? ', ' + escapeHtml(venue.province) : ''}
+                        </div>
+                        <div class="venue-info">
+                            <div class="venue-price">
+                                <span class="venue-price-label">Giá thuê</span>
+                                <span class="venue-price-value">${price}/giờ</span>
+                            </div>
+                            <button class="venue-book-btn" onclick="bookVenue(${venue.id})">
+                                Đặt sân
+                            </button>
+                        </div>
+                    </div>
+                </div>
+            `;
+        }).join('');
+    }
+
+    // ==========================================
+    // 5. BIND SỰ KIỆN
+    // ==========================================
+    function bindEvents() {
+        // Nút tìm kiếm
+        document.getElementById('searchBtn').addEventListener('click', filterVenues);
+        
+        // Enter trong ô tìm kiếm
+        document.getElementById('searchInput').addEventListener('keypress', (e) => {
+            if (e.key === 'Enter') filterVenues();
+        });
+
+        // Đổi tỉnh
+        document.getElementById('provinceFilter').addEventListener('change', filterVenues);
+
+        // Nút thêm sân
+        document.getElementById('addVenueBtn').addEventListener('click', openVenueModal);
+
+        // Đóng modal
+        document.getElementById('closeVenueModal').addEventListener('click', closeVenueModal);
+        document.getElementById('cancelVenueModal').addEventListener('click', closeVenueModal);
+
+        // Click overlay để đóng
+        document.getElementById('venueModal').addEventListener('click', (e) => {
+            if (e.target.id === 'venueModal') closeVenueModal();
+        });
+
+        // ESC để đóng
+        document.addEventListener('keydown', (e) => {
+            if (e.key === 'Escape') closeVenueModal();
+        });
+
+        // Upload tabs (URL / File)
+        document.querySelectorAll('.upload-tab').forEach(tab => {
+            tab.addEventListener('click', () => {
+                const type = tab.dataset.upload;
+                document.querySelectorAll('.upload-tab').forEach(t => t.classList.remove('active'));
+                tab.classList.add('active');
+                
+                document.getElementById('panel-url').hidden = (type !== 'url');
+                document.getElementById('panel-file').hidden = (type !== 'file');
+            });
+        });
+
+        // Thêm URL ảnh
+        document.getElementById('addUrlBtn').addEventListener('click', addImageFromUrl);
+        document.getElementById('urlInput').addEventListener('keypress', (e) => {
+            if (e.key === 'Enter') {
+                e.preventDefault();
+                addImageFromUrl();
+            }
+        });
+
+        // Upload file (drag & drop)
+        const dropZone = document.getElementById('fileDropZone');
+        const fileInput = document.getElementById('fileInput');
+
+        dropZone.addEventListener('click', () => fileInput.click());
+        
+        dropZone.addEventListener('dragover', (e) => {
+            e.preventDefault();
+            dropZone.style.borderColor = 'var(--primary, #1769ff)';
+            dropZone.style.background = '#e3f2fd';
+        });
+
+        dropZone.addEventListener('dragleave', () => {
+            dropZone.style.borderColor = '';
+            dropZone.style.background = '';
+        });
+
+        dropZone.addEventListener('drop', (e) => {
+            e.preventDefault();
+            dropZone.style.borderColor = '';
+            dropZone.style.background = '';
+            handleFiles(e.dataTransfer.files);
+        });
+
+        fileInput.addEventListener('change', (e) => {
+            handleFiles(e.target.files);
+        });
+
+        // Submit form
+        document.getElementById('venueForm').addEventListener('submit', handleVenueSubmit);
+    }
+
+    function filterVenues() {
+        const keyword = document.getElementById('searchInput').value.trim().toLowerCase();
+        const province = document.getElementById('provinceFilter').value;
+
+        let filtered = allVenues;
+
+        if (keyword) {
+            filtered = filtered.filter(v => 
+                (v.name || '').toLowerCase().includes(keyword) ||
+                (v.address || '').toLowerCase().includes(keyword)
+            );
+        }
+
+        if (province) {
+            filtered = filtered.filter(v => v.province === province);
+        }
+
+        renderVenues(filtered);
+    }
+
+    // ==========================================
+    // 6. QUẢN LÝ ẢNH
+    // ==========================================
+    function addImageFromUrl() {
+        const input = document.getElementById('urlInput');
+        const url = input.value.trim();
+
+        if (!url) return;
+        if (uploadedImages.length >= 5) {
+            alert('Tối đa 5 ảnh!');
+            return;
+        }
+
+        if (!url.match(/^https?:\/\/.+/)) {
+            alert('URL không hợp lệ! Phải bắt đầu bằng http:// hoặc https://');
+            return;
+        }
+
+        uploadedImages.push(url);
+        input.value = '';
+        renderImagePreview();
+    }
+
+    async function handleFiles(files) {
+        const fileArray = Array.from(files);
+        
+        for (const file of fileArray) {
+            if (uploadedImages.length >= 5) {
+                alert('Tối đa 5 ảnh!');
+                break;
+            }
+
+            if (file.size > 5 * 1024 * 1024) {
+                alert(`Ảnh "${file.name}" vượt quá 5MB!`);
+                continue;
+            }
+
+            if (!file.type.startsWith('image/')) {
+                alert(`File "${file.name}" không phải ảnh!`);
+                continue;
+            }
+
+            try {
+                const url = await uploadToSupabase(file);
+                uploadedImages.push(url);
+                renderImagePreview();
+                console.log('✅ Upload thành công:', url);
+            } catch (err) {
+                console.error('Lỗi upload:', err);
+                alert('Không thể upload ảnh: ' + err.message);
+            }
+        }
+    }
+
+    async function uploadToSupabase(file) {
+        const fileName = `${Date.now()}-${Math.random().toString(36).substring(7)}-${file.name.replace(/[^a-zA-Z0-9.-]/g, '_')}`;
+        const filePath = `venues/${fileName}`;
+
+        const { data, error } = await supabaseClient.storage
+            .from(STORAGE_BUCKET)
+            .upload(filePath, file, {
+                cacheControl: '3600',
+                upsert: false
+            });
+
+        if (error) throw error;
+
+        const { data: { publicUrl } } = supabaseClient.storage
+            .from(STORAGE_BUCKET)
+            .getPublicUrl(filePath);
+
+        return publicUrl;
+    }
+
+    function renderImagePreview() {
+        const grid = document.getElementById('imagePreviewGrid');
+        grid.innerHTML = uploadedImages.map((url, index) => `
+            <div class="image-preview-item">
+                <img src="${escapeHtml(url)}" alt="Preview">
+                <button type="button" class="image-remove" onclick="removeImage(${index})" title="Xóa ảnh">×</button>
+            </div>
+        `).join('');
+    }
+
+    window.removeImage = function(index) {
+        uploadedImages.splice(index, 1);
+        renderImagePreview();
+    };
+
+    // ==========================================
+    // 7. MODAL THÊM SÂN
+    // ==========================================
+    function openVenueModal() {
+        if (!isAdmin) {
+            alert('⛔ Chỉ admin mới có thể thêm sân!');
+            return;
+        }
+        document.getElementById('venueModal').hidden = false;
+        document.getElementById('venueForm').reset();
+        uploadedImages = [];
+        renderImagePreview();
+        document.getElementById('venueFormMessage').className = 'form-message';
+    }
+
+    function closeVenueModal() {
+        document.getElementById('venueModal').hidden = true;
+    }
+
+    async function handleVenueSubmit(e) {
+        e.preventDefault();
+
+        const form = e.target;
+        const formData = new FormData(form);
+
+        const amenities = [];
+        form.querySelectorAll('input[name="amenities"]:checked').forEach(cb => {
+            amenities.push(cb.value);
+        });
+
+        const payload = {
+            name: formData.get('name').trim(),
+            sport_type: formData.get('sport_type'),
+            province: formData.get('province'),
+            district: formData.get('district').trim() || null,
+            address: formData.get('address').trim(),
+            phone: formData.get('phone').trim() || null,
+            price_per_hour: parseFloat(formData.get('price_per_hour')) || 0,
+            open_time: formData.get('open_time') || '06:00',
+            close_time: formData.get('close_time') || '22:00',
+            amenities: amenities.length > 0 ? amenities : null,
+            images: uploadedImages.length > 0 ? uploadedImages : null,
+            description: formData.get('description').trim() || null,
+            status: 'active',
+            owner_id: currentSession?.user?.id || null
+        };
+
+        // Validate
+        if (!payload.name || !payload.sport_type || !payload.province || !payload.address) {
+            showFormMessage('⚠️ Vui lòng nhập đầy đủ các trường bắt buộc!', 'error');
+            return;
+        }
+
+        const btn = document.getElementById('submitVenueBtn');
+        btn.disabled = true;
+        btn.textContent = '⏳ Đang lưu...';
+
+        try {
+            const { error } = await supabaseClient
+                .from('sports_venues')
+                .insert(payload);
+
+            if (error) throw error;
+
+            showFormMessage('✅ Thêm sân thành công!', 'success');
+            console.log('✅ Đã thêm sân:', payload.name);
+            
+            setTimeout(() => {
+                closeVenueModal();
+                loadVenues();
+            }, 1000);
+
+        } catch (err) {
+            console.error('❌ Lỗi thêm sân:', err);
+            showFormMessage('Lỗi: ' + err.message, 'error');
+        } finally {
+            btn.disabled = false;
+            btn.textContent = '💾 Thêm sân';
+        }
+    }
+
+    function showFormMessage(message, type) {
+        const el = document.getElementById('venueFormMessage');
+        el.textContent = message;
+        el.className = 'form-message show ' + type;
+    }
+
+    // ==========================================
+    // 8. ĐẶT SÂN (Modal thông tin liên hệ)
+    // ==========================================
+    window.bookVenue = function(venueId) {
+        const venue = allVenues.find(v => String(v.id) === String(venueId));
+        if (!venue) {
+            alert('Không tìm thấy sân!');
+            return;
+        }
+
+        const price = Number(venue.price_per_hour).toLocaleString('vi-VN');
+        
+        alert(
+            `📞 LIÊN HỆ ĐẶT SÂN\n\n` +
+            `🏟️ ${venue.name}\n` +
+            `📍 ${venue.address}${venue.district ? ', ' + venue.district : ''}${venue.province ? ', ' + venue.province : ''}\n` +
+            `💰 ${price}đ/giờ\n` +
+            `${venue.phone ? '📞 ' + venue.phone : ''}\n` +
+            `${venue.open_time && venue.close_time ? '⏰ ' + venue.open_time + ' - ' + venue.close_time : ''}\n\n` +
+            `ℹ️ Tính năng đặt sân online đang được phát triển!`
+        );
+    };
+
+    // ==========================================
+    // 9. HELPERS
+    // ==========================================
+    function escapeHtml(text) {
+        return String(text || '')
+            .replace(/&/g, '&amp;')
+            .replace(/</g, '&lt;')
+            .replace(/>/g, '&gt;')
+            .replace(/"/g, '&quot;')
+            .replace(/'/g, '&#039;');
+    }
+
+})();
+</script>
 
 </body>
 </html>
