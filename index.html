@@ -6,7 +6,7 @@
     <meta name="description" content="SportsVN - Nền tảng công nghệ thể thao Việt Nam">
     <title>SportsVN - Nền tảng thể thao Việt Nam</title>
     <link rel="stylesheet" href="styles.css">
-        <script src="football.js" defer></script>
+    <script src="football.js" defer></script>
 </head>
 
 <body>
@@ -328,48 +328,35 @@
                     </section>
 
 
-                    <!-- CỘT 3: KẾT QUẢ + LIÊN KẾT -->
+                    <!-- CỘT 3: KẾT QUẢ BÓNG ĐÁ - PANEL MỚI -->
                     <section class="panel">
                         <div class="panel-header">
                             <div>
-                                <h2>⚽ Kết quả giải Bóng đá</h2>
+                                <h2>⚽ Kết quả Bóng đá</h2>
                             </div>
                             <a href="#">Xem tất cả →</a>
                         </div>
 
                         <div class="results-list">
-                            <div class="result-tabs">
-                                <div class="result-tab active">Hôm nay</div>
-                                <div class="result-tab">Hôm qua</div>
-                                <div class="result-tab">Ngày mai</div>
+                            <!-- TABS CHỌN GIẢI ĐẤU -->
+                            <div class="result-tabs" id="footballLeagueTabs">
+                                <div class="result-tab active" data-league="4328">NHA</div>
+                                <div class="result-tab" data-league="4335">La Liga</div>
+                                <div class="result-tab" data-league="4480">C1</div>
+                                <div class="result-tab" data-league="4564">V.League</div>
                             </div>
 
-                            <div class="result-item">
-                                <div class="result-team">QH 1</div>
-                                <div class="result-score">2 - 1</div>
-                                <div class="result-team" style="text-align:right;">QH 2</div>
-                                <div class="result-status">KT</div>
+                            <!-- TABS TRẠNG THÁI -->
+                            <div class="result-tabs" id="footballStatusTabs" style="margin-top:8px;">
+                                <div class="result-tab active" data-status="upcoming">Sắp tới</div>
+                                <div class="result-tab" data-status="recent">Gần đây</div>
                             </div>
 
-                            <div class="result-item">
-                                <div class="result-team">An Hải</div>
-                                <div class="result-score">0 - 0</div>
-                                <div class="result-team" style="text-align:right;">Hải Châu</div>
-                                <div class="result-status">HT</div>
-                            </div>
-
-                            <div class="result-item">
-                                <div class="result-team">Sơn Trà</div>
-                                <div class="result-score">3 - 1</div>
-                                <div class="result-team" style="text-align:right;">Thanh Khê</div>
-                                <div class="result-status">KT</div>
-                            </div>
-
-                            <div class="result-item">
-                                <div class="result-team">Cẩm Lệ</div>
-                                <div class="result-score">1 - 1</div>
-                                <div class="result-team" style="text-align:right;">Ngũ Hành Sơn</div>
-                                <div class="result-status">HT</div>
+                            <!-- DANH SÁCH TRẬN ĐẤU -->
+                            <div id="footballMatches">
+                                <div style="text-align:center;padding:30px;color:#6b7280;font-size:12px;">
+                                    ⏳ Đang tải...
+                                </div>
                             </div>
                         </div>
 
@@ -483,7 +470,6 @@
     <script>
         // ==========================================
         // SPORTSVN DASHBOARD - KẾT NỐI SUPABASE
-        // CHỈ DÙNG 1 SUPABASE CLIENT DUY NHẤT
         // ==========================================
         
         window.supabaseClient = null;
@@ -543,8 +529,6 @@
                 if (changeBannerBtn && userEmail === ADMIN_EMAIL) {
                     changeBannerBtn.classList.add('visible');
                     console.log('✅ Admin đã đăng nhập - Hiện nút đổi ảnh bìa');
-                } else {
-                    console.log('ℹ️ Người dùng thường - Ẩn nút đổi ảnh bìa');
                 }
             }
 
@@ -582,10 +566,7 @@
                             sortBy: { column: 'name', order: 'desc' }
                         });
 
-                    if (error) {
-                        console.error('Lỗi lấy danh sách ảnh:', error);
-                        return;
-                    }
+                    if (error) return;
 
                     var imageFiles = (data || []).filter(function(f) {
                         return f.name &&
@@ -593,10 +574,7 @@
                                /\.(jpg|jpeg|png|gif|webp)$/i.test(f.name);
                     });
 
-                    if (imageFiles.length === 0) {
-                        console.log('ℹ️ Chưa có banner trên Supabase, dùng ảnh mặc định');
-                        return;
-                    }
+                    if (imageFiles.length === 0) return;
 
                     imageFiles.sort(function(a, b) {
                         var aIsSystem = a.name.startsWith('banner-');
@@ -623,7 +601,7 @@
 
                     if (urlData && urlData.publicUrl) {
                         bannerImage.src = urlData.publicUrl + '?t=' + Date.now();
-                        console.log('✅ Đã load banner từ Supabase:', latestImage.name);
+                        console.log('✅ Đã load banner:', latestImage.name);
                     }
                 } catch (err) {
                     console.error('Lỗi load banner:', err);
@@ -642,7 +620,7 @@
                 if (!file) return;
 
                 if (!file.type.startsWith('image/')) {
-                    alert('Vui lòng chọn file ảnh (JPG, PNG, GIF...)');
+                    alert('Vui lòng chọn file ảnh');
                     return;
                 }
 
@@ -695,14 +673,13 @@
 
                             if (filesToDelete.length > 0) {
                                 await supabase.storage.from('banners').remove(filesToDelete);
-                                console.log('🗑️ Đã xóa ' + filesToDelete.length + ' ảnh cũ');
                             }
                         }
                     } catch (cleanupErr) {
                         console.warn('Lỗi xóa ảnh cũ:', cleanupErr);
                     }
 
-                    showToast('✓ Đã đổi ảnh bìa thành công! Tất cả thiết bị đều thấy.');
+                    showToast('✓ Đã đổi ảnh bìa thành công!');
                     console.log('✅ Upload thành công:', urlData.publicUrl);
 
                 } catch (err) {
@@ -729,7 +706,7 @@
             }
 
             // ==========================================
-            // 4. LOAD TIN TỨC MỚI NHẤT TỪ SUPABASE
+            // 4. LOAD TIN TỨC MỚI NHẤT
             // ==========================================
             async function loadHomeNews() {
                 try {
@@ -739,15 +716,7 @@
                         .order('created_at', { ascending: false })
                         .limit(3);
 
-                    if (error) {
-                        console.warn('Lỗi load tin tức:', error);
-                        return;
-                    }
-
-                    if (!data || data.length === 0) {
-                        console.log('ℹ️ Chưa có tin tức, giữ nguyên tin mẫu');
-                        return;
-                    }
+                    if (error || !data || data.length === 0) return;
 
                     const newsList = document.getElementById('homeNewsList');
                     if (!newsList) return;
@@ -773,13 +742,99 @@
                         </a>
                     `).join('');
 
-                    console.log('✅ Đã load ' + data.length + ' tin tức mới nhất');
+                    console.log('✅ Đã load ' + data.length + ' tin tức');
                 } catch (err) {
                     console.warn('Lỗi load tin tức:', err);
                 }
             }
 
             loadHomeNews();
+
+            // ==========================================
+            // 5. LOAD KẾT QUẢ BÓNG ĐÁ TỪ THESPORTSDB
+            // ==========================================
+            let currentLeague = '4328';
+            let currentStatus = 'upcoming';
+
+            async function loadFootballMatches() {
+                const container = document.getElementById('footballMatches');
+                if (!container) return;
+
+                if (!window.FootballAPI) {
+                    container.innerHTML = '<div style="text-align:center;padding:30px;color:#dc2626;font-size:12px;">❌ Football API chưa load</div>';
+                    return;
+                }
+
+                container.innerHTML = '<div style="text-align:center;padding:30px;color:#6b7280;font-size:12px;">⏳ Đang tải...</div>';
+
+                try {
+                    let matches = [];
+                    
+                    if (currentStatus === 'upcoming') {
+                        matches = await window.FootballAPI.getUpcomingMatches(currentLeague);
+                    } else {
+                        matches = await window.FootballAPI.getRecentMatches(currentLeague);
+                    }
+
+                    if (!matches || matches.length === 0) {
+                        container.innerHTML = '<div style="text-align:center;padding:30px;color:#9ca3af;font-size:12px;">📅 Không có trận đấu nào</div>';
+                        return;
+                    }
+
+                    matches.sort((a, b) => new Date(a.dateEvent) - new Date(b.dateEvent));
+                    const displayMatches = matches.slice(0, 5);
+
+                    container.innerHTML = displayMatches.map(match => {
+                        const homeScore = match.intHomeScore ?? '-';
+                        const awayScore = match.intAwayScore ?? '-';
+                        const isFinished = match.intHomeScore !== null && match.intHomeScore !== undefined;
+                        
+                        const statusText = isFinished 
+                            ? 'KT' 
+                            : (match.strTime ? window.FootballAPI.formatMatchTime(match.strTime) : '—');
+                        
+                        const statusColor = isFinished ? '#6b7280' : '#1769ff';
+
+                        return `
+                            <div class="result-item">
+                                <div class="result-team">${match.strHomeTeam}</div>
+                                <div class="result-score">${homeScore} - ${awayScore}</div>
+                                <div class="result-team" style="text-align:right;">${match.strAwayTeam}</div>
+                                <div class="result-status" style="color:${statusColor};font-weight:700;">${statusText}</div>
+                            </div>
+                        `;
+                    }).join('');
+
+                    console.log(`✅ Đã load ${displayMatches.length} trận ${currentLeague}`);
+
+                } catch (error) {
+                    console.error('Lỗi load bóng đá:', error);
+                    container.innerHTML = '<div style="text-align:center;padding:30px;color:#dc2626;font-size:12px;">❌ Không thể tải dữ liệu</div>';
+                }
+            }
+
+            // Sự kiện tabs League
+            document.querySelectorAll('#footballLeagueTabs .result-tab').forEach(tab => {
+                tab.addEventListener('click', () => {
+                    document.querySelectorAll('#footballLeagueTabs .result-tab').forEach(t => t.classList.remove('active'));
+                    tab.classList.add('active');
+                    currentLeague = tab.dataset.league;
+                    loadFootballMatches();
+                });
+            });
+
+            // Sự kiện tabs Status
+            document.querySelectorAll('#footballStatusTabs .result-tab').forEach(tab => {
+                tab.addEventListener('click', () => {
+                    document.querySelectorAll('#footballStatusTabs .result-tab').forEach(t => t.classList.remove('active'));
+                    tab.classList.add('active');
+                    currentStatus = tab.dataset.status;
+                    loadFootballMatches();
+                });
+            });
+
+            // Load lần đầu
+            setTimeout(() => loadFootballMatches(), 500);
 
             console.log('✅ Dashboard SportsVN đã kết nối Supabase');
         });
