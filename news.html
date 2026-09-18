@@ -9,6 +9,8 @@
     <link href="https://cdn.jsdelivr.net/npm/quill@2.0.2/dist/quill.snow.css" rel="stylesheet">
     
     <link rel="stylesheet" href="styles.css">
+    <script src="sidebar.js" defer></script>
+    
     <style>
         /* ===== STYLE RIÊNG CHO TRANG NEWS ===== */
         .news-header {
@@ -282,7 +284,6 @@
             font-family: 'Inter', sans-serif;
         }
         
-        /* Custom Quill toolbar */
         .ql-toolbar.ql-snow {
             border: 0;
             border-bottom: 1px solid var(--border);
@@ -308,7 +309,6 @@
             font-style: normal;
         }
         
-        /* Fix font size dropdown */
         .ql-snow .ql-picker.ql-font {
             width: 140px;
         }
@@ -542,54 +542,7 @@
 
     <div class="app">
 
-        <!-- SIDEBAR -->
-        <aside class="sidebar">
-            <div class="brand">
-                <div class="brand-mark">S</div>
-                <div class="brand-text">
-                    <strong>SportsVN</strong>
-                    <span>Nền tảng thể thao</span>
-                </div>
-            </div>
-
-            <nav class="main-nav">
-                <div class="nav-title">TỔNG QUAN</div>
-                <a href="index.html" class="nav-item"><span class="nav-icon">⌂</span><span>Trang chủ</span></a>
-                <a href="tournaments.html" class="nav-item"><span class="nav-icon">◈</span><span>Giải đấu</span></a>
-                <a href="#" class="nav-item"><span class="nav-icon">♙</span><span>Vận động viên</span></a>
-                <a href="#" class="nav-item"><span class="nav-icon">▣</span><span>Đơn vị</span></a>
-
-                <div class="nav-title">QUẢN LÝ GIẢI</div>
-                <a href="tournaments.html" class="nav-item"><span class="nav-icon">＋</span><span>Tạo giải đấu</span></a>
-                <a href="#" class="nav-item"><span class="nav-icon">☷</span><span>Danh sách đăng ký</span></a>
-                <a href="draw.html" class="nav-item"><span class="nav-icon">◇</span><span>Bốc thăm</span></a>
-                <a href="#" class="nav-item"><span class="nav-icon">▤</span><span>Lịch thi đấu</span></a>
-                <a href="#" class="nav-item"><span class="nav-icon">✓</span><span>Kết quả</span></a>
-
-                <div class="nav-title">THÔNG TIN</div>
-                <a href="news.html" class="nav-item active"><span class="nav-icon">▰</span><span>Tin thể thao</span></a>
-                <a href="#" class="nav-item"><span class="nav-icon">▥</span><span>Bảng thành tích</span></a>
-            </nav>
-
-            <div class="sidebar-bottom">
-                <div class="help-box">
-                    <div class="help-icon">?</div>
-                    <div>
-                        <strong>Cần hỗ trợ?</strong>
-                        <span>Liên hệ SportsVN</span>
-                    </div>
-                </div>
-                <div class="user-mini">
-                    <div class="avatar">H</div>
-                    <div class="user-info">
-                        <strong>Quản trị viên</strong>
-                        <span>SportsVN</span>
-                    </div>
-                    <button class="more-button">⋮</button>
-                </div>
-            </div>
-        </aside>
-
+        <!-- Sidebar sẽ được tự động render bởi sidebar.js -->
 
         <!-- MAIN -->
         <main class="main">
@@ -745,7 +698,7 @@
         let currentSession = null;
         let currentEditingId = null;
         let uploadedImageUrl = null;
-        let quill = null; // Quill editor instance
+        let quill = null;
 
         const ADMIN_EMAIL = 'nguyenquanghao2505@gmail.com';
 
@@ -769,50 +722,18 @@
                 placeholder: 'Nhập nội dung chi tiết của tin tức...',
                 modules: {
                     toolbar: [
-                        // Hàng 1: Font, Size, Color, Background, Format
-                        [
-                            { 'font': ['Inter', 'Times New Roman', 'Arial', 'Georgia', 'Verdana', 'Courier New'] }
-                        ],
-                        [
-                            { 'size': ['10px', '12px', '14px', '15px', '16px', '18px', '20px', '24px', '28px', '32px', '36px'] }
-                        ],
-                        [
-                            { 'color': [] },
-                            { 'background': [] }
-                        ],
-                        [
-                            'bold', 'italic', 'underline', 'strike'
-                        ],
-                        [
-                            { 'script': 'sub' }, { 'script': 'super' }
-                        ],
-                        
-                        // Hàng 2: Danh sách, Căn lề, Thụt lề
-                        [
-                            { 'list': 'ordered' }, { 'list': 'bullet' }
-                        ],
-                        [
-                            { 'indent': '-1' }, { 'indent': '+1' }
-                        ],
-                        [
-                            { 'align': [] }
-                        ],
-                        
-                        // Hàng 3: Blockquote, Code, Link, Image
-                        [
-                            'blockquote', 'code-block'
-                        ],
-                        [
-                            'link', 'image', 'video'
-                        ],
-                        
-                        // Hàng 4: Clear format, Undo/Redo
-                        [
-                            'clean'
-                        ],
-                        [
-                            'undo', 'redo'
-                        ]
+                        [{ 'font': ['Inter', 'Times New Roman', 'Arial', 'Georgia', 'Verdana', 'Courier New'] }],
+                        [{ 'size': ['10px', '12px', '14px', '15px', '16px', '18px', '20px', '24px', '28px', '32px', '36px'] }],
+                        [{ 'color': [] }, { 'background': [] }],
+                        ['bold', 'italic', 'underline', 'strike'],
+                        [{ 'script': 'sub' }, { 'script': 'super' }],
+                        [{ 'list': 'ordered' }, { 'list': 'bullet' }],
+                        [{ 'indent': '-1' }, { 'indent': '+1' }],
+                        [{ 'align': [] }],
+                        ['blockquote', 'code-block'],
+                        ['link', 'image', 'video'],
+                        ['clean'],
+                        ['undo', 'redo']
                     ]
                 }
             });
@@ -1014,8 +935,6 @@
                 const category = document.getElementById('newsCategory').value;
                 const isHot = document.getElementById('newsHot').checked;
                 const summary = document.getElementById('newsSummary').value.trim();
-                
-                // ✅ Lấy nội dung từ Quill (dạng HTML)
                 const content = quill.root.innerHTML;
 
                 if (!title) {
@@ -1078,7 +997,7 @@
                 currentEditingId = null;
                 uploadedImageUrl = null;
                 newsImageInput.value = '';
-                quill.root.innerHTML = ''; // ✅ Xóa nội dung Quill
+                quill.root.innerHTML = '';
                 imageUploadArea.classList.remove('has-image');
                 imageUploadArea.innerHTML = `
                     <div class="image-upload-icon">📷</div>
@@ -1114,8 +1033,6 @@
                 document.getElementById('newsCategory').value = data.category || 'Tin thể thao';
                 document.getElementById('newsHot').checked = data.is_hot || false;
                 document.getElementById('newsSummary').value = data.summary || '';
-                
-                // ✅ Load nội dung HTML vào Quill
                 quill.root.innerHTML = data.content || '';
 
                 if (data.image_url) {
