@@ -97,6 +97,19 @@
             transform-origin: center center;
         }
 
+        /* MŨI TÊN VÀNG Ở TRÊN CÙNG (CỐ ĐỊNH - KHÔNG XOAY) */
+        .wheel-arrow-fixed {
+            position: absolute;
+            top: -20px;
+            left: 50%;
+            transform: translateX(-50%);
+            z-index: 20;
+            pointer-events: none;
+        }
+        .wheel-arrow-fixed svg {
+            filter: drop-shadow(0 4px 8px rgba(0, 0, 0, 0.35));
+        }
+
         /* NÚT QUAY */
         .wheel-center-drink {
             position: absolute;
@@ -319,6 +332,13 @@
 
                     <div class="wheel-container">
                         <canvas id="wheelCanvas-winner" width="450" height="450" style="width: 100%; height: 100%; border-radius: 50%; box-shadow: 0 8px 32px rgba(0, 0, 0, 0.15), 0 0 0 8px #fff, 0 0 0 10px var(--primary-light);"></canvas>
+                        <!-- Mũi tên vàng cố định -->
+                        <div class="wheel-arrow-fixed">
+                            <svg width="40" height="50" viewBox="0 0 40 50">
+                                <polygon points="20,50 0,0 40,0" fill="#fbbf24" stroke="#fff" stroke-width="3"/>
+                                <circle cx="20" cy="15" r="6" fill="#fff"/>
+                            </svg>
+                        </div>
                         <div class="wheel-center-drink" data-action="winner" style="background: linear-gradient(135deg, #1769ff 0%, #4d94ff 100%); box-shadow: 0 6px 20px rgba(23, 105, 255, 0.5), 0 0 0 4px rgba(23, 105, 255, 0.2);">QUAY<br>NGAY</div>
                     </div>
 
@@ -337,6 +357,13 @@
 
                     <div class="wheel-container">
                         <img id="wheelImg-drink" src="wheel-drink.png" alt="Vòng quay Quậy Sát Phạt">
+                        <!-- Mũi tên vàng cố định -->
+                        <div class="wheel-arrow-fixed">
+                            <svg width="40" height="50" viewBox="0 0 40 50">
+                                <polygon points="20,50 0,0 40,0" fill="#fbbf24" stroke="#fff" stroke-width="3"/>
+                                <circle cx="20" cy="15" r="6" fill="#fff"/>
+                            </svg>
+                        </div>
                         <div class="wheel-center-drink" data-action="drink">QUAY<br>NGAY</div>
                     </div>
 
@@ -501,6 +528,7 @@
                 const anglePerSegment = (Math.PI * 2) / numSegments;
 
                 for (let i = 0; i < numSegments; i++) {
+                    // Bắt đầu từ -90° (12 giờ) + rotation
                     const startAngle = i * anglePerSegment + rotation - Math.PI / 2;
                     const endAngle = (i + 1) * anglePerSegment + rotation - Math.PI / 2;
 
@@ -591,15 +619,16 @@
                 const winner = participants[winnerIndex];
 
                 // Mỗi segment = 360/numSegments độ
-                // Mũi tên ở 12h, segment i bắt đầu từ -90° + i*angle (trong canvas)
-                // Để đưa segment i lên 12h, xoay -(i * angle) + offset
+                // Segment 0 có tâm ở -90° (trong canvas) → trong CSS là 0° (12h)
+                // Segment i có tâm ở -90° + i*angle trong canvas → CSS là i*angle
+                // Để đưa segment i lên 12h, xoay -i*angle
                 const anglePerSegment = 360 / participants.length;
-                const targetAngle = currentRotationWinner + (360 * 8) + (360 - (winnerIndex * anglePerSegment)) % 360;
+                const targetRotation = currentRotationWinner + (360 * 8) + (360 - (winnerIndex * anglePerSegment)) % 360;
 
                 const startTime = Date.now();
                 const duration = 5000;
                 const startRotation = currentRotationWinner;
-                const totalRotation = targetAngle - startRotation;
+                const totalRotation = targetRotation - startRotation;
 
                 let lastTickTime = 0;
                 function animate() {
@@ -656,18 +685,18 @@
 
             const DRINK_SEGMENTS = 12;
             const DRINK_ITEMS_12 = [
-                'Uống 1 ly',              // ô 1
-                'Nam uống 100%',          // ô 2
-                'Trái hay phải uống',     // ô 3
-                'Bên phải uống',          // ô 4
-                'Chỉ định 1 người uống',  // ô 5
-                'Uống 1/2 ly',            // ô 6
-                'Nữ uống 100%',           // ô 7
-                'Quay lần nữa',           // ô 8
-                'Uống 2 ly',              // ô 9
-                'Cả bàn cùng dzô!',       // ô 10
-                'Chọn 1 người cùng uống', // ô 11
-                'Mặc áo màu uống'         // ô 12
+                'Uống 1 ly',              // ô 1 - tâm 15°
+                'Nam uống 100%',          // ô 2 - tâm 45°
+                'Trái hay phải uống',     // ô 3 - tâm 75°
+                'Bên phải uống',          // ô 4 - tâm 105°
+                'Chỉ định 1 người uống',  // ô 5 - tâm 135°
+                'Uống 1/2 ly',            // ô 6 - tâm 165°
+                'Nữ uống 100%',           // ô 7 - tâm 195°
+                'Quay lần nữa',           // ô 8 - tâm 225°
+                'Uống 2 ly',              // ô 9 - tâm 255°
+                'Cả bàn cùng dzô!',       // ô 10 - tâm 285°
+                'Chọn 1 người cùng uống', // ô 11 - tâm 315°
+                'Mặc áo màu uống'         // ô 12 - tâm 345°
             ];
 
             function spinDrink() {
@@ -686,24 +715,26 @@
                 const winnerIndex = Math.floor(Math.random() * DRINK_SEGMENTS);
                 const winner = DRINK_ITEMS_12[winnerIndex];
 
-                // === CÔNG THỨC XOAY ===
+                // === CÔNG THỨC XOAY CHÍNH XÁC ===
                 // Ảnh có 12 ô, mỗi ô = 30°
-                // Mũi tên đỏ trong ảnh ở 12h (0°)
-                // Tâm ô i nằm ở góc: -(i * 30°) trong hệ tọa độ CSS (kim đồng hồ ngược)
-                // Thực tế: ô 1 ở vị trí 12h (0°), ô 2 ở 30° theo chiều kim đồng hồ
-                // Để đưa tâm ô i lên 12h, xoay ảnh ngược lại: -i * 30°
-                // Cộng thêm 5 vòng (1800°) để quay đẹp
-                const anglePerSegment = 360 / DRINK_SEGMENTS; // 30°
+                // Ô 1 (winnerIndex=0) có tâm ở 15° trong ảnh (góc 12h là 0°, chiều kim đồng hồ)
+                // Tâm ô i = 15° + i*30°
+                // Để đưa tâm ô i lên 12h (0°), xoay ảnh: -(15° + i*30°)
+                const anglePerSegment = 30;
+                const offsetFirstSegment = 15; // Ô 1 ở 15°
+                
+                // Góc cần xoay để tâm ô winnerIndex lên 12h
+                const neededRotation = -(offsetFirstSegment + winnerIndex * anglePerSegment);
                 
                 // Góc hiện tại của ảnh (mod 360)
                 const currentMod = ((currentRotationDrink % 360) + 360) % 360;
+                const targetMod = ((neededRotation % 360) + 360) % 360;
                 
-                // Góc cần xoay để đưa tâm ô winnerIndex lên 12h
-                // Nếu ảnh đang ở currentMod, ta cần xoay thêm (360 - currentMod - winnerIndex*30) mod 360
-                const neededDelta = (360 - currentMod - winnerIndex * anglePerSegment) % 360;
+                // Delta cần xoay
+                const delta = (targetMod - currentMod + 360) % 360;
                 
-                // Tổng góc xoay: 5 vòng + delta cần thiết
-                const targetRotation = currentRotationDrink + 360 * 5 + neededDelta;
+                // Tổng góc xoay: 5 vòng + delta
+                const targetRotation = currentRotationDrink + 360 * 5 + delta;
 
                 drinkImg.style.transition = 'transform 6s cubic-bezier(0.17, 0.67, 0.12, 0.99)';
                 drinkImg.style.transform = `rotate(${targetRotation}deg)`;
