@@ -8,162 +8,15 @@
     <link rel="stylesheet" href="styles.css">
     <script src="football.js" defer></script>
     <script src="provinces.js" defer></script>
+    <script src="sidebar.js" defer></script>
 </head>
 
 <body>
 
     <div class="app">
 
-        <!-- SIDEBAR -->
-        <aside class="sidebar">
-
-            <div class="brand">
-                <div class="brand-mark">S</div>
-                <div class="brand-text">
-                    <strong>SportsVN</strong>
-                    <span>Nền tảng thể thao</span>
-                </div>
-            </div>
-
-            <nav class="main-nav">
-
-                <!-- NHÓM 1: CHÍNH -->
-                <div class="nav-title">📌 CHÍNH</div>
-
-                <a href="index.html" class="nav-item active">
-                    <span class="nav-icon">🏠</span>
-                    <span>Trang chủ</span>
-                </a>
-
-                <a href="tournaments.html" class="nav-item">
-                    <span class="nav-icon">🏆</span>
-                    <span>Giải đấu</span>
-                </a>
-
-                <a href="news-list.html" class="nav-item">
-                    <span class="nav-icon">📰</span>
-                    <span>Tin thể thao</span>
-                </a>
-
-                <a href="videos.html" class="nav-item">
-                    <span class="nav-icon">🎬</span>
-                    <span>Video</span>
-                </a>
-
-                <a href="photos.html" class="nav-item">
-                    <span class="nav-icon">📸</span>
-                    <span>Hình ảnh</span>
-                </a>
-
-                <!-- NHÓM 2: QUẢN LÝ GIẢI -->
-                <div class="nav-title">🎯 QUẢN LÝ GIẢI</div>
-
-                <a href="tournaments.html" class="nav-item" data-action="create-tournament">
-                    <span class="nav-icon">➕</span>
-                    <span>Tạo giải đấu</span>
-                </a>
-
-                <a href="registrations.html" class="nav-item">
-                    <span class="nav-icon">☷</span>
-                    <span>Danh sách đăng ký</span>
-                </a>
-
-                <a href="draw.html" class="nav-item">
-                    <span class="nav-icon">◇</span>
-                    <span>Bốc thăm</span>
-                </a>
-
-                <a href="schedule.html" class="nav-item">
-                    <span class="nav-icon">📅</span>
-                    <span>Xếp lịch thi đấu</span>
-                </a>
-
-                <a href="results.html" class="nav-item">
-                    <span class="nav-icon">✓</span>
-                    <span>Kết quả</span>
-                </a>
-
-                <a href="booking.html" class="nav-item">
-                    <span class="nav-icon">🏟️</span>
-                    <span>Đặt sân</span>
-                </a>
-
-                <!-- NHÓM 3: DỊCH VỤ -->
-                <div class="nav-title">🛒 DỊCH VỤ</div>
-
-                <a href="shop.html" class="nav-item">
-                    <span class="nav-icon">🛍️</span>
-                    <span>Mua sắm</span>
-                </a>
-
-                <a href="payment.html" class="nav-item">
-                    <span class="nav-icon">💳</span>
-                    <span>Thanh toán</span>
-                </a>
-
-                <a href="lucky-wheel.html" class="nav-item">
-                    <span class="nav-icon">🎰</span>
-                    <span>Vòng quay may mắn</span>
-                </a>
-
-                <a href="ads.html" class="nav-item">
-                    <span class="nav-icon">📢</span>
-                    <span>Quảng cáo</span>
-                </a>
-
-                <a href="register-shop.html" class="nav-item">
-                    <span class="nav-icon">🏪</span>
-                    <span>Đăng ký Shop</span>
-                </a>
-
-                <!-- NHÓM 4: HỖ TRỢ -->
-                <div class="nav-title">📚 HỖ TRỢ</div>
-
-                <a href="guide.html" class="nav-item">
-                    <span class="nav-icon">📖</span>
-                    <span>Hướng dẫn tổ chức giải</span>
-                </a>
-
-                <a href="sponsors.html" class="nav-item">
-                    <span class="nav-icon">🤝</span>
-                    <span>Nhà tài trợ</span>
-                </a>
-
-                <a href="contact.html" class="nav-item">
-                    <span class="nav-icon">📞</span>
-                    <span>Liên hệ</span>
-                </a>
-
-                <a href="ranking.html" class="nav-item">
-                    <span class="nav-icon">📊</span>
-                    <span>Bảng thành tích</span>
-                </a>
-
-            </nav>
-
-            <div class="sidebar-bottom">
-
-                <div class="help-box">
-                    <div class="help-icon">?</div>
-                    <div>
-                        <strong>Cần hỗ trợ?</strong>
-                        <span>Liên hệ SportsVN</span>
-                    </div>
-                </div>
-
-                <div class="user-mini">
-                    <div class="avatar">H</div>
-                    <div class="user-info">
-                        <strong>Quản trị viên</strong>
-                        <span>SportsVN</span>
-                    </div>
-                    <button class="more-button">⋮</button>
-                </div>
-
-            </div>
-
-        </aside>
-
+        <!-- Sidebar sẽ được tự động render bởi sidebar.js -->
+        <!-- Không cần viết sidebar cứng ở đây nữa -->
 
         <!-- MAIN -->
         <main class="main">
@@ -881,11 +734,11 @@
             // 6. MOBILE MENU TOGGLE
             // ==========================================
             const mobileMenu = document.getElementById('mobileMenu');
-            const sidebar = document.querySelector('.sidebar');
             
-            if (mobileMenu && sidebar) {
+            if (mobileMenu) {
                 mobileMenu.addEventListener('click', () => {
-                    sidebar.classList.toggle('open');
+                    const sidebar = document.querySelector('.sidebar');
+                    if (sidebar) sidebar.classList.toggle('open');
                 });
             }
 
