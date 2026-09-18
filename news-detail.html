@@ -5,6 +5,7 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Chi tiết tin tức - SportsVN</title>
     <link rel="stylesheet" href="styles.css">
+    <script src="sidebar.js" defer></script>
     <style>
         /* ===== ARTICLE CONTAINER ===== */
         .article-container {
@@ -111,9 +112,7 @@
             word-wrap: break-word;
         }
         
-        .article-content p {
-            margin-bottom: 16px;
-        }
+        .article-content p { margin-bottom: 16px; }
         
         .article-content h1,
         .article-content h2,
@@ -137,9 +136,7 @@
             padding-left: 28px;
         }
         
-        .article-content li {
-            margin-bottom: 8px;
-        }
+        .article-content li { margin-bottom: 8px; }
         
         .article-content blockquote {
             border-left: 4px solid var(--primary);
@@ -164,9 +161,7 @@
             text-decoration: underline;
         }
         
-        .article-content a:hover {
-            color: var(--primary-dark);
-        }
+        .article-content a:hover { color: var(--primary-dark); }
         
         .article-content code {
             background: #f3f4f6;
@@ -202,18 +197,12 @@
         }
         
         .article-content em,
-        .article-content i {
-            font-style: italic;
-        }
+        .article-content i { font-style: italic; }
         
-        .article-content u {
-            text-decoration: underline;
-        }
+        .article-content u { text-decoration: underline; }
         
         .article-content s,
-        .article-content strike {
-            text-decoration: line-through;
-        }
+        .article-content strike { text-decoration: line-through; }
         
         /* Hỗ trợ các class của Quill */
         .article-content .ql-align-center { text-align: center; }
@@ -346,9 +335,7 @@
             background: #e5e7eb;
         }
         
-        .related-card-body {
-            padding: 14px;
-        }
+        .related-card-body { padding: 14px; }
         
         .related-card-title {
             font-size: 14px;
@@ -374,9 +361,7 @@
                 padding: 20px;
                 border-radius: 0;
             }
-            .article-title {
-                font-size: 22px;
-            }
+            .article-title { font-size: 22px; }
             .article-summary {
                 font-size: 14px;
                 padding: 16px;
@@ -396,53 +381,7 @@
 
     <div class="app">
 
-        <!-- SIDEBAR -->
-        <aside class="sidebar">
-            <div class="brand">
-                <div class="brand-mark">S</div>
-                <div class="brand-text">
-                    <strong>SportsVN</strong>
-                    <span>Nền tảng thể thao</span>
-                </div>
-            </div>
-
-            <nav class="main-nav">
-                <div class="nav-title">TỔNG QUAN</div>
-                <a href="index.html" class="nav-item"><span class="nav-icon">⌂</span><span>Trang chủ</span></a>
-                <a href="tournaments.html" class="nav-item"><span class="nav-icon">◈</span><span>Giải đấu</span></a>
-                <a href="#" class="nav-item"><span class="nav-icon">♙</span><span>Vận động viên</span></a>
-                <a href="#" class="nav-item"><span class="nav-icon">▣</span><span>Đơn vị</span></a>
-
-                <div class="nav-title">QUẢN LÝ GIẢI</div>
-                <a href="tournaments.html" class="nav-item"><span class="nav-icon">＋</span><span>Tạo giải đấu</span></a>
-                <a href="#" class="nav-item"><span class="nav-icon">☷</span><span>Danh sách đăng ký</span></a>
-                <a href="draw.html" class="nav-item"><span class="nav-icon">◇</span><span>Bốc thăm</span></a>
-                <a href="#" class="nav-item"><span class="nav-icon">▤</span><span>Lịch thi đấu</span></a>
-                <a href="#" class="nav-item"><span class="nav-icon">✓</span><span>Kết quả</span></a>
-
-                <div class="nav-title">THÔNG TIN</div>
-                <a href="news-list.html" class="nav-item active"><span class="nav-icon">▰</span><span>Tin thể thao</span></a>
-                <a href="#" class="nav-item"><span class="nav-icon">▥</span><span>Bảng thành tích</span></a>
-            </nav>
-
-            <div class="sidebar-bottom">
-                <div class="help-box">
-                    <div class="help-icon">?</div>
-                    <div>
-                        <strong>Cần hỗ trợ?</strong>
-                        <span>Liên hệ SportsVN</span>
-                    </div>
-                </div>
-                <div class="user-mini">
-                    <div class="avatar">K</div>
-                    <div class="user-info">
-                        <strong>Khách</strong>
-                        <span>SportsVN</span>
-                    </div>
-                </div>
-            </div>
-        </aside>
-
+        <!-- Sidebar sẽ được tự động render bởi sidebar.js -->
 
         <!-- MAIN -->
         <main class="main">
