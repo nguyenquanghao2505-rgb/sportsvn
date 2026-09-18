@@ -1,0 +1,352 @@
+<!DOCTYPE html>
+<html lang="vi">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Nhà tài trợ - SportsVN</title>
+    <link rel="stylesheet" href="styles.css">
+    <script src="sidebar.js" defer></script>
+    <style>
+        .sponsors-header {
+            text-align: center;
+            margin-bottom: 40px;
+        }
+        .sponsors-header h1 {
+            font-size: 32px;
+            font-weight: 900;
+            color: var(--text-dark);
+            margin-bottom: 8px;
+        }
+        .sponsors-header p {
+            color: var(--text-muted);
+            font-size: 15px;
+            max-width: 700px;
+            margin: 0 auto;
+        }
+
+        /* SPONSOR TIERS */
+        .sponsor-tier {
+            background: #fff;
+            border-radius: 16px;
+            padding: 32px;
+            border: 1px solid var(--border);
+            box-shadow: 0 1px 3px rgba(0, 0, 0, 0.08);
+            margin-bottom: 24px;
+        }
+        .tier-header {
+            display: flex;
+            align-items: center;
+            gap: 16px;
+            margin-bottom: 24px;
+            padding-bottom: 20px;
+            border-bottom: 2px solid var(--border-light);
+        }
+        .tier-icon {
+            width: 60px;
+            height: 60px;
+            border-radius: 16px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 30px;
+            flex-shrink: 0;
+        }
+        .tier-icon.diamond {
+            background: linear-gradient(135deg, #a5f3fc, #06b6d4);
+            box-shadow: 0 4px 12px rgba(6, 182, 212, 0.3);
+        }
+        .tier-icon.gold {
+            background: linear-gradient(135deg, #fde68a, #f59e0b);
+            box-shadow: 0 4px 12px rgba(245, 158, 11, 0.3);
+        }
+        .tier-icon.silver {
+            background: linear-gradient(135deg, #e5e7eb, #9ca3af);
+            box-shadow: 0 4px 12px rgba(156, 163, 175, 0.3);
+        }
+        .tier-icon.bronze {
+            background: linear-gradient(135deg, #fed7aa, #ea580c);
+            box-shadow: 0 4px 12px rgba(234, 88, 12, 0.3);
+        }
+        .tier-info h2 {
+            font-size: 22px;
+            font-weight: 900;
+            color: var(--text-dark);
+            margin-bottom: 4px;
+        }
+        .tier-info p {
+            color: var(--text-muted);
+            font-size: 13.5px;
+        }
+
+        /* SPONSOR LOGOS */
+        .sponsor-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fill, minmax(180px, 1fr));
+            gap: 20px;
+        }
+        .sponsor-card {
+            background: #f9fafb;
+            border-radius: 12px;
+            padding: 24px 16px;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            justify-content: center;
+            text-align: center;
+            border: 1px solid var(--border-light);
+            transition: all 0.25s;
+            cursor: pointer;
+            min-height: 120px;
+        }
+        .sponsor-card:hover {
+            background: #fff;
+            border-color: var(--primary);
+            box-shadow: 0 8px 16px rgba(0, 0, 0, 0.08);
+            transform: translateY(-4px);
+        }
+        .sponsor-logo {
+            width: 80px;
+            height: 80px;
+            border-radius: 16px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 32px;
+            font-weight: 900;
+            color: #fff;
+            margin-bottom: 12px;
+            background: linear-gradient(135deg, var(--primary) 0%, #4d94ff 100%);
+            box-shadow: 0 4px 12px rgba(23, 105, 255, 0.3);
+        }
+        .sponsor-name {
+            font-size: 13.5px;
+            font-weight: 700;
+            color: var(--text-dark);
+            line-height: 1.4;
+        }
+        .sponsor-tagline {
+            font-size: 11px;
+            color: var(--text-muted);
+            margin-top: 4px;
+        }
+
+        /* EMPTY STATE */
+        .sponsor-empty {
+            text-align: center;
+            padding: 60px 20px;
+            color: var(--text-muted);
+            background: #f9fafb;
+            border-radius: 12px;
+            border: 2px dashed var(--border);
+        }
+        .sponsor-empty-icon {
+            font-size: 56px;
+            margin-bottom: 12px;
+            opacity: 0.5;
+        }
+        .sponsor-empty h3 {
+            color: var(--text-dark);
+            margin-bottom: 8px;
+            font-size: 17px;
+        }
+        .sponsor-empty p {
+            font-size: 13px;
+        }
+
+        /* CTA */
+        .sponsor-cta {
+            text-align: center;
+            padding: 48px 20px;
+            background: linear-gradient(135deg, #f0f7ff 0%, #ffffff 100%);
+            border-radius: 16px;
+            border: 1px solid var(--border);
+            margin-top: 32px;
+        }
+        .sponsor-cta h3 {
+            font-size: 24px;
+            font-weight: 800;
+            color: var(--text-dark);
+            margin-bottom: 12px;
+        }
+        .sponsor-cta p {
+            color: var(--text-muted);
+            font-size: 14px;
+            margin-bottom: 24px;
+            max-width: 600px;
+            margin-left: auto;
+            margin-right: auto;
+        }
+        .sponsor-cta-btn {
+            display: inline-flex;
+            align-items: center;
+            gap: 8px;
+            padding: 14px 28px;
+            background: linear-gradient(135deg, var(--primary) 0%, #4d94ff 100%);
+            color: #fff;
+            border-radius: 10px;
+            font-weight: 700;
+            font-size: 14px;
+            text-decoration: none;
+            box-shadow: 0 4px 12px rgba(23, 105, 255, 0.3);
+            transition: all 0.2s;
+            border: 0;
+            cursor: pointer;
+        }
+        .sponsor-cta-btn:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 6px 20px rgba(23, 105, 255, 0.4);
+        }
+
+        @media (max-width: 640px) {
+            .sponsors-header h1 { font-size: 24px; }
+            .sponsor-tier { padding: 20px; }
+            .sponsor-grid { grid-template-columns: repeat(2, 1fr); }
+        }
+    </style>
+</head>
+
+<body>
+
+    <div class="app">
+
+        <!-- Sidebar tự động render bởi sidebar.js -->
+
+        <main class="main">
+
+            <header class="topbar">
+                <div class="topbar-left">
+                    <button class="mobile-menu" id="mobileMenu">☰</button>
+                    <div class="topbar-brand">
+                        <span class="topbar-label">SPORTS MANAGEMENT PLATFORM</span>
+                        <h1 class="topbar-title-main">SPORTS<span>VN</span></h1>
+                        <p class="topbar-subtitle">Nhà tài trợ & đối tác</p>
+                    </div>
+                </div>
+
+                <div class="topbar-right">
+                    <a href="index.html" class="topbar-cta" style="background: #f3f4f6; color: #4b5563; box-shadow: none;">
+                        ← Về trang chủ
+                    </a>
+                </div>
+            </header>
+
+            <section class="content">
+
+                <div class="sponsors-header">
+                    <h1>🤝 Nhà tài trợ & Đối tác</h1>
+                    <p>SportsVN trân trọng cảm ơn các nhà tài trợ, đối tác đã đồng hành và phát triển nền tảng thể thao Việt Nam</p>
+                </div>
+
+                <!-- TIER 1: KIM CƯƠNG -->
+                <div class="sponsor-tier">
+                    <div class="tier-header">
+                        <div class="tier-icon diamond">💎</div>
+                        <div class="tier-info">
+                            <h2>Nhà tài trợ Kim Cương</h2>
+                            <p>Đối tác chiến lược — Đồng hành cùng sự phát triển của SportsVN</p>
+                        </div>
+                    </div>
+                    <div class="sponsor-grid">
+                        <div class="sponsor-card">
+                            <div class="sponsor-logo">SHB</div>
+                            <div class="sponsor-name">Ngân hàng SHB</div>
+                            <div class="sponsor-tagline">Chi nhánh Đà Nẵng</div>
+                        </div>
+                        <div class="sponsor-empty" style="grid-column: 1/-1;">
+                            <div class="sponsor-empty-icon">💎</div>
+                            <h3>Đang tìm kiếm nhà tài trợ Kim Cương</h3>
+                            <p>Liên hệ để trở thành đối tác chiến lược của SportsVN</p>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- TIER 2: VÀNG -->
+                <div class="sponsor-tier">
+                    <div class="tier-header">
+                        <div class="tier-icon gold">🥇</div>
+                        <div class="tier-info">
+                            <h2>Nhà tài trợ Vàng</h2>
+                            <p>Đối tác chính — Hỗ trợ các giải đấu và sự kiện thể thao</p>
+                        </div>
+                    </div>
+                    <div class="sponsor-grid">
+                        <div class="sponsor-empty" style="grid-column: 1/-1;">
+                            <div class="sponsor-empty-icon">🥇</div>
+                            <h3>Đang tìm kiếm nhà tài trợ Vàng</h3>
+                            <p>Cơ hội quảng bá thương hiệu tại các giải đấu lớn</p>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- TIER 3: BẠC -->
+                <div class="sponsor-tier">
+                    <div class="tier-header">
+                        <div class="tier-icon silver">🥈</div>
+                        <div class="tier-info">
+                            <h2>Nhà tài trợ Bạc</h2>
+                            <p>Đối tác đồng hành — Hỗ trợ truyền thông và tổ chức</p>
+                        </div>
+                    </div>
+                    <div class="sponsor-grid">
+                        <div class="sponsor-empty" style="grid-column: 1/-1;">
+                            <div class="sponsor-empty-icon">🥈</div>
+                            <h3>Đang tìm kiếm nhà tài trợ Bạc</h3>
+                            <p>Đồng hành cùng SportsVN trong các sự kiện thể thao</p>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- TIER 4: ĐỒNG -->
+                <div class="sponsor-tier">
+                    <div class="tier-header">
+                        <div class="tier-icon bronze">🥉</div>
+                        <div class="tier-info">
+                            <h2>Nhà tài trợ Đồng</h2>
+                            <p>Đối tác — Ủng hộ và đồng hành cùng cộng đồng thể thao</p>
+                        </div>
+                    </div>
+                    <div class="sponsor-grid">
+                        <div class="sponsor-empty" style="grid-column: 1/-1;">
+                            <div class="sponsor-empty-icon">🥉</div>
+                            <h3>Đang tìm kiếm nhà tài trợ Đồng</h3>
+                            <p>Trở thành đối tác của SportsVN ngay hôm nay</p>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- CTA -->
+                <div class="sponsor-cta">
+                    <h3>🌟 Trở thành nhà tài trợ của SportsVN</h3>
+                    <p>
+                        Chúng tôi cung cấp nhiều gói tài trợ linh hoạt, phù hợp với mọi quy mô doanh nghiệp.
+                        Liên hệ để được tư vấn chi tiết về quyền lợi và cơ hội quảng bá thương hiệu.
+                    </p>
+                    <button class="sponsor-cta-btn" onclick="contactSponsor()">
+                        📞 Liên hệ tài trợ
+                    </button>
+                </div>
+
+            </section>
+
+            <footer class="footer">
+                <span>© 2026 SportsVN</span>
+                <span>Nền tảng công nghệ thể thao Việt Nam</span>
+            </footer>
+
+        </main>
+
+    </div>
+
+    <script>
+        document.addEventListener('DOMContentLoaded', function() {
+            console.log('✅ Trang Nhà tài trợ đã sẵn sàng');
+        });
+
+        function contactSponsor() {
+            // Chuyển đến trang liên hệ
+            window.location.href = 'contact.html';
+        }
+    </script>
+
+</body>
+</html>
