@@ -150,7 +150,7 @@
             50% { transform: translate(-50%, -50%) scale(1.1); }
         }
 
-        /* RESULT (chỉ dùng cho tab Trúng thưởng) */
+        /* RESULT */
         .wheel-result {
             min-height: 90px;
             padding: 24px;
@@ -231,31 +231,6 @@
         .sound-toggle:hover {
             background: var(--primary-light);
             color: var(--primary);
-        }
-
-        /* LỊCH SỬ */
-        .result-history {
-            margin-top: 24px;
-            padding: 20px;
-            background: #f9fafb;
-            border-radius: 12px;
-            border: 1px solid var(--border-light);
-            text-align: left;
-        }
-        .result-history h4 {
-            font-size: 14px;
-            font-weight: 800;
-            color: var(--text-dark);
-            margin-bottom: 12px;
-        }
-        .result-history-item {
-            padding: 8px 12px;
-            background: #fff;
-            border-radius: 8px;
-            font-size: 13px;
-            color: var(--text);
-            margin-bottom: 6px;
-            border-left: 3px solid var(--primary);
         }
 
         @media (max-width: 640px) {
@@ -365,16 +340,10 @@
                         <div class="wheel-center-drink" data-action="drink">QUAY<br>NGAY</div>
                     </div>
 
-                    <!-- ✅ ĐÃ BỎ PHẦN HIỂN THỊ CHỮ KẾT QUẢ -->
+                    <!-- ✅ KHÔNG CÒN LỊCH SỬ -->
 
                     <button class="wheel-btn" id="btnSpinDrink">🍻 QUẬY SÁT PHẠT</button>
                     <button class="wheel-btn secondary" id="btnResetDrink">↻ Reset</button>
-
-                    <!-- LỊCH SỬ -->
-                    <div class="result-history" id="historyDrink" style="display: none;">
-                        <h4>📋 Lịch sử quay</h4>
-                        <div id="historyList"></div>
-                    </div>
                 </div>
 
             </section>
@@ -524,9 +493,11 @@
                 const anglePerSegment = (Math.PI * 2) / numSegments;
 
                 for (let i = 0; i < numSegments; i++) {
+                    // Bắt đầu từ -90° (12 giờ) + rotation
                     const startAngle = i * anglePerSegment + rotation - Math.PI / 2;
                     const endAngle = (i + 1) * anglePerSegment + rotation - Math.PI / 2;
 
+                    // Vẽ segment
                     winnerCtx.beginPath();
                     winnerCtx.moveTo(centerX, centerY);
                     winnerCtx.arc(centerX, centerY, radius, startAngle, endAngle);
@@ -537,15 +508,18 @@
                     winnerCtx.lineWidth = 3;
                     winnerCtx.stroke();
 
+                    // ✅ VẼ CHỮ TÊN - CĂN ĐÚNG VỊ TRÍ
                     winnerCtx.save();
                     winnerCtx.translate(centerX, centerY);
                     winnerCtx.rotate(startAngle + anglePerSegment / 2);
                     winnerCtx.textAlign = 'right';
+                    winnerCtx.textBaseline = 'middle';
                     winnerCtx.fillStyle = '#fff';
                     winnerCtx.font = 'bold 14px Inter, sans-serif';
                     const name = participants[i];
                     const displayName = name.length > 12 ? name.slice(0, 12) + '...' : name;
-                    winnerCtx.fillText(displayName, radius - 20, 5);
+                    // Vẽ chữ ở giữa ô, cách tâm 1 khoảng
+                    winnerCtx.fillText(displayName, radius - 30, 0);
                     winnerCtx.restore();
                 }
             }
@@ -672,23 +646,8 @@
             const drinkImg = document.getElementById('wheelImg-drink');
             let isSpinningDrink = false;
             let currentRotationDrink = 0;
-            let drinkHistory = [];
 
             const DRINK_SEGMENTS = 12;
-            const DRINK_ITEMS_12 = [
-                'Uống 1 ly',
-                'Nam uống 100%',
-                'Trái hay phải uống',
-                'Bên phải uống',
-                'Chỉ định 1 người uống',
-                'Uống 1/2 ly',
-                'Nữ uống 100%',
-                'Quay lần nữa',
-                'Uống 2 ly',
-                'Cả bàn cùng dzô!',
-                'Chọn 1 người cùng uống',
-                'Mặc áo màu uống'
-            ];
 
             function spinDrink() {
                 if (isSpinningDrink) return;
@@ -700,7 +659,6 @@
 
                 // Chọn ô ngẫu nhiên (0-11)
                 const winnerIndex = Math.floor(Math.random() * DRINK_SEGMENTS);
-                const winner = DRINK_ITEMS_12[winnerIndex];
 
                 // Công thức xoay chính xác
                 const anglePerSegment = 30;
@@ -729,30 +687,8 @@
                     isSpinningDrink = false;
                     btn.disabled = false;
                     document.querySelector('.wheel-center-drink[data-action="drink"]').classList.remove('spinning');
-
                     playDing();
-
-                    // Thêm vào lịch sử (không hiện text kết quả)
-                    drinkHistory.unshift(winner);
-                    renderDrinkHistory();
                 }, 6100);
-            }
-
-            function renderDrinkHistory() {
-                const historyEl = document.getElementById('historyDrink');
-                const listEl = document.getElementById('historyList');
-
-                if (drinkHistory.length === 0) {
-                    historyEl.style.display = 'none';
-                    return;
-                }
-
-                historyEl.style.display = 'block';
-                listEl.innerHTML = drinkHistory.slice(0, 5).map((item, i) => `
-                    <div class="result-history-item">
-                        <strong>#${drinkHistory.length - i}</strong> — ${item}
-                    </div>
-                `).join('');
             }
 
             document.getElementById('btnSpinDrink').addEventListener('click', spinDrink);
@@ -764,8 +700,6 @@
                 currentRotationDrink = 0;
                 drinkImg.style.transition = 'transform 0.5s';
                 drinkImg.style.transform = 'rotate(0deg)';
-                drinkHistory = [];
-                renderDrinkHistory();
             });
 
             console.log('✅ Trang Vòng quay may mắn đã sẵn sàng');
