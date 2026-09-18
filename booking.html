@@ -368,8 +368,10 @@
                             </select>
                         </div>
                         <div class="form-field">
-                            <label class="form-label">Quận/Huyện</label>
-                            <input type="text" class="form-input" name="district" placeholder="VD: Cẩm Lệ">
+                            <label class="form-label">Phường/Xã</label>
+                            <select class="form-select" name="district" id="venueWard">
+                                <option value="">-- Chọn phường/xã --</option>
+                            </select>
                         </div>
                         <div class="form-field form-full">
                             <label class="form-label">Địa chỉ chi tiết <span>*</span></label>
@@ -523,16 +525,20 @@
 
         if (window.VIETNAM_PROVINCES && Array.isArray(window.VIETNAM_PROVINCES)) {
             window.VIETNAM_PROVINCES.forEach(p => {
+                // File provinces.js dùng trường "tentinhmoi" (không phải "name")
+                const provinceName = p.tentinhmoi || p.name;
+                if (!provinceName) return;
+
                 // Filter dropdown
                 const opt1 = document.createElement('option');
-                opt1.value = p.name;
-                opt1.textContent = p.name;
+                opt1.value = provinceName;
+                opt1.textContent = provinceName;
                 provinceFilter.appendChild(opt1);
 
                 // Form dropdown
                 const opt2 = document.createElement('option');
-                opt2.value = p.name;
-                opt2.textContent = p.name;
+                opt2.value = provinceName;
+                opt2.textContent = provinceName;
                 venueProvince.appendChild(opt2);
             });
             console.log('✅ Đã load', window.VIETNAM_PROVINCES.length, 'tỉnh thành');
@@ -542,7 +548,33 @@
     }
 
     // ==========================================
-    // 3. LOAD DANH SÁCH SÂN TỪ SUPABASE
+    // 3. LOAD PHƯỜNG/XÃ THEO TỈNH
+    // ==========================================
+    function loadWards(provinceName) {
+        const wardSelect = document.getElementById('venueWard');
+        if (!wardSelect) return;
+        
+        wardSelect.innerHTML = '<option value="">-- Chọn phường/xã --</option>';
+        
+        if (!provinceName) return;
+        
+        const province = window.VIETNAM_PROVINCES.find(p => 
+            (p.tentinhmoi || p.name) === provinceName
+        );
+        
+        if (province && province.phuongxa && Array.isArray(province.phuongxa)) {
+            province.phuongxa.forEach(w => {
+                const opt = document.createElement('option');
+                opt.value = w.tenphuongxa;
+                opt.textContent = w.tenphuongxa;
+                wardSelect.appendChild(opt);
+            });
+            console.log('✅ Đã load', province.phuongxa.length, 'phường/xã của', provinceName);
+        }
+    }
+
+    // ==========================================
+    // 4. LOAD DANH SÁCH SÂN TỪ SUPABASE
     // ==========================================
     async function loadVenues() {
         const grid = document.getElementById('venueGrid');
@@ -573,7 +605,7 @@
     }
 
     // ==========================================
-    // 4. RENDER DANH SÁCH SÂN
+    // 5. RENDER DANH SÁCH SÂN
     // ==========================================
     function renderVenues(venues) {
         const grid = document.getElementById('venueGrid');
@@ -640,7 +672,7 @@
     }
 
     // ==========================================
-    // 5. BIND SỰ KIỆN
+    // 6. BIND SỰ KIỆN
     // ==========================================
     function bindEvents() {
         // Nút tìm kiếm
@@ -651,8 +683,13 @@
             if (e.key === 'Enter') filterVenues();
         });
 
-        // Đổi tỉnh
+        // Đổi tỉnh trong filter
         document.getElementById('provinceFilter').addEventListener('change', filterVenues);
+
+        // Đổi tỉnh trong form → load phường/xã
+        document.getElementById('venueProvince')?.addEventListener('change', (e) => {
+            loadWards(e.target.value);
+        });
 
         // Nút thêm sân
         document.getElementById('addVenueBtn').addEventListener('click', openVenueModal);
@@ -745,7 +782,7 @@
     }
 
     // ==========================================
-    // 6. QUẢN LÝ ẢNH
+    // 7. QUẢN LÝ ẢNH
     // ==========================================
     function addImageFromUrl() {
         const input = document.getElementById('urlInput');
@@ -834,7 +871,7 @@
     };
 
     // ==========================================
-    // 7. MODAL THÊM SÂN
+    // 8. MODAL THÊM SÂN
     // ==========================================
     function openVenueModal() {
         if (!isAdmin) {
@@ -843,6 +880,7 @@
         }
         document.getElementById('venueModal').hidden = false;
         document.getElementById('venueForm').reset();
+        document.getElementById('venueWard').innerHTML = '<option value="">-- Chọn phường/xã --</option>';
         uploadedImages = [];
         renderImagePreview();
         document.getElementById('venueFormMessage').className = 'form-message';
@@ -921,7 +959,7 @@
     }
 
     // ==========================================
-    // 8. ĐẶT SÂN (Modal thông tin liên hệ)
+    // 9. ĐẶT SÂN (Modal thông tin liên hệ)
     // ==========================================
     window.bookVenue = function(venueId) {
         const venue = allVenues.find(v => String(v.id) === String(venueId));
@@ -944,7 +982,7 @@
     };
 
     // ==========================================
-    // 9. HELPERS
+    // 10. HELPERS
     // ==========================================
     function escapeHtml(text) {
         return String(text || '')
