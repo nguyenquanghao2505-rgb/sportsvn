@@ -46,7 +46,7 @@
         <form id="loginForm" onsubmit="handleLogin(event)">
             <div class="form-group">
                 <label>📧 Email</label>
-                <input type="email" id="email" placeholder="nguyenquanghao2505@gmail.com" required autofocus>
+                <input type="email" id="email" placeholder="Nhập email của bạn" required autofocus>
             </div>
 
             <div class="form-group">
@@ -72,110 +72,121 @@
     </div>
 
     <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+    <script src="config.js"></script>
     <script>
-        const SUPABASE_URL = 'https://bqzjksmsdtnodcfykggk.supabase.co';
-        const SUPABASE_ANON_KEY = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6ImJxemprc21zZHRub2RjZnlrZ2drIiwicm9sZSI6ImFub24iLCJpYXQiOjE3ODczNzkwNTYsImV4cCI6MjEwMjk1NTA1Nn0.nmIhW8qg547V9vcoUCuX8alDIrxH14hkr8nKMRPwLhE';
-
-        const supabaseClient = window.supabase.createClient(SUPABASE_URL, SUPABASE_ANON_KEY);
-
-        async function checkAdminRole(userId) {
-            try {
-                const { data, error } = await supabaseClient
-                    .from('user_roles')
-                    .select('role')
-                    .eq('user_id', userId)
-                    .single();
-                if (error || !data) return false;
-                return data.role === 'admin';
-            } catch (err) {
-                console.error('Lỗi kiểm tra role:', err);
-                return false;
-            }
-        }
-
-        async function handleLogin(event) {
-            event.preventDefault();
-            const email = document.getElementById('email').value.trim();
-            const password = document.getElementById('password').value;
-            const alertEl = document.getElementById('alert');
-            const btn = document.getElementById('loginBtn');
-            const btnText = document.getElementById('btnText');
-            const btnSpinner = document.getElementById('btnSpinner');
-
-            alertEl.className = 'alert';
-            alertEl.style.display = 'none';
-
-            if (!email || !password) {
-                showAlert('Vui lòng nhập đầy đủ email và mật khẩu.', 'error');
+        (function() {
+            'use strict';
+            
+            const config = window.SPORTSVN_CONFIG || {};
+            if (!config.SUPABASE_URL || !config.SUPABASE_ANON_KEY) {
+                console.error('❌ Chưa cấu hình Supabase trong config.js');
                 return;
             }
 
-            btn.disabled = true;
-            btnText.style.display = 'none';
-            btnSpinner.style.display = 'block';
+            const supabaseClient = window.supabase.createClient(
+                config.SUPABASE_URL,
+                config.SUPABASE_ANON_KEY
+            );
 
-            try {
-                const { data: authData, error: authError } = await supabaseClient.auth.signInWithPassword({
-                    email: email,
-                    password: password
-                });
+            async function checkAdminRole(userId) {
+                try {
+                    const { data, error } = await supabaseClient
+                        .from('user_roles')
+                        .select('role')
+                        .eq('user_id', userId)
+                        .single();
+                    if (error || !data) return false;
+                    return data.role === 'admin';
+                } catch (err) {
+                    console.error('Lỗi kiểm tra role:', err);
+                    return false;
+                }
+            }
 
-                if (authError) {
-                    showAlert('❌ Lỗi: ' + authError.message, 'error');
-                    btn.disabled = false;
-                    btnText.style.display = 'block';
-                    btnSpinner.style.display = 'none';
+            window.handleLogin = async function(event) {
+                event.preventDefault();
+                const email = document.getElementById('email').value.trim();
+                const password = document.getElementById('password').value;
+                const alertEl = document.getElementById('alert');
+                const btn = document.getElementById('loginBtn');
+                const btnText = document.getElementById('btnText');
+                const btnSpinner = document.getElementById('btnSpinner');
+
+                alertEl.className = 'alert';
+                alertEl.style.display = 'none';
+
+                if (!email || !password) {
+                    showAlert('Vui lòng nhập đầy đủ email và mật khẩu.', 'error');
                     return;
                 }
 
-                const isAdmin = await checkAdminRole(authData.user.id);
+                btn.disabled = true;
+                btnText.style.display = 'none';
+                btnSpinner.style.display = 'block';
 
-                if (!isAdmin) {
-                    await supabaseClient.auth.signOut();
-                    showAlert('⛔ Tài khoản không có quyền Admin.', 'error');
+                try {
+                    const { data: authData, error: authError } = await supabaseClient.auth.signInWithPassword({
+                        email: email,
+                        password: password
+                    });
+
+                    if (authError) {
+                        showAlert('❌ Lỗi: ' + authError.message, 'error');
+                        btn.disabled = false;
+                        btnText.style.display = 'block';
+                        btnSpinner.style.display = 'none';
+                        return;
+                    }
+
+                    const isAdmin = await checkAdminRole(authData.user.id);
+
+                    if (!isAdmin) {
+                        await supabaseClient.auth.signOut();
+                        showAlert('⛔ Tài khoản không có quyền Admin.', 'error');
+                        btn.disabled = false;
+                        btnText.style.display = 'block';
+                        btnSpinner.style.display = 'none';
+                        return;
+                    }
+
+                    localStorage.setItem('sportsvn_admin', JSON.stringify({
+                        user: authData.user,
+                        isAdmin: true
+                    }));
+
+                    showAlert('✅ Đăng nhập thành công! Đang chuyển hướng...', 'success');
+
+                    setTimeout(() => {
+                        window.location.href = 'index.html';
+                    }, 1000);
+
+                } catch (error) {
+                    showAlert('❌ Có lỗi xảy ra: ' + error.message, 'error');
                     btn.disabled = false;
                     btnText.style.display = 'block';
                     btnSpinner.style.display = 'none';
-                    return;
                 }
+            };
 
-                localStorage.setItem('sportsvn_admin', JSON.stringify({
-                    user: authData.user,
-                    isAdmin: true
-                }));
-
-                showAlert('✅ Đăng nhập thành công! Đang chuyển hướng...', 'success');
-
-                setTimeout(() => {
-                    window.location.href = 'index.html';
-                }, 1000);
-
-            } catch (error) {
-                showAlert('❌ Có lỗi xảy ra: ' + error.message, 'error');
-                btn.disabled = false;
-                btnText.style.display = 'block';
-                btnSpinner.style.display = 'none';
+            function showAlert(message, type) {
+                const alertEl = document.getElementById('alert');
+                alertEl.textContent = message;
+                alertEl.className = 'alert ' + type;
+                alertEl.style.display = 'block';
             }
-        }
 
-        function showAlert(message, type) {
-            const alertEl = document.getElementById('alert');
-            alertEl.textContent = message;
-            alertEl.className = 'alert ' + type;
-            alertEl.style.display = 'block';
-        }
-
-        function togglePassword() {
-            const password = document.getElementById('password');
-            const icon = document.getElementById('toggleIcon');
-            if (password.type === 'password') {
-                password.type = 'text';
-                icon.className = 'fas fa-eye-slash';
-            } else {
-                password.type = 'password';
-                icon.className = 'fas fa-eye';
-            }
-        }
+            window.togglePassword = function() {
+                const password = document.getElementById('password');
+                const icon = document.getElementById('toggleIcon');
+                if (password.type === 'password') {
+                    password.type = 'text';
+                    icon.className = 'fas fa-eye-slash';
+                } else {
+                    password.type = 'password';
+                    icon.className = 'fas fa-eye';
+                }
+            };
+        })();
     </script>
 </body>
 </html>
