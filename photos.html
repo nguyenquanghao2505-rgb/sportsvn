@@ -7,144 +7,295 @@
     <link rel="stylesheet" href="styles.css">
     <script src="sidebar.js" defer></script>
     <style>
-        .photos-header {
+        .page-header {
+            background: linear-gradient(135deg, #0d1b3e, #1a3a7a);
+            border-radius: 20px;
+            padding: 32px;
+            color: #fff;
+            margin-bottom: 24px;
             display: flex;
             justify-content: space-between;
             align-items: center;
-            margin-bottom: 24px;
             flex-wrap: wrap;
             gap: 16px;
         }
-        .photos-header h1 {
-            font-size: 28px;
-            font-weight: 900;
-            color: var(--text-dark);
-        }
-        .photos-header p {
-            color: var(--text-muted);
+        .page-header h1 { font-size: 28px; margin-bottom: 8px; }
+        .page-header p { opacity: 0.85; font-size: 14px; }
+
+        .btn-primary {
+            padding: 12px 24px;
+            background: linear-gradient(135deg, #e94560, #ff6b8a);
+            color: #fff;
+            border: none;
+            border-radius: 10px;
             font-size: 14px;
-            margin-top: 4px;
-        }
-        .photo-tabs {
-            display: flex;
-            gap: 8px;
-            margin-bottom: 24px;
-            background: #f3f4f6;
-            padding: 6px;
-            border-radius: 12px;
-            width: fit-content;
-            flex-wrap: wrap;
-        }
-        .photo-tab {
-            padding: 10px 20px;
-            border-radius: 8px;
-            font-size: 13px;
             font-weight: 700;
-            color: var(--text-muted);
             cursor: pointer;
-            border: 0;
-            background: transparent;
-            transition: all 0.2s;
+            transition: all 0.3s ease;
+            display: inline-flex;
+            align-items: center;
+            gap: 8px;
+            text-decoration: none;
         }
-        .photo-tab.active {
+        .btn-primary:hover { transform: translateY(-2px); box-shadow: 0 8px 20px rgba(233, 69, 96, 0.4); }
+
+        /* FILTER BAR */
+        .filter-bar {
             background: #fff;
-            color: var(--primary);
-            box-shadow: 0 2px 8px rgba(0, 0, 0, 0.08);
+            border-radius: 16px;
+            padding: 16px 20px;
+            margin-bottom: 24px;
+            box-shadow: 0 2px 8px rgba(0, 0, 0, 0.06);
+            display: flex;
+            gap: 12px;
+            flex-wrap: wrap;
+            align-items: center;
         }
-        .photo-grid {
+        .filter-label { font-weight: 700; font-size: 14px; color: #1a1a2e; }
+        .filter-bar select {
+            padding: 10px 14px;
+            border: 2px solid #e9ecef;
+            border-radius: 10px;
+            font-size: 14px;
+            outline: none;
+            font-family: inherit;
+            background: #f9fafb;
+            min-width: 250px;
+        }
+        .filter-bar select:focus { border-color: #1a3a7a; background: #fff; }
+
+        /* ALBUM GRID */
+        .album-grid {
             display: grid;
-            grid-template-columns: repeat(auto-fill, minmax(280px, 1fr));
-            gap: 20px;
+            grid-template-columns: repeat(auto-fill, minmax(300px, 1fr));
+            gap: 24px;
         }
-        .photo-card {
+        .album-card {
             background: #fff;
             border-radius: 16px;
             overflow: hidden;
-            box-shadow: 0 1px 3px rgba(0, 0, 0, 0.08);
-            border: 1px solid var(--border);
-            transition: all 0.25s;
+            box-shadow: 0 2px 8px rgba(0, 0, 0, 0.06);
+            border: 1px solid #e9ecef;
+            transition: all 0.3s ease;
             cursor: pointer;
-        }
-        .photo-card:hover {
-            transform: translateY(-4px);
-            box-shadow: 0 12px 24px rgba(0, 0, 0, 0.12);
-        }
-        .photo-thumb {
-            width: 100%;
-            height: 220px;
-            object-fit: cover;
-            background: #e5e7eb;
-            display: block;
-        }
-        .photo-card-body {
-            padding: 16px;
-        }
-        .photo-card-title {
-            font-size: 14px;
-            font-weight: 700;
-            color: var(--text-dark);
-            line-height: 1.4;
-            margin-bottom: 8px;
-            display: -webkit-box;
-            -webkit-line-clamp: 2;
-            -webkit-box-orient: vertical;
-            overflow: hidden;
-        }
-        .photo-card-meta {
             display: flex;
-            justify-content: space-between;
-            align-items: center;
-            font-size: 11px;
-            color: var(--text-light);
+            flex-direction: column;
         }
-        .photo-category {
+        .album-card:hover { transform: translateY(-6px); box-shadow: 0 16px 32px rgba(0, 0, 0, 0.12); }
+        .album-cover {
+            width: 100%;
+            height: 200px;
+            object-fit: cover;
+            background: linear-gradient(135deg, #e3f2fd, #bbdefb);
+            display: block;
+            position: relative;
+        }
+        .album-cover-placeholder {
+            width: 100%;
+            height: 200px;
+            background: linear-gradient(135deg, #e3f2fd, #bbdefb);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 64px;
+        }
+        .album-body { padding: 18px; flex: 1; display: flex; flex-direction: column; }
+        .album-tournament {
             display: inline-block;
-            padding: 3px 10px;
-            background: var(--primary-light);
-            color: var(--primary);
+            padding: 4px 10px;
+            background: #e3f2fd;
+            color: #1769ff;
             border-radius: 20px;
             font-size: 10px;
             font-weight: 800;
             text-transform: uppercase;
+            width: fit-content;
+            margin-bottom: 10px;
+        }
+        .album-title {
+            font-size: 16px;
+            font-weight: 800;
+            color: #1a1a2e;
+            line-height: 1.4;
             margin-bottom: 8px;
         }
+        .album-meta {
+            font-size: 13px;
+            color: #6c757d;
+            margin-top: auto;
+            padding-top: 12px;
+            border-top: 1px solid #f3f4f6;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+        }
+
         .empty-state {
             text-align: center;
             padding: 80px 20px;
-            color: var(--text-muted);
             background: #fff;
             border-radius: 16px;
-            border: 2px dashed var(--border);
+            border: 2px dashed #e9ecef;
             grid-column: 1/-1;
         }
-        .empty-state-icon {
-            font-size: 64px;
-            margin-bottom: 16px;
-            opacity: 0.5;
+        .empty-state-icon { font-size: 64px; margin-bottom: 16px; opacity: 0.5; }
+        .empty-state h3 { color: #1a1a2e; margin-bottom: 8px; font-size: 20px; }
+        .empty-state p { font-size: 13px; color: #6c757d; }
+
+        /* MODAL */
+        .modal-overlay {
+            position: fixed; inset: 0;
+            z-index: 1000;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            padding: 20px;
+            background: rgba(15, 23, 42, 0.5);
+            backdrop-filter: blur(4px);
         }
-        .empty-state h3 {
-            color: var(--text-dark);
-            margin-bottom: 8px;
-            font-size: 20px;
+        .modal-overlay[hidden] { display: none; }
+        .modal-card {
+            width: min(900px, 100%);
+            max-height: 90vh;
+            overflow: auto;
+            background: #fff;
+            border-radius: 20px;
+            box-shadow: 0 25px 50px -12px rgba(0, 0, 0, 0.25);
         }
-        .empty-state p {
-            font-size: 13px;
+        .modal-head {
+            display: flex;
+            align-items: flex-start;
+            justify-content: space-between;
+            gap: 16px;
+            padding: 24px 28px 20px;
+            border-bottom: 1px solid #f3f4f6;
+            position: sticky;
+            top: 0;
+            background: #fff;
+            z-index: 10;
         }
-        @media (max-width: 640px) {
-            .photos-header h1 { font-size: 22px; }
-            .photo-grid { grid-template-columns: 1fr; }
+        .modal-head h2 { font-size: 20px; font-weight: 800; color: #1a1a2e; }
+        .modal-close {
+            width: 36px; height: 36px;
+            display: flex; align-items: center; justify-content: center;
+            background: #f3f4f6; border: 0; border-radius: 10px;
+            color: #6c757d; font-size: 22px;
+            cursor: pointer; transition: all 0.2s;
+            flex-shrink: 0;
+        }
+        .modal-close:hover { background: #fee2e2; color: #dc2626; transform: rotate(90deg); }
+        .modal-body { padding: 24px 28px 28px; }
+
+        .form-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 18px; }
+        .form-field { display: flex; flex-direction: column; gap: 8px; }
+        .form-field.full { grid-column: 1 / -1; }
+        .form-label { font-size: 13px; font-weight: 700; color: #1a1a2e; }
+        .form-label span { color: #dc2626; }
+        .form-input, .form-select, .form-textarea {
+            width: 100%; padding: 12px 14px;
+            border: 1.5px solid #e9ecef; border-radius: 10px;
+            background: #f9fafb; font-size: 13.5px; outline: none;
+            font-family: inherit; transition: all 0.2s;
+        }
+        .form-textarea { min-height: 80px; resize: vertical; }
+        .form-input:focus, .form-select:focus, .form-textarea:focus {
+            background: #fff; border-color: #1a3a7a;
+            box-shadow: 0 0 0 4px rgba(26, 58, 122, 0.1);
+        }
+
+        .form-message {
+            padding: 14px 18px; border-radius: 10px;
+            font-size: 13px; font-weight: 600; margin-bottom: 16px; display: none;
+        }
+        .form-message.show { display: block; }
+        .form-message.success { background: #ecfdf5; color: #059669; border: 1px solid #a7f3d0; }
+        .form-message.error { background: #fef2f2; color: #dc2626; border: 1px solid #fecaca; }
+
+        .form-actions {
+            display: flex; justify-content: flex-end; gap: 12px;
+            margin-top: 24px; padding-top: 20px; border-top: 1px solid #f3f4f6;
+        }
+        .btn-cancel {
+            padding: 12px 24px; background: #f3f4f6; color: #4b5563;
+            border: 0; border-radius: 10px; font-weight: 700;
+            cursor: pointer; transition: all 0.2s;
+        }
+        .btn-cancel:hover { background: #e5e7eb; }
+        .btn-submit {
+            padding: 12px 24px;
+            background: linear-gradient(135deg, #1a3a7a, #2d4a9e);
+            color: #fff; border: 0; border-radius: 10px; font-weight: 700;
+            cursor: pointer; box-shadow: 0 4px 12px rgba(26, 58, 122, 0.25);
+            transition: all 0.2s;
+        }
+        .btn-submit:hover:not(:disabled) { transform: translateY(-2px); box-shadow: 0 6px 16px rgba(26, 58, 122, 0.35); }
+        .btn-submit:disabled { opacity: 0.6; cursor: wait; }
+
+        /* ALBUM DETAIL */
+        .album-detail-header {
+            background: linear-gradient(135deg, #0d1b3e, #1a3a7a);
+            color: #fff;
+            padding: 24px 28px;
+            border-radius: 16px 16px 0 0;
+            margin: -24px -28px 24px;
+        }
+        .album-detail-header h2 { font-size: 22px; margin-bottom: 8px; }
+        .album-detail-header p { opacity: 0.85; font-size: 14px; }
+
+        .photo-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fill, minmax(180px, 1fr));
+            gap: 12px;
+        }
+        .photo-item {
+            position: relative;
+            aspect-ratio: 1;
+            border-radius: 10px;
+            overflow: hidden;
+            cursor: pointer;
+            background: #f3f4f6;
+        }
+        .photo-item img {
+            width: 100%;
+            height: 100%;
+            object-fit: cover;
+            transition: all 0.3s ease;
+        }
+        .photo-item:hover img { transform: scale(1.05); }
+        .photo-remove {
+            position: absolute;
+            top: 8px;
+            right: 8px;
+            width: 30px;
+            height: 30px;
+            background: rgba(220, 38, 38, 0.9);
+            color: #fff;
+            border: 0;
+            border-radius: 50%;
+            font-size: 16px;
+            cursor: pointer;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            opacity: 0;
+            transition: all 0.2s;
+        }
+        .photo-item:hover .photo-remove { opacity: 1; }
+        .photo-remove:hover { background: #dc2626; transform: scale(1.1); }
+
+        @media (max-width: 768px) {
+            .page-header { padding: 20px; }
+            .page-header h1 { font-size: 22px; }
+            .form-grid { grid-template-columns: 1fr; }
+            .album-grid { grid-template-columns: 1fr; }
+            .photo-grid { grid-template-columns: repeat(auto-fill, minmax(120px, 1fr)); }
         }
     </style>
 </head>
 
 <body>
-
     <div class="app">
-
-        <!-- Sidebar tự động render bởi sidebar.js -->
-
         <main class="main">
-
             <header class="topbar">
                 <div class="topbar-left">
                     <button class="mobile-menu" id="mobileMenu">☰</button>
@@ -154,7 +305,6 @@
                         <p class="topbar-subtitle">Thư viện hình ảnh thể thao</p>
                     </div>
                 </div>
-
                 <div class="topbar-right">
                     <a href="index.html" class="topbar-cta" style="background: #f3f4f6; color: #4b5563; box-shadow: none;">
                         ← Về trang chủ
@@ -163,166 +313,593 @@
             </header>
 
             <section class="content">
-
-                <div class="photos-header">
+                <div class="page-header">
                     <div>
                         <h1>📸 Hình ảnh thể thao</h1>
                         <p>Thư viện ảnh các sự kiện, giải đấu thể thao</p>
                     </div>
+                    <button class="btn-primary" id="addAlbumBtn" style="display: none;">
+                        ➕ Tạo Album mới
+                    </button>
                 </div>
 
-                <div class="photo-tabs">
-                    <button class="photo-tab active" data-cat="all">Tất cả</button>
-                    <button class="photo-tab" data-cat="Bóng đá">⚽ Bóng đá</button>
-                    <button class="photo-tab" data-cat="Bóng rổ">🏀 Bóng rổ</button>
-                    <button class="photo-tab" data-cat="Bơi">🏊 Bơi</button>
-                    <button class="photo-tab" data-cat="Pickleball">🏓 Pickleball</button>
-                    <button class="photo-tab" data-cat="Sự kiện">🎉 Sự kiện</button>
+                <div class="filter-bar">
+                    <span class="filter-label">🏆 Lọc theo giải:</span>
+                    <select id="tournamentFilter">
+                        <option value="">-- Tất cả giải đấu --</option>
+                    </select>
                 </div>
 
-                <div class="photo-grid" id="photoGrid">
+                <div class="album-grid" id="albumGrid">
                     <div class="empty-state">
-                        <div class="empty-state-icon">📸</div>
-                        <h3>Thư viện ảnh đang được cập nhật</h3>
-                        <p>Admin sẽ sớm đăng tải hình ảnh thể thao tại đây</p>
+                        <div class="empty-state-icon">⏳</div>
+                        <h3>Đang tải danh sách album...</h3>
                     </div>
                 </div>
-
             </section>
 
             <footer class="footer">
                 <span>© 2026 SportsVN</span>
                 <span>Nền tảng công nghệ thể thao Việt Nam</span>
             </footer>
-
         </main>
+    </div>
 
+    <!-- MODAL TẠO ALBUM -->
+    <div class="modal-overlay" id="albumModal" hidden>
+        <div class="modal-card">
+            <div class="modal-head">
+                <h2>➕ Tạo Album ảnh mới</h2>
+                <button class="modal-close" id="closeAlbumModal">×</button>
+            </div>
+            <div class="modal-body">
+                <div class="form-message" id="albumFormMessage"></div>
+                <form id="albumForm">
+                    <div class="form-grid">
+                        <div class="form-field full">
+                            <label class="form-label">Thuộc giải đấu <span>*</span></label>
+                            <select class="form-select" name="tournament_id" id="albumTournament" required>
+                                <option value="">-- Chọn giải đấu --</option>
+                            </select>
+                        </div>
+                        <div class="form-field full">
+                            <label class="form-label">Tiêu đề album <span>*</span></label>
+                            <input type="text" class="form-input" name="title" placeholder="VD: Ảnh khai mạc, Chung kết..." required>
+                        </div>
+                        <div class="form-field full">
+                            <label class="form-label">Mô tả</label>
+                            <textarea class="form-textarea" name="description" placeholder="Mô tả ngắn về album..."></textarea>
+                        </div>
+                        <div class="form-field full">
+                            <label class="form-label">Ảnh đại diện (URL)</label>
+                            <input type="text" class="form-input" name="cover_image" placeholder="https://example.com/cover.jpg">
+                        </div>
+                    </div>
+                    <div class="form-actions">
+                        <button type="button" class="btn-cancel" id="cancelAlbumModal">Hủy</button>
+                        <button type="submit" class="btn-submit" id="submitAlbumBtn">💾 Tạo Album</button>
+                    </div>
+                </form>
+            </div>
+        </div>
+    </div>
+
+    <!-- MODAL XEM ALBUM -->
+    <div class="modal-overlay" id="viewAlbumModal" hidden>
+        <div class="modal-card">
+            <div class="modal-head">
+                <h2 id="viewAlbumTitle">Album</h2>
+                <button class="modal-close" id="closeViewAlbumModal">×</button>
+            </div>
+            <div class="modal-body">
+                <div id="viewAlbumInfo" style="margin-bottom: 20px;"></div>
+                <div id="viewAlbumPhotos" class="photo-grid"></div>
+                <div id="uploadPhotoSection" style="display: none; margin-top: 24px; padding-top: 20px; border-top: 1px solid #f3f4f6;">
+                    <h3 style="font-size: 16px; font-weight: 700; margin-bottom: 16px; color: #1a1a2e;">📤 Thêm ảnh vào album</h3>
+                    <div style="display: flex; gap: 8px; margin-bottom: 12px;">
+                        <input type="text" class="form-input" id="photoUrlInput" placeholder="Dán URL ảnh..." style="flex: 1;">
+                        <button type="button" class="btn-submit" id="addPhotoUrlBtn">+ Thêm URL</button>
+                    </div>
+                    <div style="text-align: center; color: #6c757d; font-size: 13px; margin: 12px 0;">hoặc</div>
+                    <input type="file" id="photoFileInput" accept="image/*" multiple style="display: none;">
+                    <button type="button" class="btn-primary" id="uploadPhotoBtn" style="width: 100%; justify-content: center;">
+                        📤 Chọn ảnh từ máy
+                    </button>
+                </div>
+            </div>
+        </div>
     </div>
 
     <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
     <script src="config.js"></script>
-    <script>
-        // ==========================================
-        // THƯ VIỆN ẢNH - SUPABASE
-        // ==========================================
-        
-        let supabaseClient = null;
-        let allPhotos = [];
+<script>
+(function() {
+    'use strict';
 
-        document.addEventListener('DOMContentLoaded', async function() {
-            'use strict';
+    let supabaseClient = null;
+    let currentSession = null;
+    let isAdmin = false;
+    let allAlbums = [];
+    let allTournaments = [];
+    let currentAlbum = null;
 
-            const config = window.SPORTSVN_CONFIG || {};
-            if (!config.SUPABASE_URL || !config.SUPABASE_ANON_KEY) {
-                console.warn('Chưa cấu hình Supabase');
+    const ADMIN_EMAIL = 'nguyenquanghao2505@gmail.com';
+    const STORAGE_BUCKET = 'sports-images';
+
+    // ==========================================
+    // KHỞI TẠO
+    // ==========================================
+    document.addEventListener('DOMContentLoaded', async function() {
+        const config = window.SPORTSVN_CONFIG || {};
+        if (!config.SUPABASE_URL || !config.SUPABASE_ANON_KEY) {
+            console.error('❌ Chưa cấu hình Supabase');
+            return;
+        }
+
+        supabaseClient = window.supabase.createClient(
+            config.SUPABASE_URL,
+            config.SUPABASE_ANON_KEY
+        );
+
+        await checkAuth();
+        await loadTournaments();
+        await loadAlbums();
+        bindEvents();
+    });
+
+    // ==========================================
+    // 1. KIỂM TRA ADMIN
+    // ==========================================
+    async function checkAuth() {
+        try {
+            const { data: { session } } = await supabaseClient.auth.getSession();
+            if (!session) return;
+            currentSession = session;
+
+            if (session.user.email === ADMIN_EMAIL) {
+                isAdmin = true;
+            } else {
+                const { data: roleData } = await supabaseClient
+                    .from('user_roles')
+                    .select('role')
+                    .eq('user_id', session.user.id)
+                    .eq('role', 'admin')
+                    .maybeSingle();
+                if (roleData) isAdmin = true;
+            }
+
+            if (isAdmin) {
+                document.getElementById('addAlbumBtn').style.display = 'inline-flex';
+                document.getElementById('uploadPhotoSection').style.display = 'block';
+                console.log('✅ Admin đã đăng nhập');
+            }
+        } catch (e) {
+            console.warn('⚠️ Lỗi check auth:', e);
+        }
+    }
+
+    // ==========================================
+    // 2. LOAD DANH SÁCH GIẢI ĐẤU
+    // ==========================================
+    async function loadTournaments() {
+        try {
+            const { data, error } = await supabaseClient
+                .from('tournaments')
+                .select('id, name, sport')
+                .order('created_at', { ascending: false });
+
+            if (error) throw error;
+            allTournaments = data || [];
+
+            const filter = document.getElementById('tournamentFilter');
+            const albumSelect = document.getElementById('albumTournament');
+
+            allTournaments.forEach(t => {
+                const opt1 = document.createElement('option');
+                opt1.value = t.id;
+                opt1.textContent = `${t.name} · ${t.sport || ''}`;
+                filter.appendChild(opt1);
+
+                const opt2 = document.createElement('option');
+                opt2.value = t.id;
+                opt2.textContent = `${t.name} · ${t.sport || ''}`;
+                albumSelect.appendChild(opt2);
+            });
+
+            console.log('✅ Đã load', allTournaments.length, 'giải đấu');
+        } catch (err) {
+            console.error('❌ Lỗi load giải đấu:', err);
+        }
+    }
+
+    // ==========================================
+    // 3. LOAD DANH SÁCH ALBUMS
+    // ==========================================
+    async function loadAlbums() {
+        const grid = document.getElementById('albumGrid');
+
+        try {
+            const { data, error } = await supabaseClient
+                .from('photo_albums')
+                .select('*')
+                .order('created_at', { ascending: false });
+
+            if (error) throw error;
+            allAlbums = data || [];
+
+            // Đếm số ảnh cho mỗi album
+            for (const album of allAlbums) {
+                const { count } = await supabaseClient
+                    .from('photos')
+                    .select('*', { count: 'exact', head: true })
+                    .eq('album_id', album.id);
+                album.photo_count = count || 0;
+            }
+
+            renderAlbums(allAlbums);
+            console.log('✅ Đã load', allAlbums.length, 'album');
+        } catch (err) {
+            console.error('❌ Lỗi load albums:', err);
+            grid.innerHTML = `
+                <div class="empty-state">
+                    <div class="empty-state-icon">❌</div>
+                    <h3>Không thể tải album</h3>
+                    <p>Lỗi: ${escapeHtml(err.message)}</p>
+                </div>
+            `;
+        }
+    }
+
+    // ==========================================
+    // 4. RENDER ALBUM
+    // ==========================================
+    function renderAlbums(albums) {
+        const grid = document.getElementById('albumGrid');
+
+        if (!albums || albums.length === 0) {
+            grid.innerHTML = `
+                <div class="empty-state">
+                    <div class="empty-state-icon">📸</div>
+                    <h3>Chưa có album ảnh nào</h3>
+                    <p>${isAdmin ? 'Nhấn "Tạo Album mới" để bắt đầu' : 'Admin sẽ sớm cập nhật album ảnh'}</p>
+                </div>
+            `;
+            return;
+        }
+
+        grid.innerHTML = albums.map(album => {
+            const tournament = allTournaments.find(t => t.id === album.tournament_id);
+            const coverUrl = album.cover_image || null;
+
+            return `
+                <div class="album-card" onclick="viewAlbum(${album.id})">
+                    ${coverUrl 
+                        ? `<img src="${escapeHtml(coverUrl)}" alt="${escapeHtml(album.title)}" class="album-cover" onerror="this.style.display='none'; this.nextElementSibling.style.display='flex';"><div class="album-cover-placeholder" style="display:none;">📸</div>`
+                        : `<div class="album-cover-placeholder">📸</div>`
+                    }
+                    <div class="album-body">
+                        <span class="album-tournament">🏆 ${escapeHtml(tournament?.name || 'Không rõ')}</span>
+                        <h3 class="album-title">${escapeHtml(album.title)}</h3>
+                        <div class="album-meta">
+                            <span>📷 ${album.photo_count} ảnh</span>
+                            <span>${formatDate(album.created_at)}</span>
+                        </div>
+                    </div>
+                </div>
+            `;
+        }).join('');
+    }
+
+    // ==========================================
+    // 5. BIND EVENTS
+    // ==========================================
+    function bindEvents() {
+        // Filter
+        document.getElementById('tournamentFilter').addEventListener('change', (e) => {
+            const tournamentId = e.target.value;
+            const filtered = tournamentId 
+                ? allAlbums.filter(a => a.tournament_id === tournamentId)
+                : allAlbums;
+            renderAlbums(filtered);
+        });
+
+        // Nút tạo album
+        document.getElementById('addAlbumBtn').addEventListener('click', openAlbumModal);
+        document.getElementById('closeAlbumModal').addEventListener('click', closeAlbumModal);
+        document.getElementById('cancelAlbumModal').addEventListener('click', closeAlbumModal);
+        document.getElementById('albumModal').addEventListener('click', (e) => {
+            if (e.target.id === 'albumModal') closeAlbumModal();
+        });
+
+        // Submit form album
+        document.getElementById('albumForm').addEventListener('submit', handleAlbumSubmit);
+
+        // Modal xem album
+        document.getElementById('closeViewAlbumModal').addEventListener('click', closeViewAlbumModal);
+        document.getElementById('viewAlbumModal').addEventListener('click', (e) => {
+            if (e.target.id === 'viewAlbumModal') closeViewAlbumModal();
+        });
+
+        // Upload ảnh
+        document.getElementById('addPhotoUrlBtn').addEventListener('click', addPhotoFromUrl);
+        document.getElementById('uploadPhotoBtn').addEventListener('click', () => {
+            document.getElementById('photoFileInput').click();
+        });
+        document.getElementById('photoFileInput').addEventListener('change', (e) => {
+            handlePhotoFiles(e.target.files);
+        });
+
+        // ESC
+        document.addEventListener('keydown', (e) => {
+            if (e.key === 'Escape') {
+                closeAlbumModal();
+                closeViewAlbumModal();
+            }
+        });
+    }
+
+    // ==========================================
+    // 6. MODAL TẠO ALBUM
+    // ==========================================
+    function openAlbumModal() {
+        if (!isAdmin) {
+            alert('⛔ Chỉ admin mới có thể tạo album!');
+            return;
+        }
+        document.getElementById('albumModal').hidden = false;
+        document.getElementById('albumForm').reset();
+        document.getElementById('albumFormMessage').className = 'form-message';
+    }
+
+    function closeAlbumModal() {
+        document.getElementById('albumModal').hidden = true;
+    }
+
+    async function handleAlbumSubmit(e) {
+        e.preventDefault();
+        const formData = new FormData(e.target);
+
+        const payload = {
+            tournament_id: formData.get('tournament_id'),
+            title: formData.get('title').trim(),
+            description: formData.get('description').trim() || null,
+            cover_image: formData.get('cover_image').trim() || null,
+            created_by: currentSession?.user?.id || null
+        };
+
+        if (!payload.tournament_id || !payload.title) {
+            showAlbumFormMessage('⚠️ Vui lòng nhập đầy đủ thông tin!', 'error');
+            return;
+        }
+
+        const btn = document.getElementById('submitAlbumBtn');
+        btn.disabled = true;
+        btn.textContent = '⏳ Đang tạo...';
+
+        try {
+            const { error } = await supabaseClient
+                .from('photo_albums')
+                .insert(payload);
+
+            if (error) throw error;
+
+            showAlbumFormMessage('✅ Tạo album thành công!', 'success');
+            setTimeout(() => {
+                closeAlbumModal();
+                loadAlbums();
+            }, 1000);
+
+        } catch (err) {
+            console.error('❌ Lỗi tạo album:', err);
+            showAlbumFormMessage('Lỗi: ' + err.message, 'error');
+        } finally {
+            btn.disabled = false;
+            btn.textContent = '💾 Tạo Album';
+        }
+    }
+
+    function showAlbumFormMessage(message, type) {
+        const el = document.getElementById('albumFormMessage');
+        el.textContent = message;
+        el.className = 'form-message show ' + type;
+    }
+
+    // ==========================================
+    // 7. XEM ALBUM
+    // ==========================================
+    window.viewAlbum = async function(albumId) {
+        const album = allAlbums.find(a => a.id === albumId);
+        if (!album) return;
+
+        currentAlbum = album;
+        const tournament = allTournaments.find(t => t.id === album.tournament_id);
+
+        document.getElementById('viewAlbumTitle').textContent = '📸 ' + album.title;
+        document.getElementById('viewAlbumInfo').innerHTML = `
+            <div class="album-detail-header">
+                <span style="font-size: 12px; opacity: 0.85;">🏆 ${escapeHtml(tournament?.name || 'Không rõ')}</span>
+                <h2>${escapeHtml(album.title)}</h2>
+                ${album.description ? `<p>${escapeHtml(album.description)}</p>` : ''}
+            </div>
+        `;
+
+        document.getElementById('viewAlbumModal').hidden = false;
+
+        // Load photos
+        await loadPhotos(albumId);
+    };
+
+    function closeViewAlbumModal() {
+        document.getElementById('viewAlbumModal').hidden = true;
+        currentAlbum = null;
+    }
+
+    async function loadPhotos(albumId) {
+        const container = document.getElementById('viewAlbumPhotos');
+
+        try {
+            const { data, error } = await supabaseClient
+                .from('photos')
+                .select('*')
+                .eq('album_id', albumId)
+                .order('sort_order', { ascending: true })
+                .order('created_at', { ascending: true });
+
+            if (error) throw error;
+
+            if (!data || data.length === 0) {
+                container.innerHTML = `
+                    <div class="empty-state" style="grid-column: 1/-1; padding: 40px;">
+                        <div class="empty-state-icon">📷</div>
+                        <h3>Album chưa có ảnh</h3>
+                        <p>${isAdmin ? 'Thêm ảnh bên dưới' : 'Admin sẽ sớm cập nhật'}</p>
+                    </div>
+                `;
                 return;
             }
 
-            supabaseClient = window.supabase.createClient(
-                config.SUPABASE_URL,
-                config.SUPABASE_ANON_KEY
-            );
+            container.innerHTML = data.map(photo => `
+                <div class="photo-item">
+                    <img src="${escapeHtml(photo.image_url)}" alt="${escapeHtml(photo.caption || '')}" loading="lazy">
+                    ${isAdmin ? `<button class="photo-remove" onclick="event.stopPropagation(); removePhoto(${photo.id})" title="Xóa ảnh">×</button>` : ''}
+                </div>
+            `).join('');
 
-            // ===== LOAD ẢNH TỪ BUCKET photos =====
-            async function loadPhotos() {
-                const grid = document.getElementById('photoGrid');
+        } catch (err) {
+            console.error('Lỗi load photos:', err);
+            container.innerHTML = `<p style="color: red; grid-column: 1/-1;">Lỗi: ${escapeHtml(err.message)}</p>`;
+        }
+    }
 
-                try {
-                    const { data, error } = await supabaseClient
-                        .storage
-                        .from('photos')
-                        .list('', {
-                            limit: 100,
-                            sortBy: { column: 'created_at', order: 'desc' }
-                        });
+    window.removePhoto = async function(photoId) {
+        if (!confirm('Xóa ảnh này?')) return;
 
-                    if (error || !data || data.length === 0) {
-                        // Giữ nguyên empty state
-                        console.log('ℹ️ Chưa có ảnh nào');
-                        return;
-                    }
+        try {
+            const { error } = await supabaseClient
+                .from('photos')
+                .delete()
+                .eq('id', photoId);
 
-                    // Lọc chỉ file ảnh
-                    const imageFiles = data.filter(f => 
-                        f.name && 
-                        !f.name.startsWith('.') && 
-                        /\.(jpg|jpeg|png|gif|webp)$/i.test(f.name)
-                    );
+            if (error) throw error;
 
-                    if (imageFiles.length === 0) return;
+            if (currentAlbum) await loadPhotos(currentAlbum.id);
+            await loadAlbums();
 
-                    // Lấy public URL cho từng ảnh
-                    allPhotos = imageFiles.map(f => {
-                        const { data: urlData } = supabaseClient
-                            .storage
-                            .from('photos')
-                            .getPublicUrl(f.name);
-                        
-                        return {
-                            name: f.name,
-                            url: urlData.publicUrl,
-                            date: f.created_at
-                        };
+        } catch (err) {
+            alert('Lỗi xóa: ' + err.message);
+        }
+    };
+
+    // ==========================================
+    // 8. THÊM ẢNH
+    // ==========================================
+    async function addPhotoFromUrl() {
+        if (!currentAlbum || !isAdmin) return;
+
+        const input = document.getElementById('photoUrlInput');
+        const url = input.value.trim();
+
+        if (!url) return;
+        if (!url.match(/^https?:\/\/.+/)) {
+            alert('URL không hợp lệ!');
+            return;
+        }
+
+        try {
+            const { error } = await supabaseClient
+                .from('photos')
+                .insert({
+                    album_id: currentAlbum.id,
+                    image_url: url,
+                    created_by: currentSession?.user?.id || null
+                });
+
+            if (error) throw error;
+
+            input.value = '';
+            await loadPhotos(currentAlbum.id);
+            await loadAlbums();
+            console.log('✅ Đã thêm ảnh từ URL');
+
+        } catch (err) {
+            alert('Lỗi thêm ảnh: ' + err.message);
+        }
+    }
+
+    async function handlePhotoFiles(files) {
+        if (!currentAlbum || !isAdmin) return;
+
+        const fileArray = Array.from(files);
+
+        for (const file of fileArray) {
+            if (file.size > 5 * 1024 * 1024) {
+                alert(`Ảnh "${file.name}" vượt quá 5MB!`);
+                continue;
+            }
+
+            if (!file.type.startsWith('image/')) {
+                alert(`File "${file.name}" không phải ảnh!`);
+                continue;
+            }
+
+            try {
+                const url = await uploadToSupabase(file);
+                await supabaseClient
+                    .from('photos')
+                    .insert({
+                        album_id: currentAlbum.id,
+                        image_url: url,
+                        created_by: currentSession?.user?.id || null
                     });
 
-                    renderPhotos(allPhotos);
-
-                } catch (err) {
-                    console.warn('Lỗi load ảnh:', err);
-                }
+                console.log('✅ Upload:', file.name);
+            } catch (err) {
+                console.error('Lỗi upload:', err);
+                alert(`Lỗi upload "${file.name}": ` + err.message);
             }
+        }
 
-            // ===== RENDER ẢNH =====
-            function renderPhotos(photos) {
-                const grid = document.getElementById('photoGrid');
+        await loadPhotos(currentAlbum.id);
+        await loadAlbums();
+    }
 
-                if (photos.length === 0) {
-                    grid.innerHTML = `
-                        <div class="empty-state">
-                            <div class="empty-state-icon">📸</div>
-                            <h3>Chưa có ảnh nào</h3>
-                            <p>Admin sẽ sớm đăng tải hình ảnh</p>
-                        </div>
-                    `;
-                    return;
-                }
+    async function uploadToSupabase(file) {
+        const fileName = `${Date.now()}-${Math.random().toString(36).substring(7)}-${file.name.replace(/[^a-zA-Z0-9.-]/g, '_')}`;
+        const filePath = `albums/${currentAlbum.id}/${fileName}`;
 
-                grid.innerHTML = photos.map(photo => `
-                    <div class="photo-card">
-                        <img src="${photo.url}" alt="${photo.name}" class="photo-thumb">
-                        <div class="photo-card-body">
-                            <span class="photo-category">Hình ảnh</span>
-                            <h3 class="photo-card-title">${photo.name}</h3>
-                            <div class="photo-card-meta">
-                                <span>📅 ${new Date(photo.date).toLocaleDateString('vi-VN')}</span>
-                            </div>
-                        </div>
-                    </div>
-                `).join('');
-            }
+        const { data, error } = await supabaseClient.storage
+            .from(STORAGE_BUCKET)
+            .upload(filePath, file, { cacheControl: '3600', upsert: false });
 
-            // ===== FILTER THEO DANH MỤC =====
-            document.querySelectorAll('.photo-tab').forEach(tab => {
-                tab.addEventListener('click', () => {
-                    document.querySelectorAll('.photo-tab').forEach(t => t.classList.remove('active'));
-                    tab.classList.add('active');
-                    
-                    const cat = tab.dataset.cat;
-                    if (cat === 'all') {
-                        renderPhotos(allPhotos);
-                    } else {
-                        const filtered = allPhotos.filter(p => 
-                            p.name.toLowerCase().includes(cat.toLowerCase())
-                        );
-                        renderPhotos(filtered);
-                    }
-                });
-            });
+        if (error) throw error;
 
-            loadPhotos();
-            console.log('✅ Trang Hình ảnh đã sẵn sàng');
-        });
-    </script>
+        const { data: { publicUrl } } = supabaseClient.storage
+            .from(STORAGE_BUCKET)
+            .getPublicUrl(filePath);
+
+        return publicUrl;
+    }
+
+    // ==========================================
+    // 9. HELPERS
+    // ==========================================
+    function formatDate(dateStr) {
+        if (!dateStr) return '—';
+        const d = new Date(dateStr);
+        return d.toLocaleDateString('vi-VN');
+    }
+
+    function escapeHtml(text) {
+        return String(text || '')
+            .replace(/&/g, '&amp;')
+            .replace(/</g, '&lt;')
+            .replace(/>/g, '&gt;')
+            .replace(/"/g, '&quot;')
+            .replace(/'/g, '&#039;');
+    }
+
+})();
+</script>
 
 </body>
 </html>
