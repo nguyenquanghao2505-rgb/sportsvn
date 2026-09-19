@@ -8,7 +8,7 @@
     <style>
         * { margin: 0; padding: 0; box-sizing: border-box; font-family: 'Segoe UI', system-ui, sans-serif; }
         body { background: #f0f2f8; min-height: 100vh; padding: 24px; }
-        .draw-container { max-width: 1300px; margin: 0 auto; }
+        .draw-container { max-width: 1400px; margin: 0 auto; }
 
         .draw-header {
             background: linear-gradient(135deg, #0d1b3e, #1a3a7a);
@@ -237,11 +237,7 @@
         }
         .group-card {
             background: #fff; border-radius: 16px; overflow: hidden;
-            box-shadow: 0 4px 15px rgba(0,0,0,0.1); animation: slideIn 0.5s ease;
-        }
-        @keyframes slideIn {
-            from { opacity: 0; transform: translateY(20px); }
-            to { opacity: 1; transform: translateY(0); }
+            box-shadow: 0 4px 15px rgba(0,0,0,0.1);
         }
         .group-header {
             background: linear-gradient(135deg, #0d1b3e, #1a3a7a);
@@ -273,107 +269,135 @@
         .group-team .team-club { font-size: 12px; color: #6c757d; margin-top: 2px; display: block; }
         .group-team .team-club.has-club { color: #1a3a7a; font-weight: 600; }
 
-        .bracket {
-            display: flex; gap: 12px; overflow-x: auto;
-            padding: 8px 0;
+        /* ===== BRACKET TREE ===== */
+        .bracket-tabs {
+            display: flex; gap: 8px; margin-bottom: 16px; flex-wrap: wrap;
+        }
+        .bracket-tab-btn {
+            padding: 10px 18px; border-radius: 8px; font-size: 13px;
+            font-weight: 700; cursor: pointer; border: 2px solid #e9ecef;
+            background: #fff; color: #6c757d; transition: all 0.2s;
+        }
+        .bracket-tab-btn.active {
+            background: linear-gradient(135deg, #0d1b3e, #1a3a7a);
+            color: #fff; border-color: #1a3a7a;
+        }
+        .bracket-wrapper {
+            overflow-x: auto; padding: 20px 8px;
+            background: #fafbfc; border-radius: 12px;
+            border: 1px solid #e9ecef;
+        }
+        .bracket-tree {
+            display: inline-flex;
+            gap: 0;
+            min-width: max-content;
             align-items: flex-start;
+            position: relative;
         }
         .bracket-round {
-            min-width: 200px;
-            flex-shrink: 0;
             display: flex;
             flex-direction: column;
+            flex-shrink: 0;
         }
-        .bracket-round h4 {
-            text-align: center; color: #1a3a7a;
-            margin-bottom: 8px;
-            font-size: 11px;
+        .bracket-round-header {
+            text-align: center; color: #fff;
+            font-size: 11px; font-weight: 700;
             text-transform: uppercase;
             letter-spacing: 0.5px;
-            padding-bottom: 6px;
-            border-bottom: 2px solid #e9ecef;
-            font-weight: 700;
+            background: linear-gradient(135deg, #0d1b3e, #1a3a7a);
+            padding: 8px;
+            border-radius: 6px;
+            margin-bottom: 8px;
+            white-space: nowrap;
         }
-        .bracket-round .matchups {
-            display: flex; flex-direction: column;
-            gap: 6px;
-        }
-        .matchup {
-            background: #fff;
-            border-radius: 8px;
-            padding: 8px 10px;
-            box-shadow: 0 1px 4px rgba(0,0,0,0.06);
-            border-left: 3px solid #1a3a7a;
-            position: relative;
-            min-height: 44px;
+        .bracket-round-body {
             display: flex;
-            align-items: center;
-            justify-content: center;
+            flex-direction: column;
+            position: relative;
         }
-        .matchup .match-number {
+        .bracket-match {
+            display: flex;
+            flex-direction: column;
+            border: 1px solid #dee2e6;
+            border-left: 3px solid #1a3a7a;
+            border-radius: 6px;
+            background: #fff;
+            margin: 3px 0;
+            padding: 4px 6px;
+            position: relative;
+            min-height: 40px;
+            justify-content: center;
+            transition: all 0.2s;
+        }
+        .bracket-match:hover {
+            border-left-color: #0984e3;
+            box-shadow: 0 2px 8px rgba(9,132,227,0.15);
+        }
+        .bracket-match.bye {
+            border-left-color: #fdcb6e;
+            background: #fff9e6;
+        }
+        .bracket-match.placeholder {
+            border-left-color: #adb5bd;
+            background: #f8f9fa;
+        }
+        .bracket-match .match-label {
             position: absolute;
-            top: 3px;
-            right: 6px;
+            top: 2px; right: 6px;
             font-size: 9px;
             color: #adb5bd;
             font-weight: 700;
         }
-        .matchup .matchup-row {
-            display: flex;
-            align-items: center;
-            justify-content: space-between;
-            gap: 6px;
+        .bracket-match .player {
             font-size: 11px;
             font-weight: 600;
             color: #1a1a2e;
+            padding: 2px 0;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            gap: 6px;
             line-height: 1.3;
-            width: 100%;
-            padding-right: 20px;
         }
-        .matchup .matchup-row .player {
+        .bracket-match .player .name {
             flex: 1;
             overflow: hidden;
             text-overflow: ellipsis;
             white-space: nowrap;
-            padding: 2px 0;
         }
-        .matchup .matchup-row .player.right { text-align: right; }
-        .matchup .matchup-row .vs-badge {
-            background: #e94560;
-            color: #fff;
-            font-size: 8px;
-            font-weight: 800;
-            padding: 1px 5px;
-            border-radius: 3px;
-            flex-shrink: 0;
-        }
-        .matchup .matchup-row .club-tag {
+        .bracket-match .player .club {
             font-size: 9px;
             color: #1a3a7a;
             background: #e7eefc;
             padding: 1px 4px;
             border-radius: 3px;
             font-weight: 700;
-            margin-left: 3px;
             flex-shrink: 0;
         }
-        .matchup .matchup-row.bye-row {
-            background: #fff9e6;
-            border-radius: 4px;
-            padding: 2px 4px;
-        }
-        .matchup .matchup-row.bye-row .player {
+        .bracket-match .player.bye {
             color: #856404;
             font-style: italic;
         }
-        .matchup .matchup-row.bye-row .vs-badge {
+        .bracket-match .player.bye .byex {
             background: #fdcb6e;
             color: #856404;
+            font-size: 9px;
+            font-weight: 800;
+            padding: 1px 5px;
+            border-radius: 3px;
         }
-        .matchup .edit-btn {
+        .bracket-match .player.placeholder {
+            color: #adb5bd;
+            font-style: italic;
+        }
+        .bracket-match .match-sep {
+            height: 1px;
+            background: #e9ecef;
+            margin: 1px 0;
+        }
+        .bracket-match .edit-btn {
             position: absolute;
-            top: 2px;
-            left: 4px;
+            top: 2px; left: 4px;
             background: transparent;
             border: none;
             color: #adb5bd;
@@ -383,16 +407,34 @@
             opacity: 0;
             transition: opacity 0.2s;
         }
-        .matchup:hover .edit-btn { opacity: 1; color: #0984e3; }
-        .matchup .edit-btn:hover { color: #e94560; transform: scale(1.2); }
+        .bracket-match:hover .edit-btn { opacity: 1; color: #0984e3; }
+        .bracket-match .edit-btn:hover { color: #e94560; transform: scale(1.2); }
 
-        .empty-state { text-align: center; padding: 40px 20px; color: #6c757d; }
-        .empty-state i { font-size: 48px; color: #dee2e6; margin-bottom: 12px; display: block; }
-        .result-actions { margin-top: 20px; display: flex; gap: 12px; flex-wrap: wrap; }
-        .bracket-info {
-            background: #e7f3ff; border-left: 4px solid #1a3a7a;
-            padding: 12px 16px; border-radius: 8px;
-            margin-bottom: 16px; font-size: 14px; color: #1a3a7a; font-weight: 700;
+        .bracket-connector {
+            flex-shrink: 0;
+            position: relative;
+        }
+        .bracket-connector svg {
+            display: block;
+        }
+        .connector-label {
+            position: absolute;
+            background: #fff;
+            border: 1px solid #1a3a7a;
+            border-radius: 4px;
+            padding: 2px 6px;
+            font-size: 9px;
+            color: #1a3a7a;
+            font-weight: 700;
+            white-space: nowrap;
+            z-index: 2;
+            pointer-events: none;
+        }
+        .connector-label.bk {
+            background: #e94560;
+            color: #fff;
+            border-color: #e94560;
+            font-size: 10px;
         }
 
         .slot-table {
@@ -408,6 +450,15 @@
         .slot-table tr.bye-row { background: #fff9e6; }
         .slot-table tr.bye-row td { color: #856404; font-style: italic; }
 
+        .empty-state { text-align: center; padding: 40px 20px; color: #6c757d; }
+        .empty-state i { font-size: 48px; color: #dee2e6; margin-bottom: 12px; display: block; }
+        .result-actions { margin-top: 20px; display: flex; gap: 12px; flex-wrap: wrap; }
+        .bracket-info {
+            background: #e7f3ff; border-left: 4px solid #1a3a7a;
+            padding: 12px 16px; border-radius: 8px;
+            margin-bottom: 16px; font-size: 14px; color: #1a3a7a; font-weight: 700;
+        }
+
         .modal-overlay {
             display: none; position: fixed; top: 0; left: 0; right: 0; bottom: 0;
             background: rgba(0,0,0,0.5); z-index: 1000;
@@ -417,7 +468,7 @@
         .modal-content {
             background: #fff; border-radius: 20px;
             max-width: 900px; width: 100%; max-height: 90vh;
-            overflow-y: auto; animation: slideIn 0.3s ease;
+            overflow-y: auto;
         }
         .modal-header {
             background: linear-gradient(135deg, #0d1b3e, #1a3a7a);
@@ -474,15 +525,12 @@
             .form-row-add { grid-template-columns: 1fr; }
             .config-row { grid-template-columns: 1fr; }
             .draw-header h1 { font-size: 22px; }
-            .bracket { flex-direction: column; }
-            .bracket-round { min-width: 100%; }
         }
     </style>
 </head>
 <body>
 
 <div class="draw-container">
-
     <div class="draw-header">
         <div>
             <h1>🎲 Bốc thăm tự động</h1>
@@ -493,12 +541,10 @@
         </a>
     </div>
 
-    <!-- BƯỚC 1 -->
     <div class="draw-panel">
         <div class="panel-title">
             <span class="step-num">1</span> Chọn nội dung & Nhập danh sách VĐV
         </div>
-
         <div class="category-select-box">
             <label><i class="fas fa-list"></i> Chọn nội dung thi đấu <span style="color: #e94560;">*</span></label>
             <select id="category-select" onchange="onCategoryChange()">
@@ -552,7 +598,6 @@
         </div>
     </div>
 
-    <!-- BƯỚC 2 -->
     <div class="draw-panel">
         <div class="panel-title">
             <span class="step-num">2</span> Ràng buộc CLB (tùy chọn)
@@ -565,13 +610,8 @@
             <input type="checkbox" id="distribute-seeds" checked>
             <span>🌱 Phân bổ hạt giống đều các nhánh/bảng</span>
         </label>
-        <p style="margin-top: 12px; color: #6c757d; font-size: 13px;">
-            <i class="fas fa-info-circle"></i>
-            Hệ thống sẽ thử tối đa 500 lần. Nếu không thể tránh, sẽ có cảnh báo.
-        </p>
     </div>
 
-    <!-- BƯỚC 3 -->
     <div class="draw-panel">
         <div class="panel-title">
             <span class="step-num">3</span> Chọn thể thức bốc thăm
@@ -647,22 +687,16 @@
             </div>
         </div>
 
-        <!-- Ô NHẬP BYE TÙY CHỈNH (chỉ hiện cho Knockout) -->
         <div id="config-bye" class="config-box" style="display:block;border-left-color:#fdcb6e;">
             <h4><i class="fas fa-ban" style="color:#fdcb6e;"></i> Slot BYE tùy chỉnh</h4>
             <div class="form-group">
                 <label>Nhập vị trí BYE (cách nhau dấu phẩy, để trống = tự động)</label>
                 <input type="text" id="custom-bye-slots" placeholder="VD: 2,15,18,34,47,50" oninput="updateByeInfo()">
-                <p style="font-size:12px;color:#6c757d;margin-top:6px;">
-                    <i class="fas fa-info-circle"></i>
-                    Nếu để trống, hệ thống tự chọn BYE đối xứng. Nếu nhập, phải khớp số BYE cần thiết.
-                </p>
             </div>
             <div id="bye-info" style="font-size:13px;color:#1a3a7a;font-weight:600;"></div>
         </div>
     </div>
 
-    <!-- BƯỚC 4 -->
     <div class="draw-panel">
         <div class="panel-title">
             <span class="step-num">4</span> Cấu hình lịch thi đấu (tùy chọn)
@@ -700,21 +734,16 @@
         </div>
     </div>
 
-    <!-- BƯỚC 5 -->
     <div class="draw-panel">
         <div class="panel-title">
             <span class="step-num">5</span> Tiến hành bốc thăm
         </div>
-        <p style="color: #6c757d; margin-bottom: 16px;">
-            Nhấn nút bên dưới để tiến hành bốc thăm theo thể thức đã chọn.
-        </p>
         <button class="btn-success" onclick="performDraw()">
             <i class="fas fa-dice"></i> BỐC THĂM NGAY
         </button>
         <div id="alert" class="alert"></div>
     </div>
 
-    <!-- BƯỚC 6 -->
     <div class="draw-panel" id="result-panel" style="display: none;">
         <div class="panel-title">
             <span class="step-num">6</span> Kết quả bốc thăm
@@ -739,10 +768,8 @@
             </button>
         </div>
     </div>
-
 </div>
 
-<!-- MODAL IMPORT -->
 <div class="modal-overlay" id="import-modal">
     <div class="modal-content">
         <div class="modal-header">
@@ -763,11 +790,7 @@
                 <div class="preview-table">
                     <table id="preview-table-content">
                         <thead>
-                            <tr>
-                                <th>STT</th>
-                                <th>Tên VĐV/Đội</th>
-                                <th>CLB/Đơn vị</th>
-                            </tr>
+                            <tr><th>STT</th><th>Tên VĐV/Đội</th><th>CLB/Đơn vị</th></tr>
                         </thead>
                         <tbody></tbody>
                     </table>
@@ -783,7 +806,6 @@
     </div>
 </div>
 
-<!-- MODAL EDIT -->
 <div class="modal-overlay" id="edit-modal">
     <div class="modal-content" style="max-width:600px;">
         <div class="modal-header">
@@ -794,7 +816,6 @@
     </div>
 </div>
 
-<!-- LOADING -->
 <div class="loading-overlay" id="loadingOverlay">
     <div class="loading-box">
         <div class="spinner"></div>
@@ -811,7 +832,7 @@
 (function() {
     'use strict';
 
-    console.log('🚀 draw.html v6 - BYE tùy chỉnh + Danh sách slot');
+    console.log('🚀 draw.html v8 - Full file, single script');
 
     const config = window.SPORTSVN_CONFIG || {};
     const supabaseClient = window.supabase.createClient(config.SUPABASE_URL, config.SUPABASE_ANON_KEY);
@@ -933,7 +954,6 @@
                 <button class="remove-btn" onclick="removeTeam(${i})" title="Xóa">×</button>
             </div>
         `).join('');
-        // Cập nhật BYE info
         if (currentDrawType === 'knockout') updateByeInfo();
     }
 
@@ -1056,7 +1076,7 @@
         const n = teams.length;
         const info = document.getElementById('bye-info');
         if (!info) return;
-        if (n < 2) { info.textContent = '⚠️ Cần ít nhất 2 VĐV'; return; }
+        if (n < 2) { info.textContent = '⚠️ Cần ít nhất 2 VĐV'; info.style.color = '#e94560'; return; }
         let bracketSize = 2;
         while (bracketSize < n) bracketSize *= 2;
         const numByes = bracketSize - n;
@@ -1145,7 +1165,7 @@
     };
 
     // ==========================================
-    // DRAW KNOCKOUT (với BYE tùy chỉnh)
+    // DRAW KNOCKOUT
     // ==========================================
     function drawKnockout(teams, protectClub) {
         const MAX_ATTEMPTS = 500;
@@ -1154,7 +1174,6 @@
         while (bracketSize < size) bracketSize *= 2;
         const numByes = bracketSize - size;
 
-        // Đọc BYE tùy chỉnh
         let customByes = null;
         const byeInput = document.getElementById('custom-bye-slots');
         if (byeInput && byeInput.value.trim()) {
@@ -1192,16 +1211,12 @@
         };
     }
 
-    /**
-     * Xây bracket với BYE tùy chỉnh (hoặc auto)
-     */
     function buildKnockoutBracketWithByes(teams, bracketSize, numByes, customByes) {
         const numFirstRoundMatches = bracketSize / 2;
         const firstRound = [];
         let players = [...teams];
 
         if (customByes && customByes.length === numByes) {
-            // Đặt BYE vào đúng slot chỉ định
             for (let i = 0; i < numFirstRoundMatches; i++) {
                 const slotA = i * 2 + 1;
                 const slotB = i * 2 + 2;
@@ -1225,7 +1240,6 @@
                 }
             }
         } else {
-            // Auto BYE
             const byes = players.slice(0, numByes);
             const playing = players.slice(numByes);
             for (let i = 0; i < numFirstRoundMatches; i++) {
@@ -1393,30 +1407,19 @@
     }
 
     function renderKnockoutHTML(result) {
-        const roundNames = getRoundNames(result.rounds.length);
-        // Tab buttons
         const tabs = `
-            <div style="display:flex;gap:8px;margin-bottom:12px;flex-wrap:wrap;">
-                <button class="btn-primary" id="tab-tree" onclick="switchBracketView('tree')"
-                    style="padding:8px 16px;font-size:13px;">
-                    🌳 Sơ đồ cây
+            <div class="bracket-tabs">
+                <button class="bracket-tab-btn active" id="tab-tree" onclick="switchBracketView('tree')">
+                    🌳 Sơ đồ cây (giống Excel)
                 </button>
-                <button class="btn-info-sm" id="tab-slot" onclick="switchBracketView('slot')"
-                    style="padding:8px 16px;font-size:13px;">
-                    📋 Danh sách slot (như Excel)
+                <button class="bracket-tab-btn" id="tab-slot" onclick="switchBracketView('slot')">
+                    📋 Danh sách slot
                 </button>
             </div>
         `;
         const treeView = `
-            <div class="bracket" id="bracket-tree">
-                ${result.rounds.map((round, i) => `
-                    <div class="bracket-round">
-                        <h4>${roundNames[i]}</h4>
-                        <div class="matchups">
-                            ${round.map((match, j) => renderMatchupCompact(match, i, j)).join('')}
-                        </div>
-                    </div>
-                `).join('')}
+            <div class="bracket-wrapper" id="bracket-tree">
+                ${renderBracketTree(result)}
             </div>
         `;
         const slotView = `
@@ -1428,11 +1431,203 @@
     }
 
     window.switchBracketView = function(view) {
-        document.getElementById('bracket-tree').style.display = (view === 'tree') ? 'flex' : 'none';
+        document.getElementById('bracket-tree').style.display = (view === 'tree') ? 'block' : 'none';
         document.getElementById('bracket-slot').style.display = (view === 'slot') ? 'block' : 'none';
-        document.getElementById('tab-tree').className = (view === 'tree') ? 'btn-primary' : 'btn-info-sm';
-        document.getElementById('tab-slot').className = (view === 'slot') ? 'btn-primary' : 'btn-info-sm';
+        document.getElementById('tab-tree').classList.toggle('active', view === 'tree');
+        document.getElementById('tab-slot').classList.toggle('active', view === 'slot');
     };
+
+    function renderBracketTree(result) {
+        const rounds = result.rounds;
+        const roundNames = getRoundNames(rounds.length);
+        const SLOT_HEIGHT = 44;
+        const MATCH_GAP = 6;
+        const COL_WIDTH = 220;
+        const CONNECTOR_WIDTH = 60;
+        const firstRoundMatchHeight = SLOT_HEIGHT * 2 + MATCH_GAP;
+        const firstRoundCount = rounds[0].length;
+        const totalHeight = firstRoundCount * firstRoundMatchHeight;
+
+        const roundPositions = [];
+        for (let r = 0; r < rounds.length; r++) {
+            const matchCount = rounds[r].length;
+            const spacing = totalHeight / matchCount;
+            const positions = [];
+            for (let m = 0; m < matchCount; m++) {
+                positions.push(m * spacing + spacing / 2);
+            }
+            roundPositions.push(positions);
+        }
+
+        let html = '<div class="bracket-tree">';
+        rounds.forEach((round, roundIdx) => {
+            const isFirstRound = roundIdx === 0;
+            const isLastRound = roundIdx === rounds.length - 1;
+            const colWidth = isFirstRound ? COL_WIDTH : COL_WIDTH - 40;
+
+            html += `<div class="bracket-round" style="min-width:${colWidth}px;width:${colWidth}px;">`;
+            html += `<div class="bracket-round-header">${roundNames[roundIdx]}</div>`;
+            html += `<div class="bracket-round-body" style="height:${totalHeight}px;position:relative;">`;
+
+            round.forEach((match, matchIdx) => {
+                const yPos = roundPositions[roundIdx][matchIdx];
+                if (isFirstRound) {
+                    html += renderFirstRoundMatch(match, matchIdx, roundIdx, yPos, SLOT_HEIGHT);
+                } else {
+                    html += renderLaterRoundMatch(match, matchIdx, roundIdx, yPos, SLOT_HEIGHT);
+                }
+            });
+
+            html += '</div></div>';
+
+            if (!isLastRound) {
+                html += `<div class="bracket-connector" style="width:${CONNECTOR_WIDTH}px;height:${totalHeight}px;position:relative;">`;
+                html += renderConnectorSVG(
+                    round.length,
+                    rounds[roundIdx + 1].length,
+                    totalHeight,
+                    roundPositions[roundIdx],
+                    roundPositions[roundIdx + 1],
+                    roundIdx,
+                    rounds.length
+                );
+                html += '</div>';
+            }
+        });
+        html += '</div>';
+        return html;
+    }
+
+    function renderFirstRoundMatch(match, matchIdx, roundIdx, yPos, slotHeight) {
+        const matchNum = matchIdx + 1;
+        let slotA = '', slotB = '', matchClass = '';
+
+        if (match.isBye) {
+            matchClass = 'bye';
+            if (match.teamA) {
+                slotA = `
+                    <div class="player" style="height:${slotHeight - 4}px;">
+                        <span class="name">${escapeHtml(match.teamA.name)}</span>
+                        ${match.teamA.club ? `<span class="club">${escapeHtml(match.teamA.club)}</span>` : ''}
+                    </div>
+                    <div class="match-sep"></div>
+                    <div class="player bye" style="height:${slotHeight - 4}px;">
+                        <span class="name">BYE</span>
+                        <span class="byex">X</span>
+                    </div>
+                `;
+            } else if (match.teamB) {
+                slotA = `
+                    <div class="player bye" style="height:${slotHeight - 4}px;">
+                        <span class="name">BYE</span>
+                        <span class="byex">X</span>
+                    </div>
+                    <div class="match-sep"></div>
+                    <div class="player" style="height:${slotHeight - 4}px;">
+                        <span class="name">${escapeHtml(match.teamB.name)}</span>
+                        ${match.teamB.club ? `<span class="club">${escapeHtml(match.teamB.club)}</span>` : ''}
+                    </div>
+                `;
+            }
+        } else if (match.isPlaceholder) {
+            matchClass = 'placeholder';
+            slotA = `
+                <div class="player placeholder" style="height:${slotHeight - 4}px;"><span class="name">Chưa xác định</span></div>
+                <div class="match-sep"></div>
+                <div class="player placeholder" style="height:${slotHeight - 4}px;"><span class="name">Chưa xác định</span></div>
+            `;
+        } else {
+            slotA = `
+                <div class="player" style="height:${slotHeight - 4}px;position:relative;">
+                    <span class="name">${escapeHtml(match.teamA.name)}</span>
+                    ${match.teamA.club ? `<span class="club">${escapeHtml(match.teamA.club)}</span>` : ''}
+                </div>
+                <div class="match-sep"></div>
+                <div class="player" style="height:${slotHeight - 4}px;position:relative;">
+                    <span class="name">${escapeHtml(match.teamB.name)}</span>
+                    ${match.teamB.club ? `<span class="club">${escapeHtml(match.teamB.club)}</span>` : ''}
+                </div>
+            `;
+        }
+
+        const top = yPos - (slotHeight * 2) / 2;
+        return `
+            <div class="bracket-match ${matchClass}" 
+                 style="position:absolute;top:${top}px;left:0;right:0;height:${slotHeight * 2}px;"
+                 data-match-idx="${matchIdx}">
+                <span class="match-label">T${matchNum}</span>
+                <button class="edit-btn" onclick="openEditMatch(${roundIdx}, ${matchIdx})" title="Sửa">
+                    <i class="fas fa-pen"></i>
+                </button>
+                ${slotA}
+            </div>
+        `;
+    }
+
+    function renderLaterRoundMatch(match, matchIdx, roundIdx, yPos, slotHeight) {
+        const matchNum = matchIdx + 1;
+        const top = yPos - slotHeight / 2;
+        let content = '';
+        if (match.isPlaceholder) {
+            content = `<div class="player placeholder" style="height:${slotHeight - 4}px;"><span class="name">Chưa xác định</span></div>`;
+        } else {
+            const player = match.teamA || match.teamB;
+            if (player) {
+                content = `
+                    <div class="player" style="height:${slotHeight - 4}px;">
+                        <span class="name">${escapeHtml(player.name)}</span>
+                        ${player.club ? `<span class="club">${escapeHtml(player.club)}</span>` : ''}
+                    </div>
+                `;
+            } else {
+                content = `<div class="player placeholder" style="height:${slotHeight - 4}px;"><span class="name">Chưa xác định</span></div>`;
+            }
+        }
+        return `
+            <div class="bracket-match" 
+                 style="position:absolute;top:${top}px;left:0;right:0;height:${slotHeight}px;"
+                 data-match-idx="${matchIdx}">
+                <span class="match-label">T${matchNum}</span>
+                <button class="edit-btn" onclick="openEditMatch(${roundIdx}, ${matchIdx})" title="Sửa">
+                    <i class="fas fa-pen"></i>
+                </button>
+                ${content}
+            </div>
+        `;
+    }
+
+    function renderConnectorSVG(fromCount, toCount, totalHeight, fromPositions, toPositions, roundIdx, totalRounds) {
+        const W = 60;
+        const midX = W / 2;
+        let paths = '';
+        for (let i = 0; i < toCount; i++) {
+            const fromIdx1 = i * 2;
+            const fromIdx2 = i * 2 + 1;
+            if (fromIdx1 >= fromPositions.length) continue;
+            const y1 = fromPositions[fromIdx1];
+            const y2 = fromIdx2 < fromPositions.length ? fromPositions[fromIdx2] : y1;
+            const yTo = toPositions[i];
+            paths += `<path d="M 0 ${y1} L ${midX} ${y1} L ${midX} ${yTo} L ${W} ${yTo}" 
+                stroke="#1a3a7a" stroke-width="1.5" fill="none" opacity="0.5"/>`;
+            if (y2 !== y1) {
+                paths += `<path d="M 0 ${y2} L ${midX} ${y2} L ${midX} ${yTo}" 
+                    stroke="#1a3a7a" stroke-width="1.5" fill="none" opacity="0.5"/>`;
+            }
+        }
+        let bkLabel = '';
+        if (roundIdx === totalRounds - 3) {
+            bkLabel = `<div class="connector-label bk" style="top:50%;left:0;transform:translate(-50%,-50%);">BK</div>`;
+        } else if (roundIdx === totalRounds - 4) {
+            bkLabel = `<div class="connector-label" style="top:50%;left:50%;transform:translate(-50%,-50%);">Tứ kết</div>`;
+        }
+        return `
+            <svg style="width:${W}px;height:${totalHeight}px;display:block;" 
+                 viewBox="0 0 ${W} ${totalHeight}" preserveAspectRatio="none">
+                ${paths}
+            </svg>
+            ${bkLabel}
+        `;
+    }
 
     function renderSlotList(result) {
         const firstRound = result.rounds[0];
@@ -1440,25 +1635,17 @@
         const numByes = result.numByes;
         let html = `
             <div style="background:#f8f9fa;padding:16px;border-radius:12px;overflow-x:auto;">
-                <h3 style="color:#1a3a7a;margin-bottom:12px;">
-                    📋 Danh sách slot (Bracket ${bracketSize})
-                </h3>
+                <h3 style="color:#1a3a7a;margin-bottom:12px;">📋 Danh sách slot (Bracket ${bracketSize})</h3>
                 <p style="font-size:13px;color:#6c757d;margin-bottom:16px;">
                     ${result.numTeams} VĐV · ${numByes} BYE
                     ${result.customByes ? ' · BYE tùy chỉnh: ' + result.customByes.join(', ') : ''}
                 </p>
                 <table class="slot-table">
-                    <thead>
-                        <tr>
-                            <th style="width:60px;">Slot</th>
-                            <th style="width:60px;">BYE</th>
-                            <th>Tên VĐV</th>
-                            <th style="width:120px;">CLB</th>
-                            <th style="width:100px;">Trận</th>
-                            <th style="width:140px;">Ghi chú</th>
-                        </tr>
-                    </thead>
-                    <tbody>
+                    <thead><tr>
+                        <th style="width:60px;">Slot</th><th style="width:60px;">BYE</th>
+                        <th>Tên VĐV</th><th style="width:120px;">CLB</th>
+                        <th style="width:100px;">Trận</th><th style="width:140px;">Ghi chú</th>
+                    </tr></thead><tbody>
         `;
         firstRound.forEach((match, matchIdx) => {
             const slotA = matchIdx * 2 + 1;
@@ -1485,100 +1672,29 @@
                     </tr>`;
                 }
             } else if (match.isPlaceholder) {
-                html += `<tr>
-                    <td style="text-align:center;">${slotA}</td>
-                    <td style="text-align:center;">—</td>
-                    <td style="color:#adb5bd;font-style:italic;">Chưa xác định</td>
-                    <td>—</td>
-                    <td style="text-align:center;">Trận ${matchIdx + 1}</td>
-                    <td></td>
-                </tr>
-                <tr>
-                    <td style="text-align:center;">${slotB}</td>
-                    <td style="text-align:center;">—</td>
-                    <td style="color:#adb5bd;font-style:italic;">Chưa xác định</td>
-                    <td>—</td>
-                    <td style="text-align:center;">Trận ${matchIdx + 1}</td>
-                    <td></td>
-                </tr>`;
+                html += `<tr><td style="text-align:center;">${slotA}</td><td style="text-align:center;">—</td>
+                    <td style="color:#adb5bd;font-style:italic;">Chưa xác định</td><td>—</td>
+                    <td style="text-align:center;">Trận ${matchIdx + 1}</td><td></td></tr>
+                <tr><td style="text-align:center;">${slotB}</td><td style="text-align:center;">—</td>
+                    <td style="color:#adb5bd;font-style:italic;">Chưa xác định</td><td>—</td>
+                    <td style="text-align:center;">Trận ${matchIdx + 1}</td><td></td></tr>`;
             } else {
                 if (match.teamA) {
-                    html += `<tr>
-                        <td style="text-align:center;">${slotA}</td>
-                        <td style="text-align:center;">—</td>
+                    html += `<tr><td style="text-align:center;">${slotA}</td><td style="text-align:center;">—</td>
                         <td style="font-weight:600;">${escapeHtml(match.teamA.name)}</td>
                         <td>${escapeHtml(match.teamA.club || '—')}</td>
-                        <td style="text-align:center;">Trận ${matchIdx + 1}</td>
-                        <td></td>
-                    </tr>`;
+                        <td style="text-align:center;">Trận ${matchIdx + 1}</td><td></td></tr>`;
                 }
                 if (match.teamB) {
-                    html += `<tr>
-                        <td style="text-align:center;">${slotB}</td>
-                        <td style="text-align:center;">—</td>
+                    html += `<tr><td style="text-align:center;">${slotB}</td><td style="text-align:center;">—</td>
                         <td style="font-weight:600;">${escapeHtml(match.teamB.name)}</td>
                         <td>${escapeHtml(match.teamB.club || '—')}</td>
-                        <td style="text-align:center;">Trận ${matchIdx + 1}</td>
-                        <td></td>
-                    </tr>`;
+                        <td style="text-align:center;">Trận ${matchIdx + 1}</td><td></td></tr>`;
                 }
             }
         });
         html += `</tbody></table></div>`;
         return html;
-    }
-
-    function renderMatchupCompact(match, roundIdx, matchIdx) {
-        const matchNum = matchIdx + 1;
-        if (match.isPlaceholder) {
-            return `
-                <div class="matchup">
-                    <span class="match-number">T${matchNum}</span>
-                    <div class="matchup-row bye-row">
-                        <span class="player">Chưa xác định</span>
-                        <span class="vs-badge">VS</span>
-                        <span class="player right">Chưa xác định</span>
-                    </div>
-                </div>
-            `;
-        }
-        if (match.isBye) {
-            const player = match.teamA || match.teamB;
-            return `
-                <div class="matchup">
-                    <span class="match-number">T${matchNum}</span>
-                    <button class="edit-btn" onclick="openEditSlot(${roundIdx}, ${matchIdx}, 'A')" title="Sửa">
-                        <i class="fas fa-pen"></i>
-                    </button>
-                    <div class="matchup-row bye-row">
-                        <span class="player">${escapeHtml(player.name)}</span>
-                        <span class="vs-badge">BYE</span>
-                        <span class="player right">—</span>
-                    </div>
-                </div>
-            `;
-        }
-        const a = match.teamA;
-        const b = match.teamB;
-        return `
-            <div class="matchup">
-                <span class="match-number">T${matchNum}</span>
-                <button class="edit-btn" onclick="openEditMatch(${roundIdx}, ${matchIdx})" title="Sửa trận này">
-                    <i class="fas fa-pen"></i>
-                </button>
-                <div class="matchup-row">
-                    <span class="player">
-                        ${escapeHtml(a.name)}
-                        ${a.club ? `<span class="club-tag">${escapeHtml(a.club)}</span>` : ''}
-                    </span>
-                    <span class="vs-badge">VS</span>
-                    <span class="player right">
-                        ${b.club ? `<span class="club-tag">${escapeHtml(b.club)}</span>` : ''}
-                        ${escapeHtml(b.name)}
-                    </span>
-                </div>
-            </div>
-        `;
     }
 
     function getRoundNames(totalRounds) {
@@ -1597,16 +1713,8 @@
     window.openEditMatch = function(roundIdx, matchIdx) {
         if (!lastResult || lastResult.type !== 'knockout') return;
         const match = lastResult.rounds[roundIdx][matchIdx];
-        if (!match || match.isPlaceholder || match.isBye) return;
-        editingContext = { roundIdx, matchIdx, side: 'both', match };
-        renderEditModal();
-    };
-
-    window.openEditSlot = function(roundIdx, matchIdx, side) {
-        if (!lastResult || lastResult.type !== 'knockout') return;
-        const match = lastResult.rounds[roundIdx][matchIdx];
-        if (!match) return;
-        editingContext = { roundIdx, matchIdx, side, match };
+        if (!match || match.isPlaceholder) return;
+        editingContext = { roundIdx, matchIdx, match };
         renderEditModal();
     };
 
@@ -1621,7 +1729,7 @@
 
         body.innerHTML = `
             <div style="margin-bottom:20px;">
-                <h3 style="color:#1a3a7a;margin-bottom:12px;">VĐV A (bên trái)</h3>
+                <h3 style="color:#1a3a7a;margin-bottom:12px;">VĐV A (trên)</h3>
                 <div class="form-group" style="margin-bottom:12px;">
                     <label>Tên VĐV</label>
                     <input type="text" id="edit-a-name" value="${escapeHtml(a?.name || '')}" style="width:100%;padding:10px;border:2px solid #e9ecef;border-radius:8px;">
@@ -1631,16 +1739,15 @@
                     <input type="text" id="edit-a-club" value="${escapeHtml(a?.club || '')}" style="width:100%;padding:10px;border:2px solid #e9ecef;border-radius:8px;">
                 </div>
                 <div class="form-group">
-                    <label>Hoặc chọn VĐV khác từ danh sách:</label>
+                    <label>Hoặc chọn VĐV khác:</label>
                     <select id="edit-a-select" style="width:100%;padding:10px;border:2px solid #e9ecef;border-radius:8px;" onchange="onSelectOtherTeam('a', this.value)">
-                        <option value="">-- Giữ nguyên / Tự nhập --</option>
+                        <option value="">-- Giữ nguyên --</option>
                         ${otherTeams.map((t, i) => `<option value="${i}">${escapeHtml(t.name)} (${escapeHtml(t.club || '—')})</option>`).join('')}
                     </select>
                 </div>
             </div>
-
             <div style="margin-bottom:20px;border-top:1px dashed #dee2e6;padding-top:20px;">
-                <h3 style="color:#1a3a7a;margin-bottom:12px;">VĐV B (bên phải)</h3>
+                <h3 style="color:#1a3a7a;margin-bottom:12px;">VĐV B (dưới)</h3>
                 <div class="form-group" style="margin-bottom:12px;">
                     <label>Tên VĐV</label>
                     <input type="text" id="edit-b-name" value="${escapeHtml(b?.name || '')}" style="width:100%;padding:10px;border:2px solid #e9ecef;border-radius:8px;">
@@ -1650,14 +1757,13 @@
                     <input type="text" id="edit-b-club" value="${escapeHtml(b?.club || '')}" style="width:100%;padding:10px;border:2px solid #e9ecef;border-radius:8px;">
                 </div>
                 <div class="form-group">
-                    <label>Hoặc chọn VĐV khác từ danh sách:</label>
+                    <label>Hoặc chọn VĐV khác:</label>
                     <select id="edit-b-select" style="width:100%;padding:10px;border:2px solid #e9ecef;border-radius:8px;" onchange="onSelectOtherTeam('b', this.value)">
-                        <option value="">-- Giữ nguyên / Tự nhập --</option>
+                        <option value="">-- Giữ nguyên --</option>
                         ${otherTeams.map((t, i) => `<option value="${i}">${escapeHtml(t.name)} (${escapeHtml(t.club || '—')})</option>`).join('')}
                     </select>
                 </div>
             </div>
-
             <div class="modal-actions">
                 <button class="btn-primary" style="background:#6c757d;" onclick="closeEditModal()">Hủy</button>
                 <button class="btn-success-sm" onclick="saveEditMatch()">
@@ -1665,7 +1771,6 @@
                 </button>
             </div>
         `;
-
         document.getElementById('edit-modal').classList.add('show');
     }
 
@@ -1686,71 +1791,17 @@
 
     window.saveEditMatch = function() {
         if (!editingContext || !lastResult) return;
-        const ctx = editingContext;
-        const match = ctx.match;
+        const match = editingContext.match;
         const aName = document.getElementById('edit-a-name').value.trim();
         const aClub = document.getElementById('edit-a-club').value.trim();
         const bName = document.getElementById('edit-b-name').value.trim();
         const bClub = document.getElementById('edit-b-club').value.trim();
-        if (!aName && !bName) { alert('Vui lòng nhập ít nhất 1 VĐV.'); return; }
         if (match.teamA && aName) { match.teamA.name = aName; match.teamA.club = aClub; }
         if (match.teamB && bName) { match.teamB.name = bName; match.teamB.club = bClub; }
         closeEditModal();
         renderResult(lastResult);
         showAlert('✅ Đã cập nhật trận đấu!', 'success');
     };
-
-    // ==========================================
-    // ALERT + UTILS
-    // ==========================================
-    function showAlert(message, type) {
-        const el = document.getElementById('alert');
-        if (!message) { el.className = 'alert'; return; }
-        el.textContent = message;
-        el.className = 'alert show ' + type;
-    }
-
-    function escapeHtml(text) {
-        return String(text || '').replace(/&/g, '&amp;').replace(/</g, '&lt;')
-            .replace(/>/g, '&gt;').replace(/"/g, '&quot;');
-    }
-
-    function showLoading(text) {
-        document.getElementById('loadingText').textContent = text || 'Đang xử lý...';
-        document.getElementById('loadingOverlay').classList.add('active');
-    }
-    function hideLoading() {
-        document.getElementById('loadingOverlay').classList.remove('active');
-    }
-
-    renderTeams();
-    loadCategories();
-    console.log('✅ draw.html v6 - Part 1 loaded');
-
-    window.__drawApp = {
-        getTeams: () => teams,
-        getLastResult: () => lastResult,
-        getCurrentCategory: () => currentCategory,
-        getTournamentId: () => tournamentId,
-        getSupabase: () => supabaseClient,
-        showAlert, showLoading, hideLoading, escapeHtml,
-    };
-})();
-</script>
-
-<script>
-(function() {
-    'use strict';
-
-    const app = window.__drawApp || {};
-    const getTeams = app.getTeams || (() => []);
-    const getLastResult = app.getLastResult || (() => null);
-    const getCurrentCategory = app.getCurrentCategory || (() => '');
-    const getTournamentId = app.getTournamentId || (() => null);
-    const getSupabase = app.getSupabase || (() => null);
-    const showAlert = app.showAlert || (() => {});
-    const showLoading = app.showLoading || (() => {});
-    const hideLoading = app.hideLoading || (() => {});
 
     // ==========================================
     // GÁN LỊCH
@@ -1793,12 +1844,7 @@
             date.setDate(date.getDate() + dayIndex);
             const session = sessions[sessionIndex] || 'Sáng';
             const time = getSessionTime(session, cfg);
-            result.push({
-                ...match,
-                date: formatDateVN(date),
-                fullDate: date.toISOString().slice(0, 10),
-                session, time, table: tableIndex, slotIndex,
-            });
+            result.push({ ...match, date: formatDateVN(date), fullDate: date.toISOString().slice(0, 10), session, time, table: tableIndex, slotIndex });
             slotIndex++;
         }
         return result;
@@ -1844,7 +1890,7 @@
     }
 
     // ==========================================
-    // SHEET KNOCKOUT (có cột Slot và BYE)
+    // SHEET KNOCKOUT
     // ==========================================
     function buildKnockoutSheet(wb, sheetName, result, categoryName) {
         const ws = wb.addWorksheet(sheetName, {
@@ -1852,65 +1898,41 @@
             pageSetup: { paperSize: 9, orientation: 'landscape', fitToPage: true },
         });
         ws.columns = [
-            { width: 6 },   // A: Slot
-            { width: 6 },   // B: BYE
-            { width: 8 },   // C: Trận
-            { width: 25 },  // D: VĐV A
-            { width: 18 },  // E: CLB A
-            { width: 6 },   // F: VS
-            { width: 25 },  // G: VĐV B
-            { width: 18 },  // H: CLB B
-            { width: 8 },   // I: Ngày
-            { width: 8 },   // J: Ca
-            { width: 6 },   // K: Bàn
-            { width: 8 },   // L: Giờ
-            { width: 25 },  // M: Ghi chú
+            { width: 6 }, { width: 6 }, { width: 8 }, { width: 25 }, { width: 18 }, { width: 6 },
+            { width: 25 }, { width: 18 }, { width: 8 }, { width: 8 }, { width: 6 }, { width: 8 }, { width: 25 },
         ];
         const titleRow = ws.addRow([`${categoryName.toUpperCase()} - BỐC THĂM LOẠI TRỰC TIẾP (Bracket ${result.bracketSize})`]);
         ws.mergeCells('A1:M1');
         styleSectionTitle(titleRow);
-        const headerRow = ws.addRow([
-            'Slot', 'BYE', 'Trận', 'VĐV A', 'CLB A', 'VS', 'VĐV B', 'CLB B', 'Ngày', 'Ca', 'Bàn', 'Giờ', 'Ghi chú'
-        ]);
+        const headerRow = ws.addRow(['Slot', 'BYE', 'Trận', 'VĐV A', 'CLB A', 'VS', 'VĐV B', 'CLB B', 'Ngày', 'Ca', 'Bàn', 'Giờ', 'Ghi chú']);
         styleHeaderRow(headerRow);
 
         const firstRound = result.rounds[0];
         const scheduleCfg = buildScheduleConfig();
         const realMatches = [];
         firstRound.forEach((m, i) => {
-            if (!m.isPlaceholder && !m.isBye && m.teamA && m.teamB) {
-                realMatches.push({ index: i, match: m });
-            }
+            if (!m.isPlaceholder && !m.isBye && m.teamA && m.teamB) realMatches.push({ index: i, match: m });
         });
         const scheduled = assignScheduleToMatches(realMatches.map((_, i) => ({ idx: i })), scheduleCfg);
 
-        // Ghi từng slot (mở rộng)
-        let tt = 1;
         let matchIdx = 0;
         firstRound.forEach((match, i) => {
             const slotA = i * 2 + 1;
             const slotB = i * 2 + 2;
             if (match.isBye) {
-                const player = match.teamA || match.teamB;
                 const byeSlot = match.teamA ? slotA : slotB;
-                const otherSlot = match.teamA ? slotB : slotA;
                 const r = ws.addRow([
                     byeSlot, 'X', `Trận ${i + 1}`,
-                    match.teamA ? match.teamA.name : '',
-                    match.teamA ? (match.teamA.club || '—') : '',
+                    match.teamA ? match.teamA.name : '', match.teamA ? (match.teamA.club || '—') : '',
                     'vs',
-                    match.teamB ? match.teamB.name : '',
-                    match.teamB ? (match.teamB.club || '—') : '',
-                    '', '', '', '',
-                    'BYE - đi tiếp'
+                    match.teamB ? match.teamB.name : '', match.teamB ? (match.teamB.club || '—') : '',
+                    '', '', '', '', 'BYE - đi tiếp'
                 ]);
                 styleDataRow(r);
                 [1, 2, 6, 9, 10, 11, 12].forEach(c => r.getCell(c).alignment = { horizontal: 'center', vertical: 'middle' });
                 r.getCell(4).font = { bold: true, color: { argb: COLORS.byeFg } };
                 r.getCell(7).font = { bold: true, color: { argb: COLORS.byeFg } };
-                r.eachCell(cell => {
-                    cell.fill = { type: 'pattern', pattern: 'solid', fgColor: { argb: COLORS.byeBg } };
-                });
+                r.eachCell(cell => { cell.fill = { type: 'pattern', pattern: 'solid', fgColor: { argb: COLORS.byeBg } }; });
             } else if (match.isPlaceholder) {
                 ws.addRow([slotA, '', `Trận ${i + 1}`, '—', '', 'vs', '—', '', '', '', '', '', '']);
                 ws.addRow([slotB, '', `Trận ${i + 1}`, '—', '', 'vs', '—', '', '', '', '', '', '']);
@@ -1919,11 +1941,9 @@
                 matchIdx++;
                 const r = ws.addRow([
                     `${slotA}-${slotB}`, '', `Trận ${i + 1}`,
-                    match.teamA.name, match.teamA.club || '—',
-                    'vs',
+                    match.teamA.name, match.teamA.club || '—', 'vs',
                     match.teamB.name, match.teamB.club || '—',
-                    sched.date || '', sched.session || '', sched.table || '', sched.time || '',
-                    ''
+                    sched.date || '', sched.session || '', sched.table || '', sched.time || '', ''
                 ]);
                 styleDataRow(r);
                 [1, 2, 6, 9, 10, 11, 12].forEach(c => r.getCell(c).alignment = { horizontal: 'center', vertical: 'middle' });
@@ -1948,12 +1968,8 @@
         const groupNames = ['A', 'B', 'C', 'D', 'E', 'F', 'G', 'H', 'I', 'J', 'K', 'L', 'M', 'N', 'O', 'P'];
         const scheduleCfg = buildScheduleConfig();
 
-        const wsSummary = wb.addWorksheet('DS Bảng đấu', {
-            pageSetup: { paperSize: 9, orientation: 'landscape', fitToPage: true },
-        });
-        wsSummary.columns = [
-            { width: 10 }, { width: 6 }, { width: 30 }, { width: 22 }, { width: 10 }, { width: 10 }, { width: 10 },
-        ];
+        const wsSummary = wb.addWorksheet('DS Bảng đấu', { pageSetup: { paperSize: 9, orientation: 'landscape', fitToPage: true } });
+        wsSummary.columns = [{ width: 10 }, { width: 6 }, { width: 30 }, { width: 22 }, { width: 10 }, { width: 10 }, { width: 10 }];
         const titleS = wsSummary.addRow([`${categoryName.toUpperCase()} - DANH SÁCH BẢNG ĐẤU`]);
         wsSummary.mergeCells('A1:G1');
         styleSectionTitle(titleS);
@@ -1972,13 +1988,8 @@
 
         result.groups.forEach((group, gi) => {
             const groupName = groupNames[gi];
-            const ws = wb.addWorksheet(`Bảng ${groupName}`, {
-                pageSetup: { paperSize: 9, orientation: 'landscape', fitToPage: true },
-            });
-            ws.columns = [
-                { width: 6 }, { width: 4 }, { width: 4 }, { width: 30 }, { width: 22 },
-                { width: 6 }, { width: 6 }, { width: 6 },
-            ];
+            const ws = wb.addWorksheet(`Bảng ${groupName}`, { pageSetup: { paperSize: 9, orientation: 'landscape', fitToPage: true } });
+            ws.columns = [{ width: 6 }, { width: 4 }, { width: 4 }, { width: 30 }, { width: 22 }, { width: 6 }, { width: 6 }, { width: 6 }];
             const titleRow = ws.addRow([`BẢNG ${groupName} (${group.length} VĐV)`]);
             ws.mergeCells('A1:H1');
             styleSectionTitle(titleRow);
@@ -1991,7 +2002,6 @@
                 row.getCell(4).font = { bold: true, color: { argb: COLORS.clubFg } };
                 [6, 7, 8].forEach(c => row.getCell(c).alignment = { horizontal: 'center', vertical: 'middle' });
             });
-
             ws.addRow([]);
             const matrixTitle = ws.addRow([`MA TRẬN ĐẤU VÒNG TRÒN - BẢNG ${groupName}`]);
             ws.mergeCells(`A${matrixTitle.number}:H${matrixTitle.number}`);
@@ -2010,7 +2020,6 @@
                 styleDataRow(r);
                 r.eachCell(c => c.alignment = { horizontal: 'center', vertical: 'middle' });
             }
-
             ws.addRow([]);
             const matchTitle = ws.addRow([`DANH SÁCH TRẬN - BẢNG ${groupName}`]);
             ws.mergeCells(`A${matchTitle.number}:H${matchTitle.number}`);
@@ -2043,13 +2052,8 @@
     function buildStage2Sheet(wb, result, categoryName, groupNames) {
         const numGroups = result.groups.length;
         if (numGroups < 2) return;
-        const ws = wb.addWorksheet('Giai đoạn 2', {
-            pageSetup: { paperSize: 9, orientation: 'landscape', fitToPage: true },
-        });
-        ws.columns = [
-            { width: 6 }, { width: 22 }, { width: 22 }, { width: 22 },
-            { width: 8 }, { width: 8 }, { width: 6 }, { width: 8 }, { width: 35 },
-        ];
+        const ws = wb.addWorksheet('Giai đoạn 2', { pageSetup: { paperSize: 9, orientation: 'landscape', fitToPage: true } });
+        ws.columns = [{ width: 6 }, { width: 22 }, { width: 22 }, { width: 22 }, { width: 8 }, { width: 8 }, { width: 6 }, { width: 8 }, { width: 35 }];
         const titleRow = ws.addRow([`GIAI ĐOẠN II - ${categoryName.toUpperCase()} (CHỌN NHẤT, NHÌ MỖI BẢNG)`]);
         ws.mergeCells('A1:I1');
         styleSectionTitle(titleRow);
@@ -2069,20 +2073,15 @@
         }
         const scheduleCfg = buildScheduleConfig();
         const scheduled = assignScheduleToMatches(pairs.map((_, i) => ({ idx: i })), scheduleCfg);
-
         pairs.forEach((p, idx) => {
             const s = scheduled[idx];
-            const row = ws.addRow([
-                idx + 1, `${p.a} vs ${p.b}`, p.a, p.b,
-                s.date, s.session, s.table, s.time, p.note,
-            ]);
+            const row = ws.addRow([idx + 1, `${p.a} vs ${p.b}`, p.a, p.b, s.date, s.session, s.table, s.time, p.note]);
             styleDataRow(row);
             [1, 5, 6, 7, 8].forEach(c => row.getCell(c).alignment = { horizontal: 'center', vertical: 'middle' });
             row.getCell(2).font = { bold: true, color: { argb: COLORS.clubFg } };
             row.getCell(3).font = { bold: true };
             row.getCell(4).font = { bold: true };
         });
-
         ws.addRow([]);
         const noteTitle = ws.addRow(['GHI CHÚ:']);
         noteTitle.getCell(1).font = { bold: true, color: { argb: COLORS.headerBg } };
@@ -2092,12 +2091,8 @@
     }
 
     function buildScheduleSummarySheet(wb, result, categoryName) {
-        const ws = wb.addWorksheet('Lịch thi đấu chung', {
-            pageSetup: { paperSize: 9, orientation: 'landscape', fitToPage: true },
-        });
-        ws.columns = [
-            { width: 6 }, { width: 10 }, { width: 35 }, { width: 10 }, { width: 10 }, { width: 8 }, { width: 10 },
-        ];
+        const ws = wb.addWorksheet('Lịch thi đấu chung', { pageSetup: { paperSize: 9, orientation: 'landscape', fitToPage: true } });
+        ws.columns = [{ width: 6 }, { width: 10 }, { width: 35 }, { width: 10 }, { width: 10 }, { width: 8 }, { width: 10 }];
         const titleRow = ws.addRow([`LỊCH THI ĐẤU - ${categoryName.toUpperCase()}`]);
         ws.mergeCells('A1:G1');
         styleSectionTitle(titleRow);
@@ -2108,14 +2103,10 @@
         if (result.type === 'knockout') {
             const firstRound = result.rounds[0];
             const matchesList = [];
-            firstRound.forEach((m, i) => {
-                if (!m.isPlaceholder && !m.isBye) matchesList.push({ matchNumber: i + 1 });
-            });
+            firstRound.forEach((m, i) => { if (!m.isPlaceholder && !m.isBye) matchesList.push({ matchNumber: i + 1 }); });
             const scheduled = assignScheduleToMatches(matchesList, scheduleCfg);
             scheduled.forEach((s) => {
-                const r = ws.addRow([
-                    tt++, s.date, `${categoryName} - Vòng 1`, s.session, s.time, 'Bàn ' + s.table, `Trận ${s.matchNumber}`,
-                ]);
+                const r = ws.addRow([tt++, s.date, `${categoryName} - Vòng 1`, s.session, s.time, 'Bàn ' + s.table, `Trận ${s.matchNumber}`]);
                 styleDataRow(r);
                 [1, 4, 5, 6].forEach(c => r.getCell(c).alignment = { horizontal: 'center', vertical: 'middle' });
             });
@@ -2128,12 +2119,8 @@
                 }
                 const scheduled = assignScheduleToMatches(matchesList, scheduleCfg);
                 scheduled.forEach((s) => {
-                    const t1 = group[s.p1];
-                    const t2 = group[s.p2];
-                    const r = ws.addRow([
-                        tt++, s.date, `Bảng ${groupName}: ${t1.name} vs ${t2.name}`,
-                        s.session, s.time, 'Bàn ' + s.table, '',
-                    ]);
+                    const t1 = group[s.p1]; const t2 = group[s.p2];
+                    const r = ws.addRow([tt++, s.date, `Bảng ${groupName}: ${t1.name} vs ${t2.name}`, s.session, s.time, 'Bàn ' + s.table, '']);
                     styleDataRow(r);
                     [1, 4, 5, 6].forEach(c => r.getCell(c).alignment = { horizontal: 'center', vertical: 'middle' });
                 });
@@ -2233,9 +2220,7 @@
         } else if (result.type === 'knockout') {
             const firstRound = result.rounds[0];
             const matchesList = [];
-            firstRound.forEach((m, i) => {
-                if (!m.isPlaceholder && !m.isBye) matchesList.push({ matchNumber: i + 1 });
-            });
+            firstRound.forEach((m, i) => { if (!m.isPlaceholder && !m.isBye) matchesList.push({ matchNumber: i + 1 }); });
             const scheduled = assignScheduleToMatches(matchesList, scheduleCfg);
             let matchIdx = 0;
             firstRound.forEach((match, i) => {
@@ -2243,11 +2228,9 @@
                 const sched = !match.isBye ? scheduled[matchIdx++] : null;
                 if (match.teamA) {
                     records.push({
-                        tournament_id: tournamentId, team_name: match.teamA.name,
-                        club: match.teamA.club || null,
-                        group_name: match.isBye ? 'BYE' : 'Vòng 1',
-                        position: i * 2 + 1, draw_type: 'knockout', round_number: 1,
-                        match_number: i + 1, category: category,
+                        tournament_id: tournamentId, team_name: match.teamA.name, club: match.teamA.club || null,
+                        group_name: match.isBye ? 'BYE' : 'Vòng 1', position: i * 2 + 1,
+                        draw_type: 'knockout', round_number: 1, match_number: i + 1, category: category,
                         match_date: sched?.fullDate || null, match_session: sched?.session || null,
                         match_time: sched?.time || null, match_table: sched?.table || null,
                         created_by: session.user.id,
@@ -2255,10 +2238,9 @@
                 }
                 if (match.teamB) {
                     records.push({
-                        tournament_id: tournamentId, team_name: match.teamB.name,
-                        club: match.teamB.club || null, group_name: 'Vòng 1',
-                        position: i * 2 + 2, draw_type: 'knockout', round_number: 1,
-                        match_number: i + 1, category: category,
+                        tournament_id: tournamentId, team_name: match.teamB.name, club: match.teamB.club || null,
+                        group_name: 'Vòng 1', position: i * 2 + 2,
+                        draw_type: 'knockout', round_number: 1, match_number: i + 1, category: category,
                         match_date: sched?.fullDate || null, match_session: sched?.session || null,
                         match_time: sched?.time || null, match_table: sched?.table || null,
                         created_by: session.user.id,
@@ -2273,16 +2255,11 @@
         btn.innerHTML = '<i class="fas fa-spinner fa-spin"></i> Đang lưu...';
 
         try {
-            await supabaseClient.from('draws')
-                .delete()
-                .eq('tournament_id', tournamentId)
-                .eq('category', category);
+            await supabaseClient.from('draws').delete().eq('tournament_id', tournamentId).eq('category', category);
             const { error } = await supabaseClient.from('draws').insert(records);
             if (error) throw error;
             showAlert(`✅ Đã lưu ${records.length} VĐV cho "${category}"! Đang chuyển trang...`, 'success');
-            setTimeout(() => {
-                window.location.href = 'schedule.html?tournament_id=' + tournamentId;
-            }, 1500);
+            setTimeout(() => { window.location.href = 'schedule.html?tournament_id=' + tournamentId; }, 1500);
         } catch (error) {
             console.error(error);
             showAlert('Lỗi lưu: ' + error.message, 'error');
@@ -2291,7 +2268,33 @@
         }
     };
 
-    console.log('✅ draw.html v6 - Part 2 loaded');
+    // ==========================================
+    // ALERT + UTILS
+    // ==========================================
+    function showAlert(message, type) {
+        const el = document.getElementById('alert');
+        if (!message) { el.className = 'alert'; return; }
+        el.textContent = message;
+        el.className = 'alert show ' + type;
+    }
+    function escapeHtml(text) {
+        return String(text || '').replace(/&/g, '&amp;').replace(/</g, '&lt;')
+            .replace(/>/g, '&gt;').replace(/"/g, '&quot;');
+    }
+    function showLoading(text) {
+        document.getElementById('loadingText').textContent = text || 'Đang xử lý...';
+        document.getElementById('loadingOverlay').classList.add('active');
+    }
+    function hideLoading() {
+        document.getElementById('loadingOverlay').classList.remove('active');
+    }
+
+    // ==========================================
+    // INIT
+    // ==========================================
+    renderTeams();
+    loadCategories();
+    console.log('✅ draw.html v8 - Single script loaded');
 })();
 </script>
 </body>
