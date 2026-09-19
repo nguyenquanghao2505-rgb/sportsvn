@@ -15,10 +15,6 @@
 
     <div class="app">
 
-        <!-- Sidebar sẽ được tự động render bởi sidebar.js -->
-        <!-- Không cần viết sidebar cứng ở đây nữa -->
-
-        <!-- MAIN -->
         <main class="main">
 
             <!-- TOPBAR -->
@@ -71,48 +67,6 @@
                 </section>
 
 
-                <!-- STATISTICS -->
-                <div class="stats-grid">
-
-                    <div class="stat-card">
-                        <div class="stat-icon blue">◈</div>
-                        <div class="stat-content">
-                            <span>Tổng số giải đấu</span>
-                            <strong>24</strong>
-                            <small><b>+12%</b> so với tháng trước</small>
-                        </div>
-                    </div>
-
-                    <div class="stat-card">
-                        <div class="stat-icon green">♙</div>
-                        <div class="stat-content">
-                            <span>Vận động viên</span>
-                            <strong>1.286</strong>
-                            <small><b>+8.5%</b> so với tháng trước</small>
-                        </div>
-                    </div>
-
-                    <div class="stat-card">
-                        <div class="stat-icon orange">✓</div>
-                        <div class="stat-content">
-                            <span>Trận đấu đã diễn ra</span>
-                            <strong>438</strong>
-                            <small><b>+18%</b> so với tháng trước</small>
-                        </div>
-                    </div>
-
-                    <div class="stat-card">
-                        <div class="stat-icon purple">▤</div>
-                        <div class="stat-content">
-                            <span>Đơn vị tham gia</span>
-                            <strong>86</strong>
-                            <small><b>+6.2%</b> so với tháng trước</small>
-                        </div>
-                    </div>
-
-                </div>
-
-
                 <!-- DASHBOARD 3 CỘT -->
                 <div class="dashboard-grid">
 
@@ -126,7 +80,7 @@
                             <a href="tournaments.html">Xem tất cả →</a>
                         </div>
 
-                        <div class="tournament-list">
+                        <div class="tournament-list" id="homeTournamentList">
                             <div class="tournament">
                                 <div class="sport-logo football">⚽</div>
                                 <div class="tournament-info">
