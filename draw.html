@@ -10,7 +10,6 @@
         body { background: #f0f2f8; min-height: 100vh; padding: 24px; }
         .draw-container { max-width: 1300px; margin: 0 auto; }
 
-        /* ===== HEADER ===== */
         .draw-header {
             background: linear-gradient(135deg, #0d1b3e, #1a3a7a);
             border-radius: 20px; padding: 32px; color: #fff;
@@ -24,12 +23,10 @@
             background: transparent; color: #fff; border: 2px solid #fff;
             padding: 12px 24px; border-radius: 10px; font-size: 15px;
             font-weight: 700; cursor: pointer; text-decoration: none;
-            display: inline-flex; align-items: center; gap: 8px;
-            transition: all 0.2s;
+            display: inline-flex; align-items: center; gap: 8px; transition: all 0.2s;
         }
         .draw-header .btn-outline:hover { background: #fff; color: #0d1b3e; }
 
-        /* ===== PANELS ===== */
         .draw-panel {
             background: #fff; border-radius: 16px; padding: 24px;
             margin-bottom: 24px; box-shadow: 0 4px 20px rgba(0,0,0,0.08);
@@ -44,7 +41,6 @@
             justify-content: center; font-size: 15px; flex-shrink: 0;
         }
 
-        /* ===== FORM ===== */
         .form-row-add {
             display: grid; grid-template-columns: 2fr 2fr 1fr 1fr;
             gap: 12px; align-items: end; margin-bottom: 16px;
@@ -55,8 +51,7 @@
         }
         .form-group input, .form-group select {
             width: 100%; padding: 12px 16px; border: 2px solid #e9ecef;
-            border-radius: 10px; font-size: 15px; font-family: inherit;
-            transition: all 0.2s;
+            border-radius: 10px; font-size: 15px; font-family: inherit; transition: all 0.2s;
         }
         .form-group input:focus, .form-group select:focus {
             border-color: #1a3a7a; outline: none;
@@ -76,11 +71,8 @@
             border: 2px solid #1a3a7a; border-radius: 10px;
             font-size: 15px; font-weight: 600; background: #fff;
         }
-        .category-select-box .hint {
-            font-size: 13px; color: #6c757d; margin-top: 8px;
-        }
+        .category-select-box .hint { font-size: 13px; color: #6c757d; margin-top: 8px; }
 
-        /* ===== BUTTONS ===== */
         .btn-primary {
             background: linear-gradient(135deg, #0d1b3e, #1a3a7a);
             color: #fff; border: none; padding: 13px 24px;
@@ -133,7 +125,6 @@
             border-radius: 12px; margin-bottom: 16px;
         }
 
-        /* ===== TEAMS ===== */
         .teams-summary {
             display: flex; gap: 12px; flex-wrap: wrap;
             padding: 12px 16px; background: #f8f9fa;
@@ -167,7 +158,6 @@
         }
         .team-item .remove-btn:hover { background: #c73650; transform: scale(1.1); }
 
-        /* ===== CHECKBOX ===== */
         .checkbox-line {
             display: flex; align-items: center; gap: 12px;
             cursor: pointer; padding: 12px 16px;
@@ -178,7 +168,6 @@
             width: 20px; height: 20px; cursor: pointer; accent-color: #1a3a7a;
         }
 
-        /* ===== DRAW TYPES ===== */
         .draw-types {
             display: grid; grid-template-columns: repeat(auto-fit, minmax(260px, 1fr));
             gap: 12px; margin-top: 12px;
@@ -201,7 +190,6 @@
         .draw-type-card .info strong { display: block; color: #1a1a2e; font-size: 15px; margin-bottom: 6px; }
         .draw-type-card .info small { color: #6c757d; font-size: 13px; line-height: 1.5; }
 
-        /* ===== CONFIG ===== */
         .config-box {
             margin-top: 20px; padding: 16px;
             background: #f8f9fa; border-radius: 12px;
@@ -230,7 +218,6 @@
         .total-check.ok { background: #d4edda; color: #155724; }
         .total-check.error { background: #f8d7da; color: #721c24; }
 
-        /* ===== ALERTS ===== */
         .warning-box {
             padding: 14px 18px; background: #fff3cd;
             border: 1px solid #ffeaa7; border-left: 4px solid #fdcb6e;
@@ -246,7 +233,6 @@
         .alert.success { background: #d4edda; color: #155724; border: 1px solid #c3e6cb; }
         .alert.info { background: #cce5ff; color: #004085; border: 1px solid #b8daff; }
 
-        /* ===== RESULT: GROUP ===== */
         .groups-grid {
             display: grid; grid-template-columns: repeat(auto-fit, minmax(250px, 1fr));
             gap: 20px; margin-top: 20px;
@@ -289,7 +275,6 @@
         .group-team .team-club { font-size: 12px; color: #6c757d; margin-top: 2px; display: block; }
         .group-team .team-club.has-club { color: #1a3a7a; font-weight: 600; }
 
-        /* ===== RESULT: BRACKET ===== */
         .bracket {
             display: flex; gap: 30px; overflow-x: auto;
             padding: 20px 0; min-height: 400px;
@@ -331,7 +316,6 @@
             font-size: 10px; margin: 4px 0; font-weight: 700;
         }
 
-        /* ===== EMPTY / MISC ===== */
         .empty-state { text-align: center; padding: 40px 20px; color: #6c757d; }
         .empty-state i { font-size: 48px; color: #dee2e6; margin-bottom: 12px; display: block; }
         .result-actions { margin-top: 20px; display: flex; gap: 12px; flex-wrap: wrap; }
@@ -341,7 +325,6 @@
             margin-bottom: 16px; font-size: 14px; color: #1a3a7a; font-weight: 700;
         }
 
-        /* ===== MODAL ===== */
         .modal-overlay {
             display: none; position: fixed; top: 0; left: 0; right: 0; bottom: 0;
             background: rgba(0,0,0,0.5); z-index: 1000;
@@ -387,7 +370,6 @@
             margin-top: 24px; padding-top: 20px; border-top: 1px solid #e9ecef;
         }
 
-        /* ===== LOADING ===== */
         .loading-overlay {
             position: fixed; top: 0; left: 0; right: 0; bottom: 0;
             background: rgba(0,0,0,0.5); display: none;
@@ -405,7 +387,6 @@
         }
         @keyframes spin { to { transform: rotate(360deg); } }
 
-        /* ===== RESPONSIVE ===== */
         @media (max-width: 768px) {
             .form-row-add { grid-template-columns: 1fr; }
             .config-row { grid-template-columns: 1fr; }
@@ -584,7 +565,7 @@
         </div>
     </div>
 
-    <!-- BƯỚC 4: CẤU HÌNH LỊCH THI ĐẤU (MỚI) -->
+    <!-- BƯỚC 4: CẤU HÌNH LỊCH THI ĐẤU -->
     <div class="draw-panel">
         <div class="panel-title">
             <span class="step-num">4</span> Cấu hình lịch thi đấu (tùy chọn)
@@ -723,7 +704,7 @@
 (function() {
     'use strict';
 
-    console.log('🚀 draw.html v3 - FULL FEATURES');
+    console.log('🚀 draw.html v4 - FULL REWRITE');
 
     // ==========================================
     // KHỞI TẠO
@@ -1085,7 +1066,7 @@
     };
 
     // ==========================================
-    // DRAW KNOCKOUT (cải tiến BYE đối xứng + seed)
+    // DRAW KNOCKOUT
     // ==========================================
     function drawKnockout(teams, protectClub, distributeSeeds) {
         const MAX_ATTEMPTS = 200;
@@ -1103,38 +1084,17 @@
 
         for (let attempt = 0; attempt < MAX_ATTEMPTS; attempt++) {
             const shuffled = shuffleArray([...teams]);
-            // Sắp xếp lại để phân bổ BYE đối xứng
-            const ordered = arrangeByeSymmetry(shuffled, bracketSize, numByes);
-            const rounds = buildKnockoutBracket(ordered, bracketSize, numByes);
+            const rounds = buildKnockoutBracket(shuffled, bracketSize, numByes);
             if (!protectClub || !hasSameClubInFirstRound(rounds[0])) {
                 return { type: 'knockout', rounds, bracketSize, numByes, numTeams: size,
                     description: `${size} VĐV → Bracket ${bracketSize}${numByes > 0 ? ' (' + numByes + ' BYE)' : ''}` };
             }
         }
         const shuffled = shuffleArray([...teams]);
-        const ordered = arrangeByeSymmetry(shuffled, bracketSize, numByes);
-        const rounds = buildKnockoutBracket(ordered, bracketSize, numByes);
+        const rounds = buildKnockoutBracket(shuffled, bracketSize, numByes);
         return { type: 'knockout', rounds, bracketSize, numByes, numTeams: size,
             description: `${size} VĐV → Bracket ${bracketSize}${numByes > 0 ? ' (' + numByes + ' BYE)' : ''}`,
             warning: 'Không thể tránh hoàn toàn. Một số VĐV cùng CLB phải gặp ở vòng đầu.' };
-    }
-
-    /**
-     * Sắp xếp BYE đối xứng: các BYE được rải đều ở các nhánh
-     * Trả về mảng teams đã sắp xếp: [BYE1, BYE2, ..., player1, player2, ...]
-     */
-    function arrangeByeSymmetry(teams, bracketSize, numByes) {
-        if (numByes === 0) return teams;
-        // Chọn vị trí BYE đối xứng
-        const byePositions = [];
-        const step = bracketSize / (numByes + 1);
-        for (let i = 1; i <= numByes; i++) {
-            byePositions.push(Math.round(i * step));
-        }
-        // Sắp xếp: các VĐV mạnh (seed) vào vị trí không BYE
-        // Đơn giản: cứ để teams ngẫu nhiên, BYE sẽ nằm ở đầu
-        // Thực tế: ta cần đảm bảo BYE không gặp nhau vòng đầu
-        return teams;
     }
 
     function buildKnockoutBracket(teams, bracketSize, numByes) {
@@ -1279,7 +1239,6 @@
         } else if (result.type === 'round-robin') {
             container.innerHTML = `<div class="bracket-info"><i class="fas fa-info-circle"></i> <strong>${escapeHtml(result.categoryName || '')}</strong> · Vòng tròn ${result.numGroups} bảng</div>` + renderRoundRobinHTML(result);
         }
-        // Enable export buttons
         document.getElementById('export-excel-btn').disabled = false;
         document.getElementById('export-current-btn').disabled = false;
     }
@@ -1405,7 +1364,7 @@
     // ==========================================
     renderTeams();
     loadCategories();
-    console.log('✅ draw.html v3 - Part 1 loaded');
+    console.log('✅ draw.html v4 - Part 1 loaded');
 
     // ==========================================
     // EXPOSE cho PART 2
@@ -1420,6 +1379,7 @@
     };
 })();
 </script>
+
 <script>
 (function() {
     'use strict';
@@ -1439,7 +1399,7 @@
     const escapeHtml = app.escapeHtml || ((t) => String(t || ''));
 
     // ==========================================
-    // GÁN NGÀY / GIỜ / BÀN TỰ ĐỘNG
+    // GÁN LỊCH
     // ==========================================
     function buildScheduleConfig() {
         return {
@@ -1452,9 +1412,9 @@
         };
     }
 
-    function getSessionLabels(sessionsPerDay) {
-        if (sessionsPerDay === 2) return ['Sáng', 'Chiều'];
-        if (sessionsPerDay === 3) return ['Sáng', 'Chiều', 'Tối'];
+    function getSessionLabels(n) {
+        if (n === 2) return ['Sáng', 'Chiều'];
+        if (n === 3) return ['Sáng', 'Chiều', 'Tối'];
         return ['Sáng', 'Chiều', 'Tối', 'Đêm'];
     }
 
@@ -1470,39 +1430,24 @@
         return `${d.getDate()}/${d.getMonth() + 1}`;
     }
 
-    /**
-     * Gán lịch cho danh sách trận đấu
-     * @param {Array} matches - [{roundName, matchNumber}]
-     * @param {Object} cfg - Schedule config
-     * @returns {Array} - matches với {date, session, time, table}
-     */
     function assignScheduleToMatches(matches, cfg) {
         const sessions = getSessionLabels(cfg.sessionsPerDay);
         const startDate = new Date(cfg.startDate);
-        const totalSlots = cfg.numDays * sessions.length * cfg.numTables;
-        if (matches.length > totalSlots) {
-            console.warn(`Cần ${matches.length} slot nhưng chỉ có ${totalSlots}`);
-        }
         const result = [];
         let slotIndex = 0;
         for (const match of matches) {
             const dayIndex = Math.floor(slotIndex / (sessions.length * cfg.numTables));
             const sessionIndex = Math.floor((slotIndex % (sessions.length * cfg.numTables)) / cfg.numTables);
             const tableIndex = (slotIndex % cfg.numTables) + 1;
-
             const date = new Date(startDate);
             date.setDate(date.getDate() + dayIndex);
             const session = sessions[sessionIndex] || 'Sáng';
             const time = getSessionTime(session, cfg);
-
             result.push({
                 ...match,
                 date: formatDateVN(date),
                 fullDate: date.toISOString().slice(0, 10),
-                session,
-                time,
-                table: tableIndex,
-                slotIndex,
+                session, time, table: tableIndex, slotIndex,
             });
             slotIndex++;
         }
@@ -1510,7 +1455,7 @@
     }
 
     // ==========================================
-    // XUẤT EXCEL VỚI EXCELJS (ĐẸP, CHUẨN)
+    // STYLE EXCELJS
     // ==========================================
     const COLORS = {
         headerBg: 'FF1A3A7A',
@@ -1519,8 +1464,8 @@
         byeFg: 'FF856404',
         groupHeaderBg: 'FF0D1B3E',
         border: 'FFDEE2E6',
-        lightBg: 'FFF8F9FA',
         clubFg: 'FF1A3A7A',
+        sectionBg: 'FFE7F3FF',
     };
 
     const thinBorder = {
@@ -1533,28 +1478,33 @@
     function styleHeaderRow(row) {
         row.height = 28;
         row.eachCell(cell => {
-            cell.font = { bold: true, color: { argb: COLORS.headerFg }, size: 12 };
+            cell.font = { bold: true, color: { argb: COLORS.headerFg }, size: 11 };
             cell.fill = { type: 'pattern', pattern: 'solid', fgColor: { argb: COLORS.headerBg } };
             cell.alignment = { horizontal: 'center', vertical: 'middle', wrapText: true };
             cell.border = thinBorder;
         });
     }
 
-    function styleDataRow(row, options = {}) {
+    function styleDataRow(row) {
         row.height = 22;
         row.eachCell(cell => {
             cell.border = thinBorder;
             cell.alignment = { horizontal: 'left', vertical: 'middle', wrapText: true };
-            if (options.centered) cell.alignment.horizontal = 'center';
-            if (options.bye) {
-                cell.fill = { type: 'pattern', pattern: 'solid', fgColor: { argb: COLORS.byeBg } };
-                cell.font = { italic: true, color: { argb: COLORS.byeFg } };
-            }
+        });
+    }
+
+    function styleSectionTitle(row) {
+        row.height = 30;
+        row.eachCell(cell => {
+            cell.font = { bold: true, size: 13, color: { argb: COLORS.headerFg } };
+            cell.fill = { type: 'pattern', pattern: 'solid', fgColor: { argb: COLORS.headerBg } };
+            cell.alignment = { horizontal: 'center', vertical: 'middle' };
+            cell.border = thinBorder;
         });
     }
 
     // ==========================================
-    // EXPORT KNOCKOUT SHEET
+    // SHEET KNOCKOUT — 1 DÒNG/CẶP ĐẤU
     // ==========================================
     function buildKnockoutSheet(wb, sheetName, result, categoryName) {
         const ws = wb.addWorksheet(sheetName, {
@@ -1562,270 +1512,362 @@
             pageSetup: { paperSize: 9, orientation: 'landscape', fitToPage: true },
         });
 
-        // Column widths
         ws.columns = [
             { width: 6 },   // A: TT
-            { width: 6 },   // B: BYE
-            { width: 4 },   // C
-            { width: 25 },  // D: VĐV
-            { width: 4 },   // E
-            { width: 8 },   // F: Ngày
-            { width: 8 },   // G: Ca
-            { width: 6 },   // H: Bàn
-            { width: 8 },   // I: Giờ
-            { width: 6 },   // J: Trận
-            { width: 4 },   // K
-            { width: 4 },   // L
-            { width: 4 },   // M
-            { width: 6 },   // N: TT
-            { width: 4 },   // O
-            { width: 8 },   // P: Nhập
-            { width: 28 },  // Q: Tên VĐV
-            { width: 4 },   // R
-            { width: 25 },  // S: Ghi chú
+            { width: 8 },   // B: Trận
+            { width: 25 },  // C: VĐV A
+            { width: 18 },  // D: CLB A
+            { width: 6 },   // E: VS
+            { width: 25 },  // F: VĐV B
+            { width: 18 },  // G: CLB B
+            { width: 8 },   // H: Ngày
+            { width: 8 },   // I: Ca
+            { width: 6 },   // J: Bàn
+            { width: 8 },   // K: Giờ
+            { width: 25 },  // L: Ghi chú
         ];
 
-        // Title row
         const titleRow = ws.addRow([`${categoryName.toUpperCase()} - BỐC THĂM LOẠI TRỰC TIẾP`]);
-        ws.mergeCells(`A1:S1`);
-        titleRow.height = 32;
-        titleRow.getCell(1).font = { bold: true, size: 14, color: { argb: COLORS.headerFg } };
-        titleRow.getCell(1).fill = { type: 'pattern', pattern: 'solid', fgColor: { argb: COLORS.headerBg } };
-        titleRow.getCell(1).alignment = { horizontal: 'center', vertical: 'middle' };
+        ws.mergeCells('A1:L1');
+        styleSectionTitle(titleRow);
 
-        // Header row
         const headerRow = ws.addRow([
-            'TT', 'BYE', '', 'VĐV', '', 'Ngày', 'Ca', 'Bàn', 'Giờ', 'Trận',
-            '', '', '', 'TT', '', 'Nhập', 'Tên VĐV', '', 'Ghi chú'
+            'TT', 'Trận', 'VĐV A', 'CLB A', 'VS', 'VĐV B', 'CLB B', 'Ngày', 'Ca', 'Bàn', 'Giờ', 'Ghi chú'
         ]);
         styleHeaderRow(headerRow);
 
-        // Build slot map
-        const { rounds, bracketSize, numByes } = result;
-        const firstRound = rounds[0];
-        const players = getTeams();
-
-        // Tạo mảng slot: mỗi slot có {player, isBye, matchNum, slotNumInMatch}
-        const slots = [];
-        for (let m = 0; m < firstRound.length; m++) {
-            const match = firstRound[m];
-            if (match.isBye) {
-                slots.push({ player: match.teamA, isBye: true, matchNum: m + 1, side: 1 });
-                slots.push({ player: null, isBye: true, matchNum: m + 1, side: 2 });
-            } else if (match.isPlaceholder) {
-                slots.push({ player: null, isBye: false, matchNum: m + 1, side: 1, placeholder: true });
-                slots.push({ player: null, isBye: false, matchNum: m + 1, side: 2, placeholder: true });
-            } else {
-                slots.push({ player: match.teamA, isBye: false, matchNum: m + 1, side: 1 });
-                slots.push({ player: match.teamB, isBye: false, matchNum: m + 1, side: 2 });
-            }
-        }
-
-        // Gán lịch
+        const firstRound = result.rounds[0];
         const scheduleCfg = buildScheduleConfig();
-        const matchSchedule = assignScheduleToMatches(
-            firstRound.map((_, i) => ({ matchNumber: i + 1 })),
-            scheduleCfg
-        );
 
-        // Ghi từng slot
-        for (let i = 0; i < slots.length; i++) {
-            const s = slots[i];
-            const sched = s.matchNum ? matchSchedule[s.matchNum - 1] : null;
-            const row = ws.addRow([
-                i + 1,                                                              // A: TT
-                s.isBye ? 'X' : '',                                                  // B: BYE
-                '',                                                                  // C
-                s.player ? s.player.name : (s.isBye ? '' : ''),                      // D: VĐV
-                '',                                                                  // E
-                sched ? sched.date : '',                                             // F: Ngày
-                sched ? sched.session : '',                                          // G: Ca
-                sched ? sched.table : '',                                            // H: Bàn
-                sched ? sched.time : '',                                             // I: Giờ
-                sched ? s.matchNum : '',                                             // J: Trận
-                '', '', '',                                                          // K, L, M
-                i + 1,                                                              // N: TT
-                '',                                                                  // O
-                '',                                                                  // P
-                s.player ? `${s.player.name} (${s.player.club || '—'})` : '',        // Q: Tên VĐV
-                '',                                                                  // R
-                s.isBye ? `BYE - slot ${i + 1}` : '',                                // S: Ghi chú
-            ]);
-
-            // Style
-            styleDataRow(row, { bye: s.isBye });
-            // Căn giữa các cột số
-            [1, 2, 6, 7, 8, 9, 10, 14].forEach(col => {
-                row.getCell(col).alignment = { horizontal: 'center', vertical: 'middle' };
-            });
-            // Cột Q in đậm
-            if (s.player) {
-                row.getCell(17).font = { bold: true, color: { argb: COLORS.clubFg } };
+        const realMatches = [];
+        firstRound.forEach((m, i) => {
+            if (!m.isPlaceholder && !m.isBye && m.teamA && m.teamB) {
+                realMatches.push({ index: i, match: m });
             }
+        });
+
+        const scheduled = assignScheduleToMatches(realMatches.map((_, i) => ({ idx: i })), scheduleCfg);
+
+        let tt = 1;
+        realMatches.forEach((item, idx) => {
+            const m = item.match;
+            const sched = scheduled[idx];
+            const row = ws.addRow([
+                tt++,
+                `Trận ${item.index + 1}`,
+                m.teamA.name,
+                m.teamA.club || '—',
+                'vs',
+                m.teamB.name,
+                m.teamB.club || '—',
+                sched.date,
+                sched.session,
+                sched.table,
+                sched.time,
+                '',
+            ]);
+            styleDataRow(row);
+            [1, 2, 5, 8, 9, 10, 11].forEach(c => {
+                row.getCell(c).alignment = { horizontal: 'center', vertical: 'middle' };
+            });
+            row.getCell(3).font = { bold: true, color: { argb: COLORS.clubFg } };
+            row.getCell(6).font = { bold: true, color: { argb: COLORS.clubFg } };
+            row.getCell(5).font = { bold: true, color: { argb: 'FFE94560' } };
+        });
+
+        // Danh sách BYE
+        const byes = firstRound.filter(m => m.isBye);
+        if (byes.length > 0) {
+            ws.addRow([]);
+            const byeTitle = ws.addRow(['DANH SÁCH BYE (ĐI THẲNG VÒNG TRONG)']);
+            ws.mergeCells(`A${byeTitle.number}:L${byeTitle.number}`);
+            styleSectionTitle(byeTitle);
+
+            const byeHeader = ws.addRow(['TT', 'Slot', 'VĐV', 'CLB', '', '', '', '', '', '', '', '']);
+            styleHeaderRow(byeHeader);
+
+            byes.forEach((m, i) => {
+                const r = ws.addRow([
+                    i + 1, 'BYE', m.teamA.name, m.teamA.club || '—', '', '', '', '', '', '', '', 'Đi thẳng vòng trong'
+                ]);
+                styleDataRow(r);
+                [1, 2].forEach(c => r.getCell(c).alignment = { horizontal: 'center', vertical: 'middle' });
+                r.getCell(3).font = { bold: true, color: { argb: COLORS.byeFg } };
+                r.eachCell(cell => {
+                    cell.fill = { type: 'pattern', pattern: 'solid', fgColor: { argb: COLORS.byeBg } };
+                });
+            });
         }
 
-        // Ghi chú BYE
         ws.addRow([]);
-        const noteRow = ws.addRow(['GHI CHÚ:']);
-        noteRow.getCell(1).font = { bold: true, color: { argb: COLORS.headerBg } };
-        ws.addRow([`Tổng số VĐV: ${players.length}`]);
-        ws.addRow([`Bracket: ${bracketSize} slot`]);
-        ws.addRow([`Số BYE: ${numByes}`]);
-
-        // Auto filter
-        ws.autoFilter = {
-            from: { row: 2, column: 1 },
-            to: { row: 2 + slots.length, column: 19 },
-        };
+        ws.addRow([`Tổng số VĐV: ${result.numTeams}`]);
+        ws.addRow([`Bracket: ${result.bracketSize} slot`]);
+        ws.addRow([`Số BYE: ${result.numByes}`]);
+        ws.addRow([`Tổng số trận vòng 1: ${realMatches.length}`]);
 
         return ws;
     }
 
     // ==========================================
-    // EXPORT ROUND-ROBIN SHEET
+    // SHEET ROUND-ROBIN + GIAI ĐOẠN 2
     // ==========================================
     function buildRoundRobinSheets(wb, result, categoryName) {
         const groupNames = ['A', 'B', 'C', 'D', 'E', 'F', 'G', 'H', 'I', 'J', 'K', 'L', 'M', 'N', 'O', 'P'];
         const scheduleCfg = buildScheduleConfig();
 
+        // Sheet tổng hợp
+        const wsSummary = wb.addWorksheet('DS Bảng đấu', {
+            pageSetup: { paperSize: 9, orientation: 'landscape', fitToPage: true },
+        });
+        wsSummary.columns = [
+            { width: 10 }, { width: 6 }, { width: 30 }, { width: 22 }, { width: 10 }, { width: 10 }, { width: 10 },
+        ];
+        const titleS = wsSummary.addRow([`${categoryName.toUpperCase()} - DANH SÁCH BẢNG ĐẤU`]);
+        wsSummary.mergeCells('A1:G1');
+        styleSectionTitle(titleS);
+        const headerS = wsSummary.addRow(['Bảng', 'Vị trí', 'Tên VĐV/Đội', 'CLB/Đơn vị', 'Điểm', 'T/B', 'XH']);
+        styleHeaderRow(headerS);
+
+        result.groups.forEach((group, gi) => {
+            group.forEach((team, j) => {
+                const r = wsSummary.addRow([
+                    groupNames[gi], j + 1, team.name, team.club || '—', '', '', ''
+                ]);
+                styleDataRow(r);
+                r.getCell(1).font = { bold: true, color: { argb: COLORS.clubFg } };
+                r.getCell(2).alignment = { horizontal: 'center', vertical: 'middle' };
+                r.getCell(3).font = { bold: true };
+                [5, 6, 7].forEach(c => r.getCell(c).alignment = { horizontal: 'center', vertical: 'middle' });
+            });
+        });
+
+        // Từng bảng
         result.groups.forEach((group, gi) => {
             const groupName = groupNames[gi];
             const sheetName = `Bảng ${groupName}`;
             const ws = wb.addWorksheet(sheetName, {
-                views: [{ state: 'frozen', ySplit: 2 }],
                 pageSetup: { paperSize: 9, orientation: 'landscape', fitToPage: true },
             });
 
             ws.columns = [
-                { width: 6 },   // A: Stt
-                { width: 4 },   // B
-                { width: 4 },   // C
-                { width: 28 },  // D: Tên VĐV
-                { width: 8 },   // E: vs
-                { width: 4 },   // F
-                { width: 8 },   // G: Ngày
-                { width: 8 },   // H: Ca
-                { width: 6 },   // I: Bàn
-                { width: 8 },   // J: Giờ
-                { width: 8 },   // K: KQ
-                { width: 6 },   // L: Điểm
-                { width: 6 },   // M: T/B
-                { width: 6 },   // N: XH
+                { width: 6 }, { width: 4 }, { width: 4 }, { width: 30 }, { width: 22 },
+                { width: 6 }, { width: 6 }, { width: 6 },
             ];
 
-            // Title
-            const titleRow = ws.addRow([`${categoryName.toUpperCase()} - BẢNG ${groupName} (${group.length} VĐV)`]);
-            ws.mergeCells('A1:N1');
-            titleRow.height = 30;
-            titleRow.getCell(1).font = { bold: true, size: 13, color: { argb: COLORS.headerFg } };
-            titleRow.getCell(1).fill = { type: 'pattern', pattern: 'solid', fgColor: { argb: COLORS.groupHeaderBg } };
-            titleRow.getCell(1).alignment = { horizontal: 'center', vertical: 'middle' };
+            const titleRow = ws.addRow([`BẢNG ${groupName} (${group.length} VĐV)`]);
+            ws.mergeCells('A1:H1');
+            styleSectionTitle(titleRow);
 
-            // Danh sách VĐV
-            const headerRow = ws.addRow(['Stt', '', '', 'Tên VĐV', 'CLB', '', '', '', '', '', '', 'Điểm', 'T/B', 'XH']);
+            const headerRow = ws.addRow(['Stt', '', '', 'Tên VĐV', 'CLB/Đơn vị', 'Điểm', 'T/B', 'XH']);
             styleHeaderRow(headerRow);
 
             group.forEach((team, i) => {
-                const row = ws.addRow([
-                    i + 1, '', '', team.name, team.club || '', '', '', '', '', '', '', '', '', ''
-                ]);
+                const row = ws.addRow([i + 1, '', '', team.name, team.club || '—', '', '', '']);
                 styleDataRow(row);
                 row.getCell(1).alignment = { horizontal: 'center', vertical: 'middle' };
                 row.getCell(4).font = { bold: true, color: { argb: COLORS.clubFg } };
-                row.getCell(5).font = { italic: true, color: { argb: COLORS.clubFg } };
+                [6, 7, 8].forEach(c => row.getCell(c).alignment = { horizontal: 'center', vertical: 'middle' });
             });
 
-            // Ma trận đấu vòng tròn
+            // Ma trận đấu
             ws.addRow([]);
-            const matrixTitle = ws.addRow(['MA TRẬN ĐẤU VÒNG TRÒN']);
-            matrixTitle.getCell(1).font = { bold: true, color: { argb: COLORS.headerBg } };
+            const matrixTitle = ws.addRow([`MA TRẬN ĐẤU VÒNG TRÒN - BẢNG ${groupName}`]);
+            ws.mergeCells(`A${matrixTitle.number}:H${matrixTitle.number}`);
+            styleSectionTitle(matrixTitle);
 
-            // Header ma trận
-            const matrixHeader = ['MS'];
-            group.forEach((_, i) => matrixHeader.push(i + 1));
-            matrixHeader.push('Ngày', 'Ca', 'Bàn', 'Giờ');
+            const matrixHeader = ['MS', ...group.map((_, i) => i + 1)];
             const mhRow = ws.addRow(matrixHeader);
             styleHeaderRow(mhRow);
 
-            // Gán lịch cho tất cả trận trong bảng
+            for (let i = 0; i < group.length; i++) {
+                const rowData = [i + 1];
+                for (let j = 0; j < group.length; j++) {
+                    if (i === j) rowData.push('');
+                    else if (i < j) rowData.push(`${i + 1}-${j + 1}`);
+                    else rowData.push('');
+                }
+                const r = ws.addRow(rowData);
+                styleDataRow(r);
+                r.eachCell(c => c.alignment = { horizontal: 'center', vertical: 'middle' });
+            }
+
+            // Danh sách trận chi tiết
+            ws.addRow([]);
+            const matchTitle = ws.addRow([`DANH SÁCH TRẬN - BẢNG ${groupName}`]);
+            ws.mergeCells(`A${matchTitle.number}:H${matchTitle.number}`);
+            styleSectionTitle(matchTitle);
+
+            const matchHeader = ws.addRow(['TT', 'Trận', 'VĐV A', 'VĐV B', 'Ngày', 'Ca', 'Bàn', 'Giờ']);
+            styleHeaderRow(matchHeader);
+
             const matchesList = [];
             for (let i = 0; i < group.length; i++) {
                 for (let j = i + 1; j < group.length; j++) {
                     matchesList.push({ p1: i, p2: j });
                 }
             }
-            const scheduleList = assignScheduleToMatches(matchesList, scheduleCfg);
-
-            let matchIdx = 0;
-            for (let i = 0; i < group.length; i++) {
-                const rowData = [i + 1];
-                for (let j = 0; j < group.length; j++) {
-                    if (i === j) rowData.push('');
-                    else if (i < j) {
-                        const sched = scheduleList[matchIdx];
-                        rowData.push(`${i + 1}-${j + 1}`);
-                        matchIdx++;
-                    } else rowData.push('');
-                }
-                // Thêm thông tin lịch (chỉ cho trận i < j)
-                // Đơn giản: ghi lịch ở cột cuối
-                const firstMatch = scheduleList.find((_, idx) => {
-                    // Tìm trận đầu tiên của hàng này
-                    let count = 0;
-                    for (let a = 0; a < group.length; a++) {
-                        for (let b = a + 1; b < group.length; b++) {
-                            if (a === i && count === 0) return idx === scheduleList.indexOf(scheduleList.find((_, ii) => {
-                                let c = 0;
-                                for (let x = 0; x < group.length; x++) {
-                                    for (let y = x + 1; y < group.length; y++) {
-                                        if (x === i && c === 0) return true;
-                                        c++;
-                                    }
-                                }
-                                return false;
-                            }));
-                            count++;
-                        }
-                    }
-                    return false;
-                });
-                rowData.push('', '', '', ''); // Placeholder
-                const r = ws.addRow(rowData);
-                styleDataRow(r, { centered: true });
-            }
-
-            // Ghi chú lịch
-            ws.addRow([]);
-            const noteTitle = ws.addRow(['LỊCH THI ĐẤU BẢNG ' + groupName]);
-            noteTitle.getCell(1).font = { bold: true, color: { argb: COLORS.headerBg } };
-
-            const lichHeader = ws.addRow(['Trận', 'VĐV 1', 'VĐV 2', 'Ngày', 'Ca', 'Bàn', 'Giờ']);
-            styleHeaderRow(lichHeader);
-
-            scheduleList.forEach((s, idx) => {
+            const scheduled = assignScheduleToMatches(matchesList, scheduleCfg);
+            scheduled.forEach((s, idx) => {
                 const t1 = group[s.p1];
                 const t2 = group[s.p2];
                 const r = ws.addRow([
-                    `${s.p1 + 1}-${s.p2 + 1}`,
+                    idx + 1,
+                    `Trận ${idx + 1}`,
                     `${t1.name} (${t1.club || '—'})`,
                     `${t2.name} (${t2.club || '—'})`,
                     s.date, s.session, s.table, s.time,
                 ]);
                 styleDataRow(r);
-                r.getCell(1).alignment = { horizontal: 'center', vertical: 'middle' };
+                [1, 2, 5, 6, 7, 8].forEach(c => r.getCell(c).alignment = { horizontal: 'center', vertical: 'middle' });
+                r.getCell(3).font = { bold: true };
+                r.getCell(4).font = { bold: true };
             });
         });
+
+        // Sheet Giai đoạn 2
+        buildStage2Sheet(wb, result, categoryName, groupNames);
     }
 
     // ==========================================
-    // EXPORT TẤT CẢ (ExcelJS)
+    // GIAI ĐOẠN 2 — CẶP ĐẤU DỰ KIẾN
+    // ==========================================
+    function buildStage2Sheet(wb, result, categoryName, groupNames) {
+        const numGroups = result.groups.length;
+        if (numGroups < 2) return;
+
+        const ws = wb.addWorksheet('Giai đoạn 2', {
+            pageSetup: { paperSize: 9, orientation: 'landscape', fitToPage: true },
+        });
+
+        ws.columns = [
+            { width: 6 },   // A: TT
+            { width: 22 },  // B: Cặp
+            { width: 22 },  // C: VĐV A
+            { width: 22 },  // D: VĐV B
+            { width: 8 },   // E: Ngày
+            { width: 8 },   // F: Ca
+            { width: 6 },   // G: Bàn
+            { width: 8 },   // H: Giờ
+            { width: 35 },  // I: Ghi chú
+        ];
+
+        const titleRow = ws.addRow([`GIAI ĐOẠN II - ${categoryName.toUpperCase()} (CHỌN NHẤT, NHÌ MỖI BẢNG)`]);
+        ws.mergeCells('A1:I1');
+        styleSectionTitle(titleRow);
+
+        const headerRow = ws.addRow(['TT', 'Cặp', 'VĐV A (dự kiến)', 'VĐV B (dự kiến)', 'Ngày', 'Ca', 'Bàn', 'Giờ', 'Ghi chú']);
+        styleHeaderRow(headerRow);
+
+        const pairs = [];
+        for (let i = 0; i < numGroups; i += 2) {
+            if (i + 1 < numGroups) {
+                pairs.push({ a: `1${groupNames[i]}`, b: `2${groupNames[i + 1]}`, note: '' });
+                pairs.push({ a: `1${groupNames[i + 1]}`, b: `2${groupNames[i]}`, note: '' });
+            }
+        }
+
+        if (numGroups % 2 === 1) {
+            const lastGroup = groupNames[numGroups - 1];
+            pairs.push({ a: `1${lastGroup}`, b: `3X (đội thứ 3 tốt nhất)`, note: 'Chờ kết quả vòng bảng' });
+        }
+
+        const scheduleCfg = buildScheduleConfig();
+        const scheduled = assignScheduleToMatches(pairs.map((_, i) => ({ idx: i })), scheduleCfg);
+
+        pairs.forEach((p, idx) => {
+            const s = scheduled[idx];
+            const row = ws.addRow([
+                idx + 1,
+                `${p.a} vs ${p.b}`,
+                p.a,
+                p.b,
+                s.date, s.session, s.table, s.time,
+                p.note,
+            ]);
+            styleDataRow(row);
+            [1, 5, 6, 7, 8].forEach(c => row.getCell(c).alignment = { horizontal: 'center', vertical: 'middle' });
+            row.getCell(2).font = { bold: true, color: { argb: COLORS.clubFg } };
+            row.getCell(3).font = { bold: true };
+            row.getCell(4).font = { bold: true };
+        });
+
+        ws.addRow([]);
+        const noteTitle = ws.addRow(['GHI CHÚ:']);
+        noteTitle.getCell(1).font = { bold: true, color: { argb: COLORS.headerBg } };
+        ws.addRow(['- Cặp đấu dự kiến dựa trên công thức: 1A vs 2B, 1B vs 2A, 1C vs 2D, 1D vs 2C, ...']);
+        ws.addRow(['- Đội "3X" là đội hạng 3 có thành tích tốt nhất (điền sau khi kết thúc vòng bảng)']);
+        ws.addRow([`- Tổng số cặp đấu giai đoạn 2: ${pairs.length}`]);
+    }
+
+    // ==========================================
+    // SHEET LỊCH THI ĐẤU CHUNG
+    // ==========================================
+    function buildScheduleSummarySheet(wb, result, categoryName) {
+        const ws = wb.addWorksheet('Lịch thi đấu chung', {
+            pageSetup: { paperSize: 9, orientation: 'landscape', fitToPage: true },
+        });
+
+        ws.columns = [
+            { width: 6 }, { width: 10 }, { width: 35 }, { width: 10 }, { width: 10 }, { width: 8 }, { width: 10 },
+        ];
+
+        const titleRow = ws.addRow([`LỊCH THI ĐẤU - ${categoryName.toUpperCase()}`]);
+        ws.mergeCells('A1:G1');
+        styleSectionTitle(titleRow);
+
+        const headerRow = ws.addRow(['TT', 'Ngày', 'Nội dung', 'Ca', 'Giờ', 'Bàn', 'Ghi chú']);
+        styleHeaderRow(headerRow);
+
+        const scheduleCfg = buildScheduleConfig();
+        let tt = 1;
+
+        if (result.type === 'knockout') {
+            const firstRound = result.rounds[0];
+            const matchesList = [];
+            firstRound.forEach((m, i) => {
+                if (!m.isPlaceholder && !m.isBye) {
+                    matchesList.push({ matchNumber: i + 1 });
+                }
+            });
+            const scheduled = assignScheduleToMatches(matchesList, scheduleCfg);
+            scheduled.forEach((s) => {
+                const r = ws.addRow([
+                    tt++, s.date, `${categoryName} - Vòng 1`, s.session, s.time, 'Bàn ' + s.table,
+                    `Trận ${s.matchNumber}`,
+                ]);
+                styleDataRow(r);
+                [1, 4, 5, 6].forEach(c => r.getCell(c).alignment = { horizontal: 'center', vertical: 'middle' });
+            });
+        } else if (result.type === 'round-robin') {
+            result.groups.forEach((group, gi) => {
+                const groupName = String.fromCharCode(65 + gi);
+                const matchesList = [];
+                for (let i = 0; i < group.length; i++) {
+                    for (let j = i + 1; j < group.length; j++) {
+                        matchesList.push({ p1: i, p2: j });
+                    }
+                }
+                const scheduled = assignScheduleToMatches(matchesList, scheduleCfg);
+                scheduled.forEach((s) => {
+                    const t1 = group[s.p1];
+                    const t2 = group[s.p2];
+                    const r = ws.addRow([
+                        tt++, s.date, `Bảng ${groupName}: ${t1.name} vs ${t2.name}`,
+                        s.session, s.time, 'Bàn ' + s.table, '',
+                    ]);
+                    styleDataRow(r);
+                    [1, 4, 5, 6].forEach(c => r.getCell(c).alignment = { horizontal: 'center', vertical: 'middle' });
+                });
+            });
+        }
+    }
+
+    // ==========================================
+    // EXPORT EXCEL
     // ==========================================
     window.exportExcelAdvanced = async function() {
         const result = getLastResult();
-        if (!result) {
-            showAlert('Chưa có kết quả để xuất!', 'error');
-            return;
-        }
+        if (!result) { showAlert('Chưa có kết quả để xuất!', 'error'); return; }
         const category = getCurrentCategory() || 'BocTham';
 
         showLoading('Đang tạo file Excel...');
@@ -1839,11 +1881,8 @@
             } else if (result.type === 'round-robin') {
                 buildRoundRobinSheets(wb, result, category);
             }
-
-            // Sheet "Lịch thi đấu chung"
             buildScheduleSummarySheet(wb, result, category);
 
-            // Write file
             const buffer = await wb.xlsx.writeBuffer();
             const blob = new Blob([buffer], {
                 type: 'application/vnd.openxmlformats-officedocument.spreadsheetml.sheet',
@@ -1865,15 +1904,9 @@
         }
     };
 
-    // ==========================================
-    // XUẤT SHEET HIỆN TẠI
-    // ==========================================
     window.exportCurrentSheet = async function() {
         const result = getLastResult();
-        if (!result) {
-            showAlert('Chưa có kết quả để xuất!', 'error');
-            return;
-        }
+        if (!result) { showAlert('Chưa có kết quả để xuất!', 'error'); return; }
         const category = getCurrentCategory() || 'BocTham';
 
         showLoading('Đang tạo file Excel...');
@@ -1907,119 +1940,6 @@
             showAlert('Lỗi xuất Excel: ' + error.message, 'error');
         }
     };
-
-    // ==========================================
-    // SHEET LỊCH THI ĐẤU CHUNG
-    // ==========================================
-    function buildScheduleSummarySheet(wb, result, categoryName) {
-        const ws = wb.addWorksheet('Lịch thi đấu chung', {
-            pageSetup: { paperSize: 9, orientation: 'landscape', fitToPage: true },
-        });
-
-        ws.columns = [
-            { width: 6 },
-            { width: 12 },
-            { width: 30 },
-            { width: 12 },
-            { width: 12 },
-            { width: 8 },
-            { width: 8 },
-            { width: 25 },
-        ];
-
-        const titleRow = ws.addRow([`LỊCH THI ĐẤU - ${categoryName.toUpperCase()}`]);
-        ws.mergeCells('A1:H1');
-        titleRow.height = 32;
-        titleRow.getCell(1).font = { bold: true, size: 14, color: { argb: COLORS.headerFg } };
-        titleRow.getCell(1).fill = { type: 'pattern', pattern: 'solid', fgColor: { argb: COLORS.headerBg } };
-        titleRow.getCell(1).alignment = { horizontal: 'center', vertical: 'middle' };
-
-        const headerRow = ws.addRow(['TT', 'Ngày', 'Nội dung', 'Ca', 'Giờ', 'Bàn', 'Số trận', 'Ghi chú']);
-        styleHeaderRow(headerRow);
-
-        const scheduleCfg = buildScheduleConfig();
-
-        if (result.type === 'knockout') {
-            const rounds = result.rounds;
-            const roundNames = getRoundNames(rounds.length);
-            let tt = 1;
-            let allMatches = [];
-            rounds.forEach((round, ri) => {
-                round.forEach((m, mi) => {
-                    if (m.isPlaceholder) return;
-                    allMatches.push({
-                        roundName: roundNames[ri],
-                        matchNumber: mi + 1,
-                    });
-                });
-            });
-            const scheduled = assignScheduleToMatches(allMatches, scheduleCfg);
-            let currentGroup = '';
-            scheduled.forEach((s) => {
-                if (s.roundName !== currentGroup) {
-                    currentGroup = s.roundName;
-                }
-                const r = ws.addRow([
-                    tt++,
-                    s.date,
-                    categoryName + ' - ' + s.roundName,
-                    s.session,
-                    s.time,
-                    'Bàn ' + s.table,
-                    1,
-                    `Trận ${s.matchNumber}`,
-                ]);
-                styleDataRow(r);
-                r.getCell(1).alignment = { horizontal: 'center', vertical: 'middle' };
-                r.getCell(4).alignment = { horizontal: 'center', vertical: 'middle' };
-                r.getCell(5).alignment = { horizontal: 'center', vertical: 'middle' };
-                r.getCell(6).alignment = { horizontal: 'center', vertical: 'middle' };
-                r.getCell(7).alignment = { horizontal: 'center', vertical: 'middle' };
-            });
-        } else if (result.type === 'round-robin') {
-            const groupNames = ['A', 'B', 'C', 'D', 'E', 'F', 'G', 'H', 'I', 'J', 'K', 'L', 'M', 'N', 'O', 'P'];
-            let tt = 1;
-            result.groups.forEach((group, gi) => {
-                const matches = [];
-                for (let i = 0; i < group.length; i++) {
-                    for (let j = i + 1; j < group.length; j++) {
-                        matches.push({ p1: i, p2: j });
-                    }
-                }
-                const scheduled = assignScheduleToMatches(matches, scheduleCfg);
-                scheduled.forEach((s) => {
-                    const t1 = group[s.p1];
-                    const t2 = group[s.p2];
-                    const r = ws.addRow([
-                        tt++,
-                        s.date,
-                        `Bảng ${groupNames[gi]}: ${t1.name} vs ${t2.name}`,
-                        s.session,
-                        s.time,
-                        'Bàn ' + s.table,
-                        1,
-                        '',
-                    ]);
-                    styleDataRow(r);
-                    r.getCell(1).alignment = { horizontal: 'center', vertical: 'middle' };
-                    r.getCell(4).alignment = { horizontal: 'center', vertical: 'middle' };
-                    r.getCell(5).alignment = { horizontal: 'center', vertical: 'middle' };
-                    r.getCell(6).alignment = { horizontal: 'center', vertical: 'middle' };
-                    r.getCell(7).alignment = { horizontal: 'center', vertical: 'middle' };
-                });
-            });
-        }
-    }
-
-    function getRoundNames(totalRounds) {
-        const names = [];
-        const standard = ['Chung kết', 'Bán kết', 'Tứ kết', 'Vòng 1/8', 'Vòng 1/16', 'Vòng 1/32'];
-        for (let i = 0; i < totalRounds; i++) {
-            const fromEnd = totalRounds - 1 - i;
-            names.push(fromEnd < standard.length ? standard[fromEnd] : `Vòng ${i + 1}`);
-        }
-        return names;
-    }
 
     // ==========================================
     // LƯU VÀO DATABASE
@@ -2059,43 +1979,35 @@
             });
         } else if (result.type === 'knockout') {
             const firstRound = result.rounds[0];
-            const matchesList = firstRound.map((_, i) => ({ matchNumber: i + 1 }));
+            const matchesList = [];
+            firstRound.forEach((m, i) => {
+                if (!m.isPlaceholder && !m.isBye) matchesList.push({ matchNumber: i + 1 });
+            });
             const scheduled = assignScheduleToMatches(matchesList, scheduleCfg);
+            let matchIdx = 0;
             firstRound.forEach((match, i) => {
-                const sched = scheduled[i];
+                if (match.isPlaceholder) return;
+                const sched = !match.isBye ? scheduled[matchIdx++] : null;
                 if (match.teamA) {
                     records.push({
-                        tournament_id: tournamentId,
-                        team_name: match.teamA.name,
+                        tournament_id: tournamentId, team_name: match.teamA.name,
                         club: match.teamA.club || null,
                         group_name: match.isBye ? 'BYE' : 'Vòng 1',
-                        position: i * 2 + 1,
-                        draw_type: 'knockout',
-                        round_number: 1,
-                        match_number: i + 1,
-                        category: category,
-                        match_date: sched?.fullDate || null,
-                        match_session: sched?.session || null,
-                        match_time: sched?.time || null,
-                        match_table: sched?.table || null,
+                        position: i * 2 + 1, draw_type: 'knockout', round_number: 1,
+                        match_number: i + 1, category: category,
+                        match_date: sched?.fullDate || null, match_session: sched?.session || null,
+                        match_time: sched?.time || null, match_table: sched?.table || null,
                         created_by: session.user.id,
                     });
                 }
                 if (match.teamB) {
                     records.push({
-                        tournament_id: tournamentId,
-                        team_name: match.teamB.name,
-                        club: match.teamB.club || null,
-                        group_name: 'Vòng 1',
-                        position: i * 2 + 2,
-                        draw_type: 'knockout',
-                        round_number: 1,
-                        match_number: i + 1,
-                        category: category,
-                        match_date: sched?.fullDate || null,
-                        match_session: sched?.session || null,
-                        match_time: sched?.time || null,
-                        match_table: sched?.table || null,
+                        tournament_id: tournamentId, team_name: match.teamB.name,
+                        club: match.teamB.club || null, group_name: 'Vòng 1',
+                        position: i * 2 + 2, draw_type: 'knockout', round_number: 1,
+                        match_number: i + 1, category: category,
+                        match_date: sched?.fullDate || null, match_session: sched?.session || null,
+                        match_time: sched?.time || null, match_table: sched?.table || null,
                         created_by: session.user.id,
                     });
                 }
@@ -2118,7 +2030,6 @@
             if (error) throw error;
 
             showAlert(`✅ Đã lưu ${records.length} VĐV cho "${category}"! Đang chuyển trang...`, 'success');
-
             setTimeout(() => {
                 window.location.href = 'schedule.html?tournament_id=' + tournamentId;
             }, 1500);
@@ -2130,7 +2041,7 @@
         }
     };
 
-    console.log('✅ draw.html v3 - Part 2 (ExcelJS Export) loaded');
+    console.log('✅ draw.html v4 - Part 2 (Fixed Excel) loaded');
 })();
 </script>
 </body>
