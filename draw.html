@@ -10,7 +10,6 @@
         body { background: #f0f2f8; min-height: 100vh; padding: 24px; }
         .draw-container { max-width: 1300px; margin: 0 auto; }
 
-        /* ===== HEADER ===== */
         .draw-header {
             background: linear-gradient(135deg, #0d1b3e, #1a3a7a);
             border-radius: 20px; padding: 32px; color: #fff;
@@ -28,7 +27,6 @@
         }
         .draw-header .btn-outline:hover { background: #fff; color: #0d1b3e; }
 
-        /* ===== PANELS ===== */
         .draw-panel {
             background: #fff; border-radius: 16px; padding: 24px;
             margin-bottom: 24px; box-shadow: 0 4px 20px rgba(0,0,0,0.08);
@@ -43,7 +41,6 @@
             justify-content: center; font-size: 15px; flex-shrink: 0;
         }
 
-        /* ===== FORM ===== */
         .form-row-add {
             display: grid; grid-template-columns: 2fr 2fr 1fr 1fr;
             gap: 12px; align-items: end; margin-bottom: 16px;
@@ -75,7 +72,6 @@
         }
         .category-select-box .hint { font-size: 13px; color: #6c757d; margin-top: 8px; }
 
-        /* ===== BUTTONS ===== */
         .btn-primary {
             background: linear-gradient(135deg, #0d1b3e, #1a3a7a);
             color: #fff; border: none; padding: 13px 24px;
@@ -127,7 +123,6 @@
             border-radius: 12px; margin-bottom: 16px;
         }
 
-        /* ===== TEAMS ===== */
         .teams-summary {
             display: flex; gap: 12px; flex-wrap: wrap;
             padding: 12px 16px; background: #f8f9fa;
@@ -161,7 +156,6 @@
         }
         .team-item .remove-btn:hover { background: #c73650; transform: scale(1.1); }
 
-        /* ===== CHECKBOX ===== */
         .checkbox-line {
             display: flex; align-items: center; gap: 12px;
             cursor: pointer; padding: 12px 16px;
@@ -172,7 +166,6 @@
             width: 20px; height: 20px; cursor: pointer; accent-color: #1a3a7a;
         }
 
-        /* ===== DRAW TYPES ===== */
         .draw-types {
             display: grid; grid-template-columns: repeat(auto-fit, minmax(260px, 1fr));
             gap: 12px; margin-top: 12px;
@@ -195,7 +188,6 @@
         .draw-type-card .info strong { display: block; color: #1a1a2e; font-size: 15px; margin-bottom: 6px; }
         .draw-type-card .info small { color: #6c757d; font-size: 13px; line-height: 1.5; }
 
-        /* ===== CONFIG ===== */
         .config-box {
             margin-top: 20px; padding: 16px;
             background: #f8f9fa; border-radius: 12px;
@@ -224,7 +216,6 @@
         .total-check.ok { background: #d4edda; color: #155724; }
         .total-check.error { background: #f8d7da; color: #721c24; }
 
-        /* ===== ALERTS ===== */
         .warning-box {
             padding: 14px 18px; background: #fff3cd;
             border: 1px solid #ffeaa7; border-left: 4px solid #fdcb6e;
@@ -240,7 +231,6 @@
         .alert.success { background: #d4edda; color: #155724; border: 1px solid #c3e6cb; }
         .alert.info { background: #cce5ff; color: #004085; border: 1px solid #b8daff; }
 
-        /* ===== GROUP ===== */
         .groups-grid {
             display: grid; grid-template-columns: repeat(auto-fit, minmax(250px, 1fr));
             gap: 20px; margin-top: 20px;
@@ -283,7 +273,6 @@
         .group-team .team-club { font-size: 12px; color: #6c757d; margin-top: 2px; display: block; }
         .group-team .team-club.has-club { color: #1a3a7a; font-weight: 600; }
 
-        /* ===== BRACKET (GỌN) ===== */
         .bracket {
             display: flex; gap: 12px; overflow-x: auto;
             padding: 8px 0;
@@ -397,7 +386,6 @@
         .matchup:hover .edit-btn { opacity: 1; color: #0984e3; }
         .matchup .edit-btn:hover { color: #e94560; transform: scale(1.2); }
 
-        /* ===== EMPTY / MISC ===== */
         .empty-state { text-align: center; padding: 40px 20px; color: #6c757d; }
         .empty-state i { font-size: 48px; color: #dee2e6; margin-bottom: 12px; display: block; }
         .result-actions { margin-top: 20px; display: flex; gap: 12px; flex-wrap: wrap; }
@@ -407,7 +395,19 @@
             margin-bottom: 16px; font-size: 14px; color: #1a3a7a; font-weight: 700;
         }
 
-        /* ===== MODAL ===== */
+        .slot-table {
+            width: 100%; border-collapse: collapse; font-size: 13px; background: #fff;
+        }
+        .slot-table th {
+            background: #1a3a7a; color: #fff; padding: 10px;
+            border: 1px solid #dee2e6; text-align: center; font-size: 12px;
+        }
+        .slot-table td {
+            padding: 8px 10px; border: 1px solid #dee2e6;
+        }
+        .slot-table tr.bye-row { background: #fff9e6; }
+        .slot-table tr.bye-row td { color: #856404; font-style: italic; }
+
         .modal-overlay {
             display: none; position: fixed; top: 0; left: 0; right: 0; bottom: 0;
             background: rgba(0,0,0,0.5); z-index: 1000;
@@ -453,7 +453,6 @@
             margin-top: 24px; padding-top: 20px; border-top: 1px solid #e9ecef;
         }
 
-        /* ===== LOADING ===== */
         .loading-overlay {
             position: fixed; top: 0; left: 0; right: 0; bottom: 0;
             background: rgba(0,0,0,0.5); display: none;
@@ -582,7 +581,7 @@
                 <input type="radio" name="draw-type" value="knockout" checked>
                 <div class="info">
                     <strong>🏆 Loại trực tiếp (Knock-out)</strong>
-                    <small>Tự động chọn bracket 8, 16, 32, 64...<br>VD: 15 VĐV → Bracket 16 (1 BYE)</small>
+                    <small>Tự động chọn bracket 8, 16, 32, 64...<br>VD: 26 VĐV → Bracket 32 (6 BYE)</small>
                 </div>
             </label>
             <label class="draw-type-card" onclick="selectDrawType('round-robin-even')">
@@ -646,6 +645,20 @@
             <div style="margin-top: 12px;">
                 <span id="total-check" class="total-check"></span>
             </div>
+        </div>
+
+        <!-- Ô NHẬP BYE TÙY CHỈNH (chỉ hiện cho Knockout) -->
+        <div id="config-bye" class="config-box" style="display:block;border-left-color:#fdcb6e;">
+            <h4><i class="fas fa-ban" style="color:#fdcb6e;"></i> Slot BYE tùy chỉnh</h4>
+            <div class="form-group">
+                <label>Nhập vị trí BYE (cách nhau dấu phẩy, để trống = tự động)</label>
+                <input type="text" id="custom-bye-slots" placeholder="VD: 2,15,18,34,47,50" oninput="updateByeInfo()">
+                <p style="font-size:12px;color:#6c757d;margin-top:6px;">
+                    <i class="fas fa-info-circle"></i>
+                    Nếu để trống, hệ thống tự chọn BYE đối xứng. Nếu nhập, phải khớp số BYE cần thiết.
+                </p>
+            </div>
+            <div id="bye-info" style="font-size:13px;color:#1a3a7a;font-weight:600;"></div>
         </div>
     </div>
 
@@ -798,7 +811,7 @@
 (function() {
     'use strict';
 
-    console.log('🚀 draw.html v5 - GỌN + EDIT');
+    console.log('🚀 draw.html v6 - BYE tùy chỉnh + Danh sách slot');
 
     const config = window.SPORTSVN_CONFIG || {};
     const supabaseClient = window.supabase.createClient(config.SUPABASE_URL, config.SUPABASE_ANON_KEY);
@@ -920,6 +933,8 @@
                 <button class="remove-btn" onclick="removeTeam(${i})" title="Xóa">×</button>
             </div>
         `).join('');
+        // Cập nhật BYE info
+        if (currentDrawType === 'knockout') updateByeInfo();
     }
 
     function updateClubDatalist() {
@@ -1032,7 +1047,37 @@
         });
         document.getElementById('config-even').style.display = (type === 'round-robin-even') ? 'block' : 'none';
         document.getElementById('config-custom').style.display = (type === 'round-robin-custom') ? 'block' : 'none';
+        document.getElementById('config-bye').style.display = (type === 'knockout') ? 'block' : 'none';
         if (type === 'round-robin-custom') renderCustomGroupsInputs();
+        if (type === 'knockout') updateByeInfo();
+    };
+
+    window.updateByeInfo = function() {
+        const n = teams.length;
+        const info = document.getElementById('bye-info');
+        if (!info) return;
+        if (n < 2) { info.textContent = '⚠️ Cần ít nhất 2 VĐV'; return; }
+        let bracketSize = 2;
+        while (bracketSize < n) bracketSize *= 2;
+        const numByes = bracketSize - n;
+        const input = document.getElementById('custom-bye-slots');
+        if (input && input.value.trim()) {
+            const custom = input.value.split(',').map(s => parseInt(s.trim())).filter(s => !isNaN(s));
+            const unique = [...new Set(custom)];
+            if (unique.length !== numByes) {
+                info.innerHTML = `⚠️ Nhập ${unique.length} BYE, cần đúng <strong>${numByes}</strong> cho bracket ${bracketSize}`;
+                info.style.color = '#e94560';
+            } else if (unique.some(s => s < 1 || s > bracketSize)) {
+                info.innerHTML = `⚠️ Slot BYE phải từ 1 đến ${bracketSize}`;
+                info.style.color = '#e94560';
+            } else {
+                info.innerHTML = `✅ ${n} VĐV → Bracket ${bracketSize} → ${numByes} BYE tùy chỉnh: ${unique.sort((a,b)=>a-b).join(', ')}`;
+                info.style.color = '#00b894';
+            }
+        } else {
+            info.innerHTML = `📊 ${n} VĐV → Bracket ${bracketSize} → cần ${numByes} BYE (tự động)`;
+            info.style.color = '#1a3a7a';
+        }
     };
 
     window.renderCustomGroupsInputs = function() {
@@ -1100,64 +1145,111 @@
     };
 
     // ==========================================
-    // DRAW KNOCKOUT
+    // DRAW KNOCKOUT (với BYE tùy chỉnh)
     // ==========================================
     function drawKnockout(teams, protectClub) {
         const MAX_ATTEMPTS = 500;
         const size = teams.length;
-        let bracketSize;
-        if (size <= 2) bracketSize = 2;
-        else if (size <= 4) bracketSize = 4;
-        else if (size <= 8) bracketSize = 8;
-        else if (size <= 16) bracketSize = 16;
-        else if (size <= 32) bracketSize = 32;
-        else if (size <= 64) bracketSize = 64;
-        else if (size <= 128) bracketSize = 128;
-        else bracketSize = 256;
+        let bracketSize = 2;
+        while (bracketSize < size) bracketSize *= 2;
         const numByes = bracketSize - size;
+
+        // Đọc BYE tùy chỉnh
+        let customByes = null;
+        const byeInput = document.getElementById('custom-bye-slots');
+        if (byeInput && byeInput.value.trim()) {
+            const parsed = byeInput.value.split(',')
+                .map(s => parseInt(s.trim()))
+                .filter(s => !isNaN(s));
+            const unique = [...new Set(parsed)].sort((a, b) => a - b);
+            if (unique.length !== numByes) {
+                throw new Error(`Số BYE nhập (${unique.length}) không khớp. Cần đúng ${numByes} BYE cho bracket ${bracketSize}.`);
+            }
+            if (unique.some(s => s < 1 || s > bracketSize)) {
+                throw new Error(`Slot BYE phải từ 1 đến ${bracketSize}.`);
+            }
+            customByes = unique;
+        }
 
         for (let attempt = 0; attempt < MAX_ATTEMPTS; attempt++) {
             const shuffled = shuffleArray([...teams]);
-            const rounds = buildKnockoutBracket(shuffled, bracketSize, numByes);
+            const rounds = buildKnockoutBracketWithByes(shuffled, bracketSize, numByes, customByes);
             if (!protectClub || !hasSameClubInFirstRound(rounds[0])) {
-                return { type: 'knockout', rounds, bracketSize, numByes, numTeams: size,
-                    description: `${size} VĐV → Bracket ${bracketSize}${numByes > 0 ? ' (' + numByes + ' BYE)' : ''}` };
+                return {
+                    type: 'knockout', rounds, bracketSize, numByes, numTeams: size,
+                    customByes,
+                    description: `${size} VĐV → Bracket ${bracketSize}${numByes > 0 ? ' (' + numByes + ' BYE' + (customByes ? ' tùy chỉnh' : '') + ')' : ''}`
+                };
             }
         }
         const shuffled = shuffleArray([...teams]);
-        const rounds = buildKnockoutBracket(shuffled, bracketSize, numByes);
-        return { type: 'knockout', rounds, bracketSize, numByes, numTeams: size,
-            description: `${size} VĐV → Bracket ${bracketSize}${numByes > 0 ? ' (' + numByes + ' BYE)' : ''}`,
-            warning: 'Không thể tránh hoàn toàn VĐV cùng CLB gặp nhau ở vòng đầu.' };
+        const rounds = buildKnockoutBracketWithByes(shuffled, bracketSize, numByes, customByes);
+        return {
+            type: 'knockout', rounds, bracketSize, numByes, numTeams: size,
+            customByes,
+            description: `${size} VĐV → Bracket ${bracketSize}${numByes > 0 ? ' (' + numByes + ' BYE' + (customByes ? ' tùy chỉnh' : '') + ')' : ''}`,
+            warning: 'Không thể tránh hoàn toàn VĐV cùng CLB gặp nhau ở vòng đầu.'
+        };
     }
 
-    function buildKnockoutBracket(teams, bracketSize, numByes) {
-        const rounds = [];
-        const firstRound = [];
+    /**
+     * Xây bracket với BYE tùy chỉnh (hoặc auto)
+     */
+    function buildKnockoutBracketWithByes(teams, bracketSize, numByes, customByes) {
         const numFirstRoundMatches = bracketSize / 2;
-        const byes = teams.slice(0, numByes);
-        const playing = teams.slice(numByes);
+        const firstRound = [];
+        let players = [...teams];
 
-        for (let i = 0; i < numFirstRoundMatches; i++) {
-            const remainingByes = byes.length;
-            const remainingMatches = numFirstRoundMatches - i;
-            const remainingPlaying = playing.length;
-            if (remainingByes > 0 && remainingPlaying === 0) {
-                firstRound.push({ teamA: byes.shift(), teamB: null, isBye: true });
-            } else if (remainingByes > 0 && remainingPlaying <= 1 && (remainingMatches - remainingByes) === 0) {
-                firstRound.push({ teamA: byes.shift(), teamB: null, isBye: true });
-            } else {
-                const teamA = playing.shift() || null;
-                const teamB = playing.shift() || null;
-                if (teamA && !teamB) firstRound.push({ teamA, teamB: null, isBye: true });
-                else if (!teamA && !teamB) firstRound.push({ teamA: null, teamB: null, isPlaceholder: true });
-                else firstRound.push({ teamA, teamB, isBye: false });
+        if (customByes && customByes.length === numByes) {
+            // Đặt BYE vào đúng slot chỉ định
+            for (let i = 0; i < numFirstRoundMatches; i++) {
+                const slotA = i * 2 + 1;
+                const slotB = i * 2 + 2;
+                const isByeA = customByes.includes(slotA);
+                const isByeB = customByes.includes(slotB);
+
+                if (isByeA && isByeB) {
+                    firstRound.push({ teamA: null, teamB: null, isPlaceholder: true });
+                } else if (isByeA) {
+                    const player = players.shift();
+                    firstRound.push({ teamA: player || null, teamB: null, isBye: true, byeSlot: slotA });
+                } else if (isByeB) {
+                    const player = players.shift();
+                    firstRound.push({ teamA: null, teamB: player || null, isBye: true, byeSlot: slotB });
+                } else {
+                    const teamA = players.shift() || null;
+                    const teamB = players.shift() || null;
+                    if (teamA && !teamB) firstRound.push({ teamA, teamB: null, isBye: true });
+                    else if (!teamA && !teamB) firstRound.push({ teamA: null, teamB: null, isPlaceholder: true });
+                    else firstRound.push({ teamA, teamB, isBye: false });
+                }
+            }
+        } else {
+            // Auto BYE
+            const byes = players.slice(0, numByes);
+            const playing = players.slice(numByes);
+            for (let i = 0; i < numFirstRoundMatches; i++) {
+                const remainingByes = byes.length;
+                const remainingMatches = numFirstRoundMatches - i;
+                const remainingPlaying = playing.length;
+                if (remainingByes > 0 && remainingPlaying === 0) {
+                    firstRound.push({ teamA: byes.shift(), teamB: null, isBye: true });
+                } else if (remainingByes > 0 && remainingPlaying <= 1 && (remainingMatches - remainingByes) === 0) {
+                    firstRound.push({ teamA: byes.shift(), teamB: null, isBye: true });
+                } else {
+                    const teamA = playing.shift() || null;
+                    const teamB = playing.shift() || null;
+                    if (teamA && !teamB) firstRound.push({ teamA, teamB: null, isBye: true });
+                    else if (!teamA && !teamB) firstRound.push({ teamA: null, teamB: null, isPlaceholder: true });
+                    else firstRound.push({ teamA, teamB, isBye: false });
+                }
+            }
+            for (let i = 0; i < firstRound.length && byes.length > 0; i++) {
+                if (firstRound[i].isPlaceholder) firstRound[i] = { teamA: byes.shift(), teamB: null, isBye: true };
             }
         }
-        for (let i = 0; i < firstRound.length && byes.length > 0; i++) {
-            if (firstRound[i].isPlaceholder) firstRound[i] = { teamA: byes.shift(), teamB: null, isBye: true };
-        }
-        rounds.push(firstRound);
+
+        const rounds = [firstRound];
         let roundSize = numFirstRoundMatches;
         while (roundSize > 1) {
             roundSize = roundSize / 2;
@@ -1302,8 +1394,21 @@
 
     function renderKnockoutHTML(result) {
         const roundNames = getRoundNames(result.rounds.length);
-        return `
-            <div class="bracket">
+        // Tab buttons
+        const tabs = `
+            <div style="display:flex;gap:8px;margin-bottom:12px;flex-wrap:wrap;">
+                <button class="btn-primary" id="tab-tree" onclick="switchBracketView('tree')"
+                    style="padding:8px 16px;font-size:13px;">
+                    🌳 Sơ đồ cây
+                </button>
+                <button class="btn-info-sm" id="tab-slot" onclick="switchBracketView('slot')"
+                    style="padding:8px 16px;font-size:13px;">
+                    📋 Danh sách slot (như Excel)
+                </button>
+            </div>
+        `;
+        const treeView = `
+            <div class="bracket" id="bracket-tree">
                 ${result.rounds.map((round, i) => `
                     <div class="bracket-round">
                         <h4>${roundNames[i]}</h4>
@@ -1314,6 +1419,113 @@
                 `).join('')}
             </div>
         `;
+        const slotView = `
+            <div id="bracket-slot" style="display:none;">
+                ${renderSlotList(result)}
+            </div>
+        `;
+        return tabs + treeView + slotView;
+    }
+
+    window.switchBracketView = function(view) {
+        document.getElementById('bracket-tree').style.display = (view === 'tree') ? 'flex' : 'none';
+        document.getElementById('bracket-slot').style.display = (view === 'slot') ? 'block' : 'none';
+        document.getElementById('tab-tree').className = (view === 'tree') ? 'btn-primary' : 'btn-info-sm';
+        document.getElementById('tab-slot').className = (view === 'slot') ? 'btn-primary' : 'btn-info-sm';
+    };
+
+    function renderSlotList(result) {
+        const firstRound = result.rounds[0];
+        const bracketSize = result.bracketSize;
+        const numByes = result.numByes;
+        let html = `
+            <div style="background:#f8f9fa;padding:16px;border-radius:12px;overflow-x:auto;">
+                <h3 style="color:#1a3a7a;margin-bottom:12px;">
+                    📋 Danh sách slot (Bracket ${bracketSize})
+                </h3>
+                <p style="font-size:13px;color:#6c757d;margin-bottom:16px;">
+                    ${result.numTeams} VĐV · ${numByes} BYE
+                    ${result.customByes ? ' · BYE tùy chỉnh: ' + result.customByes.join(', ') : ''}
+                </p>
+                <table class="slot-table">
+                    <thead>
+                        <tr>
+                            <th style="width:60px;">Slot</th>
+                            <th style="width:60px;">BYE</th>
+                            <th>Tên VĐV</th>
+                            <th style="width:120px;">CLB</th>
+                            <th style="width:100px;">Trận</th>
+                            <th style="width:140px;">Ghi chú</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+        `;
+        firstRound.forEach((match, matchIdx) => {
+            const slotA = matchIdx * 2 + 1;
+            const slotB = matchIdx * 2 + 2;
+            if (match.isBye) {
+                if (match.teamA) {
+                    html += `<tr class="bye-row">
+                        <td style="text-align:center;">${slotA}</td>
+                        <td style="text-align:center;font-weight:800;">X</td>
+                        <td style="font-weight:600;">${escapeHtml(match.teamA.name)}</td>
+                        <td>${escapeHtml(match.teamA.club || '—')}</td>
+                        <td style="text-align:center;">Trận ${matchIdx + 1}</td>
+                        <td>BYE - đi tiếp</td>
+                    </tr>`;
+                }
+                if (match.teamB) {
+                    html += `<tr class="bye-row">
+                        <td style="text-align:center;">${slotB}</td>
+                        <td style="text-align:center;font-weight:800;">X</td>
+                        <td style="font-weight:600;">${escapeHtml(match.teamB.name)}</td>
+                        <td>${escapeHtml(match.teamB.club || '—')}</td>
+                        <td style="text-align:center;">Trận ${matchIdx + 1}</td>
+                        <td>BYE - đi tiếp</td>
+                    </tr>`;
+                }
+            } else if (match.isPlaceholder) {
+                html += `<tr>
+                    <td style="text-align:center;">${slotA}</td>
+                    <td style="text-align:center;">—</td>
+                    <td style="color:#adb5bd;font-style:italic;">Chưa xác định</td>
+                    <td>—</td>
+                    <td style="text-align:center;">Trận ${matchIdx + 1}</td>
+                    <td></td>
+                </tr>
+                <tr>
+                    <td style="text-align:center;">${slotB}</td>
+                    <td style="text-align:center;">—</td>
+                    <td style="color:#adb5bd;font-style:italic;">Chưa xác định</td>
+                    <td>—</td>
+                    <td style="text-align:center;">Trận ${matchIdx + 1}</td>
+                    <td></td>
+                </tr>`;
+            } else {
+                if (match.teamA) {
+                    html += `<tr>
+                        <td style="text-align:center;">${slotA}</td>
+                        <td style="text-align:center;">—</td>
+                        <td style="font-weight:600;">${escapeHtml(match.teamA.name)}</td>
+                        <td>${escapeHtml(match.teamA.club || '—')}</td>
+                        <td style="text-align:center;">Trận ${matchIdx + 1}</td>
+                        <td></td>
+                    </tr>`;
+                }
+                if (match.teamB) {
+                    html += `<tr>
+                        <td style="text-align:center;">${slotB}</td>
+                        <td style="text-align:center;">—</td>
+                        <td style="font-weight:600;">${escapeHtml(match.teamB.name)}</td>
+                        <td>${escapeHtml(match.teamB.club || '—')}</td>
+                        <td style="text-align:center;">Trận ${matchIdx + 1}</td>
+                        <td></td>
+                    </tr>`;
+                }
+            }
+        });
+        html += `</tbody></table></div>`;
+        return html;
     }
 
     function renderMatchupCompact(match, roundIdx, matchIdx) {
@@ -1331,6 +1543,7 @@
             `;
         }
         if (match.isBye) {
+            const player = match.teamA || match.teamB;
             return `
                 <div class="matchup">
                     <span class="match-number">T${matchNum}</span>
@@ -1338,7 +1551,7 @@
                         <i class="fas fa-pen"></i>
                     </button>
                     <div class="matchup-row bye-row">
-                        <span class="player">${escapeHtml(match.teamA.name)}</span>
+                        <span class="player">${escapeHtml(player.name)}</span>
                         <span class="vs-badge">BYE</span>
                         <span class="player right">—</span>
                     </div>
@@ -1479,9 +1692,9 @@
         const aClub = document.getElementById('edit-a-club').value.trim();
         const bName = document.getElementById('edit-b-name').value.trim();
         const bClub = document.getElementById('edit-b-club').value.trim();
-        if (!aName || !bName) { alert('Vui lòng nhập đủ tên 2 VĐV.'); return; }
-        if (match.teamA) { match.teamA.name = aName; match.teamA.club = aClub; }
-        if (match.teamB) { match.teamB.name = bName; match.teamB.club = bClub; }
+        if (!aName && !bName) { alert('Vui lòng nhập ít nhất 1 VĐV.'); return; }
+        if (match.teamA && aName) { match.teamA.name = aName; match.teamA.club = aClub; }
+        if (match.teamB && bName) { match.teamB.name = bName; match.teamB.club = bClub; }
         closeEditModal();
         renderResult(lastResult);
         showAlert('✅ Đã cập nhật trận đấu!', 'success');
@@ -1512,7 +1725,7 @@
 
     renderTeams();
     loadCategories();
-    console.log('✅ draw.html v5 - Part 1 loaded');
+    console.log('✅ draw.html v6 - Part 1 loaded');
 
     window.__drawApp = {
         getTeams: () => teams,
@@ -1631,7 +1844,7 @@
     }
 
     // ==========================================
-    // SHEET KNOCKOUT
+    // SHEET KNOCKOUT (có cột Slot và BYE)
     // ==========================================
     function buildKnockoutSheet(wb, sheetName, result, categoryName) {
         const ws = wb.addWorksheet(sheetName, {
@@ -1639,15 +1852,25 @@
             pageSetup: { paperSize: 9, orientation: 'landscape', fitToPage: true },
         });
         ws.columns = [
-            { width: 6 }, { width: 8 }, { width: 25 }, { width: 18 }, { width: 6 },
-            { width: 25 }, { width: 18 }, { width: 8 }, { width: 8 }, { width: 6 },
-            { width: 8 }, { width: 25 },
+            { width: 6 },   // A: Slot
+            { width: 6 },   // B: BYE
+            { width: 8 },   // C: Trận
+            { width: 25 },  // D: VĐV A
+            { width: 18 },  // E: CLB A
+            { width: 6 },   // F: VS
+            { width: 25 },  // G: VĐV B
+            { width: 18 },  // H: CLB B
+            { width: 8 },   // I: Ngày
+            { width: 8 },   // J: Ca
+            { width: 6 },   // K: Bàn
+            { width: 8 },   // L: Giờ
+            { width: 25 },  // M: Ghi chú
         ];
-        const titleRow = ws.addRow([`${categoryName.toUpperCase()} - BỐC THĂM LOẠI TRỰC TIẾP`]);
-        ws.mergeCells('A1:L1');
+        const titleRow = ws.addRow([`${categoryName.toUpperCase()} - BỐC THĂM LOẠI TRỰC TIẾP (Bracket ${result.bracketSize})`]);
+        ws.mergeCells('A1:M1');
         styleSectionTitle(titleRow);
         const headerRow = ws.addRow([
-            'TT', 'Trận', 'VĐV A', 'CLB A', 'VS', 'VĐV B', 'CLB B', 'Ngày', 'Ca', 'Bàn', 'Giờ', 'Ghi chú'
+            'Slot', 'BYE', 'Trận', 'VĐV A', 'CLB A', 'VS', 'VĐV B', 'CLB B', 'Ngày', 'Ca', 'Bàn', 'Giờ', 'Ghi chú'
         ]);
         styleHeaderRow(headerRow);
 
@@ -1661,46 +1884,60 @@
         });
         const scheduled = assignScheduleToMatches(realMatches.map((_, i) => ({ idx: i })), scheduleCfg);
 
+        // Ghi từng slot (mở rộng)
         let tt = 1;
-        realMatches.forEach((item, idx) => {
-            const m = item.match;
-            const sched = scheduled[idx];
-            const row = ws.addRow([
-                tt++, `Trận ${item.index + 1}`, m.teamA.name, m.teamA.club || '—', 'vs',
-                m.teamB.name, m.teamB.club || '—', sched.date, sched.session, sched.table, sched.time, '',
-            ]);
-            styleDataRow(row);
-            [1, 2, 5, 8, 9, 10, 11].forEach(c => {
-                row.getCell(c).alignment = { horizontal: 'center', vertical: 'middle' };
-            });
-            row.getCell(3).font = { bold: true, color: { argb: COLORS.clubFg } };
-            row.getCell(6).font = { bold: true, color: { argb: COLORS.clubFg } };
-            row.getCell(5).font = { bold: true, color: { argb: 'FFE94560' } };
-        });
-
-        const byes = firstRound.filter(m => m.isBye);
-        if (byes.length > 0) {
-            ws.addRow([]);
-            const byeTitle = ws.addRow(['DANH SÁCH BYE (ĐI THẲNG VÒNG TRONG)']);
-            ws.mergeCells(`A${byeTitle.number}:L${byeTitle.number}`);
-            styleSectionTitle(byeTitle);
-            const byeHeader = ws.addRow(['TT', 'Slot', 'VĐV', 'CLB', '', '', '', '', '', '', '', '']);
-            styleHeaderRow(byeHeader);
-            byes.forEach((m, i) => {
-                const r = ws.addRow([i + 1, 'BYE', m.teamA.name, m.teamA.club || '—', '', '', '', '', '', '', '', 'Đi thẳng vòng trong']);
+        let matchIdx = 0;
+        firstRound.forEach((match, i) => {
+            const slotA = i * 2 + 1;
+            const slotB = i * 2 + 2;
+            if (match.isBye) {
+                const player = match.teamA || match.teamB;
+                const byeSlot = match.teamA ? slotA : slotB;
+                const otherSlot = match.teamA ? slotB : slotA;
+                const r = ws.addRow([
+                    byeSlot, 'X', `Trận ${i + 1}`,
+                    match.teamA ? match.teamA.name : '',
+                    match.teamA ? (match.teamA.club || '—') : '',
+                    'vs',
+                    match.teamB ? match.teamB.name : '',
+                    match.teamB ? (match.teamB.club || '—') : '',
+                    '', '', '', '',
+                    'BYE - đi tiếp'
+                ]);
                 styleDataRow(r);
-                [1, 2].forEach(c => r.getCell(c).alignment = { horizontal: 'center', vertical: 'middle' });
-                r.getCell(3).font = { bold: true, color: { argb: COLORS.byeFg } };
+                [1, 2, 6, 9, 10, 11, 12].forEach(c => r.getCell(c).alignment = { horizontal: 'center', vertical: 'middle' });
+                r.getCell(4).font = { bold: true, color: { argb: COLORS.byeFg } };
+                r.getCell(7).font = { bold: true, color: { argb: COLORS.byeFg } };
                 r.eachCell(cell => {
                     cell.fill = { type: 'pattern', pattern: 'solid', fgColor: { argb: COLORS.byeBg } };
                 });
-            });
-        }
+            } else if (match.isPlaceholder) {
+                ws.addRow([slotA, '', `Trận ${i + 1}`, '—', '', 'vs', '—', '', '', '', '', '', '']);
+                ws.addRow([slotB, '', `Trận ${i + 1}`, '—', '', 'vs', '—', '', '', '', '', '', '']);
+            } else {
+                const sched = scheduled[matchIdx] || {};
+                matchIdx++;
+                const r = ws.addRow([
+                    `${slotA}-${slotB}`, '', `Trận ${i + 1}`,
+                    match.teamA.name, match.teamA.club || '—',
+                    'vs',
+                    match.teamB.name, match.teamB.club || '—',
+                    sched.date || '', sched.session || '', sched.table || '', sched.time || '',
+                    ''
+                ]);
+                styleDataRow(r);
+                [1, 2, 6, 9, 10, 11, 12].forEach(c => r.getCell(c).alignment = { horizontal: 'center', vertical: 'middle' });
+                r.getCell(4).font = { bold: true, color: { argb: COLORS.clubFg } };
+                r.getCell(7).font = { bold: true, color: { argb: COLORS.clubFg } };
+                r.getCell(6).font = { bold: true, color: { argb: 'FFE94560' } };
+            }
+        });
+
         ws.addRow([]);
         ws.addRow([`Tổng số VĐV: ${result.numTeams}`]);
         ws.addRow([`Bracket: ${result.bracketSize} slot`]);
         ws.addRow([`Số BYE: ${result.numByes}`]);
-        ws.addRow([`Tổng số trận vòng 1: ${realMatches.length}`]);
+        if (result.customByes) ws.addRow([`BYE tùy chỉnh: ${result.customByes.join(', ')}`]);
         return ws;
     }
 
@@ -2054,7 +2291,7 @@
         }
     };
 
-    console.log('✅ draw.html v5 - Part 2 loaded');
+    console.log('✅ draw.html v6 - Part 2 loaded');
 })();
 </script>
 </body>
