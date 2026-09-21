@@ -42,19 +42,9 @@
             justify-content: center; font-size: 15px; flex-shrink: 0;
         }
 
-        .drop-zone {
-            border: 3px dashed #1a3a7a; border-radius: 16px;
-            padding: 40px 20px; text-align: center; cursor: pointer;
-            transition: all 0.3s ease; background: #f8f9fa;
-        }
-        .drop-zone:hover, .drop-zone.dragover { background: #e7f3ff; border-color: #0984e3; }
-        .drop-zone i { font-size: 48px; color: #1a3a7a; margin-bottom: 12px; display: block; }
-        .drop-zone p { color: #6c757d; font-size: 15px; margin-bottom: 8px; }
-        .drop-zone strong { color: #1a3a7a; }
-
         .stats-grid {
             display: grid; grid-template-columns: repeat(auto-fill, minmax(200px, 1fr));
-            gap: 12px; margin-top: 16px;
+            gap: 12px;
         }
         .stat-card {
             background: #f8f9fa; border: 2px solid #e9ecef;
@@ -256,6 +246,11 @@
         .empty-state { text-align: center; padding: 40px 20px; color: #6c757d; }
         .empty-state i { font-size: 48px; color: #dee2e6; margin-bottom: 12px; display: block; }
 
+        .loading-inline {
+            text-align: center; padding: 30px; color: #6c757d;
+        }
+        .loading-inline i { font-size: 32px; color: #1a3a7a; margin-bottom: 8px; display: block; }
+
         @media (max-width: 768px) {
             .header h1 { font-size: 22px; }
             .courts-grid { grid-template-columns: 1fr; }
@@ -269,42 +264,45 @@
     <div class="header">
         <div>
             <h1>📅 Xếp lịch tự động đa nội dung</h1>
-            <p>Tự động chia lịch cho nhiều nội dung, tránh trùng VĐV</p>
+            <p>Tự động chia lịch cho tất cả nội dung, tránh trùng VĐV</p>
         </div>
         <div class="header-actions">
-            <a href="tournaments.html" class="btn-outline">
+            <a href="categories.html" class="btn-outline" id="backLink">
                 <i class="fas fa-arrow-left"></i> Quay lại
             </a>
         </div>
     </div>
 
+    <!-- BƯỚC 1: LOAD DỮ LIỆU TỪ DRAWs -->
     <div class="panel">
         <div class="panel-title">
-            <span class="step-num">1</span> Upload file Excel đăng ký VĐV
+            <span class="step-num">1</span> Dữ liệu từ các nội dung đã bốc thăm
         </div>
-        <div class="drop-zone" id="dropZone" onclick="document.getElementById('fileInput').click()">
-            <i class="fas fa-file-excel"></i>
-            <p><strong>Kéo file Excel vào đây</strong></p>
-            <p>hoặc</p>
-            <p>Nhấn để chọn file</p>
-            <p style="font-size: 12px; margin-top: 12px; color: #6c757d;">
-                File Excel có nhiều sheet (mỗi nội dung 1 sheet).<br>
-                Cột: STT | Tên VĐV (hoặc "Tên 1 - Tên 2") | Đơn Vị
-            </p>
+        <div id="dataStatus" class="loading-inline">
+            <i class="fas fa-spinner fa-spin"></i>
+            <p>Đang tải dữ liệu từ Supabase...</p>
         </div>
-        <input type="file" id="fileInput" accept=".xlsx,.xls" style="display: none;" onchange="handleFileSelect(event)">
-        <div id="fileInfo" style="display: none; margin-top: 16px;">
-            <div class="stats-grid" id="statsGrid"></div>
+        <div id="dataStats" class="stats-grid" style="display: none;"></div>
+        <div id="contentList" class="content-list" style="margin-top: 16px;">
+            <div class="empty-state">
+                <i class="fas fa-inbox"></i>
+                <p>Đang tải...</p>
+            </div>
         </div>
     </div>
 
+    <!-- BƯỚC 2: CẤU HÌNH LỊCH -->
     <div class="panel">
         <div class="panel-title">
             <span class="step-num">2</span> Cấu hình lịch thi đấu
         </div>
         <div class="form-row">
             <div class="form-group">
-                <label><i class="fas fa-calendar"></i> Số ngày thi đấu</label>
+                <label><i class="fas fa-calendar"></i> Ngày bắt đầu</label>
+                <input type="date" id="startDate">
+            </div>
+            <div class="form-group">
+                <label><i class="fas fa-calendar-week"></i> Số ngày thi đấu</label>
                 <input type="number" id="numDays" value="3" min="1" max="30">
             </div>
             <div class="form-group">
@@ -315,48 +313,37 @@
                 <label><i class="fas fa-clock"></i> Thời gian/trận (phút)</label>
                 <input type="number" id="matchDuration" value="30" min="10" max="180">
             </div>
+        </div>
+        <div class="form-row">
             <div class="form-group">
                 <label><i class="fas fa-hourglass"></i> Nghỉ giữa trận (phút)</label>
                 <input type="number" id="breakDuration" value="5" min="0" max="60">
             </div>
-        </div>
-        <div style="margin-top: 16px;">
-            <label style="font-weight: 700; display: block; margin-bottom: 12px;">
-                <i class="fas fa-sun"></i> Các buổi thi đấu mỗi ngày
-            </label>
-            <div class="form-row">
-                <div class="form-group">
-                    <label>
-                        <input type="checkbox" id="sessionMorning" checked style="width: auto; margin-right: 6px;">
-                        Buổi Sáng
-                    </label>
-                    <input type="time" id="timeMorning" value="08:00">
-                </div>
-                <div class="form-group">
-                    <label>
-                        <input type="checkbox" id="sessionAfternoon" checked style="width: auto; margin-right: 6px;">
-                        Buổi Chiều
-                    </label>
-                    <input type="time" id="timeAfternoon" value="14:00">
-                </div>
-                <div class="form-group">
-                    <label>
-                        <input type="checkbox" id="sessionEvening" checked style="width: auto; margin-right: 6px;">
-                        Buổi Tối
-                    </label>
-                    <input type="time" id="timeEvening" value="19:00">
-                </div>
-                <div class="form-group">
-                    <label>
-                        <input type="checkbox" id="sessionNight" style="width: auto; margin-right: 6px;">
-                        Buổi Đêm (tùy chọn)
-                    </label>
-                    <input type="time" id="timeNight" value="21:00">
-                </div>
+            <div class="form-group">
+                <label><i class="fas fa-sun"></i> Giờ bắt đầu Sáng</label>
+                <input type="time" id="timeMorning" value="08:00">
+                <label style="margin-top: 6px; font-size: 13px;">
+                    <input type="checkbox" id="sessionMorning" checked style="width: auto; margin-right: 4px;"> Có buổi Sáng
+                </label>
+            </div>
+            <div class="form-group">
+                <label><i class="fas fa-cloud-sun"></i> Giờ bắt đầu Chiều</label>
+                <input type="time" id="timeAfternoon" value="14:00">
+                <label style="margin-top: 6px; font-size: 13px;">
+                    <input type="checkbox" id="sessionAfternoon" checked style="width: auto; margin-right: 4px;"> Có buổi Chiều
+                </label>
+            </div>
+            <div class="form-group">
+                <label><i class="fas fa-moon"></i> Giờ bắt đầu Tối</label>
+                <input type="time" id="timeEvening" value="19:00">
+                <label style="margin-top: 6px; font-size: 13px;">
+                    <input type="checkbox" id="sessionEvening" checked style="width: auto; margin-right: 4px;"> Có buổi Tối
+                </label>
             </div>
         </div>
     </div>
 
+    <!-- BƯỚC 3: THỨ TỰ ƯU TIÊN -->
     <div class="panel">
         <div class="panel-title">
             <span class="step-num">3</span> Thứ tự ưu tiên nội dung
@@ -364,14 +351,15 @@
         <p style="color: #6c757d; font-size: 13px; margin-bottom: 16px;">
             <i class="fas fa-info-circle"></i> Kéo thả để sắp xếp thứ tự. Nội dung xếp trên sẽ thi đấu trước.
         </p>
-        <div class="content-list" id="contentList">
+        <div class="content-list" id="contentPriorityList">
             <div class="empty-state">
                 <i class="fas fa-inbox"></i>
-                <p>Chưa có nội dung nào. Hãy upload file Excel trước.</p>
+                <p>Đang tải...</p>
             </div>
         </div>
     </div>
 
+    <!-- BƯỚC 4: CẤU HÌNH VÒNG CUỐI -->
     <div class="panel" id="finalConfigPanel" style="display: none;">
         <div class="panel-title">
             <span class="step-num">4</span> Cấu hình vòng Bán kết / Chung kết
@@ -393,6 +381,7 @@
         </table>
     </div>
 
+    <!-- BƯỚC 5: XẾP LỊCH -->
     <div class="panel">
         <div class="panel-title">
             <span class="step-num">5</span> Tiến hành xếp lịch
@@ -403,6 +392,7 @@
         <div id="alert" class="alert"></div>
     </div>
 
+    <!-- BƯỚC 6: KẾT QUẢ -->
     <div class="panel" id="resultPanel" style="display: none;">
         <div class="panel-title">
             <span class="step-num">6</span> Kết quả xếp lịch
@@ -418,6 +408,9 @@
             </button>
             <button class="btn btn-success" onclick="saveToDatabase()" id="saveBtn">
                 <i class="fas fa-save"></i> Lưu vào hệ thống
+            </button>
+            <button class="btn btn-warning" onclick="generateSchedule()">
+                <i class="fas fa-redo"></i> Xếp lại
             </button>
         </div>
     </div>
@@ -442,17 +435,14 @@
 (function() {
     'use strict';
 
-    console.log('🚀 schedule-auto.html v2 - Single script, full');
+    console.log('🚀 schedule-auto.html v3 - Query from Supabase');
 
     const config = window.SPORTSVN_CONFIG || {};
     const supabaseClient = window.supabase.createClient(config.SUPABASE_URL, config.SUPABASE_ANON_KEY);
     window.supabaseClient = supabaseClient;
 
-    // ==========================================
-    // STATE
-    // ==========================================
     let tournamentId = null;
-    let contents = [];
+    let contents = [];       // [{id, name, items, type, playerCount, drawData}]
     let allPlayers = new Map();
     let scheduleResult = null;
     let dragSrcIndex = null;
@@ -460,7 +450,7 @@
     // ==========================================
     // INIT
     // ==========================================
-    function init() {
+    async function init() {
         const params = new URLSearchParams(window.location.search);
         tournamentId = params.get('tournament_id');
         if (!tournamentId) {
@@ -470,134 +460,143 @@
         }
         window.tournamentId = tournamentId;
         console.log('📌 Tournament ID:', tournamentId);
-        setupDropZone();
+
+        document.getElementById('backLink').href = `categories.html?tournament_id=${tournamentId}`;
+
+        // Set ngày mặc định = hôm nay
+        const today = new Date();
+        document.getElementById('startDate').value = today.toISOString().slice(0, 10);
+
+        await loadDataFromDraws();
+        setupEventListeners();
     }
 
-    function setupDropZone() {
-        const dropZone = document.getElementById('dropZone');
-        ['dragenter', 'dragover'].forEach(evt => {
-            dropZone.addEventListener(evt, e => { e.preventDefault(); dropZone.classList.add('dragover'); });
-        });
-        ['dragleave', 'drop'].forEach(evt => {
-            dropZone.addEventListener(evt, e => { e.preventDefault(); dropZone.classList.remove('dragover'); });
-        });
-        dropZone.addEventListener('drop', e => {
-            const file = e.dataTransfer.files[0];
-            if (file) parseExcelFile(file);
-        });
-    }
-
-    window.handleFileSelect = function(event) {
-        const file = event.target.files[0];
-        if (file) parseExcelFile(file);
-    };
-
     // ==========================================
-    // PARSE EXCEL
+    // LOAD DATA FROM SUPABASE (draws table)
     // ==========================================
-    function parseExcelFile(file) {
-        showLoading('Đang đọc file Excel...');
-        const reader = new FileReader();
-        reader.onload = (e) => {
-            try {
-                const data = new Uint8Array(e.target.result);
-                const workbook = XLSX.read(data, { type: 'array' });
+    async function loadDataFromDraws() {
+        try {
+            console.log('📥 Loading draws...');
 
-                contents = [];
-                allPlayers = new Map();
+            const { data, error } = await supabaseClient
+                .from('draws')
+                .select('*')
+                .eq('tournament_id', tournamentId);
 
-                workbook.SheetNames.forEach((sheetName, idx) => {
-                    const sheet = workbook.Sheets[sheetName];
-                    const rows = XLSX.utils.sheet_to_json(sheet, { header: 1, defval: '' });
-                    if (rows.length < 2) return;
+            if (error) throw error;
 
-                    // Tìm header row
-                    let headerRow = 0;
-                    for (let i = 0; i < Math.min(5, rows.length); i++) {
-                        if (rows[i].some(c => String(c).toLowerCase().includes('tên'))) {
-                            headerRow = i;
-                            break;
-                        }
-                    }
+            console.log('📦 Loaded', data.length, 'draw records');
 
-                    const header = rows[headerRow];
-                    const colName = header.findIndex(h => String(h).toLowerCase().includes('tên'));
-                    const colUnit = header.findIndex(h => String(h).toLowerCase().includes('đơn vị') || String(h).toLowerCase().includes('clb'));
-                    const colYear = header.findIndex(h => String(h).toLowerCase().includes('năm sinh'));
+            if (!data || data.length === 0) {
+                document.getElementById('dataStatus').innerHTML = `
+                    <div class="empty-state">
+                        <i class="fas fa-inbox"></i>
+                        <p>Chưa có dữ liệu bốc thăm. Hãy bốc thăm ít nhất 1 nội dung trước.</p>
+                        <a href="categories.html?tournament_id=${tournamentId}" class="btn btn-primary" style="margin-top: 12px;">
+                            <i class="fas fa-dice"></i> Đi bốc thăm
+                        </a>
+                    </div>
+                `;
+                return;
+            }
 
-                    const finalColName = colName >= 0 ? colName : 1;
-                    const finalColUnit = colUnit >= 0 ? colUnit : 2;
-                    const finalColYear = colYear >= 0 ? colYear : -1;
+            // Group by category
+            const byCategory = new Map();
+            data.forEach(row => {
+                const cat = row.category || 'Không tên';
+                if (!byCategory.has(cat)) byCategory.set(cat, []);
+                byCategory.get(cat).push(row);
+            });
 
-                    const items = [];
-                    for (let i = headerRow + 1; i < rows.length; i++) {
-                        const row = rows[i];
-                        if (!row || !row[finalColName]) continue;
-                        const name = String(row[finalColName]).trim();
-                        const unit = String(row[finalColUnit] || '').trim();
-                        const year = finalColYear >= 0 ? String(row[finalColYear] || '').trim() : '';
-                        if (!name) continue;
+            console.log('📂 Groups:', byCategory.size, 'categories');
 
-                        const players = name.split(/\s*-\s*/).map(s => s.trim()).filter(Boolean);
-                        items.push({ name, unit, year, players });
-                    }
+            // Build contents
+            contents = [];
+            allPlayers = new Map();
 
-                    if (items.length === 0) return;
+            let contentId = 0;
+            for (const [catName, rows] of byCategory) {
+                contentId++;
 
-                    let type = 'single';
-                    const nameLower = sheetName.toLowerCase();
-                    if (nameLower.includes('đồng đội') || nameLower.startsWith('dd ')) type = 'team';
-                    else if (nameLower.includes('đôi')) type = 'double';
+                // Detect type
+                const nameLower = catName.toLowerCase();
+                let type = 'single';
+                if (nameLower.includes('đồng đội') || nameLower.startsWith('đội ')) type = 'team';
+                else if (nameLower.includes('đôi')) type = 'double';
 
-                    const content = {
-                        id: idx,
-                        sheetName,
-                        name: sheetName,
-                        type,
-                        items,
-                        playerCount: items.reduce((sum, it) => sum + it.players.length, 0),
-                    };
-                    contents.push(content);
-
-                    items.forEach(it => {
-                        it.players.forEach(p => {
-                            if (!allPlayers.has(p)) allPlayers.set(p, new Set());
-                            allPlayers.get(p).add(sheetName);
+                // Build items (VĐV/Đội)
+                const itemsMap = new Map();
+                rows.forEach(r => {
+                    const key = r.team_name + '|' + (r.club || '');
+                    if (!itemsMap.has(key)) {
+                        itemsMap.set(key, {
+                            name: r.team_name,
+                            unit: r.club || '',
+                            players: [r.team_name],
+                            group: r.group_name,
+                            position: r.position,
+                            draw_type: r.draw_type,
+                            rows: [],
                         });
-                    });
+                    }
+                    itemsMap.get(key).rows.push(r);
                 });
 
-                console.log('✅ Parsed', contents.length, 'nội dung');
-                console.log('👥', allPlayers.size, 'VĐV duy nhất');
+                const items = Array.from(itemsMap.values());
 
-                renderFileInfo();
-                renderContentList();
-                renderFinalConfig();
-                updateGenerateButton();
-                showAlert(`✅ Đã đọc file: ${contents.length} nội dung`, 'success');
-                hideLoading();
-            } catch (error) {
-                console.error(error);
-                hideLoading();
-                showAlert('Lỗi đọc file: ' + error.message, 'error');
+                const content = {
+                    id: contentId,
+                    name: catName,
+                    type,
+                    items,
+                    drawData: rows,
+                    playerCount: items.reduce((sum, it) => sum + it.players.length, 0),
+                };
+
+                contents.push(content);
+
+                // Track players
+                items.forEach(it => {
+                    it.players.forEach(p => {
+                        if (!allPlayers.has(p)) allPlayers.set(p, new Set());
+                        allPlayers.get(p).add(catName);
+                    });
+                });
             }
-        };
-        reader.readAsArrayBuffer(file);
+
+            console.log('✅ Parsed', contents.length, 'nội dung');
+            console.log('👥', allPlayers.size, 'VĐV duy nhất');
+
+            renderDataStats();
+            renderContentPriorityList();
+            renderFinalConfig();
+            updateGenerateButton();
+
+            document.getElementById('dataStatus').style.display = 'none';
+        } catch (error) {
+            console.error(error);
+            document.getElementById('dataStatus').innerHTML = `
+                <div class="empty-state">
+                    <i class="fas fa-exclamation-triangle" style="color: #e94560;"></i>
+                    <p>Lỗi tải dữ liệu: ${escapeHtml(error.message)}</p>
+                </div>
+            `;
+        }
     }
 
     // ==========================================
-    // RENDER FILE INFO
+    // RENDER DATA STATS
     // ==========================================
-    function renderFileInfo() {
-        const info = document.getElementById('fileInfo');
-        const grid = document.getElementById('statsGrid');
-        info.style.display = 'block';
+    function renderDataStats() {
+        const el = document.getElementById('dataStats');
+        el.style.display = 'grid';
 
         const totalPlayers = new Set();
         contents.forEach(c => c.items.forEach(it => it.players.forEach(p => totalPlayers.add(p))));
         const multiContentPlayers = Array.from(allPlayers.values()).filter(set => set.size > 1).length;
+        const totalMatches = contents.reduce((sum, c) => sum + estimateMatches(c), 0);
 
-        grid.innerHTML = `
+        el.innerHTML = `
             <div class="stat-card">
                 <div class="icon"><i class="fas fa-list"></i></div>
                 <div class="info">
@@ -619,16 +618,40 @@
                     <div class="lbl">VĐV đa nội dung</div>
                 </div>
             </div>
+            <div class="stat-card">
+                <div class="icon"><i class="fas fa-trophy"></i></div>
+                <div class="info">
+                    <div class="num">~${totalMatches}</div>
+                    <div class="lbl">Trận (dự kiến)</div>
+                </div>
+            </div>
         `;
     }
 
+    function estimateMatches(content) {
+        if (content.type === 'team') {
+            const teamsMap = new Map();
+            content.items.forEach(it => {
+                if (!teamsMap.has(it.unit)) teamsMap.set(it.unit, true);
+            });
+            const n = teamsMap.size;
+            return n * (n - 1) / 2;
+        } else {
+            const n = content.items.length;
+            if (n <= 8) return n * (n - 1) / 2;
+            let bracketSize = 2;
+            while (bracketSize < n) bracketSize *= 2;
+            return bracketSize - 1;
+        }
+    }
+
     // ==========================================
-    // RENDER CONTENT LIST (DRAG & DROP)
+    // RENDER CONTENT PRIORITY LIST
     // ==========================================
-    function renderContentList() {
-        const list = document.getElementById('contentList');
+    function renderContentPriorityList() {
+        const list = document.getElementById('contentPriorityList');
         if (contents.length === 0) {
-            list.innerHTML = '<div class="empty-state"><i class="fas fa-inbox"></i><p>Chưa có nội dung nào.</p></div>';
+            list.innerHTML = '<div class="empty-state"><i class="fas fa-inbox"></i><p>Không có nội dung.</p></div>';
             return;
         }
 
@@ -639,7 +662,7 @@
                 <div class="content-info">
                     <div class="content-name">${escapeHtml(c.name)}</div>
                     <div class="content-meta">
-                        ${c.items.length} đăng ký · ${c.playerCount} VĐV
+                        ${c.items.length} đăng ký · ${c.drawData.length} dòng draws
                         ${c.type === 'team' ? ' · Thi đấu đồng đội' : c.type === 'double' ? ' · Đôi' : ' · Đơn'}
                     </div>
                 </div>
@@ -653,7 +676,7 @@
     }
 
     function attachDragHandlers() {
-        document.querySelectorAll('.content-item').forEach(item => {
+        document.querySelectorAll('#contentPriorityList .content-item').forEach(item => {
             item.addEventListener('dragstart', handleDragStart);
             item.addEventListener('dragover', handleDragOver);
             item.addEventListener('dragleave', handleDragLeave);
@@ -685,7 +708,7 @@
         if (dragSrcIndex === null || dragSrcIndex === targetIndex) return;
         const moved = contents.splice(dragSrcIndex, 1)[0];
         contents.splice(targetIndex, 0, moved);
-        renderContentList();
+        renderContentPriorityList();
         renderFinalConfig();
     }
 
@@ -706,6 +729,7 @@
 
         const numDays = parseInt(document.getElementById('numDays')?.value) || 3;
         const sessions = getActiveSessions();
+        if (sessions.length === 0) return;
 
         body.innerHTML = contents.map((c, i) => `
             <tr>
@@ -737,8 +761,6 @@
             sessions.push({ key: 'afternoon', label: 'Chiều', time: document.getElementById('timeAfternoon')?.value || '14:00' });
         if (document.getElementById('sessionEvening')?.checked)
             sessions.push({ key: 'evening', label: 'Tối', time: document.getElementById('timeEvening')?.value || '19:00' });
-        if (document.getElementById('sessionNight')?.checked)
-            sessions.push({ key: 'night', label: 'Đêm', time: document.getElementById('timeNight')?.value || '21:00' });
         return sessions;
     }
 
@@ -748,6 +770,7 @@
 
     function getConfig() {
         return {
+            startDate: document.getElementById('startDate')?.value || new Date().toISOString().slice(0, 10),
             numDays: parseInt(document.getElementById('numDays')?.value) || 3,
             numCourts: parseInt(document.getElementById('numCourts')?.value) || 8,
             matchDuration: parseInt(document.getElementById('matchDuration')?.value) || 30,
@@ -775,7 +798,7 @@
     // GENERATE SCHEDULE
     // ==========================================
     window.generateSchedule = async function() {
-        if (contents.length === 0) { showAlert('Chưa có nội dung!', 'error'); return; }
+        if (contents.length === 0) { showAlert('Chưa có dữ liệu!', 'error'); return; }
 
         const cfg = getConfig();
         const finalConfig = getFinalConfig();
@@ -792,9 +815,9 @@
             document.getElementById('resultPanel').scrollIntoView({ behavior: 'smooth' });
 
             if (result.conflicts.length > 0) {
-                showAlert(`⚠️ Xếp xong nhưng có ${result.conflicts.length} conflict!`, 'error');
+                showAlert(`⚠️ Xếp xong! ${result.totalMatches} trận, ${result.conflicts.length} conflict!`, 'error');
             } else {
-                showAlert(`✅ Xếp lịch thành công! ${result.totalMatches} trận trong ${result.totalSlots} khung giờ.`, 'success');
+                showAlert(`✅ Xếp lịch thành công! ${result.totalMatches} trận.`, 'success');
             }
         } catch (error) {
             console.error(error);
@@ -810,7 +833,7 @@
         const breakDuration = cfg.breakDuration;
         const sessions = cfg.sessions;
 
-        // Bước 1: Tạo slots
+        // Tạo slots
         const slots = [];
         for (let d = 0; d < totalDays; d++) {
             for (const sess of sessions) {
@@ -840,7 +863,7 @@
 
         console.log(`📅 Tổng ${slots.length} slots`);
 
-        // Bước 2: Tạo matches
+        // Tạo matches
         const allMatches = [];
         contents.forEach((content, contentOrder) => {
             const matches = generateMatchesForContent(content, finalConfig[content.id], cfg);
@@ -857,14 +880,14 @@
 
         console.log(`🏆 Tổng ${allMatches.length} trận`);
 
-        // Bước 3: Sort
+        // Sort
         allMatches.sort((a, b) => {
             if (a.contentOrder !== b.contentOrder) return a.contentOrder - b.contentOrder;
             if (a.isFinalRound !== b.isFinalRound) return b.isFinalRound - a.isFinalRound;
             return a.roundOrder - b.roundOrder;
         });
 
-        // Bước 4: Gán slot + detect conflict
+        // Gán slot
         const playerBusy = new Map();
         const playerFinalSession = new Map();
         const conflicts = [];
@@ -912,21 +935,28 @@
     }
 
     // ==========================================
-    // GENERATE MATCHES
+    // GENERATE MATCHES FROM DRAWS DATA
     // ==========================================
     function generateMatchesForContent(content, finalCfg, cfg) {
         const matches = [];
 
+        // Sử dụng drawData (bảng draws từ draw.html)
+        // Mỗi row = 1 VĐV/đội trong 1 slot
+
         if (content.type === 'team') {
+            // Đồng đội: gom theo Đơn Vị
             const teamsMap = new Map();
             content.items.forEach(it => {
                 const unit = it.unit || 'Không rõ';
                 if (!teamsMap.has(unit)) teamsMap.set(unit, []);
                 teamsMap.get(unit).push(...it.players);
             });
+
             const teams = Array.from(teamsMap.entries()).map(([name, players]) => ({
                 name, players, displayName: name,
             }));
+
+            // Vòng tròn
             for (let i = 0; i < teams.length; i++) {
                 for (let j = i + 1; j < teams.length; j++) {
                     matches.push({
@@ -942,53 +972,60 @@
                     });
                 }
             }
-        } else if (content.type === 'double') {
-            const pairs = content.items.map(it => ({
-                name: it.name, players: it.players, unit: it.unit, displayName: it.name,
-            }));
-            matches.push(...generateGroupOrKnockout(pairs, content.name, cfg));
         } else {
-            const players = content.items.map(it => ({
-                name: it.name,
-                players: [it.name],
-                unit: it.unit,
-                displayName: it.name + (it.unit ? ` (${it.unit})` : ''),
-            }));
-            matches.push(...generateGroupOrKnockout(players, content.name, cfg));
-        }
+            // Đơn hoặc Đôi
+            // Group theo group_name (Bảng A, Bảng B, ...) hoặc "Vòng 1"
+            const groups = new Map();
+            content.drawData.forEach(r => {
+                const g = r.group_name || 'Vòng 1';
+                if (!groups.has(g)) groups.set(g, []);
+                groups.get(g).push(r);
+            });
 
-        return matches;
-    }
+            groups.forEach((rows, groupName) => {
+                // Tạo items từ rows
+                const itemsMap = new Map();
+                rows.forEach(r => {
+                    const key = r.team_name;
+                    if (!itemsMap.has(key)) {
+                        itemsMap.set(key, {
+                            name: r.team_name,
+                            unit: r.club || '',
+                            players: [r.team_name],
+                            displayName: r.team_name + (r.club ? ` (${r.club})` : ''),
+                        });
+                    }
+                });
+                const items = Array.from(itemsMap.values());
 
-    function generateGroupOrKnockout(participants, contentName, cfg) {
-        const matches = [];
-        const n = participants.length;
-
-        // Nếu ≤ 8 → vòng tròn, ngược lại → knockout
-        if (n <= 8) {
-            for (let i = 0; i < n; i++) {
-                for (let j = i + 1; j < n; j++) {
-                    matches.push({
-                        contentName,
-                        roundName: 'Vòng bảng',
-                        roundOrder: 1,
-                        isFinalRound: false,
-                        teamA: participants[i],
-                        teamB: participants[j],
-                        players: [...participants[i].players, ...participants[j].players],
-                        displayA: participants[i].displayName,
-                        displayB: participants[j].displayName,
-                    });
+                if (items.length <= 8) {
+                    // Vòng tròn trong bảng
+                    for (let i = 0; i < items.length; i++) {
+                        for (let j = i + 1; j < items.length; j++) {
+                            matches.push({
+                                contentName: content.name,
+                                roundName: groupName,
+                                roundOrder: 1,
+                                isFinalRound: false,
+                                teamA: items[i],
+                                teamB: items[j],
+                                players: [...items[i].players, ...items[j].players],
+                                displayA: items[i].displayName,
+                                displayB: items[j].displayName,
+                            });
+                        }
+                    }
+                } else {
+                    // Knockout
+                    matches.push(...generateKnockoutMatches(items, content.name, groupName));
                 }
-            }
-        } else {
-            matches.push(...generateKnockoutMatches(participants, contentName));
+            });
         }
 
         return matches;
     }
 
-    function generateKnockoutMatches(participants, contentName) {
+    function generateKnockoutMatches(participants, contentName, groupName) {
         const matches = [];
         let n = participants.length;
         let bracketSize = 2;
@@ -1012,7 +1049,7 @@
         round1.forEach(m => {
             matches.push({
                 contentName,
-                roundName: 'Vòng 1/' + (bracketSize / 2),
+                roundName: groupName || ('Vòng 1/' + (bracketSize / 2)),
                 roundOrder: 1,
                 isFinalRound: false,
                 ...m,
@@ -1212,7 +1249,7 @@
 
             ws.columns = [
                 { width: 6 }, { width: 8 }, { width: 10 }, { width: 8 }, { width: 6 },
-                { width: 20 }, { width: 12 }, { width: 25 }, { width: 25 }, { width: 30 },
+                { width: 25 }, { width: 15 }, { width: 28 }, { width: 28 }, { width: 30 },
             ];
 
             const titleRow = ws.addRow(['LỊCH THI ĐẤU TỔNG HỢP']);
@@ -1329,6 +1366,20 @@
     };
 
     // ==========================================
+    // EVENT LISTENERS
+    // ==========================================
+    function setupEventListeners() {
+        ['numDays', 'numCourts', 'matchDuration'].forEach(id => {
+            const el = document.getElementById(id);
+            if (el) el.addEventListener('change', renderFinalConfig);
+        });
+        ['sessionMorning', 'sessionAfternoon', 'sessionEvening'].forEach(id => {
+            const el = document.getElementById(id);
+            if (el) el.addEventListener('change', renderFinalConfig);
+        });
+    }
+
+    // ==========================================
     // HELPERS
     // ==========================================
     function formatTime(minutes) {
@@ -1361,24 +1412,10 @@
     }
 
     // ==========================================
-    // EVENT LISTENERS
-    // ==========================================
-    document.addEventListener('DOMContentLoaded', () => {
-        ['numDays', 'numCourts', 'matchDuration'].forEach(id => {
-            const el = document.getElementById(id);
-            if (el) el.addEventListener('change', renderFinalConfig);
-        });
-        ['sessionMorning', 'sessionAfternoon', 'sessionEvening', 'sessionNight'].forEach(id => {
-            const el = document.getElementById(id);
-            if (el) el.addEventListener('change', renderFinalConfig);
-        });
-    });
-
-    // ==========================================
     // START
     // ==========================================
     init();
-    console.log('✅ schedule-auto.html v2 - loaded');
+    console.log('✅ schedule-auto.html v3 - loaded');
 })();
 </script>
 </body>
