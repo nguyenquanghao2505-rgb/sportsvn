@@ -1,0 +1,752 @@
+<!DOCTYPE html>
+<html lang="vi">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+    <title>Trọng tài - Điều khiển trận đấu</title>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <style>
+        * { margin: 0; padding: 0; box-sizing: border-box; font-family: 'Segoe UI', system-ui, sans-serif; -webkit-tap-highlight-color: transparent; }
+        body { background: #0a0e1a; color: #fff; min-height: 100vh; padding-bottom: 100px; }
+
+        /* ===== LOGIN SCREEN ===== */
+        .login-screen {
+            position: fixed; inset: 0; z-index: 9999;
+            background: linear-gradient(135deg, #0a0e1a, #1a1a2e);
+            display: flex; align-items: center; justify-content: center;
+            padding: 20px;
+        }
+        .login-box {
+            background: #131a2e; border-radius: 20px;
+            padding: 40px 30px; width: 100%; max-width: 400px;
+            box-shadow: 0 20px 60px rgba(0,0,0,0.5);
+            border: 1px solid #1e2a4a;
+        }
+        .login-box h1 {
+            font-size: 24px; text-align: center; margin-bottom: 8px;
+            background: linear-gradient(135deg, #e94560, #fdcb6e);
+            -webkit-background-clip: text; -webkit-text-fill-color: transparent;
+        }
+        .login-box p { text-align: center; color: #8a92a8; font-size: 13px; margin-bottom: 28px; }
+        .pin-input {
+            width: 100%; padding: 18px;
+            background: #0a0e1a; border: 2px solid #1e2a4a;
+            border-radius: 12px; color: #fff;
+            font-size: 24px; text-align: center;
+            letter-spacing: 12px; font-weight: 800;
+            font-family: 'Courier New', monospace;
+        }
+        .pin-input:focus { border-color: #e94560; outline: none; }
+        .pin-hint { text-align: center; color: #8a92a8; font-size: 12px; margin-top: 8px; }
+
+        /* ===== HEADER ===== */
+        .ref-header {
+            background: linear-gradient(135deg, #0d1b3e, #1a3a7a);
+            padding: 16px 20px; position: sticky; top: 0; z-index: 100;
+            box-shadow: 0 4px 20px rgba(0,0,0,0.5);
+            display: flex; justify-content: space-between; align-items: center; gap: 12px;
+        }
+        .ref-header .user-info { display: flex; align-items: center; gap: 10px; }
+        .ref-header .avatar {
+            width: 36px; height: 36px; border-radius: 50%;
+            background: linear-gradient(135deg, #e94560, #fdcb6e);
+            display: flex; align-items: center; justify-content: center;
+            font-weight: 800; font-size: 14px;
+        }
+        .ref-header .user-name { font-size: 14px; font-weight: 700; }
+        .ref-header .logout-btn {
+            background: rgba(233,69,96,0.2); color: #e94560;
+            border: 1px solid #e94560; padding: 8px 14px;
+            border-radius: 8px; font-size: 12px; font-weight: 700;
+            cursor: pointer;
+        }
+
+        /* ===== STATS ===== */
+        .stats-row {
+            display: grid; grid-template-columns: repeat(3, 1fr);
+            gap: 10px; padding: 16px 20px 8px;
+        }
+        .stat-card {
+            background: #131a2e; border-radius: 12px;
+            padding: 12px; text-align: center;
+            border: 1px solid #1e2a4a;
+        }
+        .stat-card .num { font-size: 22px; font-weight: 800; color: #fdcb6e; }
+        .stat-card .lbl { font-size: 11px; color: #8a92a8; margin-top: 4px; text-transform: uppercase; }
+
+        /* ===== FILTER TABS ===== */
+        .ref-tabs {
+            display: flex; gap: 4px; padding: 12px 20px 8px;
+            overflow-x: auto; scrollbar-width: none;
+        }
+        .ref-tabs::-webkit-scrollbar { display: none; }
+        .ref-tab {
+            padding: 10px 18px; border-radius: 10px;
+            background: #131a2e; color: #8a92a8;
+            border: 1px solid #1e2a4a; font-size: 13px;
+            font-weight: 700; cursor: pointer; white-space: nowrap;
+            transition: all 0.2s;
+        }
+        .ref-tab.active {
+            background: linear-gradient(135deg, #e94560, #c73650);
+            color: #fff; border-color: #e94560;
+        }
+
+        /* ===== MATCH LIST ===== */
+        .match-list { padding: 12px 20px; }
+        .match-card {
+            background: #131a2e; border-radius: 14px;
+            padding: 16px; margin-bottom: 12px;
+            border: 1px solid #1e2a4a;
+            transition: all 0.2s;
+        }
+        .match-card.live { border-color: #fdcb6e; background: #1f1a10; }
+        .match-card.finished { border-color: #00b894; opacity: 0.75; }
+        .match-card-header {
+            display: flex; justify-content: space-between;
+            align-items: center; margin-bottom: 12px; gap: 8px;
+        }
+        .match-code {
+            font-size: 13px; font-weight: 800; color: #fdcb6e;
+            background: rgba(253,203,110,0.15);
+            padding: 4px 10px; border-radius: 6px;
+        }
+        .match-status {
+            font-size: 11px; font-weight: 700;
+            padding: 4px 10px; border-radius: 12px;
+        }
+        .match-status.pending { background: #1e2a4a; color: #8a92a8; }
+        .match-status.live { background: #e94560; color: #fff; animation: pulse 1.5s infinite; }
+        .match-status.finished { background: #00b894; color: #fff; }
+        @keyframes pulse { 0%, 100% { opacity: 1; } 50% { opacity: 0.6; } }
+
+        .match-meta {
+            display: flex; gap: 12px; flex-wrap: wrap;
+            font-size: 11px; color: #8a92a8; margin-bottom: 12px;
+        }
+        .match-meta span { display: flex; align-items: center; gap: 4px; }
+        .match-meta i { color: #fdcb6e; }
+
+        .team-row {
+            display: flex; justify-content: space-between;
+            align-items: center; padding: 10px 0;
+            border-bottom: 1px solid #1e2a4a;
+        }
+        .team-row:last-child { border-bottom: none; }
+        .team-info { flex: 1; min-width: 0; }
+        .team-name { font-size: 15px; font-weight: 700; }
+        .team-club { font-size: 11px; color: #8a92a8; margin-top: 2px; }
+        .team-info.winner .team-name { color: #00b894; }
+        .team-info.loser .team-name { color: #8a92a8; }
+        .score-display {
+            font-size: 28px; font-weight: 800;
+            min-width: 50px; text-align: center;
+        }
+        .score-display.winner { color: #00b894; }
+        .score-display.loser { color: #8a92a8; }
+
+        /* ===== BUTTONS ===== */
+        .btn {
+            border: none; border-radius: 10px;
+            font-size: 14px; font-weight: 700;
+            cursor: pointer; transition: all 0.2s;
+            display: inline-flex; align-items: center;
+            justify-content: center; gap: 6px;
+            padding: 12px 20px;
+        }
+        .btn:active { transform: scale(0.97); }
+        .btn-primary { background: linear-gradient(135deg, #0984e3, #0066cc); color: #fff; }
+        .btn-success { background: linear-gradient(135deg, #00b894, #00a859); color: #fff; }
+        .btn-danger { background: linear-gradient(135deg, #e94560, #c73650); color: #fff; }
+        .btn-warning { background: linear-gradient(135deg, #fdcb6e, #f39c12); color: #1a1a2e; }
+        .btn-secondary { background: #1e2a4a; color: #fff; }
+        .btn-block { width: 100%; }
+        .btn-sm { padding: 8px 14px; font-size: 12px; }
+        .btn-icon {
+            width: 60px; height: 60px; border-radius: 50%;
+            font-size: 28px; padding: 0; flex-shrink: 0;
+        }
+
+        /* ===== SCORE PANEL ===== */
+        .score-panel {
+            position: fixed; bottom: 0; left: 0; right: 0;
+            background: #131a2e; border-top: 3px solid #e94560;
+            padding: 16px 20px 20px;
+            box-shadow: 0 -4px 30px rgba(0,0,0,0.7);
+            z-index: 200;
+            display: none;
+            max-height: 85vh; overflow-y: auto;
+        }
+        .score-panel.show { display: block; }
+        .score-panel-header {
+            display: flex; justify-content: space-between;
+            align-items: center; margin-bottom: 12px;
+        }
+        .score-panel-title { font-size: 15px; font-weight: 800; color: #fdcb6e; }
+        .score-panel-close {
+            background: #e94560; color: #fff; border: none;
+            width: 32px; height: 32px; border-radius: 50%;
+            font-size: 18px; cursor: pointer;
+        }
+        .score-team-row {
+            display: flex; align-items: center;
+            gap: 12px; margin-bottom: 12px;
+            padding: 12px; background: #0a0e1a;
+            border-radius: 12px;
+        }
+        .score-team-info { flex: 1; min-width: 0; }
+        .score-team-name { font-size: 15px; font-weight: 700; }
+        .score-team-club { font-size: 11px; color: #8a92a8; }
+        .score-value {
+            font-size: 36px; font-weight: 800;
+            min-width: 60px; text-align: center;
+            color: #fdcb6e;
+        }
+
+        /* ===== LIVE MODAL ===== */
+        .live-modal {
+            position: fixed; inset: 0;
+            background: rgba(0,0,0,0.95); z-index: 1000;
+            display: none; align-items: center; justify-content: center;
+            padding: 20px;
+        }
+        .live-modal.show { display: flex; }
+        .live-modal-content {
+            width: 100%; max-width: 900px;
+            background: #000; border-radius: 16px;
+            overflow: hidden; position: relative;
+        }
+        .live-modal-close {
+            position: absolute; top: 12px; right: 12px;
+            background: #e94560; color: #fff;
+            width: 44px; height: 44px; border-radius: 50%;
+            border: none; font-size: 22px; cursor: pointer;
+            z-index: 10;
+        }
+        .live-modal iframe { width: 100%; aspect-ratio: 16/9; border: none; display: block; }
+        .live-empty { padding: 60px 20px; text-align: center; color: #8a92a8; }
+
+        /* ===== EMPTY ===== */
+        .empty { text-align: center; padding: 60px 20px; color: #8a92a8; }
+        .empty i { font-size: 56px; margin-bottom: 12px; display: block; opacity: 0.4; }
+
+        /* ===== TOAST ===== */
+        .toast {
+            position: fixed; bottom: 100px; left: 50%;
+            transform: translateX(-50%) translateY(100px);
+            background: #00b894; color: #fff;
+            padding: 14px 24px; border-radius: 10px;
+            font-size: 14px; font-weight: 700;
+            box-shadow: 0 8px 30px rgba(0,0,0,0.5);
+            opacity: 0; transition: all 0.3s;
+            z-index: 2000; max-width: 90%; text-align: center;
+        }
+        .toast.show { transform: translateX(-50%) translateY(0); opacity: 1; }
+        .toast.error { background: #e94560; }
+
+        /* ===== LOADING ===== */
+        .loading {
+            position: fixed; inset: 0;
+            background: rgba(0,0,0,0.7); z-index: 3000;
+            display: none; align-items: center; justify-content: center;
+        }
+        .loading.show { display: flex; }
+        .spinner {
+            width: 50px; height: 50px;
+            border: 4px solid #1e2a4a; border-top-color: #e94560;
+            border-radius: 50%; animation: spin 1s linear infinite;
+        }
+        @keyframes spin { to { transform: rotate(360deg); } }
+    </style>
+</head>
+<body>
+
+<!-- LOGIN SCREEN -->
+<div class="login-screen" id="loginScreen">
+    <div class="login-box">
+        <h1>🎾 TRỌNG TÀI</h1>
+        <p>Nhập mã PIN để đăng nhập</p>
+        <input type="tel" id="pinInput" class="pin-input" maxlength="6"
+               placeholder="••••" inputmode="numeric" pattern="[0-9]*"
+               oninput="checkPin()">
+        <div class="pin-hint">Nhập mã PIN 4-6 số được cấp</div>
+    </div>
+</div>
+
+<!-- MAIN APP -->
+<div id="mainApp" style="display: none;">
+    <div class="ref-header">
+        <div class="user-info">
+            <div class="avatar" id="userAvatar">T</div>
+            <div>
+                <div class="user-name" id="userName">Trọng tài</div>
+                <div style="font-size: 11px; color: #8a92a8;">Đang làm việc</div>
+            </div>
+        </div>
+        <button class="logout-btn" onclick="logout()">
+            <i class="fas fa-sign-out-alt"></i> Thoát
+        </button>
+    </div>
+
+    <div class="stats-row">
+        <div class="stat-card">
+            <div class="num" id="statPending">0</div>
+            <div class="lbl">Chưa đấu</div>
+        </div>
+        <div class="stat-card">
+            <div class="num" id="statLive" style="color: #e94560;">0</div>
+            <div class="lbl">Đang đấu</div>
+        </div>
+        <div class="stat-card">
+            <div class="num" id="statFinished" style="color: #00b894;">0</div>
+            <div class="lbl">Đã xong</div>
+        </div>
+    </div>
+
+    <div class="ref-tabs">
+        <button class="ref-tab active" data-filter="all" onclick="setFilter('all', this)">
+            <i class="fas fa-list"></i> Tất cả
+        </button>
+        <button class="ref-tab" data-filter="live" onclick="setFilter('live', this)">
+            <i class="fas fa-circle"></i> Đang đấu
+        </button>
+        <button class="ref-tab" data-filter="pending" onclick="setFilter('pending', this)">
+            <i class="fas fa-clock"></i> Chưa đấu
+        </button>
+        <button class="ref-tab" data-filter="finished" onclick="setFilter('finished', this)">
+            <i class="fas fa-check"></i> Đã xong
+        </button>
+    </div>
+
+    <div class="match-list" id="matchList">
+        <div class="empty">
+            <i class="fas fa-spinner fa-spin"></i>
+            <p>Đang tải...</p>
+        </div>
+    </div>
+</div>
+
+<!-- SCORE PANEL -->
+<div class="score-panel" id="scorePanel">
+    <div class="score-panel-header">
+        <div class="score-panel-title" id="panelTitle">Điều khiển trận đấu</div>
+        <button class="score-panel-close" onclick="closeScorePanel()">×</button>
+    </div>
+    <div class="score-team-row">
+        <div class="score-team-info">
+            <div class="score-team-name" id="panelTeamA">Đội A</div>
+            <div class="score-team-club" id="panelClubA"></div>
+        </div>
+        <button class="btn btn-danger btn-icon" onclick="changeScore('a', -1)">−</button>
+        <span class="score-value" id="panelScoreA">0</span>
+        <button class="btn btn-success btn-icon" onclick="changeScore('a', 1)">+</button>
+    </div>
+    <div class="score-team-row">
+        <div class="score-team-info">
+            <div class="score-team-name" id="panelTeamB">Đội B</div>
+            <div class="score-team-club" id="panelClubB"></div>
+        </div>
+        <button class="btn btn-danger btn-icon" onclick="changeScore('b', -1)">−</button>
+        <span class="score-value" id="panelScoreB">0</span>
+        <button class="btn btn-success btn-icon" onclick="changeScore('b', 1)">+</button>
+    </div>
+    <div style="display: flex; gap: 8px; margin-top: 12px;">
+        <button class="btn btn-warning btn-sm" style="flex: 1;" onclick="finishMatch()">
+            <i class="fas fa-flag-checkered"></i> Kết thúc
+        </button>
+        <button class="btn btn-secondary btn-sm" style="flex: 1;" onclick="resetMatch()">
+            <i class="fas fa-redo"></i> Reset
+        </button>
+    </div>
+</div>
+
+<!-- LIVE MODAL -->
+<div class="live-modal" id="liveModal">
+    <div class="live-modal-content">
+        <button class="live-modal-close" onclick="closeLive()">×</button>
+        <div id="liveContent"></div>
+    </div>
+</div>
+
+<div class="toast" id="toast"></div>
+<div class="loading" id="loading"><div class="spinner"></div></div>
+
+<script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+<script src="config.js"></script>
+
+<script>
+(function() {
+    'use strict';
+
+    const config = window.SPORTSVN_CONFIG || {};
+    const supabase = window.supabase.createClient(config.SUPABASE_URL, config.SUPABASE_ANON_KEY);
+
+    let tournamentId = null;
+    let currentCategory = '';
+    let currentReferee = null;
+    let currentFilter = 'all';
+    let matches = [];
+    let activeMatchId = null;
+    let realtimeChannel = null;
+
+    // ==========================================
+    // INIT
+    // ==========================================
+    function init() {
+        const params = new URLSearchParams(window.location.search);
+        tournamentId = params.get('tournament_id');
+        currentCategory = params.get('category') || '';
+
+        if (!tournamentId) {
+            alert('Thiếu tournament_id!');
+            return;
+        }
+
+        // Kiểm tra PIN đã lưu
+        const savedPin = localStorage.getItem('referee_pin');
+        const savedName = localStorage.getItem('referee_name');
+        const savedRefId = localStorage.getItem('referee_id');
+
+        if (savedPin && savedName && savedRefId) {
+            currentReferee = { id: parseInt(savedRefId), name: savedName, pin: savedPin };
+            showMainApp();
+            loadMatches();
+            setupRealtime();
+        }
+    }
+
+    // ==========================================
+    // LOGIN
+    // ==========================================
+    window.checkPin = function() {
+        const pin = document.getElementById('pinInput').value.trim();
+        if (pin.length >= 4) {
+            // Auto submit khi đủ 4 số
+            setTimeout(() => login(pin), 300);
+        }
+    };
+
+    async function login(pin) {
+        showLoading(true);
+
+        const { data, error } = await supabase
+            .from('referees')
+            .select('*')
+            .eq('tournament_id', tournamentId)
+            .eq('pin', pin)
+            .eq('is_active', true)
+            .single();
+
+        showLoading(false);
+
+        if (error || !data) {
+            showToast('Mã PIN không đúng!', 'error');
+            document.getElementById('pinInput').value = '';
+            return;
+        }
+
+        currentReferee = data;
+        localStorage.setItem('referee_pin', pin);
+        localStorage.setItem('referee_name', data.name);
+        localStorage.setItem('referee_id', data.id.toString());
+
+        showToast(`✅ Xin chào ${data.name}!`);
+        showMainApp();
+        await loadMatches();
+        setupRealtime();
+    }
+
+    window.logout = function() {
+        if (!confirm('Đăng xuất?')) return;
+        localStorage.removeItem('referee_pin');
+        localStorage.removeItem('referee_name');
+        localStorage.removeItem('referee_id');
+        location.reload();
+    };
+
+    function showMainApp() {
+        document.getElementById('loginScreen').style.display = 'none';
+        document.getElementById('mainApp').style.display = 'block';
+        document.getElementById('userName').textContent = currentReferee.name;
+        document.getElementById('userAvatar').textContent = currentReferee.name.charAt(0).toUpperCase();
+    }
+
+    // ==========================================
+    // LOAD MATCHES
+    // ==========================================
+    async function loadMatches() {
+        let query = supabase
+            .from('matches')
+            .select('*')
+            .eq('tournament_id', tournamentId)
+            .order('round_order')
+            .order('match_number');
+
+        if (currentCategory) query = query.eq('category', currentCategory);
+
+        const { data, error } = await query;
+
+        if (error) {
+            showToast('Lỗi tải trận: ' + error.message, 'error');
+            return;
+        }
+        matches = data || [];
+        renderAll();
+    }
+
+    // ==========================================
+    // REALTIME
+    // ==========================================
+    function setupRealtime() {
+        if (realtimeChannel) supabase.removeChannel(realtimeChannel);
+
+        realtimeChannel = supabase
+            .channel('matches-live')
+            .on('postgres_changes',
+                { event: '*', schema: 'public', table: 'matches', filter: `tournament_id=eq.${tournamentId}` },
+                () => { loadMatches(); }
+            )
+            .subscribe();
+    }
+
+    // ==========================================
+    // RENDER
+    // ==========================================
+    function renderAll() {
+        renderStats();
+        renderMatchList();
+    }
+
+    function renderStats() {
+        document.getElementById('statPending').textContent = matches.filter(m => m.status === 'pending').length;
+        document.getElementById('statLive').textContent = matches.filter(m => m.status === 'live').length;
+        document.getElementById('statFinished').textContent = matches.filter(m => m.status === 'finished').length;
+    }
+
+    function renderMatchList() {
+        const container = document.getElementById('matchList');
+        let filtered = matches;
+        if (currentFilter !== 'all') filtered = filtered.filter(m => m.status === currentFilter);
+
+        if (filtered.length === 0) {
+            container.innerHTML = `<div class="empty"><i class="fas fa-inbox"></i><p>Không có trận nào</p></div>`;
+            return;
+        }
+        container.innerHTML = filtered.map(renderMatchCard).join('');
+    }
+
+    function renderMatchCard(m) {
+        const statusText = { pending: '⏳ Chưa đấu', live: '🔴 Đang đấu', finished: '✅ Đã xong' }[m.status];
+        const hasYoutube = !!m.youtube_url;
+        const winnerA = m.status === 'finished' && m.score_a > m.score_b;
+        const winnerB = m.status === 'finished' && m.score_b > m.score_a;
+
+        return `
+            <div class="match-card ${m.status}">
+                <div class="match-card-header">
+                    <span class="match-code">${escapeHtml(m.round_name)} - T${m.match_number}</span>
+                    <span class="match-status ${m.status}">${statusText}</span>
+                </div>
+                <div class="match-meta">
+                    ${m.court ? `<span><i class="fas fa-table-tennis"></i> Sân ${m.court}</span>` : ''}
+                    ${m.match_time ? `<span><i class="fas fa-clock"></i> ${new Date(m.match_time).toLocaleTimeString('vi-VN', {hour:'2-digit', minute:'2-digit'})}</span>` : ''}
+                    ${hasYoutube ? `<span><i class="fas fa-video" style="color:#e94560;"></i> Có live</span>` : ''}
+                </div>
+                <div class="team-row">
+                    <div class="team-info ${winnerA ? 'winner' : (winnerB ? 'loser' : '')}">
+                        <div class="team-name">${escapeHtml(m.team_a_name || 'TBD')}</div>
+                        <div class="team-club">${escapeHtml(m.team_a_club || '')}</div>
+                    </div>
+                    <span class="score-display ${winnerA ? 'winner' : (winnerB ? 'loser' : '')}">${m.score_a || 0}</span>
+                </div>
+                <div class="team-row">
+                    <div class="team-info ${winnerB ? 'winner' : (winnerA ? 'loser' : '')}">
+                        <div class="team-name">${escapeHtml(m.team_b_name || 'TBD')}</div>
+                        <div class="team-club">${escapeHtml(m.team_b_club || '')}</div>
+                    </div>
+                    <span class="score-display ${winnerB ? 'winner' : (winnerA ? 'loser' : '')}">${m.score_b || 0}</span>
+                </div>
+                <div style="display: flex; gap: 8px; margin-top: 12px;">
+                    ${m.status === 'pending' ? `
+                        <button class="btn btn-success btn-sm" style="flex: 1;" onclick="startMatch(${m.id})">
+                            <i class="fas fa-play"></i> Bắt đầu
+                        </button>
+                    ` : ''}
+                    ${m.status === 'live' ? `
+                        <button class="btn btn-warning btn-sm" style="flex: 2;" onclick="openScorePanel(${m.id})">
+                            <i class="fas fa-edit"></i> Điều khiển
+                        </button>
+                    ` : ''}
+                    ${m.status === 'finished' ? `
+                        <button class="btn btn-secondary btn-sm" style="flex: 1;" onclick="openScorePanel(${m.id})">
+                            <i class="fas fa-eye"></i> Xem
+                        </button>
+                    ` : ''}
+                    ${hasYoutube ? `
+                        <button class="btn btn-danger btn-sm" onclick="openLive(${m.id})">
+                            <i class="fas fa-video"></i>
+                        </button>
+                    ` : ''}
+                </div>
+            </div>
+        `;
+    }
+
+    // ==========================================
+    // FILTER
+    // ==========================================
+    window.setFilter = function(filter, btn) {
+        currentFilter = filter;
+        document.querySelectorAll('.ref-tab').forEach(b => b.classList.remove('active'));
+        btn.classList.add('active');
+        renderMatchList();
+    };
+
+    // ==========================================
+    // MATCH CONTROL
+    // ==========================================
+    window.startMatch = async function(matchId) {
+        if (!confirm('Bắt đầu trận này?')) return;
+        showLoading(true);
+        const { error } = await supabase.from('matches').update({
+            status: 'live',
+            started_at: new Date().toISOString(),
+            referee_id: currentReferee.id,
+            updated_at: new Date().toISOString()
+        }).eq('id', matchId);
+        showLoading(false);
+        if (error) { showToast('Lỗi: ' + error.message, 'error'); return; }
+        showToast('✅ Đã bắt đầu trận!');
+        loadMatches();
+    };
+
+    window.openScorePanel = function(matchId) {
+        const m = matches.find(x => x.id === matchId);
+        if (!m) return;
+        activeMatchId = matchId;
+        document.getElementById('panelTitle').textContent = `${m.round_name} - T${m.match_number}`;
+        document.getElementById('panelTeamA').textContent = m.team_a_name || 'TBD';
+        document.getElementById('panelClubA').textContent = m.team_a_club || '';
+        document.getElementById('panelTeamB').textContent = m.team_b_name || 'TBD';
+        document.getElementById('panelClubB').textContent = m.team_b_club || '';
+        document.getElementById('panelScoreA').textContent = m.score_a || 0;
+        document.getElementById('panelScoreB').textContent = m.score_b || 0;
+        document.getElementById('scorePanel').classList.add('show');
+    };
+
+    window.closeScorePanel = function() {
+        document.getElementById('scorePanel').classList.remove('show');
+        activeMatchId = null;
+    };
+
+    window.changeScore = async function(side, delta) {
+        if (!activeMatchId) return;
+        const m = matches.find(x => x.id === activeMatchId);
+        if (!m) return;
+        const field = side === 'a' ? 'score_a' : 'score_b';
+        const newVal = Math.max(0, (m[field] || 0) + delta);
+        m[field] = newVal;
+        document.getElementById(side === 'a' ? 'panelScoreA' : 'panelScoreB').textContent = newVal;
+
+        const { error } = await supabase.from('matches').update({
+            [field]: newVal, updated_at: new Date().toISOString()
+        }).eq('id', activeMatchId);
+        if (error) showToast('Lỗi lưu: ' + error.message, 'error');
+    };
+
+    window.finishMatch = async function() {
+        if (!activeMatchId) return;
+        const m = matches.find(x => x.id === activeMatchId);
+        if (!m) return;
+        if (m.score_a === m.score_b) { showToast('⚠️ Tỷ số hòa!', 'error'); return; }
+        if (!confirm(`Kết thúc trận?\n${m.team_a_name} ${m.score_a} - ${m.score_b} ${m.team_b_name}`)) return;
+
+        showLoading(true);
+        const { error } = await supabase.from('matches').update({
+            status: 'finished',
+            finished_at: new Date().toISOString(),
+            updated_at: new Date().toISOString()
+        }).eq('id', activeMatchId);
+        showLoading(false);
+        if (error) { showToast('Lỗi: ' + error.message, 'error'); return; }
+        showToast('✅ Đã kết thúc!');
+        closeScorePanel();
+        loadMatches();
+    };
+
+    window.resetMatch = async function() {
+        if (!activeMatchId) return;
+        if (!confirm('Reset trận này?')) return;
+        showLoading(true);
+        const { error } = await supabase.from('matches').update({
+            score_a: 0, score_b: 0, sets_a: 0, sets_b: 0,
+            status: 'pending', started_at: null, finished_at: null,
+            updated_at: new Date().toISOString()
+        }).eq('id', activeMatchId);
+        showLoading(false);
+        if (error) { showToast('Lỗi: ' + error.message, 'error'); return; }
+        showToast('✅ Đã reset!');
+        closeScorePanel();
+        loadMatches();
+    };
+
+    // ==========================================
+    // LIVE
+    // ==========================================
+    window.openLive = function(matchId) {
+        const m = matches.find(x => x.id === matchId);
+        if (!m || !m.youtube_url) {
+            showToast('Chưa có link YouTube cho trận này!', 'error');
+            return;
+        }
+        const embedUrl = getYouTubeEmbedUrl(m.youtube_url);
+        const content = document.getElementById('liveContent');
+        if (embedUrl) {
+            content.innerHTML = `<iframe src="${embedUrl}" allow="autoplay; encrypted-media" allowfullscreen></iframe>`;
+        } else {
+            content.innerHTML = `<div class="live-empty"><i class="fas fa-video-slash"></i><p>Link không hợp lệ</p></div>`;
+        }
+        document.getElementById('liveModal').classList.add('show');
+    };
+
+    window.closeLive = function() {
+        document.getElementById('liveModal').classList.remove('show');
+        document.getElementById('liveContent').innerHTML = '';
+    };
+
+    function getYouTubeEmbedUrl(url) {
+        if (!url) return null;
+        const patterns = [
+            /(?:youtube\.com\/watch\?v=|youtu\.be\/|youtube\.com\/live\/|youtube\.com\/embed\/)([a-zA-Z0-9_-]{11})/,
+        ];
+        for (const p of patterns) {
+            const match = url.match(p);
+            if (match) return `https://www.youtube.com/embed/${match[1]}?autoplay=1`;
+        }
+        return null;
+    }
+
+    // ==========================================
+    // HELPERS
+    // ==========================================
+    function showToast(msg, type) {
+        const el = document.getElementById('toast');
+        el.textContent = msg;
+        el.className = 'toast show' + (type === 'error' ? ' error' : '');
+        setTimeout(() => el.classList.remove('show'), 3000);
+    }
+
+    function showLoading(show) {
+        document.getElementById('loading').classList.toggle('show', show);
+    }
+
+    function escapeHtml(text) {
+        return String(text || '').replace(/&/g, '&amp;').replace(/</g, '&lt;')
+            .replace(/>/g, '&gt;').replace(/"/g, '&quot;');
+    }
+
+    init();
+})();
+</script>
+</body>
+</html>
