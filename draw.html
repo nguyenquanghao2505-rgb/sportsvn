@@ -269,10 +269,7 @@
         .group-team .team-club { font-size: 12px; color: #6c757d; margin-top: 2px; display: block; }
         .group-team .team-club.has-club { color: #1a3a7a; font-weight: 600; }
 
-        /* ===== BRACKET TREE ===== */
-        .bracket-tabs {
-            display: flex; gap: 8px; margin-bottom: 16px; flex-wrap: wrap;
-        }
+        .bracket-tabs { display: flex; gap: 8px; margin-bottom: 16px; flex-wrap: wrap; }
         .bracket-tab-btn {
             padding: 10px 18px; border-radius: 8px; font-size: 13px;
             font-weight: 700; cursor: pointer; border: 2px solid #e9ecef;
@@ -288,165 +285,90 @@
             border: 1px solid #e9ecef;
         }
         .bracket-tree {
-            display: inline-flex;
-            gap: 0;
+            display: inline-flex; gap: 0;
             min-width: max-content;
-            align-items: flex-start;
-            position: relative;
+            align-items: flex-start; position: relative;
         }
-        .bracket-round {
-            display: flex;
-            flex-direction: column;
-            flex-shrink: 0;
-        }
+        .bracket-round { display: flex; flex-direction: column; flex-shrink: 0; }
         .bracket-round-header {
             text-align: center; color: #fff;
             font-size: 11px; font-weight: 700;
-            text-transform: uppercase;
-            letter-spacing: 0.5px;
+            text-transform: uppercase; letter-spacing: 0.5px;
             background: linear-gradient(135deg, #0d1b3e, #1a3a7a);
-            padding: 8px;
-            border-radius: 6px;
-            margin-bottom: 8px;
+            padding: 8px; border-radius: 6px; margin-bottom: 8px;
             white-space: nowrap;
         }
-        .bracket-round-body {
-            display: flex;
-            flex-direction: column;
-            position: relative;
-        }
+        .bracket-round-body { display: flex; flex-direction: column; position: relative; }
         .bracket-match {
-            display: flex;
-            flex-direction: column;
-            border: 1px solid #dee2e6;
-            border-left: 3px solid #1a3a7a;
-            border-radius: 6px;
-            background: #fff;
-            margin: 3px 0;
-            padding: 4px 6px;
-            position: relative;
-            min-height: 40px;
-            justify-content: center;
-            transition: all 0.2s;
+            display: flex; flex-direction: column;
+            border: 1px solid #dee2e6; border-left: 3px solid #1a3a7a;
+            border-radius: 6px; background: #fff;
+            margin: 3px 0; padding: 4px 6px;
+            position: relative; min-height: 40px;
+            justify-content: center; transition: all 0.2s;
         }
         .bracket-match:hover {
             border-left-color: #0984e3;
             box-shadow: 0 2px 8px rgba(9,132,227,0.15);
         }
-        .bracket-match.bye {
-            border-left-color: #fdcb6e;
-            background: #fff9e6;
-        }
-        .bracket-match.placeholder {
-            border-left-color: #adb5bd;
-            background: #f8f9fa;
-        }
+        .bracket-match.bye { border-left-color: #fdcb6e; background: #fff9e6; }
+        .bracket-match.placeholder { border-left-color: #adb5bd; background: #f8f9fa; }
         .bracket-match .match-label {
-            position: absolute;
-            top: 2px; right: 6px;
-            font-size: 9px;
-            color: #adb5bd;
-            font-weight: 700;
+            position: absolute; top: 2px; right: 6px;
+            font-size: 9px; color: #adb5bd; font-weight: 700;
         }
         .bracket-match .player {
-            font-size: 11px;
-            font-weight: 600;
-            color: #1a1a2e;
-            padding: 2px 0;
-            display: flex;
-            justify-content: space-between;
-            align-items: center;
-            gap: 6px;
-            line-height: 1.3;
+            font-size: 11px; font-weight: 600; color: #1a1a2e;
+            padding: 2px 0; display: flex; justify-content: space-between;
+            align-items: center; gap: 6px; line-height: 1.3;
         }
         .bracket-match .player .name {
-            flex: 1;
-            overflow: hidden;
-            text-overflow: ellipsis;
-            white-space: nowrap;
+            flex: 1; overflow: hidden;
+            text-overflow: ellipsis; white-space: nowrap;
         }
         .bracket-match .player .club {
-            font-size: 9px;
-            color: #1a3a7a;
-            background: #e7eefc;
-            padding: 1px 4px;
-            border-radius: 3px;
-            font-weight: 700;
-            flex-shrink: 0;
+            font-size: 9px; color: #1a3a7a; background: #e7eefc;
+            padding: 1px 4px; border-radius: 3px; font-weight: 700; flex-shrink: 0;
         }
-        .bracket-match .player.bye {
-            color: #856404;
-            font-style: italic;
-        }
+        .bracket-match .player.bye { color: #856404; font-style: italic; }
         .bracket-match .player.bye .byex {
-            background: #fdcb6e;
-            color: #856404;
-            font-size: 9px;
-            font-weight: 800;
-            padding: 1px 5px;
-            border-radius: 3px;
+            background: #fdcb6e; color: #856404;
+            font-size: 9px; font-weight: 800;
+            padding: 1px 5px; border-radius: 3px;
         }
-        .bracket-match .player.placeholder {
-            color: #adb5bd;
-            font-style: italic;
-        }
-        .bracket-match .match-sep {
-            height: 1px;
-            background: #e9ecef;
-            margin: 1px 0;
-        }
+        .bracket-match .player.placeholder { color: #adb5bd; font-style: italic; }
+        .bracket-match .match-sep { height: 1px; background: #e9ecef; margin: 1px 0; }
         .bracket-match .edit-btn {
-            position: absolute;
-            top: 2px; left: 4px;
-            background: transparent;
-            border: none;
-            color: #adb5bd;
-            cursor: pointer;
-            font-size: 10px;
-            padding: 2px;
-            opacity: 0;
-            transition: opacity 0.2s;
+            position: absolute; top: 2px; left: 4px;
+            background: transparent; border: none;
+            color: #adb5bd; cursor: pointer;
+            font-size: 10px; padding: 2px;
+            opacity: 0; transition: opacity 0.2s;
         }
         .bracket-match:hover .edit-btn { opacity: 1; color: #0984e3; }
         .bracket-match .edit-btn:hover { color: #e94560; transform: scale(1.2); }
 
-        .bracket-connector {
-            flex-shrink: 0;
-            position: relative;
-        }
-        .bracket-connector svg {
-            display: block;
-        }
+        .bracket-connector { flex-shrink: 0; position: relative; }
+        .bracket-connector svg { display: block; }
         .connector-label {
-            position: absolute;
-            background: #fff;
-            border: 1px solid #1a3a7a;
-            border-radius: 4px;
-            padding: 2px 6px;
-            font-size: 9px;
-            color: #1a3a7a;
-            font-weight: 700;
-            white-space: nowrap;
-            z-index: 2;
+            position: absolute; background: #fff;
+            border: 1px solid #1a3a7a; border-radius: 4px;
+            padding: 2px 6px; font-size: 9px;
+            color: #1a3a7a; font-weight: 700;
+            white-space: nowrap; z-index: 2;
             pointer-events: none;
         }
         .connector-label.bk {
-            background: #e94560;
-            color: #fff;
-            border-color: #e94560;
-            font-size: 10px;
+            background: #e94560; color: #fff;
+            border-color: #e94560; font-size: 10px;
         }
 
-        .slot-table {
-            width: 100%; border-collapse: collapse; font-size: 13px; background: #fff;
-        }
+        .slot-table { width: 100%; border-collapse: collapse; font-size: 13px; background: #fff; }
         .slot-table th {
             background: #1a3a7a; color: #fff; padding: 10px;
             border: 1px solid #dee2e6; text-align: center; font-size: 12px;
         }
-        .slot-table td {
-            padding: 8px 10px; border: 1px solid #dee2e6;
-        }
+        .slot-table td { padding: 8px 10px; border: 1px solid #dee2e6; }
         .slot-table tr.bye-row { background: #fff9e6; }
         .slot-table tr.bye-row td { color: #856404; font-style: italic; }
 
@@ -520,6 +442,24 @@
             border-radius: 50%; animation: spin 0.8s linear infinite;
         }
         @keyframes spin { to { transform: rotate(360deg); } }
+
+        /* Session config cards */
+        .session-card {
+            background: #fff; border: 1px solid #e9ecef;
+            border-radius: 8px; padding: 10px 12px;
+            transition: all 0.2s;
+        }
+        .session-card:hover { border-color: #1a3a7a; }
+        .session-checkbox-label {
+            display: flex; align-items: center; gap: 4px;
+            font-size: 12px; cursor: pointer;
+            padding: 4px 8px; border-radius: 6px;
+            background: #f8f9fa; border: 1px solid #e9ecef;
+            transition: all 0.2s;
+        }
+        .session-checkbox-label.checked {
+            background: #e7f3ff; border-color: #0984e3;
+        }
 
         @media (max-width: 768px) {
             .form-row-add { grid-template-columns: 1fr; }
@@ -650,9 +590,10 @@
             <div class="form-group" style="max-width: 300px;">
                 <label>Số bảng</label>
                 <select id="num-groups-even">
-                    <option value="2">2 bảng</option>
+                    <option value="1">1 bảng</option>
+                    <option value="2" selected>2 bảng</option>
                     <option value="3">3 bảng</option>
-                    <option value="4" selected>4 bảng</option>
+                    <option value="4">4 bảng</option>
                     <option value="5">5 bảng</option>
                     <option value="6">6 bảng</option>
                     <option value="8">8 bảng</option>
@@ -663,6 +604,7 @@
             <div class="form-group" style="max-width: 400px; margin-bottom: 12px;">
                 <label>Chọn số bảng</label>
                 <select id="num-groups-custom" onchange="renderCustomGroupsInputs()">
+                    <option value="1">1 bảng</option>
                     <option value="2">2 bảng</option>
                     <option value="3" selected>3 bảng</option>
                     <option value="4">4 bảng</option>
@@ -697,10 +639,12 @@
         </div>
     </div>
 
+    <!-- BƯỚC 4: CẤU HÌNH LỊCH THI ĐẤU LINH HOẠT -->
     <div class="draw-panel">
         <div class="panel-title">
             <span class="step-num">4</span> Cấu hình lịch thi đấu (tùy chọn)
         </div>
+
         <div class="config-row">
             <div class="form-group">
                 <label>Ngày bắt đầu</label>
@@ -708,20 +652,18 @@
             </div>
             <div class="form-group">
                 <label>Số ngày thi đấu</label>
-                <input type="number" id="num-days" value="3" min="1" max="10">
+                <input type="number" id="num-days" value="3" min="1" max="30" onchange="renderSessionsConfig()">
             </div>
+            <div class="form-group">
+                <label>Số buổi thi đấu</label>
+                <input type="number" id="num-sessions" value="5" min="1" max="60" onchange="renderSessionsConfig()">
+            </div>
+        </div>
+
+        <div class="config-row">
             <div class="form-group">
                 <label>Số bàn thi đấu</label>
                 <input type="number" id="num-tables" value="4" min="1" max="20">
-            </div>
-        </div>
-        <div class="config-row">
-            <div class="form-group">
-                <label>Ca thi đấu mỗi ngày</label>
-                <select id="sessions-per-day">
-                    <option value="2">Sáng + Chiều</option>
-                    <option value="3" selected>Sáng + Chiều + Tối</option>
-                </select>
             </div>
             <div class="form-group">
                 <label>Giờ bắt đầu Sáng</label>
@@ -731,6 +673,30 @@
                 <label>Giờ bắt đầu Chiều</label>
                 <input type="time" id="time-afternoon" value="13:30">
             </div>
+        </div>
+
+        <div class="config-row">
+            <div class="form-group">
+                <label>Giờ bắt đầu Tối</label>
+                <input type="time" id="time-evening" value="18:00">
+            </div>
+            <div class="form-group">
+                <label>Buổi bế mạc (chung kết)</label>
+                <select id="closing-session" onchange="renderSessionsConfig()">
+                    <option value="auto">Tự động (buổi cuối)</option>
+                    <option value="Sáng">Sáng</option>
+                    <option value="Chiều" selected>Chiều</option>
+                    <option value="Tối">Tối</option>
+                </select>
+            </div>
+        </div>
+
+        <div class="config-box" style="border-left-color:#00b894;">
+            <h4><i class="fas fa-calendar-alt" style="color:#00b894;"></i> Chi tiết từng buổi</h4>
+            <p style="font-size:13px;color:#6c757d;margin-bottom:12px;">
+                Tick chọn các ca diễn ra trong từng buổi. Hệ thống sẽ tự động gán ngày/giờ/bàn cho từng trận.
+            </p>
+            <div id="sessions-config"></div>
         </div>
     </div>
 
@@ -832,10 +798,11 @@
 (function() {
     'use strict';
 
-    console.log('🚀 draw.html v8 - Full file, single script');
+    console.log('🚀 draw.html v9 - Full fix + flexible schedule');
 
     const config = window.SPORTSVN_CONFIG || {};
     const supabaseClient = window.supabase.createClient(config.SUPABASE_URL, config.SUPABASE_ANON_KEY);
+    window.supabaseClient = supabaseClient;  // ← FIX: expose to window
 
     let tournamentId = null;
     let currentCategory = '';
@@ -852,6 +819,7 @@
     async function loadCategories() {
         const urlParams = new URLSearchParams(window.location.search);
         tournamentId = urlParams.get('tournament_id');
+        window.tournamentId = tournamentId;  // ← FIX: expose to window
         if (!tournamentId) { alert('Thiếu ID giải đấu!'); window.location.href = 'tournaments.html'; return; }
         console.log('📌 Tournament ID:', tournamentId);
 
@@ -1134,6 +1102,91 @@
             checkEl.className = 'total-check error';
         }
     };
+
+    // ==========================================
+    // SESSIONS CONFIG (NEW)
+    // ==========================================
+    window.renderSessionsConfig = function() {
+        const numDays = parseInt(document.getElementById('num-days')?.value) || 3;
+        const numSessions = parseInt(document.getElementById('num-sessions')?.value) || 5;
+        const container = document.getElementById('sessions-config');
+        if (!container) return;
+
+        const allSessions = ['Sáng', 'Chiều', 'Tối'];
+        const sessionsPerDay = Math.ceil(numSessions / numDays);
+        const closingChoice = document.getElementById('closing-session')?.value || 'auto';
+
+        let html = '<div style="display:grid;grid-template-columns:repeat(auto-fill,minmax(260px,1fr));gap:10px;">';
+
+        for (let i = 0; i < numSessions; i++) {
+            const dayNum = Math.floor(i / sessionsPerDay) + 1;
+            const isClosing = (i === numSessions - 1);
+            const sessionId = `session-${i}`;
+
+            // Tính suggested sessions cho buổi này
+            let suggested = [];
+            if (isClosing) {
+                if (closingChoice === 'auto') {
+                    suggested = ['Chiều'];
+                } else {
+                    suggested = [closingChoice];
+                }
+            } else {
+                const idxInDay = i % sessionsPerDay;
+                if (sessionsPerDay === 1) suggested = ['Chiều'];
+                else if (sessionsPerDay === 2) suggested = ['Sáng', 'Chiều'][idxInDay] ? [['Sáng', 'Chiều'][idxInDay]] : ['Chiều'];
+                else suggested = [allSessions[idxInDay % 3] || 'Chiều'];
+            }
+
+            html += `
+                <div class="session-card">
+                    <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:8px;">
+                        <strong style="font-size:13px;color:#1a3a7a;">Buổi ${i + 1}</strong>
+                        <span style="font-size:11px;color:#6c757d;">Ngày ${dayNum}</span>
+                        ${isClosing ? '<span style="font-size:10px;background:#fdcb6e;color:#856404;padding:2px 6px;border-radius:4px;font-weight:700;">BẾ MẠC</span>' : ''}
+                    </div>
+                    <div style="display:flex;gap:6px;flex-wrap:wrap;">
+                        ${allSessions.map(sess => `
+                            <label class="session-checkbox-label ${suggested.includes(sess) ? 'checked' : ''}"
+                                   style="${suggested.includes(sess) ? 'background:#e7f3ff;border-color:#0984e3;' : ''}">
+                                <input type="checkbox" class="session-checkbox"
+                                       data-session-index="${i}" value="${sess}"
+                                       ${suggested.includes(sess) ? 'checked' : ''}
+                                       onchange="this.parentElement.classList.toggle('checked', this.checked); this.parentElement.style.background = this.checked ? '#e7f3ff' : '#f8f9fa'; this.parentElement.style.borderColor = this.checked ? '#0984e3' : '#e9ecef';">
+                                ${sess}
+                            </label>
+                        `).join('')}
+                    </div>
+                </div>
+            `;
+        }
+        html += '</div>';
+        container.innerHTML = html;
+    };
+
+    function getSessionsConfig() {
+        const numSessions = parseInt(document.getElementById('num-sessions')?.value) || 5;
+        const startDate = document.getElementById('start-date')?.value || '2026-07-03';
+        const timeMorning = document.getElementById('time-morning')?.value || '07:30';
+        const timeAfternoon = document.getElementById('time-afternoon')?.value || '13:30';
+        const timeEvening = document.getElementById('time-evening')?.value || '18:00';
+        const numTables = parseInt(document.getElementById('num-tables')?.value) || 4;
+        const numDays = parseInt(document.getElementById('num-days')?.value) || 3;
+        const sessionsPerDay = Math.ceil(numSessions / numDays);
+
+        const sessions = [];
+        for (let i = 0; i < numSessions; i++) {
+            const checked = document.querySelectorAll(`.session-checkbox[data-session-index="${i}"]:checked`);
+            const sessionTypes = Array.from(checked).map(cb => cb.value);
+            sessions.push({
+                index: i,
+                day: Math.floor(i / sessionsPerDay),
+                types: sessionTypes.length > 0 ? sessionTypes : ['Chiều'],
+            });
+        }
+
+        return { startDate, numSessions, numTables, sessions, timeMorning, timeAfternoon, timeEvening, numDays };
+    }
 
     // ==========================================
     // PERFORM DRAW
@@ -1804,49 +1857,86 @@
     };
 
     // ==========================================
-    // GÁN LỊCH
+    // GÁN LỊCH (SỬ DỤNG SESSIONS CONFIG MỚI)
     // ==========================================
     function buildScheduleConfig() {
+        const raw = getSessionsConfig();
         return {
-            startDate: document.getElementById('start-date')?.value || '2026-07-03',
-            numDays: parseInt(document.getElementById('num-days')?.value) || 3,
-            numTables: parseInt(document.getElementById('num-tables')?.value) || 4,
-            sessionsPerDay: parseInt(document.getElementById('sessions-per-day')?.value) || 3,
-            timeMorning: document.getElementById('time-morning')?.value || '07:30',
-            timeAfternoon: document.getElementById('time-afternoon')?.value || '13:30',
+            startDate: raw.startDate,
+            numDays: raw.numDays,
+            numTables: raw.numTables,
+            numSessions: raw.numSessions,
+            sessions: raw.sessions,
+            timeMorning: raw.timeMorning,
+            timeAfternoon: raw.timeAfternoon,
+            timeEvening: raw.timeEvening,
         };
     }
-    function getSessionLabels(n) {
-        if (n === 2) return ['Sáng', 'Chiều'];
-        if (n === 3) return ['Sáng', 'Chiều', 'Tối'];
-        return ['Sáng', 'Chiều', 'Tối', 'Đêm'];
-    }
-    function getSessionTime(session, cfg) {
-        if (session === 'Sáng') return cfg.timeMorning;
-        if (session === 'Chiều') return cfg.timeAfternoon;
-        if (session === 'Tối') return '18:00';
-        return '20:00';
-    }
+
     function formatDateVN(dateStr) {
         const d = new Date(dateStr);
         return `${d.getDate()}/${d.getMonth() + 1}`;
     }
+
     function assignScheduleToMatches(matches, cfg) {
-        const sessions = getSessionLabels(cfg.sessionsPerDay);
         const startDate = new Date(cfg.startDate);
         const result = [];
-        let slotIndex = 0;
-        for (const match of matches) {
-            const dayIndex = Math.floor(slotIndex / (sessions.length * cfg.numTables));
-            const sessionIndex = Math.floor((slotIndex % (sessions.length * cfg.numTables)) / cfg.numTables);
-            const tableIndex = (slotIndex % cfg.numTables) + 1;
-            const date = new Date(startDate);
-            date.setDate(date.getDate() + dayIndex);
-            const session = sessions[sessionIndex] || 'Sáng';
-            const time = getSessionTime(session, cfg);
-            result.push({ ...match, date: formatDateVN(date), fullDate: date.toISOString().slice(0, 10), session, time, table: tableIndex, slotIndex });
-            slotIndex++;
+        let matchIndex = 0;
+
+        for (const session of cfg.sessions) {
+            if (matchIndex >= matches.length) break;
+
+            for (const sessionType of session.types) {
+                if (matchIndex >= matches.length) break;
+
+                const time = sessionType === 'Sáng' ? cfg.timeMorning
+                           : sessionType === 'Chiều' ? cfg.timeAfternoon
+                           : cfg.timeEvening;
+
+                for (let tableIdx = 0; tableIdx < cfg.numTables; tableIdx++) {
+                    if (matchIndex >= matches.length) break;
+
+                    const date = new Date(startDate);
+                    date.setDate(date.getDate() + session.day);
+
+                    result.push({
+                        ...matches[matchIndex],
+                        date: formatDateVN(date),
+                        fullDate: date.toISOString().slice(0, 10),
+                        session: sessionType,
+                        time: time,
+                        table: tableIdx + 1,
+                        sessionIndex: session.index,
+                        matchIndexInSession: tableIdx,
+                    });
+                    matchIndex++;
+                }
+            }
         }
+
+        // Nếu còn trận chưa gán
+        const lastSession = cfg.sessions[cfg.sessions.length - 1];
+        const lastSessionType = lastSession.types[lastSession.types.length - 1] || 'Chiều';
+        const lastTime = lastSessionType === 'Sáng' ? cfg.timeMorning
+                       : lastSessionType === 'Chiều' ? cfg.timeAfternoon
+                       : cfg.timeEvening;
+        let overflowIdx = 0;
+        while (matchIndex < matches.length) {
+            const date = new Date(startDate);
+            date.setDate(date.getDate() + lastSession.day);
+            result.push({
+                ...matches[matchIndex],
+                date: formatDateVN(date),
+                fullDate: date.toISOString().slice(0, 10),
+                session: lastSessionType,
+                time: lastTime,
+                table: (overflowIdx % cfg.numTables) + 1,
+                sessionIndex: lastSession.index,
+            });
+            matchIndex++;
+            overflowIdx++;
+        }
+
         return result;
     }
 
@@ -2129,12 +2219,12 @@
     }
 
     // ==========================================
-    // EXPORT EXCEL
+    // EXPORT EXCEL (FIXED)
     // ==========================================
     window.exportExcelAdvanced = async function() {
-        const result = getLastResult();
+        const result = lastResult;
         if (!result) { showAlert('Chưa có kết quả để xuất!', 'error'); return; }
-        const category = getCurrentCategory() || 'BocTham';
+        const category = currentCategory || 'BocTham';
         showLoading('Đang tạo file Excel...');
         try {
             const wb = new ExcelJS.Workbook();
@@ -2161,9 +2251,9 @@
     };
 
     window.exportCurrentSheet = async function() {
-        const result = getLastResult();
+        const result = lastResult;
         if (!result) { showAlert('Chưa có kết quả để xuất!', 'error'); return; }
-        const category = getCurrentCategory() || 'BocTham';
+        const category = currentCategory || 'BocTham';
         showLoading('Đang tạo file Excel...');
         try {
             const wb = new ExcelJS.Workbook();
@@ -2188,13 +2278,13 @@
     };
 
     // ==========================================
-    // LƯU DATABASE
+    // LƯU DATABASE (FIXED)
     // ==========================================
     window.saveToDatabase = async function() {
-        const result = getLastResult();
-        const category = getCurrentCategory();
-        const tournamentId = getTournamentId();
-        const supabaseClient = getSupabase();
+        const result = lastResult;
+        const category = currentCategory;
+        const tournamentId = window.tournamentId;
+        const supabaseClient = window.supabaseClient;
         if (!result) { showAlert('Chưa có kết quả.', 'error'); return; }
         if (!category) { showAlert('Chưa chọn nội dung.', 'error'); return; }
         if (!tournamentId) { showAlert('Không có ID giải đấu.', 'error'); return; }
@@ -2294,7 +2384,8 @@
     // ==========================================
     renderTeams();
     loadCategories();
-    console.log('✅ draw.html v8 - Single script loaded');
+    renderSessionsConfig();
+    console.log('✅ draw.html v9 - Fixed + flexible schedule loaded');
 })();
 </script>
 </body>
