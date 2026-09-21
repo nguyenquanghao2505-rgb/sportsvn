@@ -452,7 +452,7 @@
 (function() {
     'use strict';
 
-    console.log('🚀 draw.html v16 - Branches Upper/Lower');
+    console.log('🚀 draw.html v17 - Compact Excel Layout');
 
     const config = window.SPORTSVN_CONFIG || {};
     const supabaseClient = window.supabase.createClient(config.SUPABASE_URL, config.SUPABASE_ANON_KEY);
@@ -546,7 +546,6 @@
         }
         return names;
     }
-    // Lấy tên bảng từ tên đội: "Nhất A" → "A"
     function getGroupLetter(name) {
         if (!name) return null;
         return name.replace('Nhất ', '').replace('Nhì ', '').trim();
@@ -984,7 +983,6 @@
         const autoLabel = getAutoRoundLabel(bracketSize);
         const finalLabel = (result.koRoundLabel === 'auto' || !result.koRoundLabel) ? autoLabel : result.koRoundLabel;
 
-        // Chọn BYE tự động
         if (koState.selectedByes.length === 0 && numByes > 0) {
             const priorityInput = result.koByePriorityInput || '';
             const priorityGroups = priorityInput.split(',').map(s => s.trim().toUpperCase()).filter(s => s.length > 0);
@@ -1008,38 +1006,30 @@
             }
         }
 
-        // ==========================================================
-        // GHÉP CẶP: CHIA NHÁNH TRÊN / DƯỚI
-        // Nhánh TRÊN: Nhất A, C, E, G... + Nhì B, D, F, H...
-        // Nhánh DƯỚI: Nhất B, D, F, H... + Nhì A, C, E, G...
-        // ==========================================================
         const champs = koState.selectedChampions.filter(c => !koState.selectedByes.includes(c));
         const runners = koState.selectedRunnersUp.filter(r => !koState.selectedByes.includes(r));
 
         champs.sort((a, b) => a.localeCompare(b));
         runners.sort((a, b) => a.localeCompare(b));
 
-        // Tách Nhất/Nhì theo nhánh
         const upperChamps = [], upperRunners = [];
         const lowerChamps = [], lowerRunners = [];
 
         champs.forEach(c => {
             const idx = getGroupIndex(c);
-            if (idx % 2 === 0) upperChamps.push(c);  // Nhất bảng lẻ A, C, E...
-            else lowerChamps.push(c);                 // Nhất bảng chẵn B, D, F...
+            if (idx % 2 === 0) upperChamps.push(c);
+            else lowerChamps.push(c);
         });
         runners.forEach(r => {
             const idx = getGroupIndex(r);
-            if (idx % 2 === 1) upperRunners.push(r);  // Nhì bảng chẵn B, D, F...
-            else lowerRunners.push(r);                 // Nhì bảng lẻ A, C, E...
+            if (idx % 2 === 1) upperRunners.push(r);
+            else lowerRunners.push(r);
         });
 
-        // Ghép cặp nhánh TRÊN: Nhất A vs Nhì B, Nhất C vs Nhì D, ...
         const upperPairings = [];
         const usedUpperRunners = new Set();
         upperChamps.forEach(champ => {
             const cGroup = getGroupLetter(champ);
-            // Tìm Nhì khác bảng
             let matchedIdx = -1;
             for (let j = 0; j < upperRunners.length; j++) {
                 if (usedUpperRunners.has(j)) continue;
@@ -1057,12 +1047,10 @@
                 upperPairings.push({ a: champ, b: null });
             }
         });
-        // Nhì dư của nhánh trên
         for (let j = 0; j < upperRunners.length; j++) {
             if (!usedUpperRunners.has(j)) upperPairings.push({ a: null, b: upperRunners[j] });
         }
 
-        // Ghép cặp nhánh DƯỚI: Nhất B vs Nhì A, Nhất D vs Nhì C...
         const lowerPairings = [];
         const usedLowerRunners = new Set();
         lowerChamps.forEach(champ => {
@@ -1088,7 +1076,6 @@
             if (!usedLowerRunners.has(j)) lowerPairings.push({ a: null, b: lowerRunners[j] });
         }
 
-        // Gộp: nhánh trên trước, nhánh dưới sau
         const pairings = [...upperPairings, ...lowerPairings];
         const upperCount = upperPairings.length;
 
@@ -1469,22 +1456,17 @@
         const rowHeight = 100;
         const upperCount = d.upperCount || Math.ceil(d.pairings.length / 2);
 
-        // VÒNG 1
         html += `<div class="bracket-round" style="min-width:320px;width:320px;">`;
         html += `<div class="bracket-round-header editable" onclick="openRoundLabelPicker()" title="Click để đổi tên vòng">${d.roundLabel}</div>`;
 
-        // Chiều cao tổng: pairings * rowHeight + 60px cho 2 nhãn nhánh
         const totalBodyHeight = d.pairings.length * rowHeight + 60;
         html += `<div class="bracket-round-body" style="height:${totalBodyHeight}px;position:relative;">`;
 
-        // Nhãn NHÁNH TRÊN
         html += `<div class="branch-label branch-upper" style="top:0;">⬆️ NHÁNH TRÊN (Nhất A, C, E... vs Nhì B, D, F...)</div>`;
 
-        // Nhãn NHÁNH DƯỚI (chèn trước trận đầu của nhánh dưới)
         const lowerLabelTop = 30 + upperCount * rowHeight;
         html += `<div class="branch-label branch-lower" style="top:${lowerLabelTop}px;">⬇️ NHÁNH DƯỚI (Nhất B, D, F... vs Nhì A, C, E...)</div>`;
 
-        // Vẽ các cặp đấu
         d.pairings.forEach((p, idx) => {
             let top;
             if (idx < upperCount) {
@@ -1513,7 +1495,6 @@
 
         html += `</div></div>`;
 
-        // Các vòng sau
         let prevCount = d.pairings.length;
         for (let r = 1; r < totalRounds; r++) {
             const matchCount = Math.ceil(prevCount / 2);
@@ -1537,7 +1518,6 @@
             prevCount = matchCount;
         }
 
-        // Tranh hạng 3
         html += `<div class="bracket-connector" style="width:30px;height:${totalBodyHeight}px;"></div>`;
         html += `<div class="bracket-round" style="min-width:200px;width:200px;background:#fff8f0;">`;
         html += `<div class="bracket-round-header" style="background:linear-gradient(135deg,#e67e22,#d35400);">🥉 TRANH HẠNG 3</div>`;
@@ -1549,9 +1529,6 @@
         return html;
     }
 
-    // ==========================================
-    // TỰ CHỌN CẶP ĐẤU KNOCKOUT
-    // ==========================================
     window.changePairSlot = function(pairIdx, slot, teamName) {
         if (!lastResult || !lastResult.knockoutData) return;
         const d = lastResult.knockoutData;
@@ -1600,7 +1577,6 @@
 
     window.autoPairKnockout = function() {
         if (!lastResult) return;
-        // Gọi lại buildKnockoutData để tạo cặp theo quy tắc chia nhánh
         buildKnockoutData(lastResult);
         renderResult(lastResult);
         showAlert('✅ Đã tự động xếp cặp theo quy tắc chia nhánh trên/dưới!', 'success');
@@ -1647,9 +1623,6 @@
         }
     };
 
-    // ==========================================
-    // ĐỔI TÊN VÒNG — KHÔNG REBUILD PAIRINGS
-    // ==========================================
     window.openRoundLabelPicker = function() {
         if (!lastResult || !lastResult.knockoutData) return;
         const labels = ['Tự động (theo bracket)', 'Vòng 1/32', 'Vòng 1/16', 'Vòng 1/8', 'Vòng 1/4', 'Tứ kết', 'Bán kết'];
@@ -1663,7 +1636,6 @@
         const idx = parseInt(choice) - 1;
         if (idx < 0 || idx >= labels.length) return;
 
-        // CHỈ đổi label — KHÔNG rebuild pairings
         lastResult.koRoundLabel = idx === 0 ? 'auto' : labels[idx];
         const newLabel = idx === 0 ? lastResult.knockoutData.autoLabel : labels[idx];
         lastResult.knockoutData.roundLabel = newLabel;
@@ -1811,9 +1783,6 @@
         return html;
     }
 
-    // ==========================================
-    // EDIT THIRD PLACE
-    // ==========================================
     window.editThirdPlaceManually = function() {
         if (!lastResult) return;
         const tp = lastResult.thirdPlaceMatch || { teamA: null, teamB: null, winner: null };
@@ -1834,9 +1803,6 @@
         showAlert('✅ Đã cập nhật trận Tranh hạng 3!', 'success');
     };
 
-    // ==========================================
-    // MODAL EDIT MATCH
-    // ==========================================
     window.openEditMatch = function(roundIdx, matchIdx) {
         if (!lastResult || lastResult.type !== 'knockout') return;
         const match = lastResult.rounds[roundIdx][matchIdx];
@@ -2006,7 +1972,7 @@
     }
 
     // ==========================================
-    // BUILD ALL-IN-ONE SHEET
+    // BUILD ALL-IN-ONE SHEET — LAYOUT GỌN GÀNG (như ảnh 2)
     // ==========================================
     async function buildAllInOneSheet(wb, result, categoryName) {
         const sheetName = categoryName.replace(/[\\\/\?\*\[\]:]/g, '_').slice(0, 31) || 'Sheet1';
@@ -2023,6 +1989,7 @@
         const groupNames = ['A', 'B', 'C', 'D', 'E', 'F', 'G', 'H', 'I', 'J', 'K', 'L', 'M', 'N', 'O', 'P'];
         let currentRow = 1;
 
+        // Tiêu đề chính
         ws.addRow([`${categoryName.toUpperCase()} - BỐC THĂM & SƠ ĐỒ THI ĐẤU`]);
         ws.mergeCells(`A${currentRow}:M${currentRow}`);
         const titleCell = ws.getCell(`A${currentRow}`);
@@ -2036,62 +2003,84 @@
         if (result.type === 'round-robin') {
             result.groups.forEach((group, gi) => {
                 const gName = groupNames[gi];
-                ws.addRow([`BẢNG ${gName} (${group.length} VĐV)`]);
+                const n = group.length;
+
+                // Tiêu đề bảng
+                ws.addRow([`BẢNG ${gName} (${n} VĐV)`]);
                 ws.mergeCells(`A${currentRow}:M${currentRow}`);
                 styleSectionTitle(ws.getRow(currentRow));
                 currentRow++;
 
-                const hRow = ws.addRow(['Stt', '', '', 'Tên VĐV', 'CLB/Đơn vị', 'Điểm', 'T/B', 'XH', '', '', '', '', '']);
+                // HEADER: Stt | (trống) | (trống) | Tên VĐV | CLB/Đơn vị | 1 | 2 | 3 | ... | Điểm | T/B | XH
+                const headerCols = ['Stt', '', '', 'Tên VĐV / Đội', 'CLB/Đơn vị'];
+                for (let i = 1; i <= n; i++) headerCols.push(String(i));
+                headerCols.push('Điểm', 'T/B', 'XH');
+                while (headerCols.length < 13) headerCols.push('');
+
+                const hRow = ws.addRow(headerCols);
                 styleHeaderRow(hRow); currentRow++;
-                group.forEach((team, i) => {
-                    const r = ws.addRow([i + 1, '', '', team.name, team.club || '—', '', '', '', '', '', '', '', '']);
-                    styleDataRow(r); currentRow++;
-                    r.getCell(1).alignment = { horizontal: 'center', vertical: 'middle' };
-                    r.getCell(4).font = { bold: true, color: { argb: COLORS.clubFg } };
-                });
-                ws.addRow([]); currentRow++;
 
-                const matrixTitle = ws.addRow([`MA TRẬN ĐẤU VÒNG TRÒN - BẢNG ${gName}`]);
-                ws.mergeCells(`A${currentRow}:M${currentRow}`);
-                styleSectionTitle(ws.getRow(currentRow));
-                currentRow++;
-                const matrixHeader = ['MS', '1', '2', '3', '4', '5', '6', '7', '8', '9', '10', '11', '12', '13', '14', '15', '16'].slice(0, group.length + 1);
-                const mhRow = ws.addRow(matrixHeader); styleHeaderRow(mhRow); currentRow++;
-                for (let i = 0; i < group.length; i++) {
-                    const rowData = [i + 1];
-                    for (let j = 0; j < group.length; j++) {
-                        if (i === j) rowData.push('');
+                // Body VĐV + Ma trận gộp
+                group.forEach((team, i) => {
+                    const rowData = [i + 1, '', '', team.name, team.club || '—'];
+                    // Ma trận: đường chéo \ hoặc cặp đấu
+                    for (let j = 0; j < n; j++) {
+                        if (i === j) rowData.push('\\');
                         else if (i < j) rowData.push(`${i + 1}-${j + 1}`);
                         else rowData.push('');
                     }
-                    while (rowData.length < matrixHeader.length) rowData.push('');
-                    const r = ws.addRow(rowData); styleDataRow(r); currentRow++;
-                    r.eachCell(c => c.alignment = { horizontal: 'center', vertical: 'middle' });
-                }
+                    rowData.push('', '', ''); // Điểm, T/B, XH
+                    while (rowData.length < 13) rowData.push('');
+                    const r = ws.addRow(rowData);
+                    styleDataRow(r); currentRow++;
+                    r.getCell(1).alignment = { horizontal: 'center', vertical: 'middle' };
+                    r.getCell(4).font = { bold: true, color: { argb: COLORS.clubFg } };
+                    // Căn giữa ma trận (cột F → F+n-1)
+                    for (let c = 6; c <= 5 + n; c++) {
+                        r.getCell(c).alignment = { horizontal: 'center', vertical: 'middle' };
+                        r.getCell(c).font = { size: 11, bold: true, color: { argb: 'FF1A3A7A' } };
+                    }
+                    // Đường chéo \ in đậm
+                    const diagCol = 6 + i;
+                    r.getCell(diagCol).font = { bold: true, color: { argb: 'FFADB5BD' } };
+                    r.getCell(diagCol).fill = { type: 'pattern', pattern: 'solid', fgColor: { argb: 'FFE9ECEF' } };
+                });
+
+                // Dòng trống nhỏ
                 ws.addRow([]); currentRow++;
 
-                const matchTitle = ws.addRow([`DANH SÁCH TRẬN - BẢNG ${gName}`]);
-                ws.mergeCells(`A${currentRow}:M${currentRow}`);
-                styleSectionTitle(ws.getRow(currentRow));
-                currentRow++;
-                const mHeader = ws.addRow(['TT', 'Trận', 'VĐV A', '', 'VĐV B', '', 'Ngày', 'Ca', 'Bàn', 'Giờ', '', '', '']);
+                // HEADER DANH SÁCH TRẬN
+                const mHeader = ws.addRow(['MS', 'VĐV', 'vs', 'VĐV', '', '', '', '', 'Thời gian', 'Bàn', 'Trận', 'KQ', '']);
                 styleHeaderRow(mHeader); currentRow++;
 
+                // Danh sách trận
                 const matchesList = [];
-                for (let i = 0; i < group.length; i++) for (let j = i + 1; j < group.length; j++) matchesList.push({ p1: i, p2: j });
+                for (let i = 0; i < n; i++) {
+                    for (let j = i + 1; j < n; j++) {
+                        matchesList.push({ p1: i, p2: j, ms: `${i + 1}-${j + 1}` });
+                    }
+                }
                 const scheduled = assignScheduleToMatches(matchesList, scheduleCfg);
                 scheduled.forEach((s, idx) => {
                     const t1 = group[s.p1]; const t2 = group[s.p2];
-                    const r = ws.addRow([idx + 1, `Trận ${idx + 1}`, t1.name + (t1.club ? ` (${t1.club})` : ''), '', t2.name + (t2.club ? ` (${t2.club})` : ''), '', s.date, s.session, s.table, s.time, '', '', '']);
+                    const timeStr = `${s.session} ${s.date}`;
+                    const r = ws.addRow([
+                        s.ms, t1.name, '-', t2.name,
+                        '', '', '', '',
+                        timeStr, s.table, idx + 1, '', ''
+                    ]);
                     styleDataRow(r); currentRow++;
-                    [1, 2, 7, 8, 9, 10].forEach(c => r.getCell(c).alignment = { horizontal: 'center', vertical: 'middle' });
-                    r.getCell(3).font = { bold: true };
-                    r.getCell(5).font = { bold: true };
+                    [1, 3, 9, 10, 11].forEach(c => r.getCell(c).alignment = { horizontal: 'center', vertical: 'middle' });
+                    r.getCell(2).font = { bold: true };
+                    r.getCell(4).font = { bold: true };
+                    r.getCell(9).font = { size: 10, color: { argb: 'FF856404' }, bold: true };
                 });
-                ws.addRow([]); currentRow++;
+
+                // Dòng trống giữa các bảng
                 ws.addRow([]); currentRow++;
             });
 
+            // GIAI ĐOẠN 2: Knockout (giữ nguyên)
             if (result.numGroups >= 2 && result.knockoutData) {
                 const d = result.knockoutData;
                 const totalRounds = Math.log2(d.bracketSize);
@@ -2363,7 +2352,7 @@
         }
     });
 
-    console.log('✅ draw.html v16 loaded');
+    console.log('✅ draw.html v17 loaded');
 
 })();
 </script>
