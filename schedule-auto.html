@@ -1,0 +1,1385 @@
+<!DOCTYPE html>
+<html lang="vi">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Xếp lịch tự động - SportsVN</title>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <style>
+        * { margin: 0; padding: 0; box-sizing: border-box; font-family: 'Segoe UI', system-ui, sans-serif; }
+        body { background: #f0f2f8; min-height: 100vh; padding: 24px; }
+        .container { max-width: 1500px; margin: 0 auto; }
+
+        .header {
+            background: linear-gradient(135deg, #0d1b3e, #1a3a7a);
+            border-radius: 20px; padding: 32px; color: #fff;
+            margin-bottom: 24px; display: flex; justify-content: space-between;
+            align-items: center; flex-wrap: wrap; gap: 16px;
+            box-shadow: 0 8px 30px rgba(13,27,62,0.25);
+        }
+        .header h1 { font-size: 28px; margin-bottom: 8px; }
+        .header p { opacity: 0.85; }
+        .header-actions { display: flex; gap: 10px; flex-wrap: wrap; }
+        .btn-outline {
+            background: transparent; color: #fff; border: 2px solid #fff;
+            padding: 10px 20px; border-radius: 10px; font-size: 14px;
+            font-weight: 700; cursor: pointer; text-decoration: none;
+            display: inline-flex; align-items: center; gap: 8px; transition: all 0.2s;
+        }
+        .btn-outline:hover { background: #fff; color: #0d1b3e; }
+
+        .panel {
+            background: #fff; border-radius: 16px; padding: 24px;
+            margin-bottom: 24px; box-shadow: 0 4px 20px rgba(0,0,0,0.08);
+        }
+        .panel-title {
+            font-size: 20px; font-weight: 700; color: #1a1a2e;
+            margin-bottom: 16px; display: flex; align-items: center; gap: 10px;
+        }
+        .step-num {
+            background: #1a3a7a; color: #fff; width: 32px; height: 32px;
+            border-radius: 50%; display: flex; align-items: center;
+            justify-content: center; font-size: 15px; flex-shrink: 0;
+        }
+
+        .drop-zone {
+            border: 3px dashed #1a3a7a; border-radius: 16px;
+            padding: 40px 20px; text-align: center; cursor: pointer;
+            transition: all 0.3s ease; background: #f8f9fa;
+        }
+        .drop-zone:hover, .drop-zone.dragover { background: #e7f3ff; border-color: #0984e3; }
+        .drop-zone i { font-size: 48px; color: #1a3a7a; margin-bottom: 12px; display: block; }
+        .drop-zone p { color: #6c757d; font-size: 15px; margin-bottom: 8px; }
+        .drop-zone strong { color: #1a3a7a; }
+
+        .stats-grid {
+            display: grid; grid-template-columns: repeat(auto-fill, minmax(200px, 1fr));
+            gap: 12px; margin-top: 16px;
+        }
+        .stat-card {
+            background: #f8f9fa; border: 2px solid #e9ecef;
+            border-radius: 12px; padding: 16px;
+            display: flex; align-items: center; gap: 12px;
+        }
+        .stat-card .icon {
+            width: 44px; height: 44px; border-radius: 10px;
+            background: linear-gradient(135deg, #1a3a7a, #0d1b3e);
+            color: #fff; display: flex; align-items: center;
+            justify-content: center; font-size: 18px; flex-shrink: 0;
+        }
+        .stat-card .info { flex: 1; min-width: 0; }
+        .stat-card .num { font-size: 22px; font-weight: 800; color: #1a3a7a; }
+        .stat-card .lbl { font-size: 12px; color: #6c757d; text-transform: uppercase; }
+
+        .form-row {
+            display: grid; grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+            gap: 12px; margin-bottom: 16px;
+        }
+        .form-group label {
+            display: block; font-weight: 600; font-size: 14px;
+            margin-bottom: 6px; color: #1a1a2e;
+        }
+        .form-group input, .form-group select {
+            width: 100%; padding: 12px 16px; border: 2px solid #e9ecef;
+            border-radius: 10px; font-size: 15px; font-family: inherit;
+            transition: all 0.2s;
+        }
+        .form-group input:focus, .form-group select:focus {
+            border-color: #1a3a7a; outline: none;
+            box-shadow: 0 0 0 3px rgba(26,58,122,0.1);
+        }
+
+        .btn {
+            padding: 12px 24px; border-radius: 10px; font-size: 14px;
+            font-weight: 700; cursor: pointer; border: none;
+            transition: all 0.3s ease; text-decoration: none;
+            display: inline-flex; align-items: center;
+            justify-content: center; gap: 6px;
+        }
+        .btn:hover { transform: translateY(-2px); }
+        .btn:disabled { opacity: 0.5; cursor: not-allowed; transform: none; }
+        .btn-primary { background: linear-gradient(135deg, #0d1b3e, #1a3a7a); color: #fff; }
+        .btn-success { background: linear-gradient(135deg, #00b894, #00a859); color: #fff; }
+        .btn-warning { background: #fdcb6e; color: #1a1a2e; }
+        .btn-danger { background: #e94560; color: #fff; }
+        .btn-info { background: #0984e3; color: #fff; }
+        .btn-block { width: 100%; }
+        .btn-lg { padding: 16px 32px; font-size: 17px; font-weight: 800; }
+
+        .content-list { display: grid; gap: 10px; }
+        .content-item {
+            background: #f8f9fa; border: 2px solid #e9ecef;
+            border-radius: 12px; padding: 14px 16px;
+            display: flex; align-items: center; gap: 12px;
+            cursor: move; transition: all 0.2s;
+        }
+        .content-item:hover { border-color: #1a3a7a; background: #fff; }
+        .content-item.dragging { opacity: 0.4; }
+        .content-item.drag-over { border-color: #e94560; border-style: dashed; }
+        .content-item .drag-handle { color: #adb5bd; cursor: grab; font-size: 18px; }
+        .content-item .order-badge {
+            width: 32px; height: 32px; border-radius: 50%;
+            background: linear-gradient(135deg, #1a3a7a, #0d1b3e);
+            color: #fff; display: flex; align-items: center;
+            justify-content: center; font-weight: 800;
+            font-size: 14px; flex-shrink: 0;
+        }
+        .content-item .content-info { flex: 1; min-width: 0; }
+        .content-item .content-name { font-size: 15px; font-weight: 700; color: #1a1a2e; }
+        .content-item .content-meta { font-size: 12px; color: #6c757d; margin-top: 4px; }
+        .content-item .content-badge {
+            font-size: 11px; font-weight: 700;
+            padding: 4px 10px; border-radius: 12px;
+            flex-shrink: 0;
+        }
+        .badge-team { background: #fdcb6e; color: #856404; }
+        .badge-single { background: #a29bfe; color: #fff; }
+        .badge-double { background: #00b894; color: #fff; }
+
+        .final-config-table {
+            width: 100%; border-collapse: collapse;
+            font-size: 13px; background: #fff;
+            border-radius: 10px; overflow: hidden;
+            box-shadow: 0 2px 8px rgba(0,0,0,0.05);
+        }
+        .final-config-table th {
+            background: #1a3a7a; color: #fff; padding: 12px;
+            text-align: left; font-size: 12px;
+            text-transform: uppercase; letter-spacing: 0.5px;
+        }
+        .final-config-table td { padding: 12px; border-bottom: 1px solid #e9ecef; }
+        .final-config-table tr:last-child td { border-bottom: none; }
+        .final-config-table tr:hover { background: #f8f9fa; }
+        .final-config-table select {
+            width: 100%; padding: 8px 12px; border: 2px solid #e9ecef;
+            border-radius: 8px; font-size: 13px;
+        }
+        .final-config-table select:focus { border-color: #1a3a7a; outline: none; }
+
+        .warning-box {
+            padding: 14px 18px; background: #fff3cd;
+            border: 1px solid #ffeaa7; border-left: 4px solid #fdcb6e;
+            border-radius: 10px; color: #856404;
+            margin-bottom: 20px; font-size: 14px; line-height: 1.6;
+        }
+        .warning-box.error {
+            background: #f8d7da; border-color: #f5c6cb;
+            border-left-color: #e94560; color: #721c24;
+        }
+        .warning-box.success {
+            background: #d4edda; border-color: #c3e6cb;
+            border-left-color: #00b894; color: #155724;
+        }
+        .warning-box strong { display: block; margin-bottom: 4px; }
+        .warning-box ul { margin-left: 20px; margin-top: 8px; }
+        .warning-box li { margin-bottom: 4px; }
+
+        .alert {
+            padding: 14px 18px; border-radius: 10px;
+            margin-top: 16px; display: none; font-size: 14px;
+        }
+        .alert.show { display: block; }
+        .alert.error { background: #f8d7da; color: #721c24; border: 1px solid #f5c6cb; }
+        .alert.success { background: #d4edda; color: #155724; border: 1px solid #c3e6cb; }
+        .alert.info { background: #cce5ff; color: #004085; border: 1px solid #b8daff; }
+
+        .schedule-preview {
+            background: #f8f9fa; border-radius: 12px;
+            padding: 16px; overflow-x: auto;
+        }
+        .schedule-day { margin-bottom: 24px; }
+        .schedule-day-header {
+            background: linear-gradient(135deg, #0d1b3e, #1a3a7a);
+            color: #fff; padding: 12px 20px;
+            border-radius: 10px; font-weight: 800;
+            font-size: 16px; margin-bottom: 12px;
+            display: flex; justify-content: space-between; align-items: center;
+        }
+        .schedule-session { margin-bottom: 16px; }
+        .schedule-session-header {
+            background: #fff; padding: 10px 16px;
+            border-radius: 8px; font-weight: 700;
+            color: #1a3a7a; font-size: 14px;
+            margin-bottom: 10px; border-left: 4px solid #1a3a7a;
+        }
+        .courts-grid { display: grid; gap: 10px; }
+        .court-column {
+            background: #fff; border-radius: 10px;
+            padding: 12px; min-width: 200px;
+        }
+        .court-title {
+            font-size: 13px; font-weight: 800;
+            color: #1a3a7a; margin-bottom: 8px;
+            padding-bottom: 6px; border-bottom: 2px solid #e9ecef;
+            display: flex; justify-content: space-between;
+        }
+        .match-card {
+            background: #f8f9fa; border-radius: 8px;
+            padding: 10px; margin-bottom: 8px;
+            font-size: 12px; border-left: 3px solid #1a3a7a;
+            transition: all 0.2s;
+        }
+        .match-card:hover { background: #e7f3ff; }
+        .match-card.conflict { border-left-color: #e94560; background: #fff5f7; }
+        .match-card .time {
+            font-weight: 800; color: #1a3a7a;
+            font-size: 11px; margin-bottom: 4px;
+            display: flex; justify-content: space-between;
+        }
+        .match-card .content-name {
+            font-weight: 700; color: #e94560;
+            font-size: 11px; margin-bottom: 4px;
+            text-transform: uppercase;
+        }
+        .match-card .players {
+            font-size: 12px; font-weight: 600;
+            color: #1a1a2e;
+        }
+
+        .loading-overlay {
+            position: fixed; top: 0; left: 0; right: 0; bottom: 0;
+            background: rgba(0,0,0,0.7); display: none;
+            align-items: center; justify-content: center; z-index: 9999;
+        }
+        .loading-overlay.active { display: flex; }
+        .loading-box {
+            background: #fff; padding: 30px 40px;
+            border-radius: 16px; text-align: center;
+        }
+        .spinner {
+            display: inline-block; width: 40px; height: 40px;
+            border: 4px solid #e9ecef; border-top-color: #1a3a7a;
+            border-radius: 50%; animation: spin 0.8s linear infinite;
+        }
+        @keyframes spin { to { transform: rotate(360deg); } }
+
+        .empty-state { text-align: center; padding: 40px 20px; color: #6c757d; }
+        .empty-state i { font-size: 48px; color: #dee2e6; margin-bottom: 12px; display: block; }
+
+        @media (max-width: 768px) {
+            .header h1 { font-size: 22px; }
+            .courts-grid { grid-template-columns: 1fr; }
+        }
+    </style>
+</head>
+<body>
+
+<div class="container">
+
+    <div class="header">
+        <div>
+            <h1>📅 Xếp lịch tự động đa nội dung</h1>
+            <p>Tự động chia lịch cho nhiều nội dung, tránh trùng VĐV</p>
+        </div>
+        <div class="header-actions">
+            <a href="tournaments.html" class="btn-outline">
+                <i class="fas fa-arrow-left"></i> Quay lại
+            </a>
+        </div>
+    </div>
+
+    <div class="panel">
+        <div class="panel-title">
+            <span class="step-num">1</span> Upload file Excel đăng ký VĐV
+        </div>
+        <div class="drop-zone" id="dropZone" onclick="document.getElementById('fileInput').click()">
+            <i class="fas fa-file-excel"></i>
+            <p><strong>Kéo file Excel vào đây</strong></p>
+            <p>hoặc</p>
+            <p>Nhấn để chọn file</p>
+            <p style="font-size: 12px; margin-top: 12px; color: #6c757d;">
+                File Excel có nhiều sheet (mỗi nội dung 1 sheet).<br>
+                Cột: STT | Tên VĐV (hoặc "Tên 1 - Tên 2") | Đơn Vị
+            </p>
+        </div>
+        <input type="file" id="fileInput" accept=".xlsx,.xls" style="display: none;" onchange="handleFileSelect(event)">
+        <div id="fileInfo" style="display: none; margin-top: 16px;">
+            <div class="stats-grid" id="statsGrid"></div>
+        </div>
+    </div>
+
+    <div class="panel">
+        <div class="panel-title">
+            <span class="step-num">2</span> Cấu hình lịch thi đấu
+        </div>
+        <div class="form-row">
+            <div class="form-group">
+                <label><i class="fas fa-calendar"></i> Số ngày thi đấu</label>
+                <input type="number" id="numDays" value="3" min="1" max="30">
+            </div>
+            <div class="form-group">
+                <label><i class="fas fa-table-tennis"></i> Số sân thi đấu</label>
+                <input type="number" id="numCourts" value="8" min="1" max="30">
+            </div>
+            <div class="form-group">
+                <label><i class="fas fa-clock"></i> Thời gian/trận (phút)</label>
+                <input type="number" id="matchDuration" value="30" min="10" max="180">
+            </div>
+            <div class="form-group">
+                <label><i class="fas fa-hourglass"></i> Nghỉ giữa trận (phút)</label>
+                <input type="number" id="breakDuration" value="5" min="0" max="60">
+            </div>
+        </div>
+        <div style="margin-top: 16px;">
+            <label style="font-weight: 700; display: block; margin-bottom: 12px;">
+                <i class="fas fa-sun"></i> Các buổi thi đấu mỗi ngày
+            </label>
+            <div class="form-row">
+                <div class="form-group">
+                    <label>
+                        <input type="checkbox" id="sessionMorning" checked style="width: auto; margin-right: 6px;">
+                        Buổi Sáng
+                    </label>
+                    <input type="time" id="timeMorning" value="08:00">
+                </div>
+                <div class="form-group">
+                    <label>
+                        <input type="checkbox" id="sessionAfternoon" checked style="width: auto; margin-right: 6px;">
+                        Buổi Chiều
+                    </label>
+                    <input type="time" id="timeAfternoon" value="14:00">
+                </div>
+                <div class="form-group">
+                    <label>
+                        <input type="checkbox" id="sessionEvening" checked style="width: auto; margin-right: 6px;">
+                        Buổi Tối
+                    </label>
+                    <input type="time" id="timeEvening" value="19:00">
+                </div>
+                <div class="form-group">
+                    <label>
+                        <input type="checkbox" id="sessionNight" style="width: auto; margin-right: 6px;">
+                        Buổi Đêm (tùy chọn)
+                    </label>
+                    <input type="time" id="timeNight" value="21:00">
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <div class="panel">
+        <div class="panel-title">
+            <span class="step-num">3</span> Thứ tự ưu tiên nội dung
+        </div>
+        <p style="color: #6c757d; font-size: 13px; margin-bottom: 16px;">
+            <i class="fas fa-info-circle"></i> Kéo thả để sắp xếp thứ tự. Nội dung xếp trên sẽ thi đấu trước.
+        </p>
+        <div class="content-list" id="contentList">
+            <div class="empty-state">
+                <i class="fas fa-inbox"></i>
+                <p>Chưa có nội dung nào. Hãy upload file Excel trước.</p>
+            </div>
+        </div>
+    </div>
+
+    <div class="panel" id="finalConfigPanel" style="display: none;">
+        <div class="panel-title">
+            <span class="step-num">4</span> Cấu hình vòng Bán kết / Chung kết
+        </div>
+        <p style="color: #6c757d; font-size: 13px; margin-bottom: 16px;">
+            <i class="fas fa-info-circle"></i> Chọn buổi diễn ra BK/CK cho từng nội dung.
+            Hệ thống sẽ tự tránh xếp 2 trận BK/CK của cùng 1 VĐV vào 1 buổi.
+        </p>
+        <table class="final-config-table">
+            <thead>
+                <tr>
+                    <th style="width: 50px;">#</th>
+                    <th>Nội dung</th>
+                    <th style="width: 150px;">Ngày</th>
+                    <th style="width: 150px;">Buổi</th>
+                </tr>
+            </thead>
+            <tbody id="finalConfigBody"></tbody>
+        </table>
+    </div>
+
+    <div class="panel">
+        <div class="panel-title">
+            <span class="step-num">5</span> Tiến hành xếp lịch
+        </div>
+        <button class="btn btn-success btn-block btn-lg" onclick="generateSchedule()" id="generateBtn" disabled>
+            <i class="fas fa-magic"></i> XẾP LỊCH TỰ ĐỘNG
+        </button>
+        <div id="alert" class="alert"></div>
+    </div>
+
+    <div class="panel" id="resultPanel" style="display: none;">
+        <div class="panel-title">
+            <span class="step-num">6</span> Kết quả xếp lịch
+        </div>
+        <div id="conflictWarning"></div>
+        <div id="scheduleResult" class="schedule-preview"></div>
+        <div style="margin-top: 20px; display: flex; gap: 12px; flex-wrap: wrap;">
+            <button class="btn btn-primary" onclick="window.print()">
+                <i class="fas fa-print"></i> In lịch
+            </button>
+            <button class="btn btn-info" onclick="exportSchedule()">
+                <i class="fas fa-file-excel"></i> Xuất Excel
+            </button>
+            <button class="btn btn-success" onclick="saveToDatabase()" id="saveBtn">
+                <i class="fas fa-save"></i> Lưu vào hệ thống
+            </button>
+        </div>
+    </div>
+
+</div>
+
+<div class="loading-overlay" id="loadingOverlay">
+    <div class="loading-box">
+        <div class="spinner"></div>
+        <p id="loadingText" style="margin-top: 16px; color: #1a3a7a; font-weight: 700;">
+            Đang xử lý...
+        </p>
+    </div>
+</div>
+
+<script src="https://cdn.jsdelivr.net/npm/xlsx@0.18.5/dist/xlsx.full.min.js"></script>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/exceljs/4.4.0/exceljs.min.js"></script>
+<script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+<script src="config.js"></script>
+
+<script>
+(function() {
+    'use strict';
+
+    console.log('🚀 schedule-auto.html v2 - Single script, full');
+
+    const config = window.SPORTSVN_CONFIG || {};
+    const supabaseClient = window.supabase.createClient(config.SUPABASE_URL, config.SUPABASE_ANON_KEY);
+    window.supabaseClient = supabaseClient;
+
+    // ==========================================
+    // STATE
+    // ==========================================
+    let tournamentId = null;
+    let contents = [];
+    let allPlayers = new Map();
+    let scheduleResult = null;
+    let dragSrcIndex = null;
+
+    // ==========================================
+    // INIT
+    // ==========================================
+    function init() {
+        const params = new URLSearchParams(window.location.search);
+        tournamentId = params.get('tournament_id');
+        if (!tournamentId) {
+            alert('Thiếu tournament_id!');
+            window.location.href = 'tournaments.html';
+            return;
+        }
+        window.tournamentId = tournamentId;
+        console.log('📌 Tournament ID:', tournamentId);
+        setupDropZone();
+    }
+
+    function setupDropZone() {
+        const dropZone = document.getElementById('dropZone');
+        ['dragenter', 'dragover'].forEach(evt => {
+            dropZone.addEventListener(evt, e => { e.preventDefault(); dropZone.classList.add('dragover'); });
+        });
+        ['dragleave', 'drop'].forEach(evt => {
+            dropZone.addEventListener(evt, e => { e.preventDefault(); dropZone.classList.remove('dragover'); });
+        });
+        dropZone.addEventListener('drop', e => {
+            const file = e.dataTransfer.files[0];
+            if (file) parseExcelFile(file);
+        });
+    }
+
+    window.handleFileSelect = function(event) {
+        const file = event.target.files[0];
+        if (file) parseExcelFile(file);
+    };
+
+    // ==========================================
+    // PARSE EXCEL
+    // ==========================================
+    function parseExcelFile(file) {
+        showLoading('Đang đọc file Excel...');
+        const reader = new FileReader();
+        reader.onload = (e) => {
+            try {
+                const data = new Uint8Array(e.target.result);
+                const workbook = XLSX.read(data, { type: 'array' });
+
+                contents = [];
+                allPlayers = new Map();
+
+                workbook.SheetNames.forEach((sheetName, idx) => {
+                    const sheet = workbook.Sheets[sheetName];
+                    const rows = XLSX.utils.sheet_to_json(sheet, { header: 1, defval: '' });
+                    if (rows.length < 2) return;
+
+                    // Tìm header row
+                    let headerRow = 0;
+                    for (let i = 0; i < Math.min(5, rows.length); i++) {
+                        if (rows[i].some(c => String(c).toLowerCase().includes('tên'))) {
+                            headerRow = i;
+                            break;
+                        }
+                    }
+
+                    const header = rows[headerRow];
+                    const colName = header.findIndex(h => String(h).toLowerCase().includes('tên'));
+                    const colUnit = header.findIndex(h => String(h).toLowerCase().includes('đơn vị') || String(h).toLowerCase().includes('clb'));
+                    const colYear = header.findIndex(h => String(h).toLowerCase().includes('năm sinh'));
+
+                    const finalColName = colName >= 0 ? colName : 1;
+                    const finalColUnit = colUnit >= 0 ? colUnit : 2;
+                    const finalColYear = colYear >= 0 ? colYear : -1;
+
+                    const items = [];
+                    for (let i = headerRow + 1; i < rows.length; i++) {
+                        const row = rows[i];
+                        if (!row || !row[finalColName]) continue;
+                        const name = String(row[finalColName]).trim();
+                        const unit = String(row[finalColUnit] || '').trim();
+                        const year = finalColYear >= 0 ? String(row[finalColYear] || '').trim() : '';
+                        if (!name) continue;
+
+                        const players = name.split(/\s*-\s*/).map(s => s.trim()).filter(Boolean);
+                        items.push({ name, unit, year, players });
+                    }
+
+                    if (items.length === 0) return;
+
+                    let type = 'single';
+                    const nameLower = sheetName.toLowerCase();
+                    if (nameLower.includes('đồng đội') || nameLower.startsWith('dd ')) type = 'team';
+                    else if (nameLower.includes('đôi')) type = 'double';
+
+                    const content = {
+                        id: idx,
+                        sheetName,
+                        name: sheetName,
+                        type,
+                        items,
+                        playerCount: items.reduce((sum, it) => sum + it.players.length, 0),
+                    };
+                    contents.push(content);
+
+                    items.forEach(it => {
+                        it.players.forEach(p => {
+                            if (!allPlayers.has(p)) allPlayers.set(p, new Set());
+                            allPlayers.get(p).add(sheetName);
+                        });
+                    });
+                });
+
+                console.log('✅ Parsed', contents.length, 'nội dung');
+                console.log('👥', allPlayers.size, 'VĐV duy nhất');
+
+                renderFileInfo();
+                renderContentList();
+                renderFinalConfig();
+                updateGenerateButton();
+                showAlert(`✅ Đã đọc file: ${contents.length} nội dung`, 'success');
+                hideLoading();
+            } catch (error) {
+                console.error(error);
+                hideLoading();
+                showAlert('Lỗi đọc file: ' + error.message, 'error');
+            }
+        };
+        reader.readAsArrayBuffer(file);
+    }
+
+    // ==========================================
+    // RENDER FILE INFO
+    // ==========================================
+    function renderFileInfo() {
+        const info = document.getElementById('fileInfo');
+        const grid = document.getElementById('statsGrid');
+        info.style.display = 'block';
+
+        const totalPlayers = new Set();
+        contents.forEach(c => c.items.forEach(it => it.players.forEach(p => totalPlayers.add(p))));
+        const multiContentPlayers = Array.from(allPlayers.values()).filter(set => set.size > 1).length;
+
+        grid.innerHTML = `
+            <div class="stat-card">
+                <div class="icon"><i class="fas fa-list"></i></div>
+                <div class="info">
+                    <div class="num">${contents.length}</div>
+                    <div class="lbl">Nội dung</div>
+                </div>
+            </div>
+            <div class="stat-card">
+                <div class="icon"><i class="fas fa-users"></i></div>
+                <div class="info">
+                    <div class="num">${totalPlayers.size}</div>
+                    <div class="lbl">VĐV</div>
+                </div>
+            </div>
+            <div class="stat-card">
+                <div class="icon"><i class="fas fa-user-tag"></i></div>
+                <div class="info">
+                    <div class="num">${multiContentPlayers}</div>
+                    <div class="lbl">VĐV đa nội dung</div>
+                </div>
+            </div>
+        `;
+    }
+
+    // ==========================================
+    // RENDER CONTENT LIST (DRAG & DROP)
+    // ==========================================
+    function renderContentList() {
+        const list = document.getElementById('contentList');
+        if (contents.length === 0) {
+            list.innerHTML = '<div class="empty-state"><i class="fas fa-inbox"></i><p>Chưa có nội dung nào.</p></div>';
+            return;
+        }
+
+        list.innerHTML = contents.map((c, i) => `
+            <div class="content-item" draggable="true" data-index="${i}">
+                <span class="drag-handle"><i class="fas fa-grip-vertical"></i></span>
+                <div class="order-badge">${i + 1}</div>
+                <div class="content-info">
+                    <div class="content-name">${escapeHtml(c.name)}</div>
+                    <div class="content-meta">
+                        ${c.items.length} đăng ký · ${c.playerCount} VĐV
+                        ${c.type === 'team' ? ' · Thi đấu đồng đội' : c.type === 'double' ? ' · Đôi' : ' · Đơn'}
+                    </div>
+                </div>
+                <span class="content-badge ${c.type === 'team' ? 'badge-team' : c.type === 'double' ? 'badge-double' : 'badge-single'}">
+                    ${c.type === 'team' ? 'ĐỘI' : c.type === 'double' ? 'ĐÔI' : 'ĐƠN'}
+                </span>
+            </div>
+        `).join('');
+
+        attachDragHandlers();
+    }
+
+    function attachDragHandlers() {
+        document.querySelectorAll('.content-item').forEach(item => {
+            item.addEventListener('dragstart', handleDragStart);
+            item.addEventListener('dragover', handleDragOver);
+            item.addEventListener('dragleave', handleDragLeave);
+            item.addEventListener('drop', handleDrop);
+            item.addEventListener('dragend', handleDragEnd);
+        });
+    }
+
+    function handleDragStart(e) {
+        dragSrcIndex = parseInt(this.dataset.index);
+        this.classList.add('dragging');
+        e.dataTransfer.effectAllowed = 'move';
+    }
+
+    function handleDragOver(e) {
+        e.preventDefault();
+        e.dataTransfer.dropEffect = 'move';
+        if (parseInt(this.dataset.index) !== dragSrcIndex) {
+            this.classList.add('drag-over');
+        }
+    }
+
+    function handleDragLeave(e) { this.classList.remove('drag-over'); }
+
+    function handleDrop(e) {
+        e.preventDefault();
+        this.classList.remove('drag-over');
+        const targetIndex = parseInt(this.dataset.index);
+        if (dragSrcIndex === null || dragSrcIndex === targetIndex) return;
+        const moved = contents.splice(dragSrcIndex, 1)[0];
+        contents.splice(targetIndex, 0, moved);
+        renderContentList();
+        renderFinalConfig();
+    }
+
+    function handleDragEnd(e) {
+        this.classList.remove('dragging');
+        document.querySelectorAll('.content-item').forEach(i => i.classList.remove('drag-over'));
+        dragSrcIndex = null;
+    }
+
+    // ==========================================
+    // RENDER FINAL CONFIG
+    // ==========================================
+    function renderFinalConfig() {
+        const panel = document.getElementById('finalConfigPanel');
+        const body = document.getElementById('finalConfigBody');
+        if (contents.length === 0) { panel.style.display = 'none'; return; }
+        panel.style.display = 'block';
+
+        const numDays = parseInt(document.getElementById('numDays')?.value) || 3;
+        const sessions = getActiveSessions();
+
+        body.innerHTML = contents.map((c, i) => `
+            <tr>
+                <td><strong>${i + 1}</strong></td>
+                <td><strong>${escapeHtml(c.name)}</strong></td>
+                <td>
+                    <select data-content-id="${c.id}" data-field="day">
+                        ${Array.from({length: numDays}, (_, d) => `
+                            <option value="${d + 1}" ${d === numDays - 1 ? 'selected' : ''}>Ngày ${d + 1}</option>
+                        `).join('')}
+                    </select>
+                </td>
+                <td>
+                    <select data-content-id="${c.id}" data-field="session">
+                        ${sessions.map(s => `
+                            <option value="${s.key}" ${s.key === 'afternoon' ? 'selected' : ''}>${s.label}</option>
+                        `).join('')}
+                    </select>
+                </td>
+            </tr>
+        `).join('');
+    }
+
+    function getActiveSessions() {
+        const sessions = [];
+        if (document.getElementById('sessionMorning')?.checked)
+            sessions.push({ key: 'morning', label: 'Sáng', time: document.getElementById('timeMorning')?.value || '08:00' });
+        if (document.getElementById('sessionAfternoon')?.checked)
+            sessions.push({ key: 'afternoon', label: 'Chiều', time: document.getElementById('timeAfternoon')?.value || '14:00' });
+        if (document.getElementById('sessionEvening')?.checked)
+            sessions.push({ key: 'evening', label: 'Tối', time: document.getElementById('timeEvening')?.value || '19:00' });
+        if (document.getElementById('sessionNight')?.checked)
+            sessions.push({ key: 'night', label: 'Đêm', time: document.getElementById('timeNight')?.value || '21:00' });
+        return sessions;
+    }
+
+    function updateGenerateButton() {
+        document.getElementById('generateBtn').disabled = contents.length === 0;
+    }
+
+    function getConfig() {
+        return {
+            numDays: parseInt(document.getElementById('numDays')?.value) || 3,
+            numCourts: parseInt(document.getElementById('numCourts')?.value) || 8,
+            matchDuration: parseInt(document.getElementById('matchDuration')?.value) || 30,
+            breakDuration: parseInt(document.getElementById('breakDuration')?.value) || 5,
+            sessions: getActiveSessions(),
+        };
+    }
+
+    function getFinalConfig() {
+        const result = {};
+        document.querySelectorAll('#finalConfigBody select[data-field="day"]').forEach(sel => {
+            const id = parseInt(sel.dataset.contentId);
+            if (!result[id]) result[id] = {};
+            result[id].day = parseInt(sel.value);
+        });
+        document.querySelectorAll('#finalConfigBody select[data-field="session"]').forEach(sel => {
+            const id = parseInt(sel.dataset.contentId);
+            if (!result[id]) result[id] = {};
+            result[id].session = sel.value;
+        });
+        return result;
+    }
+
+    // ==========================================
+    // GENERATE SCHEDULE
+    // ==========================================
+    window.generateSchedule = async function() {
+        if (contents.length === 0) { showAlert('Chưa có nội dung!', 'error'); return; }
+
+        const cfg = getConfig();
+        const finalConfig = getFinalConfig();
+        if (cfg.sessions.length === 0) { showAlert('Cần chọn ít nhất 1 buổi!', 'error'); return; }
+
+        showLoading('Đang xếp lịch...');
+        await sleep(100);
+
+        try {
+            const result = buildSchedule(contents, cfg, finalConfig);
+            scheduleResult = result;
+            renderResult(result);
+            document.getElementById('resultPanel').style.display = 'block';
+            document.getElementById('resultPanel').scrollIntoView({ behavior: 'smooth' });
+
+            if (result.conflicts.length > 0) {
+                showAlert(`⚠️ Xếp xong nhưng có ${result.conflicts.length} conflict!`, 'error');
+            } else {
+                showAlert(`✅ Xếp lịch thành công! ${result.totalMatches} trận trong ${result.totalSlots} khung giờ.`, 'success');
+            }
+        } catch (error) {
+            console.error(error);
+            showAlert('Lỗi xếp lịch: ' + error.message, 'error');
+        }
+        hideLoading();
+    };
+
+    function buildSchedule(contents, cfg, finalConfig) {
+        const totalDays = cfg.numDays;
+        const numCourts = cfg.numCourts;
+        const matchDuration = cfg.matchDuration;
+        const breakDuration = cfg.breakDuration;
+        const sessions = cfg.sessions;
+
+        // Bước 1: Tạo slots
+        const slots = [];
+        for (let d = 0; d < totalDays; d++) {
+            for (const sess of sessions) {
+                const sessionHours = sess.key === 'evening' ? 2.5 : sess.key === 'night' ? 2 : 3.5;
+                const totalMinutes = sessionHours * 60;
+                const slotDuration = matchDuration + breakDuration;
+                const numSlotsPerCourt = Math.floor(totalMinutes / slotDuration);
+                const [startH, startM] = sess.time.split(':').map(Number);
+                let currentMinutes = startH * 60 + startM;
+
+                for (let slotIdx = 0; slotIdx < numSlotsPerCourt; slotIdx++) {
+                    for (let court = 1; court <= numCourts; court++) {
+                        slots.push({
+                            day: d + 1,
+                            session: sess.key,
+                            sessionLabel: sess.label,
+                            time: formatTime(currentMinutes),
+                            timeMinutes: currentMinutes,
+                            court: court,
+                            dayIndex: d,
+                        });
+                    }
+                    currentMinutes += slotDuration;
+                }
+            }
+        }
+
+        console.log(`📅 Tổng ${slots.length} slots`);
+
+        // Bước 2: Tạo matches
+        const allMatches = [];
+        contents.forEach((content, contentOrder) => {
+            const matches = generateMatchesForContent(content, finalConfig[content.id], cfg);
+            matches.forEach(m => {
+                allMatches.push({
+                    ...m,
+                    contentId: content.id,
+                    contentName: content.name,
+                    contentOrder,
+                    contentType: content.type,
+                });
+            });
+        });
+
+        console.log(`🏆 Tổng ${allMatches.length} trận`);
+
+        // Bước 3: Sort
+        allMatches.sort((a, b) => {
+            if (a.contentOrder !== b.contentOrder) return a.contentOrder - b.contentOrder;
+            if (a.isFinalRound !== b.isFinalRound) return b.isFinalRound - a.isFinalRound;
+            return a.roundOrder - b.roundOrder;
+        });
+
+        // Bước 4: Gán slot + detect conflict
+        const playerBusy = new Map();
+        const playerFinalSession = new Map();
+        const conflicts = [];
+        const assignedSlots = new Set();
+        const scheduled = [];
+
+        for (const match of allMatches) {
+            const slot = findBestSlot(match, slots, assignedSlots, playerBusy, finalConfig, cfg);
+            if (!slot) {
+                conflicts.push({ match, reason: 'Không còn slot trống phù hợp' });
+                continue;
+            }
+
+            assignedSlots.add(slotKey(slot));
+
+            match.players.forEach(p => {
+                if (!playerBusy.has(p)) playerBusy.set(p, new Set());
+                playerBusy.get(p).add(slotKey(slot));
+            });
+
+            if (match.isFinalRound && match.players.length > 0) {
+                match.players.forEach(p => {
+                    const key = `${p}|${slot.day}|${slot.session}`;
+                    if (playerFinalSession.has(key)) {
+                        conflicts.push({
+                            match,
+                            reason: `VĐV ${p} đã có trận BK/CK cùng buổi ${slot.sessionLabel} ngày ${slot.day}`,
+                            player: p,
+                        });
+                    }
+                    playerFinalSession.set(key, match);
+                });
+            }
+
+            scheduled.push({ ...match, slot, matchId: scheduled.length + 1 });
+        }
+
+        scheduled.sort((a, b) => {
+            if (a.slot.day !== b.slot.day) return a.slot.day - b.slot.day;
+            if (a.slot.timeMinutes !== b.slot.timeMinutes) return a.slot.timeMinutes - b.slot.timeMinutes;
+            return a.slot.court - b.slot.court;
+        });
+
+        return { matches: scheduled, conflicts, slots, totalMatches: scheduled.length, totalSlots: slots.length, cfg };
+    }
+
+    // ==========================================
+    // GENERATE MATCHES
+    // ==========================================
+    function generateMatchesForContent(content, finalCfg, cfg) {
+        const matches = [];
+
+        if (content.type === 'team') {
+            const teamsMap = new Map();
+            content.items.forEach(it => {
+                const unit = it.unit || 'Không rõ';
+                if (!teamsMap.has(unit)) teamsMap.set(unit, []);
+                teamsMap.get(unit).push(...it.players);
+            });
+            const teams = Array.from(teamsMap.entries()).map(([name, players]) => ({
+                name, players, displayName: name,
+            }));
+            for (let i = 0; i < teams.length; i++) {
+                for (let j = i + 1; j < teams.length; j++) {
+                    matches.push({
+                        contentName: content.name,
+                        roundName: 'Vòng bảng',
+                        roundOrder: 1,
+                        isFinalRound: false,
+                        teamA: teams[i],
+                        teamB: teams[j],
+                        players: [...teams[i].players, ...teams[j].players],
+                        displayA: teams[i].displayName,
+                        displayB: teams[j].displayName,
+                    });
+                }
+            }
+        } else if (content.type === 'double') {
+            const pairs = content.items.map(it => ({
+                name: it.name, players: it.players, unit: it.unit, displayName: it.name,
+            }));
+            matches.push(...generateGroupOrKnockout(pairs, content.name, cfg));
+        } else {
+            const players = content.items.map(it => ({
+                name: it.name,
+                players: [it.name],
+                unit: it.unit,
+                displayName: it.name + (it.unit ? ` (${it.unit})` : ''),
+            }));
+            matches.push(...generateGroupOrKnockout(players, content.name, cfg));
+        }
+
+        return matches;
+    }
+
+    function generateGroupOrKnockout(participants, contentName, cfg) {
+        const matches = [];
+        const n = participants.length;
+
+        // Nếu ≤ 8 → vòng tròn, ngược lại → knockout
+        if (n <= 8) {
+            for (let i = 0; i < n; i++) {
+                for (let j = i + 1; j < n; j++) {
+                    matches.push({
+                        contentName,
+                        roundName: 'Vòng bảng',
+                        roundOrder: 1,
+                        isFinalRound: false,
+                        teamA: participants[i],
+                        teamB: participants[j],
+                        players: [...participants[i].players, ...participants[j].players],
+                        displayA: participants[i].displayName,
+                        displayB: participants[j].displayName,
+                    });
+                }
+            }
+        } else {
+            matches.push(...generateKnockoutMatches(participants, contentName));
+        }
+
+        return matches;
+    }
+
+    function generateKnockoutMatches(participants, contentName) {
+        const matches = [];
+        let n = participants.length;
+        let bracketSize = 2;
+        while (bracketSize < n) bracketSize *= 2;
+
+        const round1 = [];
+        const shuffled = [...participants];
+        for (let i = 0; i < bracketSize / 2; i++) {
+            const a = shuffled[i * 2] || null;
+            const b = shuffled[i * 2 + 1] || null;
+            if (a && b) {
+                round1.push({
+                    teamA: a, teamB: b,
+                    players: [...a.players, ...b.players],
+                    displayA: a.displayName,
+                    displayB: b.displayName,
+                });
+            }
+        }
+
+        round1.forEach(m => {
+            matches.push({
+                contentName,
+                roundName: 'Vòng 1/' + (bracketSize / 2),
+                roundOrder: 1,
+                isFinalRound: false,
+                ...m,
+            });
+        });
+
+        let remaining = round1.length;
+        let roundNum = 2;
+        const roundNames = ['Vòng 1/16', 'Vòng 1/8', 'Tứ kết', 'Bán kết', 'Chung kết'];
+
+        while (remaining > 1) {
+            remaining = Math.floor(remaining / 2);
+            const roundName = roundNames[roundNum - 2] || `Vòng ${roundNum}`;
+            const isFinal = remaining <= 1;
+
+            for (let i = 0; i < remaining; i++) {
+                matches.push({
+                    contentName,
+                    roundName,
+                    roundOrder: roundNum,
+                    isFinalRound: isFinal,
+                    teamA: { name: 'TBD', players: [], displayName: 'TBD' },
+                    teamB: { name: 'TBD', players: [], displayName: 'TBD' },
+                    players: [],
+                    displayA: 'TBD',
+                    displayB: 'TBD',
+                    isPlaceholder: true,
+                });
+            }
+            roundNum++;
+        }
+
+        return matches;
+    }
+
+    // ==========================================
+    // FIND BEST SLOT
+    // ==========================================
+    function findBestSlot(match, slots, assignedSlots, playerBusy, finalConfig, cfg) {
+        const contentFinal = finalConfig[match.contentId];
+        let candidateSlots = slots;
+
+        if (match.isFinalRound && contentFinal) {
+            candidateSlots = slots.filter(s =>
+                s.day === contentFinal.day && s.session === contentFinal.session
+            );
+            if (candidateSlots.length === 0) candidateSlots = slots;
+        }
+
+        const validSlots = candidateSlots.filter(slot => {
+            if (assignedSlots.has(slotKey(slot))) return false;
+            for (const p of match.players) {
+                if (playerBusy.has(p) && playerBusy.get(p).has(slotKey(slot))) return false;
+            }
+            return true;
+        });
+
+        if (validSlots.length === 0) return null;
+
+        validSlots.sort((a, b) => {
+            if (a.day !== b.day) return a.day - b.day;
+            if (a.timeMinutes !== b.timeMinutes) return a.timeMinutes - b.timeMinutes;
+            return a.court - b.court;
+        });
+
+        return validSlots[0];
+    }
+
+    function slotKey(slot) {
+        return `${slot.day}|${slot.session}|${slot.court}|${slot.timeMinutes}`;
+    }
+
+    // ==========================================
+    // RENDER RESULT
+    // ==========================================
+    function renderResult(result) {
+        const { matches, conflicts } = result;
+        const warningEl = document.getElementById('conflictWarning');
+        const scheduleEl = document.getElementById('scheduleResult');
+
+        if (conflicts.length > 0) {
+            warningEl.innerHTML = `
+                <div class="warning-box error">
+                    <strong><i class="fas fa-exclamation-triangle"></i> Phát hiện ${conflicts.length} conflict!</strong>
+                    <ul>
+                        ${conflicts.slice(0, 10).map(c => `
+                            <li><strong>${escapeHtml(c.match.contentName)}</strong> - ${escapeHtml(c.match.displayA)} vs ${escapeHtml(c.match.displayB)}: ${escapeHtml(c.reason)}</li>
+                        `).join('')}
+                        ${conflicts.length > 10 ? `<li>... và ${conflicts.length - 10} conflict khác</li>` : ''}
+                    </ul>
+                </div>
+            `;
+        } else {
+            warningEl.innerHTML = `
+                <div class="warning-box success">
+                    <strong><i class="fas fa-check-circle"></i> Không có conflict!</strong>
+                    Tất cả các trận đã được xếp lịch hợp lý.
+                </div>
+            `;
+        }
+
+        const byDay = {};
+        matches.forEach(m => {
+            const day = m.slot.day;
+            if (!byDay[day]) byDay[day] = {};
+            const sess = m.slot.session;
+            if (!byDay[day][sess]) byDay[day][sess] = [];
+            byDay[day][sess].push(m);
+        });
+
+        let html = '';
+        const daysSorted = Object.keys(byDay).map(Number).sort((a, b) => a - b);
+
+        for (const day of daysSorted) {
+            const dayMatches = Object.values(byDay[day]).flat();
+            html += `<div class="schedule-day">`;
+            html += `<div class="schedule-day-header">
+                <span>📅 Ngày ${day}</span>
+                <span>${dayMatches.length} trận</span>
+            </div>`;
+
+            const sessions = Object.keys(byDay[day]).sort((a, b) => {
+                const order = { morning: 0, afternoon: 1, evening: 2, night: 3 };
+                return (order[a] || 99) - (order[b] || 99);
+            });
+
+            for (const sess of sessions) {
+                const sessMatches = byDay[day][sess];
+                const sessLabel = sessMatches[0]?.slot.sessionLabel || sess;
+                html += `<div class="schedule-session">`;
+                html += `<div class="schedule-session-header">
+                    <i class="fas fa-clock"></i> Buổi ${sessLabel} — ${sessMatches.length} trận
+                </div>`;
+
+                const byCourt = {};
+                sessMatches.forEach(m => {
+                    const court = m.slot.court;
+                    if (!byCourt[court]) byCourt[court] = [];
+                    byCourt[court].push(m);
+                });
+
+                html += `<div class="courts-grid" style="grid-template-columns: repeat(auto-fill, minmax(220px, 1fr));">`;
+                for (const court of Object.keys(byCourt).map(Number).sort((a, b) => a - b)) {
+                    html += `<div class="court-column">`;
+                    html += `<div class="court-title">
+                        <span>SÂN ${court}</span>
+                        <span style="color: #6c757d; font-weight: 600;">${byCourt[court].length} trận</span>
+                    </div>`;
+
+                    byCourt[court].sort((a, b) => a.slot.timeMinutes - b.slot.timeMinutes).forEach(m => {
+                        const hasConflict = conflicts.some(c => c.match === m);
+                        html += `
+                            <div class="match-card ${hasConflict ? 'conflict' : ''}">
+                                <div class="time">
+                                    <span>${m.slot.time}</span>
+                                    <span>${m.roundName}</span>
+                                </div>
+                                <div class="content-name">${escapeHtml(m.contentName)}</div>
+                                <div class="players">
+                                    ${escapeHtml(m.displayA)}<br>
+                                    <span style="color: #e94560; font-size: 10px;">VS</span><br>
+                                    ${escapeHtml(m.displayB)}
+                                </div>
+                            </div>
+                        `;
+                    });
+
+                    html += `</div>`;
+                }
+                html += `</div></div>`;
+            }
+
+            html += `</div>`;
+        }
+
+        scheduleEl.innerHTML = html;
+    }
+
+    // ==========================================
+    // EXPORT EXCEL
+    // ==========================================
+    window.exportSchedule = async function() {
+        if (!scheduleResult || scheduleResult.matches.length === 0) {
+            showAlert('Chưa có kết quả để xuất!', 'error');
+            return;
+        }
+
+        showLoading('Đang tạo file Excel...');
+        try {
+            const wb = new ExcelJS.Workbook();
+            wb.creator = 'SportsVN Scheduler';
+            wb.created = new Date();
+
+            const ws = wb.addWorksheet('Lịch thi đấu', {
+                pageSetup: { paperSize: 9, orientation: 'landscape', fitToPage: true },
+            });
+
+            ws.columns = [
+                { width: 6 }, { width: 8 }, { width: 10 }, { width: 8 }, { width: 6 },
+                { width: 20 }, { width: 12 }, { width: 25 }, { width: 25 }, { width: 30 },
+            ];
+
+            const titleRow = ws.addRow(['LỊCH THI ĐẤU TỔNG HỢP']);
+            ws.mergeCells('A1:J1');
+            titleRow.height = 30;
+            titleRow.getCell(1).font = { bold: true, size: 14, color: { argb: 'FFFFFFFF' } };
+            titleRow.getCell(1).fill = { type: 'pattern', pattern: 'solid', fgColor: { argb: 'FF1A3A7A' } };
+            titleRow.getCell(1).alignment = { horizontal: 'center', vertical: 'middle' };
+
+            const headerRow = ws.addRow(['TT', 'Ngày', 'Buổi', 'Giờ', 'Sân', 'Nội dung', 'Vòng', 'VĐV A', 'VĐV B', 'Ghi chú']);
+            headerRow.height = 25;
+            headerRow.eachCell(cell => {
+                cell.font = { bold: true, color: { argb: 'FFFFFFFF' }, size: 11 };
+                cell.fill = { type: 'pattern', pattern: 'solid', fgColor: { argb: 'FF1A3A7A' } };
+                cell.alignment = { horizontal: 'center', vertical: 'middle' };
+                cell.border = { top: { style: 'thin' }, left: { style: 'thin' }, bottom: { style: 'thin' }, right: { style: 'thin' } };
+            });
+
+            const thinBorder = {
+                top: { style: 'thin', color: { argb: 'FFDEE2E6' } },
+                left: { style: 'thin', color: { argb: 'FFDEE2E6' } },
+                bottom: { style: 'thin', color: { argb: 'FFDEE2E6' } },
+                right: { style: 'thin', color: { argb: 'FFDEE2E6' } },
+            };
+
+            scheduleResult.matches.forEach((m, i) => {
+                const row = ws.addRow([
+                    i + 1,
+                    `Ngày ${m.slot.day}`,
+                    m.slot.sessionLabel,
+                    m.slot.time,
+                    `Sân ${m.slot.court}`,
+                    m.contentName,
+                    m.roundName,
+                    m.displayA,
+                    m.displayB,
+                    '',
+                ]);
+                row.height = 22;
+                row.eachCell(cell => {
+                    cell.border = thinBorder;
+                    cell.alignment = { vertical: 'middle' };
+                });
+                [1, 2, 3, 4, 5, 7].forEach(c => {
+                    row.getCell(c).alignment = { horizontal: 'center', vertical: 'middle' };
+                });
+                row.getCell(8).font = { bold: true, color: { argb: 'FF1A3A7A' } };
+                row.getCell(9).font = { bold: true, color: { argb: 'FF1A3A7A' } };
+            });
+
+            const buffer = await wb.xlsx.writeBuffer();
+            const blob = new Blob([buffer], { type: 'application/vnd.openxmlformats-officedocument.spreadsheetml.sheet' });
+            const url = URL.createObjectURL(blob);
+            const a = document.createElement('a');
+            a.href = url;
+            a.download = `LichThiDau_${new Date().toISOString().slice(0, 10)}.xlsx`;
+            a.click();
+            URL.revokeObjectURL(url);
+
+            hideLoading();
+            showAlert('✅ Đã xuất file Excel!', 'success');
+        } catch (error) {
+            console.error(error);
+            hideLoading();
+            showAlert('Lỗi xuất Excel: ' + error.message, 'error');
+        }
+    };
+
+    // ==========================================
+    // SAVE TO DATABASE
+    // ==========================================
+    window.saveToDatabase = async function() {
+        if (!scheduleResult || scheduleResult.matches.length === 0) {
+            showAlert('Chưa có kết quả!', 'error');
+            return;
+        }
+        if (!tournamentId) { showAlert('Thiếu tournament_id', 'error'); return; }
+
+        const btn = document.getElementById('saveBtn');
+        btn.disabled = true;
+        btn.innerHTML = '<i class="fas fa-spinner fa-spin"></i> Đang lưu...';
+
+        try {
+            const records = scheduleResult.matches.map(m => ({
+                tournament_id: tournamentId,
+                category: m.contentName,
+                round_name: m.roundName,
+                round_order: m.roundOrder,
+                match_number: 1,
+                court: m.slot.court,
+                team_a_name: m.displayA,
+                team_b_name: m.displayB,
+                status: 'pending',
+                match_session: m.slot.sessionLabel,
+                match_time: m.slot.time,
+                match_table: m.slot.court,
+                scheduled_day: m.slot.day,
+            }));
+
+            await supabaseClient.from('matches').delete().eq('tournament_id', tournamentId);
+            const { error } = await supabaseClient.from('matches').insert(records);
+            if (error) throw error;
+
+            showAlert(`✅ Đã lưu ${records.length} trận!`, 'success');
+            setTimeout(() => {
+                window.location.href = 'schedule.html?tournament_id=' + tournamentId;
+            }, 1500);
+        } catch (error) {
+            console.error(error);
+            showAlert('Lỗi lưu: ' + error.message, 'error');
+            btn.disabled = false;
+            btn.innerHTML = '<i class="fas fa-save"></i> Lưu vào hệ thống';
+        }
+    };
+
+    // ==========================================
+    // HELPERS
+    // ==========================================
+    function formatTime(minutes) {
+        const h = Math.floor(minutes / 60);
+        const m = minutes % 60;
+        return `${String(h).padStart(2, '0')}:${String(m).padStart(2, '0')}`;
+    }
+
+    function sleep(ms) { return new Promise(r => setTimeout(r, ms)); }
+
+    window.showAlert = function(message, type) {
+        const el = document.getElementById('alert');
+        if (!message) { el.className = 'alert'; return; }
+        el.textContent = message;
+        el.className = 'alert show ' + type;
+    };
+
+    window.showLoading = function(text) {
+        document.getElementById('loadingText').textContent = text || 'Đang xử lý...';
+        document.getElementById('loadingOverlay').classList.add('active');
+    };
+
+    window.hideLoading = function() {
+        document.getElementById('loadingOverlay').classList.remove('active');
+    };
+
+    function escapeHtml(text) {
+        return String(text || '').replace(/&/g, '&amp;').replace(/</g, '&lt;')
+            .replace(/>/g, '&gt;').replace(/"/g, '&quot;');
+    }
+
+    // ==========================================
+    // EVENT LISTENERS
+    // ==========================================
+    document.addEventListener('DOMContentLoaded', () => {
+        ['numDays', 'numCourts', 'matchDuration'].forEach(id => {
+            const el = document.getElementById(id);
+            if (el) el.addEventListener('change', renderFinalConfig);
+        });
+        ['sessionMorning', 'sessionAfternoon', 'sessionEvening', 'sessionNight'].forEach(id => {
+            const el = document.getElementById(id);
+            if (el) el.addEventListener('change', renderFinalConfig);
+        });
+    });
+
+    // ==========================================
+    // START
+    // ==========================================
+    init();
+    console.log('✅ schedule-auto.html v2 - loaded');
+})();
+</script>
+</body>
+</html>
