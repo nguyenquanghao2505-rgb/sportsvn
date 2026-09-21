@@ -525,7 +525,7 @@
 (function() {
     'use strict';
 
-    console.log('🚀 categories.html v5 - FIX delete cascade');
+    console.log('🚀 categories.html v6 - DELETE CASCADE FULL FIX');
 
     const config = window.SPORTSVN_CONFIG || {};
     const supabaseClient = window.supabase.createClient(config.SUPABASE_URL, config.SUPABASE_ANON_KEY);
@@ -1870,7 +1870,7 @@
     };
 
     // ==========================================
-    // XÓA NỘI DUNG - FIX CASCADE
+    // XÓA NỘI DUNG - FIX CASCADE FULL
     // ==========================================
     window.deleteCategory = async function(id) {
         const c = categories.find(x => x.id == id);
@@ -1893,7 +1893,7 @@
         if (!confirm(warning)) return;
         
         try {
-            // 1. Xóa match_scores liên quan
+            // 1. Xóa match_scores liên quan theo category name
             await supabaseClient
                 .from('match_scores')
                 .delete()
@@ -1907,7 +1907,7 @@
                 .eq('tournament_id', tournamentId)
                 .eq('category_id', c.id);
             
-            // 3. Xóa schedules theo category name (fallback)
+            // 3. Xóa schedules theo category name (fallback cho dữ liệu cũ)
             await supabaseClient
                 .from('schedules')
                 .delete()
@@ -1921,7 +1921,7 @@
                 .eq('tournament_id', tournamentId)
                 .eq('category', c.name);
             
-            // 5. Xóa matches liên quan (nếu có)
+            // 5. Xóa matches liên quan (nếu có bảng này)
             await supabaseClient
                 .from('matches')
                 .delete()
@@ -1938,6 +1938,8 @@
             if (scoresCount > 0) summary.push(`${scoresCount} scores`);
             
             showAlert(`✅ Đã xóa nội dung "${c.name}"${summary.length > 0 ? ' + ' + summary.join(' + ') : ''}!`, 'success');
+            
+            // QUAN TRỌNG: Load lại toàn bộ dữ liệu để xóa cache cục bộ
             await loadAllData();
         } catch (error) {
             console.error(error);
