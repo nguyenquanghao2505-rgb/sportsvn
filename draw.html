@@ -9,463 +9,152 @@
         * { margin: 0; padding: 0; box-sizing: border-box; font-family: 'Segoe UI', system-ui, sans-serif; }
         body { background: #f0f2f8; min-height: 100vh; padding: 24px; }
         .draw-container { max-width: 1400px; margin: 0 auto; }
-
-        .draw-header {
-            background: linear-gradient(135deg, #0d1b3e, #1a3a7a);
-            border-radius: 20px; padding: 32px; color: #fff;
-            margin-bottom: 24px; display: flex; justify-content: space-between;
-            align-items: center; flex-wrap: wrap; gap: 16px;
-            box-shadow: 0 8px 30px rgba(13,27,62,0.25);
-        }
+        .draw-header { background: linear-gradient(135deg, #0d1b3e, #1a3a7a); border-radius: 20px; padding: 32px; color: #fff; margin-bottom: 24px; display: flex; justify-content: space-between; align-items: center; flex-wrap: wrap; gap: 16px; box-shadow: 0 8px 30px rgba(13,27,62,0.25); }
         .draw-header h1 { font-size: 28px; margin-bottom: 8px; }
         .draw-header p { opacity: 0.85; }
-        .draw-header .btn-outline {
-            background: transparent; color: #fff; border: 2px solid #fff;
-            padding: 12px 24px; border-radius: 10px; font-size: 15px;
-            font-weight: 700; cursor: pointer; text-decoration: none;
-            display: inline-flex; align-items: center; gap: 8px; transition: all 0.2s;
-        }
+        .draw-header .btn-outline { background: transparent; color: #fff; border: 2px solid #fff; padding: 12px 24px; border-radius: 10px; font-size: 15px; font-weight: 700; cursor: pointer; text-decoration: none; display: inline-flex; align-items: center; gap: 8px; transition: all 0.2s; }
         .draw-header .btn-outline:hover { background: #fff; color: #0d1b3e; }
-
-        .draw-panel {
-            background: #fff; border-radius: 16px; padding: 24px;
-            margin-bottom: 24px; box-shadow: 0 4px 20px rgba(0,0,0,0.08);
-        }
-        .panel-title {
-            font-size: 20px; font-weight: 700; color: #1a1a2e;
-            margin-bottom: 16px; display: flex; align-items: center; gap: 10px;
-        }
-        .step-num {
-            background: #1a3a7a; color: #fff; width: 32px; height: 32px;
-            border-radius: 50%; display: flex; align-items: center;
-            justify-content: center; font-size: 15px; flex-shrink: 0;
-        }
-
-        .form-row-add {
-            display: grid; grid-template-columns: 2fr 2fr 1fr 1fr;
-            gap: 12px; align-items: end; margin-bottom: 16px;
-        }
-        .form-group label {
-            display: block; font-weight: 600; font-size: 14px;
-            margin-bottom: 6px; color: #1a1a2e;
-        }
-        .form-group input, .form-group select {
-            width: 100%; padding: 12px 16px; border: 2px solid #e9ecef;
-            border-radius: 10px; font-size: 15px; font-family: inherit; transition: all 0.2s;
-        }
-        .form-group input:focus, .form-group select:focus {
-            border-color: #1a3a7a; outline: none;
-            box-shadow: 0 0 0 3px rgba(26,58,122,0.1);
-        }
-        .category-select-box {
-            background: #e7f3ff; border-left: 4px solid #1a3a7a;
-            padding: 16px 20px; border-radius: 12px; margin-bottom: 20px;
-        }
-        .category-select-box label {
-            display: block; font-weight: 700; font-size: 15px;
-            color: #1a3a7a; margin-bottom: 8px;
-        }
-        .category-select-box select {
-            width: 100%; max-width: 500px; padding: 12px 16px;
-            border: 2px solid #1a3a7a; border-radius: 10px;
-            font-size: 15px; font-weight: 600; background: #fff;
-        }
+        .draw-panel { background: #fff; border-radius: 16px; padding: 24px; margin-bottom: 24px; box-shadow: 0 4px 20px rgba(0,0,0,0.08); }
+        .panel-title { font-size: 20px; font-weight: 700; color: #1a1a2e; margin-bottom: 16px; display: flex; align-items: center; gap: 10px; }
+        .step-num { background: #1a3a7a; color: #fff; width: 32px; height: 32px; border-radius: 50%; display: flex; align-items: center; justify-content: center; font-size: 15px; flex-shrink: 0; }
+        .form-row-add { display: grid; grid-template-columns: 2fr 2fr 1fr 1fr; gap: 12px; align-items: end; margin-bottom: 16px; }
+        .form-group label { display: block; font-weight: 600; font-size: 14px; margin-bottom: 6px; color: #1a1a2e; }
+        .form-group input, .form-group select { width: 100%; padding: 12px 16px; border: 2px solid #e9ecef; border-radius: 10px; font-size: 15px; font-family: inherit; transition: all 0.2s; }
+        .form-group input:focus, .form-group select:focus { border-color: #1a3a7a; outline: none; box-shadow: 0 0 0 3px rgba(26,58,122,0.1); }
+        .category-select-box { background: #e7f3ff; border-left: 4px solid #1a3a7a; padding: 16px 20px; border-radius: 12px; margin-bottom: 20px; }
+        .category-select-box label { display: block; font-weight: 700; font-size: 15px; color: #1a3a7a; margin-bottom: 8px; }
+        .category-select-box select { width: 100%; max-width: 500px; padding: 12px 16px; border: 2px solid #1a3a7a; border-radius: 10px; font-size: 15px; font-weight: 600; background: #fff; }
         .category-select-box .hint { font-size: 13px; color: #6c757d; margin-top: 8px; }
-
-        .btn-primary {
-            background: linear-gradient(135deg, #0d1b3e, #1a3a7a);
-            color: #fff; border: none; padding: 13px 24px;
-            border-radius: 10px; font-size: 15px; font-weight: 700;
-            cursor: pointer; transition: all 0.3s ease;
-            display: inline-flex; align-items: center; justify-content: center; gap: 6px;
-        }
+        .btn-primary { background: linear-gradient(135deg, #0d1b3e, #1a3a7a); color: #fff; border: none; padding: 13px 24px; border-radius: 10px; font-size: 15px; font-weight: 700; cursor: pointer; transition: all 0.3s ease; display: inline-flex; align-items: center; justify-content: center; gap: 6px; }
         .btn-primary:hover { transform: translateY(-2px); box-shadow: 0 8px 20px rgba(26,58,122,0.3); }
         .btn-primary:disabled { opacity: 0.5; cursor: not-allowed; transform: none; }
-        .btn-success-sm {
-            background: linear-gradient(135deg, #00b894, #00a859);
-            color: #fff; border: none; padding: 12px 20px;
-            border-radius: 10px; font-size: 14px; font-weight: 700;
-            cursor: pointer; display: inline-flex; align-items: center;
-            justify-content: center; gap: 6px; transition: all 0.3s ease;
-        }
+        .btn-success-sm { background: linear-gradient(135deg, #00b894, #00a859); color: #fff; border: none; padding: 12px 20px; border-radius: 10px; font-size: 14px; font-weight: 700; cursor: pointer; display: inline-flex; align-items: center; justify-content: center; gap: 6px; transition: all 0.3s ease; }
         .btn-success-sm:hover { transform: translateY(-2px); box-shadow: 0 6px 15px rgba(0,184,148,0.4); }
         .btn-success-sm:disabled { opacity: 0.5; cursor: not-allowed; transform: none; }
-        .btn-danger-sm {
-            background: #e94560; color: #fff; border: none;
-            padding: 10px 18px; border-radius: 10px; font-size: 14px;
-            font-weight: 700; cursor: pointer;
-            display: inline-flex; align-items: center; gap: 6px;
-        }
-        .btn-warning-sm {
-            background: #fdcb6e; color: #1a1a2e; border: none;
-            padding: 12px 20px; border-radius: 10px; font-size: 14px;
-            font-weight: 700; cursor: pointer;
-            display: inline-flex; align-items: center; gap: 6px;
-        }
-        .btn-info-sm {
-            background: #0984e3; color: #fff; border: none;
-            padding: 12px 20px; border-radius: 10px; font-size: 14px;
-            font-weight: 700; cursor: pointer;
-            display: inline-flex; align-items: center; gap: 6px;
-        }
-        .btn-success {
-            background: linear-gradient(135deg, #00b894, #00a859);
-            color: #fff; border: none; padding: 16px 32px;
-            border-radius: 12px; font-size: 17px; font-weight: 800;
-            cursor: pointer; width: 100%; margin-top: 16px;
-            display: inline-flex; align-items: center;
-            justify-content: center; gap: 8px; transition: all 0.3s ease;
-        }
+        .btn-danger-sm { background: #e94560; color: #fff; border: none; padding: 10px 18px; border-radius: 10px; font-size: 14px; font-weight: 700; cursor: pointer; display: inline-flex; align-items: center; gap: 6px; }
+        .btn-warning-sm { background: #fdcb6e; color: #1a1a2e; border: none; padding: 12px 20px; border-radius: 10px; font-size: 14px; font-weight: 700; cursor: pointer; display: inline-flex; align-items: center; gap: 6px; }
+        .btn-info-sm { background: #0984e3; color: #fff; border: none; padding: 12px 20px; border-radius: 10px; font-size: 14px; font-weight: 700; cursor: pointer; display: inline-flex; align-items: center; gap: 6px; }
+        .btn-success { background: linear-gradient(135deg, #00b894, #00a859); color: #fff; border: none; padding: 16px 32px; border-radius: 12px; font-size: 17px; font-weight: 800; cursor: pointer; width: 100%; margin-top: 16px; display: inline-flex; align-items: center; justify-content: center; gap: 8px; transition: all 0.3s ease; }
         .btn-success:hover { transform: translateY(-2px); box-shadow: 0 10px 25px rgba(0,184,148,0.4); }
-        .action-bar {
-            display: flex; gap: 12px; flex-wrap: wrap;
-            padding: 14px 16px; background: #f8f9fa;
-            border-radius: 12px; margin-bottom: 16px;
-        }
-
-        .teams-summary {
-            display: flex; gap: 12px; flex-wrap: wrap;
-            padding: 12px 16px; background: #f8f9fa;
-            border-radius: 10px; margin-bottom: 16px; font-size: 14px;
-        }
+        .action-bar { display: flex; gap: 12px; flex-wrap: wrap; padding: 14px 16px; background: #f8f9fa; border-radius: 12px; margin-bottom: 16px; }
+        .teams-summary { display: flex; gap: 12px; flex-wrap: wrap; padding: 12px 16px; background: #f8f9fa; border-radius: 10px; margin-bottom: 16px; font-size: 14px; }
         .teams-summary .stat { display: flex; align-items: center; gap: 6px; }
         .teams-summary .stat strong { color: #1a3a7a; }
-        .teams-list {
-            display: grid; grid-template-columns: repeat(auto-fill, minmax(240px, 1fr));
-            gap: 12px; max-height: 500px; overflow-y: auto; padding: 4px;
-        }
-        .team-item {
-            background: #f8f9fa; padding: 12px 14px; border-radius: 10px;
-            border: 2px solid #e9ecef; display: flex; justify-content: space-between;
-            align-items: center; gap: 8px; transition: all 0.2s ease;
-        }
+        .teams-list { display: grid; grid-template-columns: repeat(auto-fill, minmax(240px, 1fr)); gap: 12px; max-height: 500px; overflow-y: auto; padding: 4px; }
+        .team-item { background: #f8f9fa; padding: 12px 14px; border-radius: 10px; border: 2px solid #e9ecef; display: flex; justify-content: space-between; align-items: center; gap: 8px; transition: all 0.2s ease; }
         .team-item:hover { border-color: #1a3a7a; background: #fff; }
         .team-item .team-info { flex: 1; min-width: 0; }
-        .team-item .team-name {
-            font-weight: 700; color: #1a1a2e; font-size: 14px;
-            display: block; white-space: nowrap; overflow: hidden; text-overflow: ellipsis;
-        }
+        .team-item .team-name { font-weight: 700; color: #1a1a2e; font-size: 14px; display: block; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
         .team-item .team-club { font-size: 12px; color: #6c757d; margin-top: 2px; display: block; }
         .team-item .team-club.has-club { color: #1a3a7a; font-weight: 600; }
-        .team-item .remove-btn {
-            background: #e94560; color: #fff; border: none;
-            width: 26px; height: 26px; border-radius: 50%;
-            cursor: pointer; font-size: 13px;
-            display: flex; align-items: center; justify-content: center; flex-shrink: 0;
-            transition: all 0.2s;
-        }
+        .team-item .remove-btn { background: #e94560; color: #fff; border: none; width: 26px; height: 26px; border-radius: 50%; cursor: pointer; font-size: 13px; display: flex; align-items: center; justify-content: center; flex-shrink: 0; transition: all 0.2s; }
         .team-item .remove-btn:hover { background: #c73650; transform: scale(1.1); }
-
-        .checkbox-line {
-            display: flex; align-items: center; gap: 12px;
-            cursor: pointer; padding: 12px 16px;
-            background: #f8f9fa; border-radius: 10px; font-size: 15px;
-            margin-bottom: 8px;
-        }
-        .checkbox-line input[type="checkbox"] {
-            width: 20px; height: 20px; cursor: pointer; accent-color: #1a3a7a;
-        }
-
-        .draw-types {
-            display: grid; grid-template-columns: repeat(auto-fit, minmax(260px, 1fr));
-            gap: 12px; margin-top: 12px;
-        }
-        .draw-type-card {
-            background: #fff; border: 2px solid #e9ecef;
-            border-radius: 12px; padding: 16px 18px; cursor: pointer;
-            transition: all 0.2s ease; display: flex; align-items: flex-start; gap: 12px;
-        }
+        .checkbox-line { display: flex; align-items: center; gap: 12px; cursor: pointer; padding: 12px 16px; background: #f8f9fa; border-radius: 10px; font-size: 15px; margin-bottom: 8px; }
+        .checkbox-line input[type="checkbox"] { width: 20px; height: 20px; cursor: pointer; accent-color: #1a3a7a; }
+        .draw-types { display: grid; grid-template-columns: repeat(auto-fit, minmax(260px, 1fr)); gap: 12px; margin-top: 12px; }
+        .draw-type-card { background: #fff; border: 2px solid #e9ecef; border-radius: 12px; padding: 16px 18px; cursor: pointer; transition: all 0.2s ease; display: flex; align-items: flex-start; gap: 12px; }
         .draw-type-card:hover { border-color: #1a3a7a; transform: translateY(-2px); }
-        .draw-type-card.selected {
-            border-color: #1a3a7a; background: #f0f4ff;
-            box-shadow: 0 4px 12px rgba(26,58,122,0.15);
-        }
-        .draw-type-card input[type="radio"] {
-            margin-top: 4px; width: 18px; height: 18px;
-            accent-color: #1a3a7a; flex-shrink: 0;
-        }
+        .draw-type-card.selected { border-color: #1a3a7a; background: #f0f4ff; box-shadow: 0 4px 12px rgba(26,58,122,0.15); }
+        .draw-type-card input[type="radio"] { margin-top: 4px; width: 18px; height: 18px; accent-color: #1a3a7a; flex-shrink: 0; }
         .draw-type-card .info { flex: 1; }
         .draw-type-card .info strong { display: block; color: #1a1a2e; font-size: 15px; margin-bottom: 6px; }
         .draw-type-card .info small { color: #6c757d; font-size: 13px; line-height: 1.5; }
-
-        .config-box {
-            margin-top: 20px; padding: 16px;
-            background: #f8f9fa; border-radius: 12px;
-            border-left: 4px solid #1a3a7a;
-        }
-        .config-box h4 {
-            font-size: 15px; font-weight: 700; color: #1a1a2e;
-            margin-bottom: 12px; display: flex; align-items: center; gap: 8px;
-        }
-        .config-row {
-            display: grid; grid-template-columns: 1fr 1fr 1fr;
-            gap: 12px; margin-bottom: 12px;
-        }
+        .config-box { margin-top: 20px; padding: 16px; background: #f8f9fa; border-radius: 12px; border-left: 4px solid #1a3a7a; }
+        .config-box h4 { font-size: 15px; font-weight: 700; color: #1a1a2e; margin-bottom: 12px; display: flex; align-items: center; gap: 8px; }
+        .config-row { display: grid; grid-template-columns: 1fr 1fr 1fr; gap: 12px; margin-bottom: 12px; }
         .custom-groups { display: flex; gap: 8px; flex-wrap: wrap; align-items: center; }
         .group-input-wrapper { display: flex; flex-direction: column; gap: 4px; align-items: center; }
         .group-input-wrapper label { font-size: 12px; font-weight: 700; color: #1a3a7a; }
-        .group-input {
-            width: 65px; padding: 10px 8px; border: 2px solid #e9ecef;
-            border-radius: 8px; text-align: center; font-weight: 700; font-size: 15px;
-        }
+        .group-input { width: 65px; padding: 10px 8px; border: 2px solid #e9ecef; border-radius: 8px; text-align: center; font-weight: 700; font-size: 15px; }
         .group-input:focus { border-color: #1a3a7a; outline: none; }
-        .total-check {
-            font-size: 14px; font-weight: 700;
-            padding: 6px 14px; border-radius: 20px; display: inline-block;
-        }
+        .total-check { font-size: 14px; font-weight: 700; padding: 6px 14px; border-radius: 20px; display: inline-block; }
         .total-check.ok { background: #d4edda; color: #155724; }
         .total-check.error { background: #f8d7da; color: #721c24; }
-
-        .warning-box {
-            padding: 14px 18px; background: #fff3cd;
-            border: 1px solid #ffeaa7; border-left: 4px solid #fdcb6e;
-            border-radius: 10px; color: #856404;
-            margin-bottom: 20px; font-size: 14px; line-height: 1.6;
-        }
-        .alert {
-            padding: 14px 18px; border-radius: 10px;
-            margin-top: 16px; display: none; font-size: 14px;
-        }
+        .warning-box { padding: 14px 18px; background: #fff3cd; border: 1px solid #ffeaa7; border-left: 4px solid #fdcb6e; border-radius: 10px; color: #856404; margin-bottom: 20px; font-size: 14px; line-height: 1.6; }
+        .alert { padding: 14px 18px; border-radius: 10px; margin-top: 16px; display: none; font-size: 14px; }
         .alert.show { display: block; }
         .alert.error { background: #f8d7da; color: #721c24; border: 1px solid #f5c6cb; }
         .alert.success { background: #d4edda; color: #155724; border: 1px solid #c3e6cb; }
         .alert.info { background: #cce5ff; color: #004085; border: 1px solid #b8daff; }
-
-        .groups-grid {
-            display: grid; grid-template-columns: repeat(auto-fit, minmax(250px, 1fr));
-            gap: 20px; margin-top: 20px;
-        }
-        .group-card {
-            background: #fff; border-radius: 16px; overflow: hidden;
-            box-shadow: 0 4px 15px rgba(0,0,0,0.1);
-        }
-        .group-header {
-            background: linear-gradient(135deg, #0d1b3e, #1a3a7a);
-            color: #fff; padding: 16px 20px;
-            font-size: 18px; font-weight: 800;
-            display: flex; justify-content: space-between; align-items: center;
-        }
-        .group-header .count {
-            font-size: 13px; font-weight: 600; opacity: 0.85;
-            background: rgba(255,255,255,0.15);
-            padding: 3px 10px; border-radius: 12px;
-        }
+        .groups-grid { display: grid; grid-template-columns: repeat(auto-fit, minmax(250px, 1fr)); gap: 20px; margin-top: 20px; }
+        .group-card { background: #fff; border-radius: 16px; overflow: hidden; box-shadow: 0 4px 15px rgba(0,0,0,0.1); }
+        .group-header { background: linear-gradient(135deg, #0d1b3e, #1a3a7a); color: #fff; padding: 16px 20px; font-size: 18px; font-weight: 800; display: flex; justify-content: space-between; align-items: center; }
+        .group-header .count { font-size: 13px; font-weight: 600; opacity: 0.85; background: rgba(255,255,255,0.15); padding: 3px 10px; border-radius: 12px; }
         .group-teams { padding: 14px; }
-        .group-team {
-            padding: 12px 14px; background: #f8f9fa;
-            border-radius: 10px; margin-bottom: 8px;
-            display: flex; align-items: center; gap: 12px;
-        }
+        .group-team { padding: 12px 14px; background: #f8f9fa; border-radius: 10px; margin-bottom: 8px; display: flex; align-items: center; gap: 12px; }
         .group-team:hover { background: #f0f4ff; }
         .group-team:last-child { margin-bottom: 0; }
-        .group-team .position {
-            width: 28px; height: 28px; background: #1a3a7a;
-            color: #fff; border-radius: 50%;
-            display: flex; align-items: center; justify-content: center;
-            font-size: 13px; font-weight: 700; flex-shrink: 0;
-        }
+        .group-team .position { width: 28px; height: 28px; background: #1a3a7a; color: #fff; border-radius: 50%; display: flex; align-items: center; justify-content: center; font-size: 13px; font-weight: 700; flex-shrink: 0; }
         .group-team .team-info { flex: 1; min-width: 0; }
         .group-team .team-name { font-weight: 700; color: #1a1a2e; font-size: 14px; display: block; }
         .group-team .team-club { font-size: 12px; color: #6c757d; margin-top: 2px; display: block; }
         .group-team .team-club.has-club { color: #1a3a7a; font-weight: 600; }
-
         .bracket-tabs { display: flex; gap: 8px; margin-bottom: 16px; flex-wrap: wrap; }
-        .bracket-tab-btn {
-            padding: 10px 18px; border-radius: 8px; font-size: 13px;
-            font-weight: 700; cursor: pointer; border: 2px solid #e9ecef;
-            background: #fff; color: #6c757d; transition: all 0.2s;
-        }
-        .bracket-tab-btn.active {
-            background: linear-gradient(135deg, #0d1b3e, #1a3a7a);
-            color: #fff; border-color: #1a3a7a;
-        }
-        .bracket-wrapper {
-            overflow-x: auto; padding: 20px 8px;
-            background: #fafbfc; border-radius: 12px;
-            border: 1px solid #e9ecef;
-        }
-        .bracket-tree {
-            display: inline-flex; gap: 0;
-            min-width: max-content;
-            align-items: flex-start; position: relative;
-        }
+        .bracket-tab-btn { padding: 10px 18px; border-radius: 8px; font-size: 13px; font-weight: 700; cursor: pointer; border: 2px solid #e9ecef; background: #fff; color: #6c757d; transition: all 0.2s; }
+        .bracket-tab-btn.active { background: linear-gradient(135deg, #0d1b3e, #1a3a7a); color: #fff; border-color: #1a3a7a; }
+        .bracket-wrapper { overflow-x: auto; padding: 20px 8px; background: #fafbfc; border-radius: 12px; border: 1px solid #e9ecef; }
+        .bracket-tree { display: inline-flex; gap: 0; min-width: max-content; align-items: flex-start; position: relative; }
         .bracket-round { display: flex; flex-direction: column; flex-shrink: 0; }
-        .bracket-round-header {
-            text-align: center; color: #fff;
-            font-size: 11px; font-weight: 700;
-            text-transform: uppercase; letter-spacing: 0.5px;
-            background: linear-gradient(135deg, #0d1b3e, #1a3a7a);
-            padding: 8px; border-radius: 6px; margin-bottom: 8px;
-            white-space: nowrap;
-        }
+        .bracket-round-header { text-align: center; color: #fff; font-size: 11px; font-weight: 700; text-transform: uppercase; letter-spacing: 0.5px; background: linear-gradient(135deg, #0d1b3e, #1a3a7a); padding: 8px; border-radius: 6px; margin-bottom: 8px; white-space: nowrap; }
         .bracket-round-body { display: flex; flex-direction: column; position: relative; }
-        .bracket-match {
-            display: flex; flex-direction: column;
-            border: 1px solid #dee2e6; border-left: 3px solid #1a3a7a;
-            border-radius: 6px; background: #fff;
-            margin: 3px 0; padding: 4px 6px;
-            position: relative; min-height: 40px;
-            justify-content: center; transition: all 0.2s;
-        }
-        .bracket-match:hover {
-            border-left-color: #0984e3;
-            box-shadow: 0 2px 8px rgba(9,132,227,0.15);
-        }
+        .bracket-match { display: flex; flex-direction: column; border: 1px solid #dee2e6; border-left: 3px solid #1a3a7a; border-radius: 6px; background: #fff; margin: 3px 0; padding: 4px 6px; position: relative; min-height: 40px; justify-content: center; transition: all 0.2s; }
+        .bracket-match:hover { border-left-color: #0984e3; box-shadow: 0 2px 8px rgba(9,132,227,0.15); }
         .bracket-match.bye { border-left-color: #fdcb6e; background: #fff9e6; }
         .bracket-match.placeholder { border-left-color: #adb5bd; background: #f8f9fa; }
-        .bracket-match .match-label {
-            position: absolute; top: 2px; right: 6px;
-            font-size: 9px; color: #adb5bd; font-weight: 700;
-        }
-        .bracket-match .player {
-            font-size: 11px; font-weight: 600; color: #1a1a2e;
-            padding: 2px 0; display: flex; justify-content: space-between;
-            align-items: center; gap: 6px; line-height: 1.3;
-        }
-        .bracket-match .player .name {
-            flex: 1; overflow: hidden;
-            text-overflow: ellipsis; white-space: nowrap;
-        }
-        .bracket-match .player .club {
-            font-size: 9px; color: #1a3a7a; background: #e7eefc;
-            padding: 1px 4px; border-radius: 3px; font-weight: 700; flex-shrink: 0;
-        }
+        .bracket-match.third-place { border-left-color: #e67e22; background: #fff8f0; }
+        .bracket-match .match-label { position: absolute; top: 2px; right: 6px; font-size: 9px; color: #adb5bd; font-weight: 700; }
+        .bracket-match .player { font-size: 11px; font-weight: 600; color: #1a1a2e; padding: 2px 0; display: flex; justify-content: space-between; align-items: center; gap: 6px; line-height: 1.3; }
+        .bracket-match .player .name { flex: 1; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
+        .bracket-match .player .club { font-size: 9px; color: #1a3a7a; background: #e7eefc; padding: 1px 4px; border-radius: 3px; font-weight: 700; flex-shrink: 0; }
         .bracket-match .player.bye { color: #856404; font-style: italic; }
-        .bracket-match .player.bye .byex {
-            background: #fdcb6e; color: #856404;
-            font-size: 9px; font-weight: 800;
-            padding: 1px 5px; border-radius: 3px;
-        }
+        .bracket-match .player.bye .byex { background: #fdcb6e; color: #856404; font-size: 9px; font-weight: 800; padding: 1px 5px; border-radius: 3px; }
         .bracket-match .player.placeholder { color: #adb5bd; font-style: italic; }
         .bracket-match .match-sep { height: 1px; background: #e9ecef; margin: 1px 0; }
-        .bracket-match .edit-btn {
-            position: absolute; top: 2px; left: 4px;
-            background: transparent; border: none;
-            color: #adb5bd; cursor: pointer;
-            font-size: 10px; padding: 2px;
-            opacity: 0; transition: opacity 0.2s;
-        }
+        .bracket-match .edit-btn { position: absolute; top: 2px; left: 4px; background: transparent; border: none; color: #adb5bd; cursor: pointer; font-size: 10px; padding: 2px; opacity: 0; transition: opacity 0.2s; }
         .bracket-match:hover .edit-btn { opacity: 1; color: #0984e3; }
         .bracket-match .edit-btn:hover { color: #e94560; transform: scale(1.2); }
-
         .bracket-connector { flex-shrink: 0; position: relative; }
         .bracket-connector svg { display: block; }
-        .connector-label {
-            position: absolute; background: #fff;
-            border: 1px solid #1a3a7a; border-radius: 4px;
-            padding: 2px 6px; font-size: 9px;
-            color: #1a3a7a; font-weight: 700;
-            white-space: nowrap; z-index: 2;
-            pointer-events: none;
-        }
-        .connector-label.bk {
-            background: #e94560; color: #fff;
-            border-color: #e94560; font-size: 10px;
-        }
-
         .slot-table { width: 100%; border-collapse: collapse; font-size: 13px; background: #fff; }
-        .slot-table th {
-            background: #1a3a7a; color: #fff; padding: 10px;
-            border: 1px solid #dee2e6; text-align: center; font-size: 12px;
-        }
+        .slot-table th { background: #1a3a7a; color: #fff; padding: 10px; border: 1px solid #dee2e6; text-align: center; font-size: 12px; }
         .slot-table td { padding: 8px 10px; border: 1px solid #dee2e6; }
         .slot-table tr.bye-row { background: #fff9e6; }
         .slot-table tr.bye-row td { color: #856404; font-style: italic; }
-
         .empty-state { text-align: center; padding: 40px 20px; color: #6c757d; }
         .empty-state i { font-size: 48px; color: #dee2e6; margin-bottom: 12px; display: block; }
         .result-actions { margin-top: 20px; display: flex; gap: 12px; flex-wrap: wrap; }
-        .bracket-info {
-            background: #e7f3ff; border-left: 4px solid #1a3a7a;
-            padding: 12px 16px; border-radius: 8px;
-            margin-bottom: 16px; font-size: 14px; color: #1a3a7a; font-weight: 700;
-        }
-
-        .modal-overlay {
-            display: none; position: fixed; top: 0; left: 0; right: 0; bottom: 0;
-            background: rgba(0,0,0,0.5); z-index: 1000;
-            align-items: center; justify-content: center; padding: 20px;
-        }
+        .bracket-info { background: #e7f3ff; border-left: 4px solid #1a3a7a; padding: 12px 16px; border-radius: 8px; margin-bottom: 16px; font-size: 14px; color: #1a3a7a; font-weight: 700; }
+        .modal-overlay { display: none; position: fixed; top: 0; left: 0; right: 0; bottom: 0; background: rgba(0,0,0,0.5); z-index: 1000; align-items: center; justify-content: center; padding: 20px; }
         .modal-overlay.show { display: flex; }
-        .modal-content {
-            background: #fff; border-radius: 20px;
-            max-width: 900px; width: 100%; max-height: 90vh;
-            overflow-y: auto;
-        }
-        .modal-header {
-            background: linear-gradient(135deg, #0d1b3e, #1a3a7a);
-            color: #fff; padding: 24px 28px; border-radius: 20px 20px 0 0;
-            display: flex; justify-content: space-between; align-items: center;
-        }
+        .modal-content { background: #fff; border-radius: 20px; max-width: 900px; width: 100%; max-height: 90vh; overflow-y: auto; }
+        .modal-header { background: linear-gradient(135deg, #0d1b3e, #1a3a7a); color: #fff; padding: 24px 28px; border-radius: 20px 20px 0 0; display: flex; justify-content: space-between; align-items: center; }
         .modal-header h2 { font-size: 20px; }
         .modal-close { background: none; border: none; color: #fff; font-size: 28px; cursor: pointer; }
         .modal-body { padding: 28px; }
-        .drop-zone {
-            border: 3px dashed #1a3a7a; border-radius: 16px;
-            padding: 40px 20px; text-align: center; cursor: pointer;
-            transition: all 0.3s ease; background: #f8f9fa;
-        }
+        .drop-zone { border: 3px dashed #1a3a7a; border-radius: 16px; padding: 40px 20px; text-align: center; cursor: pointer; transition: all 0.3s ease; background: #f8f9fa; }
         .drop-zone:hover, .drop-zone.dragover { background: #e7f3ff; border-color: #0984e3; }
         .drop-zone i { font-size: 48px; color: #1a3a7a; margin-bottom: 12px; display: block; }
         .drop-zone p { color: #6c757d; font-size: 15px; margin-bottom: 8px; }
         .drop-zone strong { color: #1a3a7a; }
-        .preview-table {
-            max-height: 300px; overflow-y: auto; margin-top: 16px;
-            border: 1px solid #e9ecef; border-radius: 10px;
-        }
+        .preview-table { max-height: 300px; overflow-y: auto; margin-top: 16px; border: 1px solid #e9ecef; border-radius: 10px; }
         .preview-table table { width: 100%; border-collapse: collapse; font-size: 13px; }
-        .preview-table th {
-            background: #1a3a7a; color: #fff; padding: 10px;
-            text-align: left; position: sticky; top: 0;
-        }
+        .preview-table th { background: #1a3a7a; color: #fff; padding: 10px; text-align: left; position: sticky; top: 0; }
         .preview-table td { padding: 8px 10px; border-bottom: 1px solid #e9ecef; }
         .preview-table tr:last-child td { border-bottom: none; }
         .preview-table tr:nth-child(even) { background: #f8f9fa; }
-        .modal-actions {
-            display: flex; gap: 12px; justify-content: flex-end;
-            margin-top: 24px; padding-top: 20px; border-top: 1px solid #e9ecef;
-        }
-
-        .loading-overlay {
-            position: fixed; top: 0; left: 0; right: 0; bottom: 0;
-            background: rgba(0,0,0,0.5); display: none;
-            align-items: center; justify-content: center; z-index: 9999;
-        }
+        .modal-actions { display: flex; gap: 12px; justify-content: flex-end; margin-top: 24px; padding-top: 20px; border-top: 1px solid #e9ecef; }
+        .loading-overlay { position: fixed; top: 0; left: 0; right: 0; bottom: 0; background: rgba(0,0,0,0.5); display: none; align-items: center; justify-content: center; z-index: 9999; }
         .loading-overlay.active { display: flex; }
-        .loading-box {
-            background: #fff; padding: 30px 40px;
-            border-radius: 16px; text-align: center;
-        }
-        .spinner {
-            display: inline-block; width: 40px; height: 40px;
-            border: 4px solid #e9ecef; border-top-color: #1a3a7a;
-            border-radius: 50%; animation: spin 0.8s linear infinite;
-        }
+        .loading-box { background: #fff; padding: 30px 40px; border-radius: 16px; text-align: center; }
+        .spinner { display: inline-block; width: 40px; height: 40px; border: 4px solid #e9ecef; border-top-color: #1a3a7a; border-radius: 50%; animation: spin 0.8s linear infinite; }
         @keyframes spin { to { transform: rotate(360deg); } }
-
-        /* Session config cards */
-        .session-card {
-            background: #fff; border: 1px solid #e9ecef;
-            border-radius: 8px; padding: 10px 12px;
-            transition: all 0.2s;
-        }
+        .session-card { background: #fff; border: 1px solid #e9ecef; border-radius: 8px; padding: 10px 12px; transition: all 0.2s; }
         .session-card:hover { border-color: #1a3a7a; }
-        .session-checkbox-label {
-            display: flex; align-items: center; gap: 4px;
-            font-size: 12px; cursor: pointer;
-            padding: 4px 8px; border-radius: 6px;
-            background: #f8f9fa; border: 1px solid #e9ecef;
-            transition: all 0.2s;
-        }
-        .session-checkbox-label.checked {
-            background: #e7f3ff; border-color: #0984e3;
-        }
-
-        @media (max-width: 768px) {
-            .form-row-add { grid-template-columns: 1fr; }
-            .config-row { grid-template-columns: 1fr; }
-            .draw-header h1 { font-size: 22px; }
-        }
+        .session-checkbox-label { display: flex; align-items: center; gap: 4px; font-size: 12px; cursor: pointer; padding: 4px 8px; border-radius: 6px; background: #f8f9fa; border: 1px solid #e9ecef; transition: all 0.2s; }
+        .session-checkbox-label.checked { background: #e7f3ff; border-color: #0984e3; }
+        .stage-header { background: #fff3cd; padding: 14px 18px; border-radius: 10px; margin: 24px 0 20px; font-weight: 800; color: #856404; border-left: 4px solid #fdcb6e; display: flex; align-items: center; gap: 10px; }
+        .stage-header.knockout { background: #e7f3ff; color: #1a3a7a; border-left-color: #1a3a7a; }
+        @media (max-width: 768px) { .form-row-add { grid-template-columns: 1fr; } .config-row { grid-template-columns: 1fr; } .draw-header h1 { font-size: 22px; } }
     </style>
 </head>
 <body>
@@ -474,7 +163,7 @@
     <div class="draw-header">
         <div>
             <h1>🎲 Bốc thăm tự động</h1>
-            <p>Chia bảng · Loại trực tiếp · Vòng tròn · Xuất Excel chuẩn</p>
+            <p>Chia bảng · Loại trực tiếp · Vòng tròn + Knockout · Xuất Excel đầy đủ</p>
         </div>
         <a href="tournaments.html" class="btn-outline">
             <i class="fas fa-arrow-left"></i> Quay lại
@@ -482,266 +171,128 @@
     </div>
 
     <div class="draw-panel">
-        <div class="panel-title">
-            <span class="step-num">1</span> Chọn nội dung & Nhập danh sách VĐV
-        </div>
+        <div class="panel-title"><span class="step-num">1</span> Chọn nội dung & Nhập danh sách VĐV</div>
         <div class="category-select-box">
             <label><i class="fas fa-list"></i> Chọn nội dung thi đấu <span style="color: #e94560;">*</span></label>
             <select id="category-select" onchange="onCategoryChange()">
                 <option value="">-- Đang tải danh sách nội dung... --</option>
             </select>
-            <div class="hint">
-                <i class="fas fa-info-circle"></i> Kết quả bốc thăm sẽ lưu theo nội dung này
-            </div>
+            <div class="hint"><i class="fas fa-info-circle"></i> Kết quả bốc thăm sẽ lưu theo nội dung này</div>
         </div>
-
         <div class="form-row-add">
-            <div class="form-group">
-                <label>Tên VĐV / Đội</label>
-                <input type="text" id="team-input" placeholder="VD: Nguyễn Văn An">
-            </div>
-            <div class="form-group">
-                <label>CLB / Đơn vị</label>
-                <input type="text" id="club-input" placeholder="VD: CLB Hà Nội" list="club-list">
-                <datalist id="club-list"></datalist>
-            </div>
-            <div class="form-group">
-                <label>&nbsp;</label>
-                <button class="btn-primary" onclick="addTeam()" style="width: 100%;">
-                    <i class="fas fa-plus"></i> Thêm
-                </button>
-            </div>
-            <div class="form-group">
-                <label>&nbsp;</label>
-                <button class="btn-success-sm" onclick="loadSampleTeams()" style="width: 100%;">
-                    <i class="fas fa-magic"></i> 16 mẫu
-                </button>
-            </div>
+            <div class="form-group"><label>Tên VĐV / Đội</label><input type="text" id="team-input" placeholder="VD: Nguyễn Văn An"></div>
+            <div class="form-group"><label>CLB / Đơn vị</label><input type="text" id="club-input" placeholder="VD: CLB Hà Nội" list="club-list"><datalist id="club-list"></datalist></div>
+            <div class="form-group"><label>&nbsp;</label><button class="btn-primary" onclick="addTeam()" style="width: 100%;"><i class="fas fa-plus"></i> Thêm</button></div>
+            <div class="form-group"><label>&nbsp;</label><button class="btn-success-sm" onclick="loadSampleTeams()" style="width: 100%;"><i class="fas fa-magic"></i> 16 mẫu</button></div>
         </div>
         <div class="action-bar">
-            <button class="btn-success-sm" onclick="openImportModal()">
-                <i class="fas fa-file-import"></i> 📥 Import Excel
-            </button>
-            <button class="btn-primary" onclick="exportTeams()" style="background: #0984e3;">
-                <i class="fas fa-file-export"></i> 📤 Export Excel
-            </button>
-            <button class="btn-warning-sm" onclick="downloadTeamTemplate()">
-                <i class="fas fa-download"></i> 📄 Tải file mẫu
-            </button>
+            <button class="btn-success-sm" onclick="openImportModal()"><i class="fas fa-file-import"></i> 📥 Import Excel</button>
+            <button class="btn-primary" onclick="exportTeams()" style="background: #0984e3;"><i class="fas fa-file-export"></i> 📤 Export Excel</button>
+            <button class="btn-warning-sm" onclick="downloadTeamTemplate()"><i class="fas fa-download"></i> 📄 Tải file mẫu</button>
         </div>
         <div id="teams-summary" class="teams-summary"></div>
         <div id="teams-list" class="teams-list"></div>
         <div style="margin-top: 16px; text-align: right;">
-            <button class="btn-danger-sm" onclick="clearAllTeams()">
-                <i class="fas fa-trash"></i> Xóa tất cả
-            </button>
+            <button class="btn-danger-sm" onclick="clearAllTeams()"><i class="fas fa-trash"></i> Xóa tất cả</button>
         </div>
     </div>
 
     <div class="draw-panel">
-        <div class="panel-title">
-            <span class="step-num">2</span> Ràng buộc CLB (tùy chọn)
-        </div>
-        <label class="checkbox-line">
-            <input type="checkbox" id="protect-club" checked>
-            <span>🚫 Không cho VĐV <strong>cùng CLB</strong> gặp nhau ở vòng đầu</span>
-        </label>
-        <label class="checkbox-line">
-            <input type="checkbox" id="distribute-seeds" checked>
-            <span>🌱 Phân bổ hạt giống đều các nhánh/bảng</span>
-        </label>
+        <div class="panel-title"><span class="step-num">2</span> Ràng buộc CLB (tùy chọn)</div>
+        <label class="checkbox-line"><input type="checkbox" id="protect-club" checked><span>🚫 Không cho VĐV <strong>cùng CLB</strong> gặp nhau ở vòng đầu</span></label>
+        <label class="checkbox-line"><input type="checkbox" id="distribute-seeds" checked><span>🌱 Phân bổ hạt giống đều các nhánh/bảng</span></label>
     </div>
 
     <div class="draw-panel">
-        <div class="panel-title">
-            <span class="step-num">3</span> Chọn thể thức bốc thăm
-        </div>
+        <div class="panel-title"><span class="step-num">3</span> Chọn thể thức bốc thăm</div>
         <div class="draw-types">
             <label class="draw-type-card selected" onclick="selectDrawType('knockout')">
                 <input type="radio" name="draw-type" value="knockout" checked>
-                <div class="info">
-                    <strong>🏆 Loại trực tiếp (Knock-out)</strong>
-                    <small>Tự động chọn bracket 8, 16, 32, 64...<br>VD: 26 VĐV → Bracket 32 (6 BYE)</small>
-                </div>
+                <div class="info"><strong>🏆 Loại trực tiếp (Knock-out)</strong><small>Tự động chọn bracket 8, 16, 32, 64...<br>VD: 26 VĐV → Bracket 32 (6 BYE)</small></div>
             </label>
             <label class="draw-type-card" onclick="selectDrawType('round-robin-even')">
                 <input type="radio" name="draw-type" value="round-robin-even">
-                <div class="info">
-                    <strong>🔄 Vòng tròn - Chia đều</strong>
-                    <small>Chia đều vào các bảng.<br>VD: 10 đội / 2 bảng = 2 bảng × 5 đội</small>
-                </div>
+                <div class="info"><strong>🔄 Vòng tròn - Chia đều</strong><small>Chia đều vào các bảng.<br>VD: 10 đội / 2 bảng = 2 bảng × 5 đội</small></div>
             </label>
             <label class="draw-type-card" onclick="selectDrawType('round-robin-custom')">
                 <input type="radio" name="draw-type" value="round-robin-custom">
-                <div class="info">
-                    <strong>⚙️ Vòng tròn - Chia tùy chỉnh</strong>
-                    <small>Tự chọn số bảng, hệ thống chia đều.<br>VD: 41 VĐV / 10 bảng = 5+4×9</small>
-                </div>
+                <div class="info"><strong>⚙️ Vòng tròn - Chia tùy chỉnh</strong><small>Tự chọn số bảng, hệ thống chia đều.<br>VD: 41 VĐV / 10 bảng = 5+4×9</small></div>
             </label>
             <label class="draw-type-card" onclick="selectDrawType('round-robin-single')">
                 <input type="radio" name="draw-type" value="round-robin-single">
-                <div class="info">
-                    <strong>🎯 Vòng tròn 1 bảng</strong>
-                    <small>Tất cả các đội đấu vòng tròn trong 1 bảng duy nhất</small>
-                </div>
+                <div class="info"><strong>🎯 Vòng tròn 1 bảng</strong><small>Tất cả các đội đấu vòng tròn trong 1 bảng duy nhất</small></div>
             </label>
         </div>
         <div id="config-even" class="config-box" style="display: none;">
-            <div class="form-group" style="max-width: 300px;">
-                <label>Số bảng</label>
-                <select id="num-groups-even">
-                    <option value="1">1 bảng</option>
-                    <option value="2" selected>2 bảng</option>
-                    <option value="3">3 bảng</option>
-                    <option value="4">4 bảng</option>
-                    <option value="5">5 bảng</option>
-                    <option value="6">6 bảng</option>
-                    <option value="8">8 bảng</option>
-                </select>
+            <div class="form-group" style="max-width: 300px;"><label>Số bảng</label>
+                <select id="num-groups-even"><option value="1">1 bảng</option><option value="2" selected>2 bảng</option><option value="3">3 bảng</option><option value="4">4 bảng</option><option value="5">5 bảng</option><option value="6">6 bảng</option><option value="8">8 bảng</option></select>
             </div>
         </div>
         <div id="config-custom" class="config-box" style="display: none;">
-            <div class="form-group" style="max-width: 400px; margin-bottom: 12px;">
-                <label>Chọn số bảng</label>
+            <div class="form-group" style="max-width: 400px; margin-bottom: 12px;"><label>Chọn số bảng</label>
                 <select id="num-groups-custom" onchange="renderCustomGroupsInputs()">
-                    <option value="1">1 bảng</option>
-                    <option value="2">2 bảng</option>
-                    <option value="3" selected>3 bảng</option>
-                    <option value="4">4 bảng</option>
-                    <option value="5">5 bảng</option>
-                    <option value="6">6 bảng</option>
-                    <option value="7">7 bảng</option>
-                    <option value="8">8 bảng</option>
-                    <option value="9">9 bảng</option>
-                    <option value="10">10 bảng</option>
-                    <option value="11">11 bảng</option>
-                    <option value="12">12 bảng</option>
-                    <option value="13">13 bảng</option>
-                    <option value="14">14 bảng</option>
-                    <option value="15">15 bảng</option>
-                    <option value="16">16 bảng</option>
+                    <option value="1">1 bảng</option><option value="2">2 bảng</option><option value="3" selected>3 bảng</option><option value="4">4 bảng</option><option value="5">5 bảng</option><option value="6">6 bảng</option><option value="7">7 bảng</option><option value="8">8 bảng</option><option value="9">9 bảng</option><option value="10">10 bảng</option><option value="11">11 bảng</option><option value="12">12 bảng</option><option value="13">13 bảng</option><option value="14">14 bảng</option><option value="15">15 bảng</option><option value="16">16 bảng</option>
                 </select>
             </div>
             <label style="font-weight: 700; margin-bottom: 10px; display: block;">Số đội mỗi bảng (tự động tính, có thể sửa)</label>
             <div class="custom-groups" id="custom-groups-inputs"></div>
-            <div style="margin-top: 12px;">
-                <span id="total-check" class="total-check"></span>
-            </div>
+            <div style="margin-top: 12px;"><span id="total-check" class="total-check"></span></div>
         </div>
-
         <div id="config-bye" class="config-box" style="display:block;border-left-color:#fdcb6e;">
             <h4><i class="fas fa-ban" style="color:#fdcb6e;"></i> Slot BYE tùy chỉnh</h4>
-            <div class="form-group">
-                <label>Nhập vị trí BYE (cách nhau dấu phẩy, để trống = tự động)</label>
-                <input type="text" id="custom-bye-slots" placeholder="VD: 2,15,18,34,47,50" oninput="updateByeInfo()">
-            </div>
+            <div class="form-group"><label>Nhập vị trí BYE (cách nhau dấu phẩy, để trống = tự động)</label><input type="text" id="custom-bye-slots" placeholder="VD: 2,15,18,34,47,50" oninput="updateByeInfo()"></div>
             <div id="bye-info" style="font-size:13px;color:#1a3a7a;font-weight:600;"></div>
         </div>
     </div>
 
-    <!-- BƯỚC 4: CẤU HÌNH LỊCH THI ĐẤU LINH HOẠT -->
     <div class="draw-panel">
-        <div class="panel-title">
-            <span class="step-num">4</span> Cấu hình lịch thi đấu (tùy chọn)
-        </div>
-
+        <div class="panel-title"><span class="step-num">4</span> Cấu hình lịch thi đấu (tùy chọn)</div>
         <div class="config-row">
-            <div class="form-group">
-                <label>Ngày bắt đầu</label>
-                <input type="date" id="start-date" value="2026-07-03">
-            </div>
-            <div class="form-group">
-                <label>Số ngày thi đấu</label>
-                <input type="number" id="num-days" value="3" min="1" max="30" onchange="renderSessionsConfig()">
-            </div>
-            <div class="form-group">
-                <label>Số buổi thi đấu</label>
-                <input type="number" id="num-sessions" value="5" min="1" max="60" onchange="renderSessionsConfig()">
-            </div>
+            <div class="form-group"><label>Ngày bắt đầu</label><input type="date" id="start-date" value="2026-07-03"></div>
+            <div class="form-group"><label>Số ngày thi đấu</label><input type="number" id="num-days" value="3" min="1" max="30" onchange="renderSessionsConfig()"></div>
+            <div class="form-group"><label>Số buổi thi đấu</label><input type="number" id="num-sessions" value="5" min="1" max="60" onchange="renderSessionsConfig()"></div>
         </div>
-
         <div class="config-row">
-            <div class="form-group">
-                <label>Số bàn thi đấu</label>
-                <input type="number" id="num-tables" value="4" min="1" max="20">
-            </div>
-            <div class="form-group">
-                <label>Giờ bắt đầu Sáng</label>
-                <input type="time" id="time-morning" value="07:30">
-            </div>
-            <div class="form-group">
-                <label>Giờ bắt đầu Chiều</label>
-                <input type="time" id="time-afternoon" value="13:30">
-            </div>
+            <div class="form-group"><label>Số bàn thi đấu</label><input type="number" id="num-tables" value="4" min="1" max="20"></div>
+            <div class="form-group"><label>Giờ bắt đầu Sáng</label><input type="time" id="time-morning" value="07:30"></div>
+            <div class="form-group"><label>Giờ bắt đầu Chiều</label><input type="time" id="time-afternoon" value="13:30"></div>
         </div>
-
         <div class="config-row">
-            <div class="form-group">
-                <label>Giờ bắt đầu Tối</label>
-                <input type="time" id="time-evening" value="18:00">
-            </div>
-            <div class="form-group">
-                <label>Buổi bế mạc (chung kết)</label>
-                <select id="closing-session" onchange="renderSessionsConfig()">
-                    <option value="auto">Tự động (buổi cuối)</option>
-                    <option value="Sáng">Sáng</option>
-                    <option value="Chiều" selected>Chiều</option>
-                    <option value="Tối">Tối</option>
-                </select>
+            <div class="form-group"><label>Giờ bắt đầu Tối</label><input type="time" id="time-evening" value="18:00"></div>
+            <div class="form-group"><label>Buổi bế mạc (chung kết)</label>
+                <select id="closing-session" onchange="renderSessionsConfig()"><option value="auto">Tự động (buổi cuối)</option><option value="Sáng">Sáng</option><option value="Chiều" selected>Chiều</option><option value="Tối">Tối</option></select>
             </div>
         </div>
-
         <div class="config-box" style="border-left-color:#00b894;">
             <h4><i class="fas fa-calendar-alt" style="color:#00b894;"></i> Chi tiết từng buổi</h4>
-            <p style="font-size:13px;color:#6c757d;margin-bottom:12px;">
-                Tick chọn các ca diễn ra trong từng buổi. Hệ thống sẽ tự động gán ngày/giờ/bàn cho từng trận.
-            </p>
+            <p style="font-size:13px;color:#6c757d;margin-bottom:12px;">Tick chọn các ca diễn ra trong từng buổi. Hệ thống sẽ tự động gán ngày/giờ/bàn cho từng trận.</p>
             <div id="sessions-config"></div>
         </div>
     </div>
 
     <div class="draw-panel">
-        <div class="panel-title">
-            <span class="step-num">5</span> Tiến hành bốc thăm
-        </div>
-        <button class="btn-success" onclick="performDraw()">
-            <i class="fas fa-dice"></i> BỐC THĂM NGAY
-        </button>
+        <div class="panel-title"><span class="step-num">5</span> Tiến hành bốc thăm</div>
+        <button class="btn-success" onclick="performDraw()"><i class="fas fa-dice"></i> BỐC THĂM NGAY</button>
         <div id="alert" class="alert"></div>
     </div>
 
     <div class="draw-panel" id="result-panel" style="display: none;">
-        <div class="panel-title">
-            <span class="step-num">6</span> Kết quả bốc thăm
-        </div>
+        <div class="panel-title"><span class="step-num">6</span> Kết quả bốc thăm</div>
         <div id="result-warning" class="warning-box" style="display: none;"></div>
         <div id="result-container"></div>
         <div class="result-actions">
-            <button class="btn-primary" onclick="window.print()">
-                <i class="fas fa-print"></i> In kết quả
-            </button>
-            <button class="btn-success-sm" onclick="exportExcelAdvanced()" id="export-excel-btn">
-                <i class="fas fa-file-excel"></i> 📊 Xuất Excel (đẹp)
-            </button>
-            <button class="btn-info-sm" onclick="exportCurrentSheet()" id="export-current-btn">
-                <i class="fas fa-file-export"></i> Xuất sheet hiện tại
-            </button>
-            <button class="btn-success-sm" onclick="saveToDatabase()" id="save-btn">
-                <i class="fas fa-save"></i> Lưu vào hệ thống
-            </button>
-            <button class="btn-warning-sm" onclick="performDraw()">
-                <i class="fas fa-redo"></i> Bốc lại
-            </button>
+            <button class="btn-primary" onclick="window.print()"><i class="fas fa-print"></i> In kết quả</button>
+            <button class="btn-success-sm" onclick="exportExcelAdvanced()" id="export-excel-btn"><i class="fas fa-file-excel"></i> 📊 Xuất Excel đầy đủ</button>
+            <button class="btn-info-sm" onclick="exportCurrentSheet()" id="export-current-btn"><i class="fas fa-file-export"></i> Xuất sheet hiện tại</button>
+            <button class="btn-success-sm" onclick="saveToDatabase()" id="save-btn"><i class="fas fa-save"></i> Lưu vào hệ thống</button>
+            <button class="btn-warning-sm" onclick="performDraw()"><i class="fas fa-redo"></i> Bốc lại</button>
         </div>
     </div>
 </div>
 
 <div class="modal-overlay" id="import-modal">
     <div class="modal-content">
-        <div class="modal-header">
-            <h2>📥 Import VĐV từ Excel</h2>
-            <button class="modal-close" onclick="closeImportModal()">×</button>
-        </div>
+        <div class="modal-header"><h2>📥 Import VĐV từ Excel</h2><button class="modal-close" onclick="closeImportModal()">×</button></div>
         <div class="modal-body">
             <div class="drop-zone" id="drop-zone" onclick="document.getElementById('file-input').click()">
                 <i class="fas fa-cloud-upload-alt"></i>
@@ -755,17 +306,13 @@
                 <h3 style="margin: 20px 0 12px; color: #1a3a7a;">📋 Preview (<span id="preview-count">0</span> VĐV)</h3>
                 <div class="preview-table">
                     <table id="preview-table-content">
-                        <thead>
-                            <tr><th>STT</th><th>Tên VĐV/Đội</th><th>CLB/Đơn vị</th></tr>
-                        </thead>
+                        <thead><tr><th>STT</th><th>Tên VĐV/Đội</th><th>CLB/Đơn vị</th></tr></thead>
                         <tbody></tbody>
                     </table>
                 </div>
                 <div class="modal-actions">
                     <button class="btn-primary" style="background: #6c757d;" onclick="resetImport()">Hủy</button>
-                    <button class="btn-success-sm" onclick="confirmImport()" id="import-btn">
-                        <i class="fas fa-check"></i> ✅ Xác nhận Import
-                    </button>
+                    <button class="btn-success-sm" onclick="confirmImport()" id="import-btn"><i class="fas fa-check"></i> ✅ Xác nhận Import</button>
                 </div>
             </div>
         </div>
@@ -774,10 +321,7 @@
 
 <div class="modal-overlay" id="edit-modal">
     <div class="modal-content" style="max-width:600px;">
-        <div class="modal-header">
-            <h2>✏️ Chỉnh sửa trận đấu</h2>
-            <button class="modal-close" onclick="closeEditModal()">×</button>
-        </div>
+        <div class="modal-header"><h2>✏️ Chỉnh sửa trận đấu</h2><button class="modal-close" onclick="closeEditModal()">×</button></div>
         <div class="modal-body" id="edit-modal-body"></div>
     </div>
 </div>
@@ -798,11 +342,11 @@
 (function() {
     'use strict';
 
-    console.log('🚀 draw.html v9 - Full fix + flexible schedule');
+    console.log('🚀 draw.html v10 - Full Round Robin + Knockout + Third Place + Full Excel');
 
     const config = window.SPORTSVN_CONFIG || {};
     const supabaseClient = window.supabase.createClient(config.SUPABASE_URL, config.SUPABASE_ANON_KEY);
-    window.supabaseClient = supabaseClient;  // ← FIX: expose to window
+    window.supabaseClient = supabaseClient;
 
     let tournamentId = null;
     let currentCategory = '';
@@ -819,32 +363,22 @@
     async function loadCategories() {
         const urlParams = new URLSearchParams(window.location.search);
         tournamentId = urlParams.get('tournament_id');
-        window.tournamentId = tournamentId;  // ← FIX: expose to window
+        window.tournamentId = tournamentId;
         if (!tournamentId) { alert('Thiếu ID giải đấu!'); window.location.href = 'tournaments.html'; return; }
-        console.log('📌 Tournament ID:', tournamentId);
 
         const { data, error } = await supabaseClient
-            .from('categories')
-            .select('id, name, category_type, scoring_type')
-            .eq('tournament_id', tournamentId)
-            .order('priority');
-
-        if (error) { console.error(error); showAlert('Lỗi tải danh sách nội dung: ' + error.message, 'error'); return; }
+            .from('categories').select('id, name, category_type, scoring_type')
+            .eq('tournament_id', tournamentId).order('priority');
+        if (error) { showAlert('Lỗi tải danh sách nội dung: ' + error.message, 'error'); return; }
 
         categoriesList = data || [];
         const select = document.getElementById('category-select');
-        if (categoriesList.length === 0) {
-            select.innerHTML = '<option value="">-- Chưa có nội dung nào --</option>';
-            return;
-        }
+        if (categoriesList.length === 0) { select.innerHTML = '<option value="">-- Chưa có nội dung nào --</option>'; return; }
         select.innerHTML = '<option value="">-- Chọn nội dung thi đấu --</option>' +
             categoriesList.map(c => `<option value="${escapeHtml(c.name)}">${escapeHtml(c.name)}</option>`).join('');
-        console.log('✅ Loaded', categoriesList.length, 'nội dung');
     }
 
-    window.onCategoryChange = function() {
-        currentCategory = document.getElementById('category-select').value;
-    };
+    window.onCategoryChange = function() { currentCategory = document.getElementById('category-select').value; };
 
     // ==========================================
     // QUẢN LÝ VĐV
@@ -861,38 +395,22 @@
         renderTeams(); updateClubDatalist(); showAlert('', '');
     };
 
-    document.getElementById('team-input').addEventListener('keypress', (e) => {
-        if (e.key === 'Enter') { e.preventDefault(); document.getElementById('club-input').focus(); }
-    });
-    document.getElementById('club-input').addEventListener('keypress', (e) => {
-        if (e.key === 'Enter') { e.preventDefault(); window.addTeam(); }
-    });
+    document.getElementById('team-input').addEventListener('keypress', (e) => { if (e.key === 'Enter') { e.preventDefault(); document.getElementById('club-input').focus(); } });
+    document.getElementById('club-input').addEventListener('keypress', (e) => { if (e.key === 'Enter') { e.preventDefault(); window.addTeam(); } });
 
     window.removeTeam = function(index) { teams.splice(index, 1); renderTeams(); };
-    window.clearAllTeams = function() {
-        if (!confirm('Xóa tất cả VĐV/Đội?')) return;
-        teams = []; renderTeams();
-        document.getElementById('result-panel').style.display = 'none';
-    };
+    window.clearAllTeams = function() { if (!confirm('Xóa tất cả VĐV/Đội?')) return; teams = []; renderTeams(); document.getElementById('result-panel').style.display = 'none'; };
 
     window.loadSampleTeams = function() {
         const sample = [
-            { name: 'Nguyễn Văn An', club: 'CLB Hà Nội' },
-            { name: 'Trần Văn Bình', club: 'CLB Hà Nội' },
-            { name: 'Lê Văn Cường', club: 'CLB Hà Nội' },
-            { name: 'Phạm Văn Dũng', club: 'CLB Hà Nội' },
-            { name: 'Hoàng Văn Em', club: 'CLB Đà Nẵng' },
-            { name: 'Vũ Văn Phong', club: 'CLB Đà Nẵng' },
-            { name: 'Đặng Văn Giang', club: 'CLB Đà Nẵng' },
-            { name: 'Bùi Văn Huy', club: 'CLB TP.HCM' },
-            { name: 'Ngô Văn Khánh', club: 'CLB TP.HCM' },
-            { name: 'Đinh Văn Linh', club: 'CLB TP.HCM' },
-            { name: 'Trương Văn Minh', club: 'CLB Huế' },
-            { name: 'Lý Văn Nam', club: 'CLB Huế' },
-            { name: 'Hồ Văn Oanh', club: 'CLB Huế' },
-            { name: 'Dương Văn Phúc', club: 'CLB Cần Thơ' },
-            { name: 'Tạ Văn Quân', club: 'CLB Cần Thơ' },
-            { name: 'Võ Văn Sơn', club: 'CLB Cần Thơ' }
+            { name: 'Nguyễn Văn An', club: 'CLB Hà Nội' }, { name: 'Trần Văn Bình', club: 'CLB Hà Nội' },
+            { name: 'Lê Văn Cường', club: 'CLB Hà Nội' }, { name: 'Phạm Văn Dũng', club: 'CLB Hà Nội' },
+            { name: 'Hoàng Văn Em', club: 'CLB Đà Nẵng' }, { name: 'Vũ Văn Phong', club: 'CLB Đà Nẵng' },
+            { name: 'Đặng Văn Giang', club: 'CLB Đà Nẵng' }, { name: 'Bùi Văn Huy', club: 'CLB TP.HCM' },
+            { name: 'Ngô Văn Khánh', club: 'CLB TP.HCM' }, { name: 'Đinh Văn Linh', club: 'CLB TP.HCM' },
+            { name: 'Trương Văn Minh', club: 'CLB Huế' }, { name: 'Lý Văn Nam', club: 'CLB Huế' },
+            { name: 'Hồ Văn Oanh', club: 'CLB Huế' }, { name: 'Dương Văn Phúc', club: 'CLB Cần Thơ' },
+            { name: 'Tạ Văn Quân', club: 'CLB Cần Thơ' }, { name: 'Võ Văn Sơn', club: 'CLB Cần Thơ' }
         ];
         teams = [...sample]; renderTeams(); updateClubDatalist();
         showAlert('Đã thêm 16 VĐV mẫu!', 'success');
@@ -907,21 +425,15 @@
         }
         const clubCounts = {};
         teams.forEach(t => { if (t.club) clubCounts[t.club] = (clubCounts[t.club] || 0) + 1; });
-        summary.innerHTML = `
-            <div class="stat"><i class="fas fa-users"></i> Tổng: <strong>${teams.length} VĐV/Đội</strong></div>
-            <div class="stat"><i class="fas fa-shield-alt"></i> Số CLB: <strong>${Object.keys(clubCounts).length}</strong></div>
-        `;
+        summary.innerHTML = `<div class="stat"><i class="fas fa-users"></i> Tổng: <strong>${teams.length} VĐV/Đội</strong></div><div class="stat"><i class="fas fa-shield-alt"></i> Số CLB: <strong>${Object.keys(clubCounts).length}</strong></div>`;
         container.innerHTML = teams.map((t, i) => `
             <div class="team-item">
                 <div class="team-info">
                     <span class="team-name">${escapeHtml(t.name)}</span>
-                    <span class="team-club ${t.club ? 'has-club' : ''}">
-                        ${t.club ? '🛡 ' + escapeHtml(t.club) : 'Không có CLB'}
-                    </span>
+                    <span class="team-club ${t.club ? 'has-club' : ''}">${t.club ? '🛡 ' + escapeHtml(t.club) : 'Không có CLB'}</span>
                 </div>
                 <button class="remove-btn" onclick="removeTeam(${i})" title="Xóa">×</button>
-            </div>
-        `).join('');
+            </div>`).join('');
         if (currentDrawType === 'knockout') updateByeInfo();
     }
 
@@ -935,15 +447,8 @@
     // ==========================================
     window.openImportModal = function() { resetImport(); document.getElementById('import-modal').classList.add('show'); };
     window.closeImportModal = function() { document.getElementById('import-modal').classList.remove('show'); resetImport(); };
-    function resetImport() {
-        importData = [];
-        document.getElementById('import-preview').style.display = 'none';
-        document.getElementById('file-input').value = '';
-    }
-    window.handleFileSelect = function(event) {
-        const file = event.target.files[0];
-        if (file) parseExcelFile(file);
-    };
+    function resetImport() { importData = []; document.getElementById('import-preview').style.display = 'none'; document.getElementById('file-input').value = ''; }
+    window.handleFileSelect = function(event) { const file = event.target.files[0]; if (file) parseExcelFile(file); };
     function parseExcelFile(file) {
         const reader = new FileReader();
         reader.onload = (e) => {
@@ -953,10 +458,7 @@
                 const sheet = workbook.Sheets[workbook.SheetNames[0]];
                 const jsonData = XLSX.utils.sheet_to_json(sheet, { header: 1, defval: '' });
                 if (jsonData.length < 2) { alert('File Excel trống!'); return; }
-                importData = jsonData.slice(1).map(row => ({
-                    name: String(row[1] || '').trim(),
-                    club: String(row[2] || '').trim()
-                })).filter(t => t.name);
+                importData = jsonData.slice(1).map(row => ({ name: String(row[1] || '').trim(), club: String(row[2] || '').trim() })).filter(t => t.name);
                 if (importData.length === 0) { alert('Không tìm thấy dữ liệu!'); return; }
                 renderImportPreview();
             } catch (error) { alert('Lỗi đọc file: ' + error.message); }
@@ -967,34 +469,22 @@
         document.getElementById('import-preview').style.display = 'block';
         document.getElementById('preview-count').textContent = importData.length;
         const tbody = document.querySelector('#preview-table-content tbody');
-        tbody.innerHTML = importData.map((t, i) => `
-            <tr><td>${i + 1}</td><td><strong>${escapeHtml(t.name)}</strong></td><td>${escapeHtml(t.club || '—')}</td></tr>
-        `).join('');
+        tbody.innerHTML = importData.map((t, i) => `<tr><td>${i + 1}</td><td><strong>${escapeHtml(t.name)}</strong></td><td>${escapeHtml(t.club || '—')}</td></tr>`).join('');
     }
     window.confirmImport = function() {
         if (importData.length === 0) return;
         if (!confirm(`Import ${importData.length} VĐV?`)) return;
         let added = 0;
-        importData.forEach(newTeam => {
-            const exists = teams.some(t => t.name === newTeam.name && t.club === newTeam.club);
-            if (!exists) { teams.push(newTeam); added++; }
-        });
+        importData.forEach(newTeam => { const exists = teams.some(t => t.name === newTeam.name && t.club === newTeam.club); if (!exists) { teams.push(newTeam); added++; } });
         closeImportModal(); renderTeams(); updateClubDatalist();
         showAlert(`✅ Đã import ${added} VĐV! (Bỏ qua ${importData.length - added} trùng)`, 'success');
     };
     document.addEventListener('DOMContentLoaded', () => {
         const dropZone = document.getElementById('drop-zone');
         if (dropZone) {
-            ['dragenter', 'dragover'].forEach(evt => {
-                dropZone.addEventListener(evt, e => { e.preventDefault(); dropZone.classList.add('dragover'); });
-            });
-            ['dragleave', 'drop'].forEach(evt => {
-                dropZone.addEventListener(evt, e => { e.preventDefault(); dropZone.classList.remove('dragover'); });
-            });
-            dropZone.addEventListener('drop', e => {
-                const file = e.dataTransfer.files[0];
-                if (file) parseExcelFile(file);
-            });
+            ['dragenter', 'dragover'].forEach(evt => { dropZone.addEventListener(evt, e => { e.preventDefault(); dropZone.classList.add('dragover'); }); });
+            ['dragleave', 'drop'].forEach(evt => { dropZone.addEventListener(evt, e => { e.preventDefault(); dropZone.classList.remove('dragover'); }); });
+            dropZone.addEventListener('drop', e => { const file = e.dataTransfer.files[0]; if (file) parseExcelFile(file); });
         }
     });
 
@@ -1010,11 +500,7 @@
     };
 
     window.downloadTeamTemplate = function() {
-        const template = [
-            { 'STT': 1, 'Tên VĐV/Đội': 'Nguyễn Văn An', 'CLB/Đơn vị': 'CLB Hà Nội' },
-            { 'STT': 2, 'Tên VĐV/Đội': 'Trần Văn Bình', 'CLB/Đơn vị': 'CLB Hà Nội' },
-            { 'STT': 3, 'Tên VĐV/Đội': 'Lê Văn Cường', 'CLB/Đơn vị': 'CLB Đà Nẵng' }
-        ];
+        const template = [{ 'STT': 1, 'Tên VĐV/Đội': 'Nguyễn Văn An', 'CLB/Đơn vị': 'CLB Hà Nội' }, { 'STT': 2, 'Tên VĐV/Đội': 'Trần Văn Bình', 'CLB/Đơn vị': 'CLB Hà Nội' }, { 'STT': 3, 'Tên VĐV/Đội': 'Lê Văn Cường', 'CLB/Đơn vị': 'CLB Đà Nẵng' }];
         const ws = XLSX.utils.json_to_sheet(template);
         ws['!cols'] = [{ wch: 5 }, { wch: 30 }, { wch: 25 }];
         const wb = XLSX.utils.book_new();
@@ -1052,16 +538,9 @@
         if (input && input.value.trim()) {
             const custom = input.value.split(',').map(s => parseInt(s.trim())).filter(s => !isNaN(s));
             const unique = [...new Set(custom)];
-            if (unique.length !== numByes) {
-                info.innerHTML = `⚠️ Nhập ${unique.length} BYE, cần đúng <strong>${numByes}</strong> cho bracket ${bracketSize}`;
-                info.style.color = '#e94560';
-            } else if (unique.some(s => s < 1 || s > bracketSize)) {
-                info.innerHTML = `⚠️ Slot BYE phải từ 1 đến ${bracketSize}`;
-                info.style.color = '#e94560';
-            } else {
-                info.innerHTML = `✅ ${n} VĐV → Bracket ${bracketSize} → ${numByes} BYE tùy chỉnh: ${unique.sort((a,b)=>a-b).join(', ')}`;
-                info.style.color = '#00b894';
-            }
+            if (unique.length !== numByes) { info.innerHTML = `⚠️ Nhập ${unique.length} BYE, cần đúng <strong>${numByes}</strong> cho bracket ${bracketSize}`; info.style.color = '#e94560'; }
+            else if (unique.some(s => s < 1 || s > bracketSize)) { info.innerHTML = `⚠️ Slot BYE phải từ 1 đến ${bracketSize}`; info.style.color = '#e94560'; }
+            else { info.innerHTML = `✅ ${n} VĐV → Bracket ${bracketSize} → ${numByes} BYE tùy chỉnh: ${unique.sort((a,b)=>a-b).join(', ')}`; info.style.color = '#00b894'; }
         } else {
             info.innerHTML = `📊 ${n} VĐV → Bracket ${bracketSize} → cần ${numByes} BYE (tự động)`;
             info.style.color = '#1a3a7a';
@@ -1080,10 +559,7 @@
             const groupName = String.fromCharCode(65 + i);
             const wrapper = document.createElement('div');
             wrapper.className = 'group-input-wrapper';
-            wrapper.innerHTML = `
-                <label>Bảng ${groupName}</label>
-                <input type="number" class="group-input" data-group="${i}" min="1" value="${size}" onchange="checkCustomTotal()">
-            `;
+            wrapper.innerHTML = `<label>Bảng ${groupName}</label><input type="number" class="group-input" data-group="${i}" min="1" value="${size}" onchange="checkCustomTotal()">`;
             container.appendChild(wrapper);
         }
         checkCustomTotal();
@@ -1094,49 +570,29 @@
         const total = Array.from(inputs).reduce((sum, inp) => sum + (parseInt(inp.value) || 0), 0);
         const checkEl = document.getElementById('total-check');
         const diff = teams.length - total;
-        if (diff === 0) {
-            checkEl.textContent = `✅ Tổng: ${total}/${teams.length} VĐV — Khớp!`;
-            checkEl.className = 'total-check ok';
-        } else {
-            checkEl.textContent = `⚠️ Tổng: ${total}/${teams.length} VĐV — ${diff > 0 ? 'thiếu ' + diff : 'thừa ' + Math.abs(diff)}`;
-            checkEl.className = 'total-check error';
-        }
+        if (diff === 0) { checkEl.textContent = `✅ Tổng: ${total}/${teams.length} VĐV — Khớp!`; checkEl.className = 'total-check ok'; }
+        else { checkEl.textContent = `⚠️ Tổng: ${total}/${teams.length} VĐV — ${diff > 0 ? 'thiếu ' + diff : 'thừa ' + Math.abs(diff)}`; checkEl.className = 'total-check error'; }
     };
 
     // ==========================================
-    // SESSIONS CONFIG (NEW)
+    // SESSIONS CONFIG
     // ==========================================
     window.renderSessionsConfig = function() {
         const numDays = parseInt(document.getElementById('num-days')?.value) || 3;
         const numSessions = parseInt(document.getElementById('num-sessions')?.value) || 5;
         const container = document.getElementById('sessions-config');
         if (!container) return;
-
         const allSessions = ['Sáng', 'Chiều', 'Tối'];
         const sessionsPerDay = Math.ceil(numSessions / numDays);
         const closingChoice = document.getElementById('closing-session')?.value || 'auto';
 
         let html = '<div style="display:grid;grid-template-columns:repeat(auto-fill,minmax(260px,1fr));gap:10px;">';
-
         for (let i = 0; i < numSessions; i++) {
             const dayNum = Math.floor(i / sessionsPerDay) + 1;
             const isClosing = (i === numSessions - 1);
-            const sessionId = `session-${i}`;
-
-            // Tính suggested sessions cho buổi này
             let suggested = [];
-            if (isClosing) {
-                if (closingChoice === 'auto') {
-                    suggested = ['Chiều'];
-                } else {
-                    suggested = [closingChoice];
-                }
-            } else {
-                const idxInDay = i % sessionsPerDay;
-                if (sessionsPerDay === 1) suggested = ['Chiều'];
-                else if (sessionsPerDay === 2) suggested = ['Sáng', 'Chiều'][idxInDay] ? [['Sáng', 'Chiều'][idxInDay]] : ['Chiều'];
-                else suggested = [allSessions[idxInDay % 3] || 'Chiều'];
-            }
+            if (isClosing) { suggested = closingChoice === 'auto' ? ['Chiều'] : [closingChoice]; }
+            else { const idxInDay = i % sessionsPerDay; if (sessionsPerDay === 1) suggested = ['Chiều']; else if (sessionsPerDay === 2) suggested = [['Sáng', 'Chiều'][idxInDay]]; else suggested = [allSessions[idxInDay % 3] || 'Chiều']; }
 
             html += `
                 <div class="session-card">
@@ -1147,12 +603,8 @@
                     </div>
                     <div style="display:flex;gap:6px;flex-wrap:wrap;">
                         ${allSessions.map(sess => `
-                            <label class="session-checkbox-label ${suggested.includes(sess) ? 'checked' : ''}"
-                                   style="${suggested.includes(sess) ? 'background:#e7f3ff;border-color:#0984e3;' : ''}">
-                                <input type="checkbox" class="session-checkbox"
-                                       data-session-index="${i}" value="${sess}"
-                                       ${suggested.includes(sess) ? 'checked' : ''}
-                                       onchange="this.parentElement.classList.toggle('checked', this.checked); this.parentElement.style.background = this.checked ? '#e7f3ff' : '#f8f9fa'; this.parentElement.style.borderColor = this.checked ? '#0984e3' : '#e9ecef';">
+                            <label class="session-checkbox-label ${suggested.includes(sess) ? 'checked' : ''}" style="${suggested.includes(sess) ? 'background:#e7f3ff;border-color:#0984e3;' : ''}">
+                                <input type="checkbox" class="session-checkbox" data-session-index="${i}" value="${sess}" ${suggested.includes(sess) ? 'checked' : ''} onchange="this.parentElement.classList.toggle('checked', this.checked); this.parentElement.style.background = this.checked ? '#e7f3ff' : '#f8f9fa'; this.parentElement.style.borderColor = this.checked ? '#0984e3' : '#e9ecef';">
                                 ${sess}
                             </label>
                         `).join('')}
@@ -1178,13 +630,8 @@
         for (let i = 0; i < numSessions; i++) {
             const checked = document.querySelectorAll(`.session-checkbox[data-session-index="${i}"]:checked`);
             const sessionTypes = Array.from(checked).map(cb => cb.value);
-            sessions.push({
-                index: i,
-                day: Math.floor(i / sessionsPerDay),
-                types: sessionTypes.length > 0 ? sessionTypes : ['Chiều'],
-            });
+            sessions.push({ index: i, day: Math.floor(i / sessionsPerDay), types: sessionTypes.length > 0 ? sessionTypes : ['Chiều'] });
         }
-
         return { startDate, numSessions, numTables, sessions, timeMorning, timeAfternoon, timeEvening, numDays };
     }
 
@@ -1198,14 +645,9 @@
         let result;
         try {
             if (currentDrawType === 'knockout') result = drawKnockout(teams, protectClub);
-            else if (currentDrawType === 'round-robin-even') {
-                const numGroups = parseInt(document.getElementById('num-groups-even').value);
-                result = drawRoundRobinEven(teams, numGroups, protectClub);
-            } else if (currentDrawType === 'round-robin-custom') {
-                result = drawRoundRobinCustom(teams, protectClub);
-            } else if (currentDrawType === 'round-robin-single') {
-                result = drawRoundRobinSingle(teams, protectClub);
-            }
+            else if (currentDrawType === 'round-robin-even') { const numGroups = parseInt(document.getElementById('num-groups-even').value); result = drawRoundRobinEven(teams, numGroups, protectClub); }
+            else if (currentDrawType === 'round-robin-custom') { result = drawRoundRobinCustom(teams, protectClub); }
+            else if (currentDrawType === 'round-robin-single') { result = drawRoundRobinSingle(teams, protectClub); }
         } catch (error) { showAlert('Lỗi bốc thăm: ' + error.message, 'error'); return; }
         if (!result) { showAlert('Không thể bốc thăm.', 'error'); return; }
         result.categoryName = currentCategory;
@@ -1230,16 +672,10 @@
         let customByes = null;
         const byeInput = document.getElementById('custom-bye-slots');
         if (byeInput && byeInput.value.trim()) {
-            const parsed = byeInput.value.split(',')
-                .map(s => parseInt(s.trim()))
-                .filter(s => !isNaN(s));
+            const parsed = byeInput.value.split(',').map(s => parseInt(s.trim())).filter(s => !isNaN(s));
             const unique = [...new Set(parsed)].sort((a, b) => a - b);
-            if (unique.length !== numByes) {
-                throw new Error(`Số BYE nhập (${unique.length}) không khớp. Cần đúng ${numByes} BYE cho bracket ${bracketSize}.`);
-            }
-            if (unique.some(s => s < 1 || s > bracketSize)) {
-                throw new Error(`Slot BYE phải từ 1 đến ${bracketSize}.`);
-            }
+            if (unique.length !== numByes) throw new Error(`Số BYE nhập (${unique.length}) không khớp. Cần đúng ${numByes} BYE cho bracket ${bracketSize}.`);
+            if (unique.some(s => s < 1 || s > bracketSize)) throw new Error(`Slot BYE phải từ 1 đến ${bracketSize}.`);
             customByes = unique;
         }
 
@@ -1248,19 +684,19 @@
             const rounds = buildKnockoutBracketWithByes(shuffled, bracketSize, numByes, customByes);
             if (!protectClub || !hasSameClubInFirstRound(rounds[0])) {
                 return {
-                    type: 'knockout', rounds, bracketSize, numByes, numTeams: size,
-                    customByes,
-                    description: `${size} VĐV → Bracket ${bracketSize}${numByes > 0 ? ' (' + numByes + ' BYE' + (customByes ? ' tùy chỉnh' : '') + ')' : ''}`
+                    type: 'knockout', rounds, bracketSize, numByes, numTeams: size, customByes,
+                    description: `${size} VĐV → Bracket ${bracketSize}${numByes > 0 ? ' (' + numByes + ' BYE' + (customByes ? ' tùy chỉnh' : '') + ')' : ''}`,
+                    thirdPlaceMatch: { teamA: null, teamB: null, winner: null }
                 };
             }
         }
         const shuffled = shuffleArray([...teams]);
         const rounds = buildKnockoutBracketWithByes(shuffled, bracketSize, numByes, customByes);
         return {
-            type: 'knockout', rounds, bracketSize, numByes, numTeams: size,
-            customByes,
+            type: 'knockout', rounds, bracketSize, numByes, numTeams: size, customByes,
             description: `${size} VĐV → Bracket ${bracketSize}${numByes > 0 ? ' (' + numByes + ' BYE' + (customByes ? ' tùy chỉnh' : '') + ')' : ''}`,
-            warning: 'Không thể tránh hoàn toàn VĐV cùng CLB gặp nhau ở vòng đầu.'
+            warning: 'Không thể tránh hoàn toàn VĐV cùng CLB gặp nhau ở vòng đầu.',
+            thirdPlaceMatch: { teamA: null, teamB: null, winner: null }
         };
     }
 
@@ -1275,16 +711,10 @@
                 const slotB = i * 2 + 2;
                 const isByeA = customByes.includes(slotA);
                 const isByeB = customByes.includes(slotB);
-
-                if (isByeA && isByeB) {
-                    firstRound.push({ teamA: null, teamB: null, isPlaceholder: true });
-                } else if (isByeA) {
-                    const player = players.shift();
-                    firstRound.push({ teamA: player || null, teamB: null, isBye: true, byeSlot: slotA });
-                } else if (isByeB) {
-                    const player = players.shift();
-                    firstRound.push({ teamA: null, teamB: player || null, isBye: true, byeSlot: slotB });
-                } else {
+                if (isByeA && isByeB) firstRound.push({ teamA: null, teamB: null, isPlaceholder: true });
+                else if (isByeA) { const player = players.shift(); firstRound.push({ teamA: player || null, teamB: null, isBye: true, byeSlot: slotA }); }
+                else if (isByeB) { const player = players.shift(); firstRound.push({ teamA: null, teamB: player || null, isBye: true, byeSlot: slotB }); }
+                else {
                     const teamA = players.shift() || null;
                     const teamB = players.shift() || null;
                     if (teamA && !teamB) firstRound.push({ teamA, teamB: null, isBye: true });
@@ -1299,11 +729,9 @@
                 const remainingByes = byes.length;
                 const remainingMatches = numFirstRoundMatches - i;
                 const remainingPlaying = playing.length;
-                if (remainingByes > 0 && remainingPlaying === 0) {
-                    firstRound.push({ teamA: byes.shift(), teamB: null, isBye: true });
-                } else if (remainingByes > 0 && remainingPlaying <= 1 && (remainingMatches - remainingByes) === 0) {
-                    firstRound.push({ teamA: byes.shift(), teamB: null, isBye: true });
-                } else {
+                if (remainingByes > 0 && remainingPlaying === 0) firstRound.push({ teamA: byes.shift(), teamB: null, isBye: true });
+                else if (remainingByes > 0 && remainingPlaying <= 1 && (remainingMatches - remainingByes) === 0) firstRound.push({ teamA: byes.shift(), teamB: null, isBye: true });
+                else {
                     const teamA = playing.shift() || null;
                     const teamB = playing.shift() || null;
                     if (teamA && !teamB) firstRound.push({ teamA, teamB: null, isBye: true });
@@ -1321,9 +749,7 @@
         while (roundSize > 1) {
             roundSize = roundSize / 2;
             const roundMatches = [];
-            for (let i = 0; i < roundSize; i++) {
-                roundMatches.push({ teamA: null, teamB: null, isPlaceholder: true });
-            }
+            for (let i = 0; i < roundSize; i++) roundMatches.push({ teamA: null, teamB: null, isPlaceholder: true });
             rounds.push(roundMatches);
         }
         return rounds;
@@ -1338,12 +764,12 @@
             const shuffled = shuffleArray([...teams]);
             const groups = splitIntoGroups(shuffled, numGroups);
             if (!protectClub || !hasSameClubInGroup(groups)) {
-                return { type: 'round-robin', groups, numGroups };
+                return { type: 'round-robin', groups, numGroups, thirdPlaceMatch: { teamA: null, teamB: null, winner: null } };
             }
         }
         const shuffled = shuffleArray([...teams]);
         const groups = splitIntoGroups(shuffled, numGroups);
-        return { type: 'round-robin', groups, numGroups, warning: 'Không thể tránh hoàn toàn.' };
+        return { type: 'round-robin', groups, numGroups, warning: 'Không thể tránh hoàn toàn.', thirdPlaceMatch: { teamA: null, teamB: null, winner: null } };
     }
 
     function drawRoundRobinCustom(teams, protectClub) {
@@ -1358,18 +784,18 @@
             let idx = 0;
             for (const size of groupSizes) { groups.push(shuffled.slice(idx, idx + size)); idx += size; }
             if (!protectClub || !hasSameClubInGroup(groups)) {
-                return { type: 'round-robin', groups, numGroups: groupSizes.length };
+                return { type: 'round-robin', groups, numGroups: groupSizes.length, thirdPlaceMatch: { teamA: null, teamB: null, winner: null } };
             }
         }
         const shuffled = shuffleArray([...teams]);
         const groups = [];
         let idx = 0;
         for (const size of groupSizes) { groups.push(shuffled.slice(idx, idx + size)); idx += size; }
-        return { type: 'round-robin', groups, numGroups: groupSizes.length, warning: 'Không thể tránh hoàn toàn.' };
+        return { type: 'round-robin', groups, numGroups: groupSizes.length, warning: 'Không thể tránh hoàn toàn.', thirdPlaceMatch: { teamA: null, teamB: null, winner: null } };
     }
 
     function drawRoundRobinSingle(teams, protectClub) {
-        return { type: 'round-robin', groups: [shuffleArray([...teams])], numGroups: 1 };
+        return { type: 'round-robin', groups: [shuffleArray([...teams])], numGroups: 1, thirdPlaceMatch: { teamA: null, teamB: null, winner: null } };
     }
 
     // ==========================================
@@ -1383,13 +809,11 @@
         }
         return a;
     }
-
     function splitIntoGroups(arr, numGroups) {
         const groups = Array.from({ length: numGroups }, () => []);
         arr.forEach((item, i) => groups[i % numGroups].push(item));
         return groups;
     }
-
     function hasSameClubInGroup(groups) {
         for (const group of groups) {
             const clubs = group.map(t => t.club).filter(Boolean);
@@ -1398,7 +822,6 @@
         }
         return false;
     }
-
     function hasSameClubInFirstRound(matches) {
         for (const match of matches) {
             if (match.isBye || match.isPlaceholder) continue;
@@ -1415,10 +838,8 @@
     function renderResult(result) {
         const container = document.getElementById('result-container');
         const warningEl = document.getElementById('result-warning');
-        if (result.warning) {
-            warningEl.style.display = 'block';
-            warningEl.innerHTML = '<i class="fas fa-exclamation-triangle"></i> ' + escapeHtml(result.warning);
-        } else { warningEl.style.display = 'none'; }
+        if (result.warning) { warningEl.style.display = 'block'; warningEl.innerHTML = '<i class="fas fa-exclamation-triangle"></i> ' + escapeHtml(result.warning); }
+        else { warningEl.style.display = 'none'; }
         let bracketInfo = '';
         if (result.type === 'knockout' && result.description) {
             bracketInfo = `<div class="bracket-info"><i class="fas fa-info-circle"></i> <strong>${escapeHtml(result.categoryName || '')}</strong> · ${escapeHtml(result.description)}</div>`;
@@ -1434,52 +855,136 @@
 
     function renderRoundRobinHTML(result) {
         const groupNames = ['A', 'B', 'C', 'D', 'E', 'F', 'G', 'H', 'I', 'J', 'K', 'L', 'M', 'N', 'O', 'P'];
-        return `
-            <div class="groups-grid">
-                ${result.groups.map((group, i) => `
-                    <div class="group-card">
-                        <div class="group-header">
-                            <span>🏆 Bảng ${groupNames[i]}</span>
-                            <span class="count">${group.length} VĐV</span>
+        let html = `<div class="groups-grid">${result.groups.map((group, i) => `
+            <div class="group-card">
+                <div class="group-header"><span>🏆 Bảng ${groupNames[i]}</span><span class="count">${group.length} VĐV</span></div>
+                <div class="group-teams">
+                    ${group.map((team, j) => `
+                        <div class="group-team">
+                            <div class="position">${j + 1}</div>
+                            <div class="team-info">
+                                <span class="team-name">${escapeHtml(team.name)}</span>
+                                ${team.club ? `<span class="team-club has-club">🛡 ${escapeHtml(team.club)}</span>` : ''}
+                            </div>
                         </div>
-                        <div class="group-teams">
-                            ${group.map((team, j) => `
-                                <div class="group-team">
-                                    <div class="position">${j + 1}</div>
-                                    <div class="team-info">
-                                        <span class="team-name">${escapeHtml(team.name)}</span>
-                                        ${team.club ? `<span class="team-club has-club">🛡 ${escapeHtml(team.club)}</span>` : ''}
-                                    </div>
-                                </div>
-                            `).join('')}
-                        </div>
+                    `).join('')}
+                </div>
+            </div>
+        `).join('')}</div>`;
+
+        // Add Stage 2 (Knockout) for round robin
+        if (result.numGroups >= 2) {
+            html += renderRoundRobinKnockoutStage(result);
+        }
+        return html;
+    }
+
+    function renderRoundRobinKnockoutStage(result) {
+        const numGroups = result.numGroups;
+        const qualifiedPerGroup = 2; // Top 2 each group
+        const totalQualified = numGroups * qualifiedPerGroup;
+        let bracketSize = 2;
+        while (bracketSize < totalQualified) bracketSize *= 2;
+        if (bracketSize < 4) bracketSize = 4;
+
+        const totalRounds = Math.log2(bracketSize);
+        const roundNames = getRoundNames(totalRounds);
+        const groupNames = ['A', 'B', 'C', 'D', 'E', 'F', 'G', 'H', 'I', 'J', 'K', 'L', 'M', 'N', 'O', 'P'];
+
+        // Build pairing: 1A vs 2B, 1B vs 2A, 1C vs 2D, 1D vs 2C, ...
+        const pairings = [];
+        for (let i = 0; i < numGroups; i += 2) {
+            if (i + 1 < numGroups) {
+                pairings.push({ a: `Nhất ${groupNames[i]}`, b: `Nhì ${groupNames[i + 1]}`, aIdx: i, bIdx: i + 1 });
+                pairings.push({ a: `Nhất ${groupNames[i + 1]}`, b: `Nhì ${groupNames[i]}`, aIdx: i + 1, bIdx: i });
+            } else {
+                pairings.push({ a: `Nhất ${groupNames[i]}`, b: `Nhì ${groupNames[i]}`, aIdx: i, bIdx: i });
+            }
+        }
+
+        let html = `<div class="stage-header knockout"><i class="fas fa-trophy"></i> GIAI ĐOẠN 2: VÒNG LOẠI TRỰC TIẾP (Top ${totalQualified} đội - Bracket ${bracketSize})</div>`;
+        html += `<div class="bracket-wrapper"><div class="bracket-tree">`;
+
+        // Round 1: pairings
+        html += `<div class="bracket-round" style="min-width:240px;width:240px;">`;
+        html += `<div class="bracket-round-header">${roundNames[0]}</div>`;
+        html += `<div class="bracket-round-body" style="height:${pairings.length * 80}px;position:relative;">`;
+
+        pairings.forEach((p, idx) => {
+            const top = idx * 80 + 4;
+            html += `
+                <div class="bracket-match placeholder" style="position:absolute;top:${top}px;left:0;right:0;height:72px;">
+                    <span class="match-label">T${idx + 1}</span>
+                    <button class="edit-btn" onclick="openEditRRPairing(${idx})" title="Sửa"><i class="fas fa-pen"></i></button>
+                    <div class="player placeholder" style="height:30px;">
+                        <span class="name">${escapeHtml(p.a)}</span>
                     </div>
-                `).join('')}
+                    <div class="match-sep"></div>
+                    <div class="player placeholder" style="height:30px;">
+                        <span class="name">${escapeHtml(p.b)}</span>
+                    </div>
+                </div>
+            `;
+        });
+        html += `</div></div>`;
+
+        // Subsequent rounds
+        let prevCount = pairings.length;
+        for (let r = 1; r < totalRounds; r++) {
+            const matchCount = Math.ceil(prevCount / 2);
+            const roundNum = r + 1;
+            html += `<div class="bracket-connector" style="width:60px;height:${pairings.length * 80}px;"></div>`;
+            html += `<div class="bracket-round" style="min-width:200px;width:200px;">`;
+            html += `<div class="bracket-round-header">${roundNames[r]}</div>`;
+            html += `<div class="bracket-round-body" style="height:${pairings.length * 80}px;position:relative;">`;
+            for (let m = 0; m < matchCount; m++) {
+                const spacing = (pairings.length * 80) / matchCount;
+                const top = m * spacing + spacing / 2 - 36;
+                html += `
+                    <div class="bracket-match placeholder" style="position:absolute;top:${top}px;left:0;right:0;height:72px;">
+                        <span class="match-label">T${m + 1}</span>
+                        <div class="player placeholder" style="height:30px;"><span class="name">Chờ KQ</span></div>
+                        <div class="match-sep"></div>
+                        <div class="player placeholder" style="height:30px;"><span class="name">Chờ KQ</span></div>
+                    </div>
+                `;
+            }
+            html += `</div></div>`;
+            prevCount = matchCount;
+        }
+
+        // Third place match
+        html += `
+            <div class="bracket-connector" style="width:30px;height:${pairings.length * 80}px;"></div>
+            <div class="bracket-round" style="min-width:200px;width:200px;background:#fff8f0;">
+                <div class="bracket-round-header" style="background:linear-gradient(135deg,#e67e22,#d35400);">🥉 TRANH HẠNG 3</div>
+                <div class="bracket-round-body" style="height:${pairings.length * 80}px;position:relative;">
+                    <div class="bracket-match third-place" style="position:absolute;top:${pairings.length * 40 - 36}px;left:0;right:0;height:72px;">
+                        <button class="edit-btn" onclick="openEditThirdPlace()" title="Sửa"><i class="fas fa-pen"></i></button>
+                        <div class="player placeholder" style="height:30px;"><span class="name">Chờ thua BK 1</span></div>
+                        <div class="match-sep"></div>
+                        <div class="player placeholder" style="height:30px;"><span class="name">Chờ thua BK 2</span></div>
+                    </div>
+                </div>
             </div>
         `;
+
+        html += `</div></div>`;
+        html += `<div style="margin-top:12px;text-align:center;">
+            <button class="btn-warning-sm" onclick="editThirdPlaceManually()"><i class="fas fa-edit"></i> Chỉnh sửa trận Tranh hạng 3</button>
+        </div>`;
+        return html;
     }
 
     function renderKnockoutHTML(result) {
         const tabs = `
             <div class="bracket-tabs">
-                <button class="bracket-tab-btn active" id="tab-tree" onclick="switchBracketView('tree')">
-                    🌳 Sơ đồ cây (giống Excel)
-                </button>
-                <button class="bracket-tab-btn" id="tab-slot" onclick="switchBracketView('slot')">
-                    📋 Danh sách slot
-                </button>
+                <button class="bracket-tab-btn active" id="tab-tree" onclick="switchBracketView('tree')">🌳 Sơ đồ cây (giống Excel)</button>
+                <button class="bracket-tab-btn" id="tab-slot" onclick="switchBracketView('slot')">📋 Danh sách slot</button>
             </div>
         `;
-        const treeView = `
-            <div class="bracket-wrapper" id="bracket-tree">
-                ${renderBracketTree(result)}
-            </div>
-        `;
-        const slotView = `
-            <div id="bracket-slot" style="display:none;">
-                ${renderSlotList(result)}
-            </div>
-        `;
+        const treeView = `<div class="bracket-wrapper" id="bracket-tree">${renderBracketTree(result)}</div>`;
+        const slotView = `<div id="bracket-slot" style="display:none;">${renderSlotList(result)}</div>`;
         return tabs + treeView + slotView;
     }
 
@@ -1506,9 +1011,7 @@
             const matchCount = rounds[r].length;
             const spacing = totalHeight / matchCount;
             const positions = [];
-            for (let m = 0; m < matchCount; m++) {
-                positions.push(m * spacing + spacing / 2);
-            }
+            for (let m = 0; m < matchCount; m++) positions.push(m * spacing + spacing / 2);
             roundPositions.push(positions);
         }
 
@@ -1524,29 +1027,41 @@
 
             round.forEach((match, matchIdx) => {
                 const yPos = roundPositions[roundIdx][matchIdx];
-                if (isFirstRound) {
-                    html += renderFirstRoundMatch(match, matchIdx, roundIdx, yPos, SLOT_HEIGHT);
-                } else {
-                    html += renderLaterRoundMatch(match, matchIdx, roundIdx, yPos, SLOT_HEIGHT);
-                }
+                if (isFirstRound) html += renderFirstRoundMatch(match, matchIdx, roundIdx, yPos, SLOT_HEIGHT);
+                else html += renderLaterRoundMatch(match, matchIdx, roundIdx, yPos, SLOT_HEIGHT);
             });
 
             html += '</div></div>';
-
             if (!isLastRound) {
                 html += `<div class="bracket-connector" style="width:${CONNECTOR_WIDTH}px;height:${totalHeight}px;position:relative;">`;
-                html += renderConnectorSVG(
-                    round.length,
-                    rounds[roundIdx + 1].length,
-                    totalHeight,
-                    roundPositions[roundIdx],
-                    roundPositions[roundIdx + 1],
-                    roundIdx,
-                    rounds.length
-                );
+                html += renderConnectorSVG(round.length, rounds[roundIdx + 1].length, totalHeight, roundPositions[roundIdx], roundPositions[roundIdx + 1], roundIdx, rounds.length);
                 html += '</div>';
             }
         });
+
+        // Third place match column
+        const thirdMatchTop = totalHeight / 2 - 36;
+        html += `<div class="bracket-connector" style="width:30px;height:${totalHeight}px;position:relative;"></div>`;
+        html += `<div class="bracket-round" style="min-width:200px;width:200px;background:#fff8f0;">`;
+        html += `<div class="bracket-round-header" style="background:linear-gradient(135deg,#e67e22,#d35400);">🥉 TRANH HẠNG 3</div>`;
+        html += `<div class="bracket-round-body" style="height:${totalHeight}px;position:relative;">`;
+        const tp = result.thirdPlaceMatch || { teamA: null, teamB: null, winner: null };
+        html += `
+            <div class="bracket-match third-place" style="position:absolute;top:${thirdMatchTop}px;left:0;right:0;height:72px;">
+                <button class="edit-btn" onclick="editThirdPlaceManually()" title="Sửa"><i class="fas fa-pen"></i></button>
+                <div class="player ${!tp.teamA ? 'placeholder' : ''} ${tp.winner === tp.teamA?.name ? 'winner' : ''}" style="height:30px;">
+                    <span class="name">${tp.teamA ? escapeHtml(tp.teamA.name) : 'Chờ thua BK 1'}</span>
+                    ${tp.teamA?.club ? `<span class="club">${escapeHtml(tp.teamA.club)}</span>` : ''}
+                </div>
+                <div class="match-sep"></div>
+                <div class="player ${!tp.teamB ? 'placeholder' : ''} ${tp.winner === tp.teamB?.name ? 'winner' : ''}" style="height:30px;">
+                    <span class="name">${tp.teamB ? escapeHtml(tp.teamB.name) : 'Chờ thua BK 2'}</span>
+                    ${tp.teamB?.club ? `<span class="club">${escapeHtml(tp.teamB.club)}</span>` : ''}
+                </div>
+            </div>
+        `;
+        html += `</div></div>`;
+
         html += '</div>';
         return html;
     }
@@ -1558,63 +1073,18 @@
         if (match.isBye) {
             matchClass = 'bye';
             if (match.teamA) {
-                slotA = `
-                    <div class="player" style="height:${slotHeight - 4}px;">
-                        <span class="name">${escapeHtml(match.teamA.name)}</span>
-                        ${match.teamA.club ? `<span class="club">${escapeHtml(match.teamA.club)}</span>` : ''}
-                    </div>
-                    <div class="match-sep"></div>
-                    <div class="player bye" style="height:${slotHeight - 4}px;">
-                        <span class="name">BYE</span>
-                        <span class="byex">X</span>
-                    </div>
-                `;
+                slotA = `<div class="player" style="height:${slotHeight - 4}px;"><span class="name">${escapeHtml(match.teamA.name)}</span>${match.teamA.club ? `<span class="club">${escapeHtml(match.teamA.club)}</span>` : ''}</div><div class="match-sep"></div><div class="player bye" style="height:${slotHeight - 4}px;"><span class="name">BYE</span><span class="byex">X</span></div>`;
             } else if (match.teamB) {
-                slotA = `
-                    <div class="player bye" style="height:${slotHeight - 4}px;">
-                        <span class="name">BYE</span>
-                        <span class="byex">X</span>
-                    </div>
-                    <div class="match-sep"></div>
-                    <div class="player" style="height:${slotHeight - 4}px;">
-                        <span class="name">${escapeHtml(match.teamB.name)}</span>
-                        ${match.teamB.club ? `<span class="club">${escapeHtml(match.teamB.club)}</span>` : ''}
-                    </div>
-                `;
+                slotA = `<div class="player bye" style="height:${slotHeight - 4}px;"><span class="name">BYE</span><span class="byex">X</span></div><div class="match-sep"></div><div class="player" style="height:${slotHeight - 4}px;"><span class="name">${escapeHtml(match.teamB.name)}</span>${match.teamB.club ? `<span class="club">${escapeHtml(match.teamB.club)}</span>` : ''}</div>`;
             }
         } else if (match.isPlaceholder) {
             matchClass = 'placeholder';
-            slotA = `
-                <div class="player placeholder" style="height:${slotHeight - 4}px;"><span class="name">Chưa xác định</span></div>
-                <div class="match-sep"></div>
-                <div class="player placeholder" style="height:${slotHeight - 4}px;"><span class="name">Chưa xác định</span></div>
-            `;
+            slotA = `<div class="player placeholder" style="height:${slotHeight - 4}px;"><span class="name">Chưa xác định</span></div><div class="match-sep"></div><div class="player placeholder" style="height:${slotHeight - 4}px;"><span class="name">Chưa xác định</span></div>`;
         } else {
-            slotA = `
-                <div class="player" style="height:${slotHeight - 4}px;position:relative;">
-                    <span class="name">${escapeHtml(match.teamA.name)}</span>
-                    ${match.teamA.club ? `<span class="club">${escapeHtml(match.teamA.club)}</span>` : ''}
-                </div>
-                <div class="match-sep"></div>
-                <div class="player" style="height:${slotHeight - 4}px;position:relative;">
-                    <span class="name">${escapeHtml(match.teamB.name)}</span>
-                    ${match.teamB.club ? `<span class="club">${escapeHtml(match.teamB.club)}</span>` : ''}
-                </div>
-            `;
+            slotA = `<div class="player" style="height:${slotHeight - 4}px;"><span class="name">${escapeHtml(match.teamA.name)}</span>${match.teamA.club ? `<span class="club">${escapeHtml(match.teamA.club)}</span>` : ''}</div><div class="match-sep"></div><div class="player" style="height:${slotHeight - 4}px;"><span class="name">${escapeHtml(match.teamB.name)}</span>${match.teamB.club ? `<span class="club">${escapeHtml(match.teamB.club)}</span>` : ''}</div>`;
         }
-
         const top = yPos - (slotHeight * 2) / 2;
-        return `
-            <div class="bracket-match ${matchClass}" 
-                 style="position:absolute;top:${top}px;left:0;right:0;height:${slotHeight * 2}px;"
-                 data-match-idx="${matchIdx}">
-                <span class="match-label">T${matchNum}</span>
-                <button class="edit-btn" onclick="openEditMatch(${roundIdx}, ${matchIdx})" title="Sửa">
-                    <i class="fas fa-pen"></i>
-                </button>
-                ${slotA}
-            </div>
-        `;
+        return `<div class="bracket-match ${matchClass}" style="position:absolute;top:${top}px;left:0;right:0;height:${slotHeight * 2}px;" data-match-idx="${matchIdx}"><span class="match-label">T${matchNum}</span><button class="edit-btn" onclick="openEditMatch(${roundIdx}, ${matchIdx})" title="Sửa"><i class="fas fa-pen"></i></button>${slotA}</div>`;
     }
 
     function renderLaterRoundMatch(match, matchIdx, roundIdx, yPos, slotHeight) {
@@ -1625,28 +1095,10 @@
             content = `<div class="player placeholder" style="height:${slotHeight - 4}px;"><span class="name">Chưa xác định</span></div>`;
         } else {
             const player = match.teamA || match.teamB;
-            if (player) {
-                content = `
-                    <div class="player" style="height:${slotHeight - 4}px;">
-                        <span class="name">${escapeHtml(player.name)}</span>
-                        ${player.club ? `<span class="club">${escapeHtml(player.club)}</span>` : ''}
-                    </div>
-                `;
-            } else {
-                content = `<div class="player placeholder" style="height:${slotHeight - 4}px;"><span class="name">Chưa xác định</span></div>`;
-            }
+            if (player) content = `<div class="player" style="height:${slotHeight - 4}px;"><span class="name">${escapeHtml(player.name)}</span>${player.club ? `<span class="club">${escapeHtml(player.club)}</span>` : ''}</div>`;
+            else content = `<div class="player placeholder" style="height:${slotHeight - 4}px;"><span class="name">Chưa xác định</span></div>`;
         }
-        return `
-            <div class="bracket-match" 
-                 style="position:absolute;top:${top}px;left:0;right:0;height:${slotHeight}px;"
-                 data-match-idx="${matchIdx}">
-                <span class="match-label">T${matchNum}</span>
-                <button class="edit-btn" onclick="openEditMatch(${roundIdx}, ${matchIdx})" title="Sửa">
-                    <i class="fas fa-pen"></i>
-                </button>
-                ${content}
-            </div>
-        `;
+        return `<div class="bracket-match" style="position:absolute;top:${top}px;left:0;right:0;height:${slotHeight}px;" data-match-idx="${matchIdx}"><span class="match-label">T${matchNum}</span><button class="edit-btn" onclick="openEditMatch(${roundIdx}, ${matchIdx})" title="Sửa"><i class="fas fa-pen"></i></button>${content}</div>`;
     }
 
     function renderConnectorSVG(fromCount, toCount, totalHeight, fromPositions, toPositions, roundIdx, totalRounds) {
@@ -1660,90 +1112,28 @@
             const y1 = fromPositions[fromIdx1];
             const y2 = fromIdx2 < fromPositions.length ? fromPositions[fromIdx2] : y1;
             const yTo = toPositions[i];
-            paths += `<path d="M 0 ${y1} L ${midX} ${y1} L ${midX} ${yTo} L ${W} ${yTo}" 
-                stroke="#1a3a7a" stroke-width="1.5" fill="none" opacity="0.5"/>`;
-            if (y2 !== y1) {
-                paths += `<path d="M 0 ${y2} L ${midX} ${y2} L ${midX} ${yTo}" 
-                    stroke="#1a3a7a" stroke-width="1.5" fill="none" opacity="0.5"/>`;
-            }
+            paths += `<path d="M 0 ${y1} L ${midX} ${y1} L ${midX} ${yTo} L ${W} ${yTo}" stroke="#1a3a7a" stroke-width="1.5" fill="none" opacity="0.5"/>`;
+            if (y2 !== y1) paths += `<path d="M 0 ${y2} L ${midX} ${y2} L ${midX} ${yTo}" stroke="#1a3a7a" stroke-width="1.5" fill="none" opacity="0.5"/>`;
         }
-        let bkLabel = '';
-        if (roundIdx === totalRounds - 3) {
-            bkLabel = `<div class="connector-label bk" style="top:50%;left:0;transform:translate(-50%,-50%);">BK</div>`;
-        } else if (roundIdx === totalRounds - 4) {
-            bkLabel = `<div class="connector-label" style="top:50%;left:50%;transform:translate(-50%,-50%);">Tứ kết</div>`;
-        }
-        return `
-            <svg style="width:${W}px;height:${totalHeight}px;display:block;" 
-                 viewBox="0 0 ${W} ${totalHeight}" preserveAspectRatio="none">
-                ${paths}
-            </svg>
-            ${bkLabel}
-        `;
+        return `<svg style="width:${W}px;height:${totalHeight}px;display:block;" viewBox="0 0 ${W} ${totalHeight}" preserveAspectRatio="none">${paths}</svg>`;
     }
 
     function renderSlotList(result) {
         const firstRound = result.rounds[0];
         const bracketSize = result.bracketSize;
         const numByes = result.numByes;
-        let html = `
-            <div style="background:#f8f9fa;padding:16px;border-radius:12px;overflow-x:auto;">
-                <h3 style="color:#1a3a7a;margin-bottom:12px;">📋 Danh sách slot (Bracket ${bracketSize})</h3>
-                <p style="font-size:13px;color:#6c757d;margin-bottom:16px;">
-                    ${result.numTeams} VĐV · ${numByes} BYE
-                    ${result.customByes ? ' · BYE tùy chỉnh: ' + result.customByes.join(', ') : ''}
-                </p>
-                <table class="slot-table">
-                    <thead><tr>
-                        <th style="width:60px;">Slot</th><th style="width:60px;">BYE</th>
-                        <th>Tên VĐV</th><th style="width:120px;">CLB</th>
-                        <th style="width:100px;">Trận</th><th style="width:140px;">Ghi chú</th>
-                    </tr></thead><tbody>
-        `;
+        let html = `<div style="background:#f8f9fa;padding:16px;border-radius:12px;overflow-x:auto;"><h3 style="color:#1a3a7a;margin-bottom:12px;">📋 Danh sách slot (Bracket ${bracketSize})</h3><p style="font-size:13px;color:#6c757d;margin-bottom:16px;">${result.numTeams} VĐV · ${numByes} BYE ${result.customByes ? ' · BYE tùy chỉnh: ' + result.customByes.join(', ') : ''}</p><table class="slot-table"><thead><tr><th style="width:60px;">Slot</th><th style="width:60px;">BYE</th><th>Tên VĐV</th><th style="width:120px;">CLB</th><th style="width:100px;">Trận</th><th style="width:140px;">Ghi chú</th></tr></thead><tbody>`;
         firstRound.forEach((match, matchIdx) => {
             const slotA = matchIdx * 2 + 1;
             const slotB = matchIdx * 2 + 2;
             if (match.isBye) {
-                if (match.teamA) {
-                    html += `<tr class="bye-row">
-                        <td style="text-align:center;">${slotA}</td>
-                        <td style="text-align:center;font-weight:800;">X</td>
-                        <td style="font-weight:600;">${escapeHtml(match.teamA.name)}</td>
-                        <td>${escapeHtml(match.teamA.club || '—')}</td>
-                        <td style="text-align:center;">Trận ${matchIdx + 1}</td>
-                        <td>BYE - đi tiếp</td>
-                    </tr>`;
-                }
-                if (match.teamB) {
-                    html += `<tr class="bye-row">
-                        <td style="text-align:center;">${slotB}</td>
-                        <td style="text-align:center;font-weight:800;">X</td>
-                        <td style="font-weight:600;">${escapeHtml(match.teamB.name)}</td>
-                        <td>${escapeHtml(match.teamB.club || '—')}</td>
-                        <td style="text-align:center;">Trận ${matchIdx + 1}</td>
-                        <td>BYE - đi tiếp</td>
-                    </tr>`;
-                }
+                if (match.teamA) html += `<tr class="bye-row"><td style="text-align:center;">${slotA}</td><td style="text-align:center;font-weight:800;">X</td><td style="font-weight:600;">${escapeHtml(match.teamA.name)}</td><td>${escapeHtml(match.teamA.club || '—')}</td><td style="text-align:center;">Trận ${matchIdx + 1}</td><td>BYE - đi tiếp</td></tr>`;
+                if (match.teamB) html += `<tr class="bye-row"><td style="text-align:center;">${slotB}</td><td style="text-align:center;font-weight:800;">X</td><td style="font-weight:600;">${escapeHtml(match.teamB.name)}</td><td>${escapeHtml(match.teamB.club || '—')}</td><td style="text-align:center;">Trận ${matchIdx + 1}</td><td>BYE - đi tiếp</td></tr>`;
             } else if (match.isPlaceholder) {
-                html += `<tr><td style="text-align:center;">${slotA}</td><td style="text-align:center;">—</td>
-                    <td style="color:#adb5bd;font-style:italic;">Chưa xác định</td><td>—</td>
-                    <td style="text-align:center;">Trận ${matchIdx + 1}</td><td></td></tr>
-                <tr><td style="text-align:center;">${slotB}</td><td style="text-align:center;">—</td>
-                    <td style="color:#adb5bd;font-style:italic;">Chưa xác định</td><td>—</td>
-                    <td style="text-align:center;">Trận ${matchIdx + 1}</td><td></td></tr>`;
+                html += `<tr><td style="text-align:center;">${slotA}</td><td style="text-align:center;">—</td><td style="color:#adb5bd;font-style:italic;">Chưa xác định</td><td>—</td><td style="text-align:center;">Trận ${matchIdx + 1}</td><td></td></tr><tr><td style="text-align:center;">${slotB}</td><td style="text-align:center;">—</td><td style="color:#adb5bd;font-style:italic;">Chưa xác định</td><td>—</td><td style="text-align:center;">Trận ${matchIdx + 1}</td><td></td></tr>`;
             } else {
-                if (match.teamA) {
-                    html += `<tr><td style="text-align:center;">${slotA}</td><td style="text-align:center;">—</td>
-                        <td style="font-weight:600;">${escapeHtml(match.teamA.name)}</td>
-                        <td>${escapeHtml(match.teamA.club || '—')}</td>
-                        <td style="text-align:center;">Trận ${matchIdx + 1}</td><td></td></tr>`;
-                }
-                if (match.teamB) {
-                    html += `<tr><td style="text-align:center;">${slotB}</td><td style="text-align:center;">—</td>
-                        <td style="font-weight:600;">${escapeHtml(match.teamB.name)}</td>
-                        <td>${escapeHtml(match.teamB.club || '—')}</td>
-                        <td style="text-align:center;">Trận ${matchIdx + 1}</td><td></td></tr>`;
-                }
+                if (match.teamA) html += `<tr><td style="text-align:center;">${slotA}</td><td style="text-align:center;">—</td><td style="font-weight:600;">${escapeHtml(match.teamA.name)}</td><td>${escapeHtml(match.teamA.club || '—')}</td><td style="text-align:center;">Trận ${matchIdx + 1}</td><td></td></tr>`;
+                if (match.teamB) html += `<tr><td style="text-align:center;">${slotB}</td><td style="text-align:center;">—</td><td style="font-weight:600;">${escapeHtml(match.teamB.name)}</td><td>${escapeHtml(match.teamB.club || '—')}</td><td style="text-align:center;">Trận ${matchIdx + 1}</td><td></td></tr>`;
             }
         });
         html += `</tbody></table></div>`;
@@ -1759,6 +1149,36 @@
         }
         return names;
     }
+
+    // ==========================================
+    // EDIT THIRD PLACE
+    // ==========================================
+    window.editThirdPlaceManually = function() {
+        if (!lastResult) return;
+        const tp = lastResult.thirdPlaceMatch || { teamA: null, teamB: null, winner: null };
+        const aName = prompt('Tên VĐV A (Tranh hạng 3):', tp.teamA?.name || '');
+        if (aName === null) return;
+        const aClub = prompt('CLB VĐV A:', tp.teamA?.club || '');
+        if (aClub === null) return;
+        const bName = prompt('Tên VĐV B (Tranh hạng 3):', tp.teamB?.name || '');
+        if (bName === null) return;
+        const bClub = prompt('CLB VĐV B:', tp.teamB?.club || '');
+        if (bClub === null) return;
+        lastResult.thirdPlaceMatch = {
+            teamA: aName ? { name: aName, club: aClub } : null,
+            teamB: bName ? { name: bName, club: bClub } : null,
+            winner: null
+        };
+        renderResult(lastResult);
+        showAlert('✅ Đã cập nhật trận Tranh hạng 3!', 'success');
+    };
+
+    window.openEditRRPairing = function(idx) {
+        // Placeholder - could add edit for round robin knockout pairings
+        alert('Chỉnh sửa cặp đấu sẽ có sau khi có kết quả vòng bảng (bên categories.html)');
+    };
+
+    window.openEditThirdPlace = function() { editThirdPlaceManually(); };
 
     // ==========================================
     // MODAL CHỈNH SỬA
@@ -1783,45 +1203,19 @@
         body.innerHTML = `
             <div style="margin-bottom:20px;">
                 <h3 style="color:#1a3a7a;margin-bottom:12px;">VĐV A (trên)</h3>
-                <div class="form-group" style="margin-bottom:12px;">
-                    <label>Tên VĐV</label>
-                    <input type="text" id="edit-a-name" value="${escapeHtml(a?.name || '')}" style="width:100%;padding:10px;border:2px solid #e9ecef;border-radius:8px;">
-                </div>
-                <div class="form-group" style="margin-bottom:12px;">
-                    <label>CLB / Đơn vị</label>
-                    <input type="text" id="edit-a-club" value="${escapeHtml(a?.club || '')}" style="width:100%;padding:10px;border:2px solid #e9ecef;border-radius:8px;">
-                </div>
-                <div class="form-group">
-                    <label>Hoặc chọn VĐV khác:</label>
-                    <select id="edit-a-select" style="width:100%;padding:10px;border:2px solid #e9ecef;border-radius:8px;" onchange="onSelectOtherTeam('a', this.value)">
-                        <option value="">-- Giữ nguyên --</option>
-                        ${otherTeams.map((t, i) => `<option value="${i}">${escapeHtml(t.name)} (${escapeHtml(t.club || '—')})</option>`).join('')}
-                    </select>
-                </div>
+                <div class="form-group" style="margin-bottom:12px;"><label>Tên VĐV</label><input type="text" id="edit-a-name" value="${escapeHtml(a?.name || '')}" style="width:100%;padding:10px;border:2px solid #e9ecef;border-radius:8px;"></div>
+                <div class="form-group" style="margin-bottom:12px;"><label>CLB / Đơn vị</label><input type="text" id="edit-a-club" value="${escapeHtml(a?.club || '')}" style="width:100%;padding:10px;border:2px solid #e9ecef;border-radius:8px;"></div>
+                <div class="form-group"><label>Hoặc chọn VĐV khác:</label><select id="edit-a-select" style="width:100%;padding:10px;border:2px solid #e9ecef;border-radius:8px;" onchange="onSelectOtherTeam('a', this.value)"><option value="">-- Giữ nguyên --</option>${otherTeams.map((t, i) => `<option value="${i}">${escapeHtml(t.name)} (${escapeHtml(t.club || '—')})</option>`).join('')}</select></div>
             </div>
             <div style="margin-bottom:20px;border-top:1px dashed #dee2e6;padding-top:20px;">
                 <h3 style="color:#1a3a7a;margin-bottom:12px;">VĐV B (dưới)</h3>
-                <div class="form-group" style="margin-bottom:12px;">
-                    <label>Tên VĐV</label>
-                    <input type="text" id="edit-b-name" value="${escapeHtml(b?.name || '')}" style="width:100%;padding:10px;border:2px solid #e9ecef;border-radius:8px;">
-                </div>
-                <div class="form-group" style="margin-bottom:12px;">
-                    <label>CLB / Đơn vị</label>
-                    <input type="text" id="edit-b-club" value="${escapeHtml(b?.club || '')}" style="width:100%;padding:10px;border:2px solid #e9ecef;border-radius:8px;">
-                </div>
-                <div class="form-group">
-                    <label>Hoặc chọn VĐV khác:</label>
-                    <select id="edit-b-select" style="width:100%;padding:10px;border:2px solid #e9ecef;border-radius:8px;" onchange="onSelectOtherTeam('b', this.value)">
-                        <option value="">-- Giữ nguyên --</option>
-                        ${otherTeams.map((t, i) => `<option value="${i}">${escapeHtml(t.name)} (${escapeHtml(t.club || '—')})</option>`).join('')}
-                    </select>
-                </div>
+                <div class="form-group" style="margin-bottom:12px;"><label>Tên VĐV</label><input type="text" id="edit-b-name" value="${escapeHtml(b?.name || '')}" style="width:100%;padding:10px;border:2px solid #e9ecef;border-radius:8px;"></div>
+                <div class="form-group" style="margin-bottom:12px;"><label>CLB / Đơn vị</label><input type="text" id="edit-b-club" value="${escapeHtml(b?.club || '')}" style="width:100%;padding:10px;border:2px solid #e9ecef;border-radius:8px;"></div>
+                <div class="form-group"><label>Hoặc chọn VĐV khác:</label><select id="edit-b-select" style="width:100%;padding:10px;border:2px solid #e9ecef;border-radius:8px;" onchange="onSelectOtherTeam('b', this.value)"><option value="">-- Giữ nguyên --</option>${otherTeams.map((t, i) => `<option value="${i}">${escapeHtml(t.name)} (${escapeHtml(t.club || '—')})</option>`).join('')}</select></div>
             </div>
             <div class="modal-actions">
                 <button class="btn-primary" style="background:#6c757d;" onclick="closeEditModal()">Hủy</button>
-                <button class="btn-success-sm" onclick="saveEditMatch()">
-                    <i class="fas fa-check"></i> Lưu thay đổi
-                </button>
+                <button class="btn-success-sm" onclick="saveEditMatch()"><i class="fas fa-check"></i> Lưu thay đổi</button>
             </div>
         `;
         document.getElementById('edit-modal').classList.add('show');
@@ -1837,10 +1231,7 @@
         document.getElementById(`edit-${side}-club`).value = t.club || '';
     };
 
-    window.closeEditModal = function() {
-        document.getElementById('edit-modal').classList.remove('show');
-        editingContext = null;
-    };
+    window.closeEditModal = function() { document.getElementById('edit-modal').classList.remove('show'); editingContext = null; };
 
     window.saveEditMatch = function() {
         if (!editingContext || !lastResult) return;
@@ -1857,152 +1248,67 @@
     };
 
     // ==========================================
-    // GÁN LỊCH (SỬ DỤNG SESSIONS CONFIG MỚI)
+    // SCHEDULE BUILD
     // ==========================================
     function buildScheduleConfig() {
         const raw = getSessionsConfig();
-        return {
-            startDate: raw.startDate,
-            numDays: raw.numDays,
-            numTables: raw.numTables,
-            numSessions: raw.numSessions,
-            sessions: raw.sessions,
-            timeMorning: raw.timeMorning,
-            timeAfternoon: raw.timeAfternoon,
-            timeEvening: raw.timeEvening,
-        };
+        return { startDate: raw.startDate, numDays: raw.numDays, numTables: raw.numTables, numSessions: raw.numSessions, sessions: raw.sessions, timeMorning: raw.timeMorning, timeAfternoon: raw.timeAfternoon, timeEvening: raw.timeEvening };
     }
-
-    function formatDateVN(dateStr) {
-        const d = new Date(dateStr);
-        return `${d.getDate()}/${d.getMonth() + 1}`;
-    }
+    function formatDateVN(dateStr) { const d = new Date(dateStr); return `${d.getDate()}/${d.getMonth() + 1}`; }
 
     function assignScheduleToMatches(matches, cfg) {
         const startDate = new Date(cfg.startDate);
         const result = [];
         let matchIndex = 0;
-
         for (const session of cfg.sessions) {
             if (matchIndex >= matches.length) break;
-
             for (const sessionType of session.types) {
                 if (matchIndex >= matches.length) break;
-
-                const time = sessionType === 'Sáng' ? cfg.timeMorning
-                           : sessionType === 'Chiều' ? cfg.timeAfternoon
-                           : cfg.timeEvening;
-
+                const time = sessionType === 'Sáng' ? cfg.timeMorning : sessionType === 'Chiều' ? cfg.timeAfternoon : cfg.timeEvening;
                 for (let tableIdx = 0; tableIdx < cfg.numTables; tableIdx++) {
                     if (matchIndex >= matches.length) break;
-
-                    const date = new Date(startDate);
-                    date.setDate(date.getDate() + session.day);
-
-                    result.push({
-                        ...matches[matchIndex],
-                        date: formatDateVN(date),
-                        fullDate: date.toISOString().slice(0, 10),
-                        session: sessionType,
-                        time: time,
-                        table: tableIdx + 1,
-                        sessionIndex: session.index,
-                        matchIndexInSession: tableIdx,
-                    });
+                    const date = new Date(startDate); date.setDate(date.getDate() + session.day);
+                    result.push({ ...matches[matchIndex], date: formatDateVN(date), fullDate: date.toISOString().slice(0, 10), session: sessionType, time: time, table: tableIdx + 1, sessionIndex: session.index, matchIndexInSession: tableIdx });
                     matchIndex++;
                 }
             }
         }
-
-        // Nếu còn trận chưa gán
         const lastSession = cfg.sessions[cfg.sessions.length - 1];
         const lastSessionType = lastSession.types[lastSession.types.length - 1] || 'Chiều';
-        const lastTime = lastSessionType === 'Sáng' ? cfg.timeMorning
-                       : lastSessionType === 'Chiều' ? cfg.timeAfternoon
-                       : cfg.timeEvening;
+        const lastTime = lastSessionType === 'Sáng' ? cfg.timeMorning : lastSessionType === 'Chiều' ? cfg.timeAfternoon : cfg.timeEvening;
         let overflowIdx = 0;
         while (matchIndex < matches.length) {
-            const date = new Date(startDate);
-            date.setDate(date.getDate() + lastSession.day);
-            result.push({
-                ...matches[matchIndex],
-                date: formatDateVN(date),
-                fullDate: date.toISOString().slice(0, 10),
-                session: lastSessionType,
-                time: lastTime,
-                table: (overflowIdx % cfg.numTables) + 1,
-                sessionIndex: lastSession.index,
-            });
-            matchIndex++;
-            overflowIdx++;
+            const date = new Date(startDate); date.setDate(date.getDate() + lastSession.day);
+            result.push({ ...matches[matchIndex], date: formatDateVN(date), fullDate: date.toISOString().slice(0, 10), session: lastSessionType, time: lastTime, table: (overflowIdx % cfg.numTables) + 1, sessionIndex: lastSession.index });
+            matchIndex++; overflowIdx++;
         }
-
         return result;
     }
 
     // ==========================================
     // STYLE EXCELJS
     // ==========================================
-    const COLORS = {
-        headerBg: 'FF1A3A7A', headerFg: 'FFFFFFFF', byeBg: 'FFFFF3CD', byeFg: 'FF856404',
-        groupHeaderBg: 'FF0D1B3E', border: 'FFDEE2E6', clubFg: 'FF1A3A7A',
-    };
-    const thinBorder = {
-        top: { style: 'thin', color: { argb: COLORS.border } },
-        left: { style: 'thin', color: { argb: COLORS.border } },
-        bottom: { style: 'thin', color: { argb: COLORS.border } },
-        right: { style: 'thin', color: { argb: COLORS.border } },
-    };
-    function styleHeaderRow(row) {
-        row.height = 28;
-        row.eachCell(cell => {
-            cell.font = { bold: true, color: { argb: COLORS.headerFg }, size: 11 };
-            cell.fill = { type: 'pattern', pattern: 'solid', fgColor: { argb: COLORS.headerBg } };
-            cell.alignment = { horizontal: 'center', vertical: 'middle', wrapText: true };
-            cell.border = thinBorder;
-        });
-    }
-    function styleDataRow(row) {
-        row.height = 22;
-        row.eachCell(cell => {
-            cell.border = thinBorder;
-            cell.alignment = { horizontal: 'left', vertical: 'middle', wrapText: true };
-        });
-    }
-    function styleSectionTitle(row) {
-        row.height = 30;
-        row.eachCell(cell => {
-            cell.font = { bold: true, size: 13, color: { argb: COLORS.headerFg } };
-            cell.fill = { type: 'pattern', pattern: 'solid', fgColor: { argb: COLORS.headerBg } };
-            cell.alignment = { horizontal: 'center', vertical: 'middle' };
-            cell.border = thinBorder;
-        });
-    }
+    const COLORS = { headerBg: 'FF1A3A7A', headerFg: 'FFFFFFFF', byeBg: 'FFFFF3CD', byeFg: 'FF856404', groupHeaderBg: 'FF0D1B3E', border: 'FFDEE2E6', clubFg: 'FF1A3A7A', thirdBg: 'FFFFF8F0', thirdBorder: 'FFE67E22' };
+    const thinBorder = { top: { style: 'thin', color: { argb: COLORS.border } }, left: { style: 'thin', color: { argb: COLORS.border } }, bottom: { style: 'thin', color: { argb: COLORS.border } }, right: { style: 'thin', color: { argb: COLORS.border } } };
+    function styleHeaderRow(row) { row.height = 28; row.eachCell(cell => { cell.font = { bold: true, color: { argb: COLORS.headerFg }, size: 11 }; cell.fill = { type: 'pattern', pattern: 'solid', fgColor: { argb: COLORS.headerBg } }; cell.alignment = { horizontal: 'center', vertical: 'middle', wrapText: true }; cell.border = thinBorder; }); }
+    function styleDataRow(row) { row.height = 22; row.eachCell(cell => { cell.border = thinBorder; cell.alignment = { horizontal: 'left', vertical: 'middle', wrapText: true }; }); }
+    function styleSectionTitle(row) { row.height = 30; row.eachCell(cell => { cell.font = { bold: true, size: 13, color: { argb: COLORS.headerFg } }; cell.fill = { type: 'pattern', pattern: 'solid', fgColor: { argb: COLORS.headerBg } }; cell.alignment = { horizontal: 'center', vertical: 'middle' }; cell.border = thinBorder; }); }
 
     // ==========================================
-    // SHEET KNOCKOUT
+    // SHEET KNOCKOUT (với đường kẻ + third place)
     // ==========================================
     function buildKnockoutSheet(wb, sheetName, result, categoryName) {
-        const ws = wb.addWorksheet(sheetName, {
-            views: [{ state: 'frozen', ySplit: 2 }],
-            pageSetup: { paperSize: 9, orientation: 'landscape', fitToPage: true },
-        });
-        ws.columns = [
-            { width: 6 }, { width: 6 }, { width: 8 }, { width: 25 }, { width: 18 }, { width: 6 },
-            { width: 25 }, { width: 18 }, { width: 8 }, { width: 8 }, { width: 6 }, { width: 8 }, { width: 25 },
-        ];
+        const ws = wb.addWorksheet(sheetName, { views: [{ state: 'frozen', ySplit: 2 }], pageSetup: { paperSize: 9, orientation: 'landscape', fitToPage: true } });
+        ws.columns = [{ width: 6 }, { width: 6 }, { width: 8 }, { width: 25 }, { width: 18 }, { width: 6 }, { width: 25 }, { width: 18 }, { width: 8 }, { width: 8 }, { width: 6 }, { width: 8 }, { width: 25 }];
         const titleRow = ws.addRow([`${categoryName.toUpperCase()} - BỐC THĂM LOẠI TRỰC TIẾP (Bracket ${result.bracketSize})`]);
-        ws.mergeCells('A1:M1');
-        styleSectionTitle(titleRow);
+        ws.mergeCells('A1:M1'); styleSectionTitle(titleRow);
         const headerRow = ws.addRow(['Slot', 'BYE', 'Trận', 'VĐV A', 'CLB A', 'VS', 'VĐV B', 'CLB B', 'Ngày', 'Ca', 'Bàn', 'Giờ', 'Ghi chú']);
         styleHeaderRow(headerRow);
 
         const firstRound = result.rounds[0];
         const scheduleCfg = buildScheduleConfig();
         const realMatches = [];
-        firstRound.forEach((m, i) => {
-            if (!m.isPlaceholder && !m.isBye && m.teamA && m.teamB) realMatches.push({ index: i, match: m });
-        });
+        firstRound.forEach((m, i) => { if (!m.isPlaceholder && !m.isBye && m.teamA && m.teamB) realMatches.push({ index: i, match: m }); });
         const scheduled = assignScheduleToMatches(realMatches.map((_, i) => ({ idx: i })), scheduleCfg);
 
         let matchIdx = 0;
@@ -2011,13 +1317,7 @@
             const slotB = i * 2 + 2;
             if (match.isBye) {
                 const byeSlot = match.teamA ? slotA : slotB;
-                const r = ws.addRow([
-                    byeSlot, 'X', `Trận ${i + 1}`,
-                    match.teamA ? match.teamA.name : '', match.teamA ? (match.teamA.club || '—') : '',
-                    'vs',
-                    match.teamB ? match.teamB.name : '', match.teamB ? (match.teamB.club || '—') : '',
-                    '', '', '', '', 'BYE - đi tiếp'
-                ]);
+                const r = ws.addRow([byeSlot, 'X', `Trận ${i + 1}`, match.teamA ? match.teamA.name : '', match.teamA ? (match.teamA.club || '—') : '', 'vs', match.teamB ? match.teamB.name : '', match.teamB ? (match.teamB.club || '—') : '', '', '', '', '', 'BYE - đi tiếp']);
                 styleDataRow(r);
                 [1, 2, 6, 9, 10, 11, 12].forEach(c => r.getCell(c).alignment = { horizontal: 'center', vertical: 'middle' });
                 r.getCell(4).font = { bold: true, color: { argb: COLORS.byeFg } };
@@ -2027,14 +1327,8 @@
                 ws.addRow([slotA, '', `Trận ${i + 1}`, '—', '', 'vs', '—', '', '', '', '', '', '']);
                 ws.addRow([slotB, '', `Trận ${i + 1}`, '—', '', 'vs', '—', '', '', '', '', '', '']);
             } else {
-                const sched = scheduled[matchIdx] || {};
-                matchIdx++;
-                const r = ws.addRow([
-                    `${slotA}-${slotB}`, '', `Trận ${i + 1}`,
-                    match.teamA.name, match.teamA.club || '—', 'vs',
-                    match.teamB.name, match.teamB.club || '—',
-                    sched.date || '', sched.session || '', sched.table || '', sched.time || '', ''
-                ]);
+                const sched = scheduled[matchIdx] || {}; matchIdx++;
+                const r = ws.addRow([`${slotA}-${slotB}`, '', `Trận ${i + 1}`, match.teamA.name, match.teamA.club || '—', 'vs', match.teamB.name, match.teamB.club || '—', sched.date || '', sched.session || '', sched.table || '', sched.time || '', '']);
                 styleDataRow(r);
                 [1, 2, 6, 9, 10, 11, 12].forEach(c => r.getCell(c).alignment = { horizontal: 'center', vertical: 'middle' });
                 r.getCell(4).font = { bold: true, color: { argb: COLORS.clubFg } };
@@ -2042,6 +1336,19 @@
                 r.getCell(6).font = { bold: true, color: { argb: 'FFE94560' } };
             }
         });
+
+        ws.addRow([]);
+        const tp = result.thirdPlaceMatch || { teamA: null, teamB: null, winner: null };
+        const tpTitle = ws.addRow(['🥉 TRẬN TRANH HẠNG 3']);
+        ws.mergeCells(`A${tpTitle.number}:M${tpTitle.number}`);
+        styleSectionTitle(tpTitle);
+        const tpHeader = ws.addRow(['Slot', 'BYE', 'Trận', 'VĐV A', 'CLB A', 'VS', 'VĐV B', 'CLB B', 'Ngày', 'Ca', 'Bàn', 'Giờ', 'Ghi chú']);
+        styleHeaderRow(tpHeader);
+        const tpr = ws.addRow(['', '', 'Tranh hạng 3', tp.teamA?.name || '—', tp.teamA?.club || '', 'vs', tp.teamB?.name || '—', tp.teamB?.club || '', '', '', '', '', tp.winner || '']);
+        styleDataRow(tpr);
+        [1, 2, 6, 9, 10, 11, 12].forEach(c => tpr.getCell(c).alignment = { horizontal: 'center', vertical: 'middle' });
+        tpr.eachCell(cell => { cell.fill = { type: 'pattern', pattern: 'solid', fgColor: { argb: COLORS.thirdBg } }; });
+        [4, 7].forEach(c => tpr.getCell(c).font = { bold: true, color: { argb: COLORS.thirdBorder } });
 
         ws.addRow([]);
         ws.addRow([`Tổng số VĐV: ${result.numTeams}`]);
@@ -2052,7 +1359,7 @@
     }
 
     // ==========================================
-    // SHEET ROUND-ROBIN
+    // SHEET ROUND-ROBIN + KNOCKOUT STAGE 2
     // ==========================================
     function buildRoundRobinSheets(wb, result, categoryName) {
         const groupNames = ['A', 'B', 'C', 'D', 'E', 'F', 'G', 'H', 'I', 'J', 'K', 'L', 'M', 'N', 'O', 'P'];
@@ -2061,8 +1368,7 @@
         const wsSummary = wb.addWorksheet('DS Bảng đấu', { pageSetup: { paperSize: 9, orientation: 'landscape', fitToPage: true } });
         wsSummary.columns = [{ width: 10 }, { width: 6 }, { width: 30 }, { width: 22 }, { width: 10 }, { width: 10 }, { width: 10 }];
         const titleS = wsSummary.addRow([`${categoryName.toUpperCase()} - DANH SÁCH BẢNG ĐẤU`]);
-        wsSummary.mergeCells('A1:G1');
-        styleSectionTitle(titleS);
+        wsSummary.mergeCells('A1:G1'); styleSectionTitle(titleS);
         const headerS = wsSummary.addRow(['Bảng', 'Vị trí', 'Tên VĐV/Đội', 'CLB/Đơn vị', 'Điểm', 'T/B', 'XH']);
         styleHeaderRow(headerS);
         result.groups.forEach((group, gi) => {
@@ -2081,8 +1387,7 @@
             const ws = wb.addWorksheet(`Bảng ${groupName}`, { pageSetup: { paperSize: 9, orientation: 'landscape', fitToPage: true } });
             ws.columns = [{ width: 6 }, { width: 4 }, { width: 4 }, { width: 30 }, { width: 22 }, { width: 6 }, { width: 6 }, { width: 6 }];
             const titleRow = ws.addRow([`BẢNG ${groupName} (${group.length} VĐV)`]);
-            ws.mergeCells('A1:H1');
-            styleSectionTitle(titleRow);
+            ws.mergeCells('A1:H1'); styleSectionTitle(titleRow);
             const headerRow = ws.addRow(['Stt', '', '', 'Tên VĐV', 'CLB/Đơn vị', 'Điểm', 'T/B', 'XH']);
             styleHeaderRow(headerRow);
             group.forEach((team, i) => {
@@ -2094,11 +1399,9 @@
             });
             ws.addRow([]);
             const matrixTitle = ws.addRow([`MA TRẬN ĐẤU VÒNG TRÒN - BẢNG ${groupName}`]);
-            ws.mergeCells(`A${matrixTitle.number}:H${matrixTitle.number}`);
-            styleSectionTitle(matrixTitle);
+            ws.mergeCells(`A${matrixTitle.number}:H${matrixTitle.number}`); styleSectionTitle(matrixTitle);
             const matrixHeader = ['MS', ...group.map((_, i) => i + 1)];
-            const mhRow = ws.addRow(matrixHeader);
-            styleHeaderRow(mhRow);
+            const mhRow = ws.addRow(matrixHeader); styleHeaderRow(mhRow);
             for (let i = 0; i < group.length; i++) {
                 const rowData = [i + 1];
                 for (let j = 0; j < group.length; j++) {
@@ -2112,23 +1415,15 @@
             }
             ws.addRow([]);
             const matchTitle = ws.addRow([`DANH SÁCH TRẬN - BẢNG ${groupName}`]);
-            ws.mergeCells(`A${matchTitle.number}:H${matchTitle.number}`);
-            styleSectionTitle(matchTitle);
+            ws.mergeCells(`A${matchTitle.number}:H${matchTitle.number}`); styleSectionTitle(matchTitle);
             const matchHeader = ws.addRow(['TT', 'Trận', 'VĐV A', 'VĐV B', 'Ngày', 'Ca', 'Bàn', 'Giờ']);
             styleHeaderRow(matchHeader);
             const matchesList = [];
-            for (let i = 0; i < group.length; i++) {
-                for (let j = i + 1; j < group.length; j++) matchesList.push({ p1: i, p2: j });
-            }
+            for (let i = 0; i < group.length; i++) for (let j = i + 1; j < group.length; j++) matchesList.push({ p1: i, p2: j });
             const scheduled = assignScheduleToMatches(matchesList, scheduleCfg);
             scheduled.forEach((s, idx) => {
-                const t1 = group[s.p1];
-                const t2 = group[s.p2];
-                const r = ws.addRow([
-                    idx + 1, `Trận ${idx + 1}`,
-                    `${t1.name} (${t1.club || '—'})`, `${t2.name} (${t2.club || '—'})`,
-                    s.date, s.session, s.table, s.time,
-                ]);
+                const t1 = group[s.p1]; const t2 = group[s.p2];
+                const r = ws.addRow([idx + 1, `Trận ${idx + 1}`, `${t1.name} (${t1.club || '—'})`, `${t2.name} (${t2.club || '—'})`, s.date, s.session, s.table, s.time]);
                 styleDataRow(r);
                 [1, 2, 5, 6, 7, 8].forEach(c => r.getCell(c).alignment = { horizontal: 'center', vertical: 'middle' });
                 r.getCell(3).font = { bold: true };
@@ -2142,24 +1437,21 @@
     function buildStage2Sheet(wb, result, categoryName, groupNames) {
         const numGroups = result.groups.length;
         if (numGroups < 2) return;
-        const ws = wb.addWorksheet('Giai đoạn 2', { pageSetup: { paperSize: 9, orientation: 'landscape', fitToPage: true } });
+        const ws = wb.addWorksheet('Giai đoạn 2 (Knockout)', { pageSetup: { paperSize: 9, orientation: 'landscape', fitToPage: true } });
         ws.columns = [{ width: 6 }, { width: 22 }, { width: 22 }, { width: 22 }, { width: 8 }, { width: 8 }, { width: 6 }, { width: 8 }, { width: 35 }];
-        const titleRow = ws.addRow([`GIAI ĐOẠN II - ${categoryName.toUpperCase()} (CHỌN NHẤT, NHÌ MỖI BẢNG)`]);
-        ws.mergeCells('A1:I1');
-        styleSectionTitle(titleRow);
+        const titleRow = ws.addRow([`GIAI ĐOẠN II - ${categoryName.toUpperCase()} (CHỌN NHẤT, NHÌ MỖI BẢNG + TRANH HẠNG 3)`]);
+        ws.mergeCells('A1:I1'); styleSectionTitle(titleRow);
         const headerRow = ws.addRow(['TT', 'Cặp', 'VĐV A (dự kiến)', 'VĐV B (dự kiến)', 'Ngày', 'Ca', 'Bàn', 'Giờ', 'Ghi chú']);
         styleHeaderRow(headerRow);
 
         const pairs = [];
         for (let i = 0; i < numGroups; i += 2) {
             if (i + 1 < numGroups) {
-                pairs.push({ a: `1${groupNames[i]}`, b: `2${groupNames[i + 1]}`, note: '' });
-                pairs.push({ a: `1${groupNames[i + 1]}`, b: `2${groupNames[i]}`, note: '' });
+                pairs.push({ a: `Nhất ${groupNames[i]}`, b: `Nhì ${groupNames[i + 1]}`, note: '' });
+                pairs.push({ a: `Nhất ${groupNames[i + 1]}`, b: `Nhì ${groupNames[i]}`, note: '' });
+            } else {
+                pairs.push({ a: `Nhất ${groupNames[i]}`, b: `Nhì ${groupNames[i]}`, note: '' });
             }
-        }
-        if (numGroups % 2 === 1) {
-            const lastGroup = groupNames[numGroups - 1];
-            pairs.push({ a: `1${lastGroup}`, b: `3X (đội thứ 3 tốt nhất)`, note: 'Chờ kết quả vòng bảng' });
         }
         const scheduleCfg = buildScheduleConfig();
         const scheduled = assignScheduleToMatches(pairs.map((_, i) => ({ idx: i })), scheduleCfg);
@@ -2172,20 +1464,33 @@
             row.getCell(3).font = { bold: true };
             row.getCell(4).font = { bold: true };
         });
+
+        // Vòng tiếp theo
         ws.addRow([]);
-        const noteTitle = ws.addRow(['GHI CHÚ:']);
-        noteTitle.getCell(1).font = { bold: true, color: { argb: COLORS.headerBg } };
-        ws.addRow(['- Cặp đấu dự kiến dựa trên công thức: 1A vs 2B, 1B vs 2A, 1C vs 2D, 1D vs 2C, ...']);
-        ws.addRow(['- Đội "3X" là đội hạng 3 có thành tích tốt nhất (điền sau khi kết thúc vòng bảng)']);
-        ws.addRow([`- Tổng số cặp đấu giai đoạn 2: ${pairs.length}`]);
+        const nextTitle = ws.addRow(['CÁC VÒNG TIẾP THEO (Bán kết, Chung kết, Tranh hạng 3)']);
+        ws.mergeCells(`A${nextTitle.number}:I${nextTitle.number}`); styleSectionTitle(nextTitle);
+        const nextHeader = ws.addRow(['TT', 'Vòng', 'VĐV A', 'VĐV B', 'Ngày', 'Ca', 'Bàn', 'Giờ', 'Ghi chú']);
+        styleHeaderRow(nextHeader);
+        const nextRounds = [
+            { name: 'Bán kết 1', note: 'Thắng TK1 vs Thắng TK2' },
+            { name: 'Bán kết 2', note: 'Thắng TK3 vs Thắng TK4' },
+            { name: 'Chung kết', note: 'Thắng BK1 vs Thắng BK2' },
+            { name: 'Tranh hạng 3', note: 'Thua BK1 vs Thua BK2' },
+        ];
+        nextRounds.forEach((r, idx) => {
+            const row = ws.addRow([idx + 1, r.name, '', '', '', '', '', '', r.note]);
+            styleDataRow(row);
+            [1, 5, 6, 7, 8].forEach(c => row.getCell(c).alignment = { horizontal: 'center', vertical: 'middle' });
+            row.getCell(2).font = { bold: true, color: { argb: COLORS.clubFg } };
+            if (r.name === 'Tranh hạng 3') row.eachCell(cell => { cell.fill = { type: 'pattern', pattern: 'solid', fgColor: { argb: COLORS.thirdBg } }; });
+        });
     }
 
     function buildScheduleSummarySheet(wb, result, categoryName) {
         const ws = wb.addWorksheet('Lịch thi đấu chung', { pageSetup: { paperSize: 9, orientation: 'landscape', fitToPage: true } });
         ws.columns = [{ width: 6 }, { width: 10 }, { width: 35 }, { width: 10 }, { width: 10 }, { width: 8 }, { width: 10 }];
         const titleRow = ws.addRow([`LỊCH THI ĐẤU - ${categoryName.toUpperCase()}`]);
-        ws.mergeCells('A1:G1');
-        styleSectionTitle(titleRow);
+        ws.mergeCells('A1:G1'); styleSectionTitle(titleRow);
         const headerRow = ws.addRow(['TT', 'Ngày', 'Nội dung', 'Ca', 'Giờ', 'Bàn', 'Ghi chú']);
         styleHeaderRow(headerRow);
         const scheduleCfg = buildScheduleConfig();
@@ -2204,9 +1509,7 @@
             result.groups.forEach((group, gi) => {
                 const groupName = String.fromCharCode(65 + gi);
                 const matchesList = [];
-                for (let i = 0; i < group.length; i++) {
-                    for (let j = i + 1; j < group.length; j++) matchesList.push({ p1: i, p2: j });
-                }
+                for (let i = 0; i < group.length; i++) for (let j = i + 1; j < group.length; j++) matchesList.push({ p1: i, p2: j });
                 const scheduled = assignScheduleToMatches(matchesList, scheduleCfg);
                 scheduled.forEach((s) => {
                     const t1 = group[s.p1]; const t2 = group[s.p2];
@@ -2219,7 +1522,7 @@
     }
 
     // ==========================================
-    // EXPORT EXCEL (FIXED)
+    // EXPORT EXCEL ADVANCED
     // ==========================================
     window.exportExcelAdvanced = async function() {
         const result = lastResult;
@@ -2236,18 +1539,13 @@
             const buffer = await wb.xlsx.writeBuffer();
             const blob = new Blob([buffer], { type: 'application/vnd.openxmlformats-officedocument.spreadsheetml.sheet' });
             const url = URL.createObjectURL(blob);
-            const a = document.createElement('a');
-            a.href = url;
+            const a = document.createElement('a'); a.href = url;
             const safeName = category.replace(/[^\w\u00C0-\u024F\u1E00-\u1EFF]/g, '_');
-            a.download = `${safeName}_${new Date().toISOString().slice(0, 10)}.xlsx`;
-            a.click();
-            URL.revokeObjectURL(url);
+            a.download = `${safeName}_Full_${new Date().toISOString().slice(0, 10)}.xlsx`;
+            a.click(); URL.revokeObjectURL(url);
             hideLoading();
-            showAlert('✅ Đã xuất file Excel!', 'success');
-        } catch (error) {
-            console.error(error); hideLoading();
-            showAlert('Lỗi xuất Excel: ' + error.message, 'error');
-        }
+            showAlert('✅ Đã xuất file Excel đầy đủ (có Tranh hạng 3)!', 'success');
+        } catch (error) { console.error(error); hideLoading(); showAlert('Lỗi xuất Excel: ' + error.message, 'error'); }
     };
 
     window.exportCurrentSheet = async function() {
@@ -2263,22 +1561,17 @@
             const buffer = await wb.xlsx.writeBuffer();
             const blob = new Blob([buffer], { type: 'application/vnd.openxmlformats-officedocument.spreadsheetml.sheet' });
             const url = URL.createObjectURL(blob);
-            const a = document.createElement('a');
-            a.href = url;
+            const a = document.createElement('a'); a.href = url;
             const safeName = category.replace(/[^\w\u00C0-\u024F\u1E00-\u1EFF]/g, '_');
             a.download = `${safeName}_${new Date().toISOString().slice(0, 10)}.xlsx`;
-            a.click();
-            URL.revokeObjectURL(url);
+            a.click(); URL.revokeObjectURL(url);
             hideLoading();
             showAlert('✅ Đã xuất sheet hiện tại!', 'success');
-        } catch (error) {
-            console.error(error); hideLoading();
-            showAlert('Lỗi xuất Excel: ' + error.message, 'error');
-        }
+        } catch (error) { console.error(error); hideLoading(); showAlert('Lỗi xuất Excel: ' + error.message, 'error'); }
     };
 
     // ==========================================
-    // LƯU DATABASE (FIXED)
+    // SAVE TO DATABASE
     // ==========================================
     window.saveToDatabase = async function() {
         const result = lastResult;
@@ -2300,11 +1593,7 @@
         if (result.type === 'round-robin') {
             result.groups.forEach((group, i) => {
                 group.forEach((team, j) => {
-                    records.push({
-                        tournament_id: tournamentId, team_name: team.name, club: team.club || null,
-                        group_name: groupNames[i], position: j + 1, draw_type: 'round-robin',
-                        category: category, created_by: session.user.id,
-                    });
+                    records.push({ tournament_id: tournamentId, team_name: team.name, club: team.club || null, group_name: groupNames[i], position: j + 1, draw_type: 'round-robin', category: category, created_by: session.user.id });
                 });
             });
         } else if (result.type === 'knockout') {
@@ -2317,24 +1606,10 @@
                 if (match.isPlaceholder) return;
                 const sched = !match.isBye ? scheduled[matchIdx++] : null;
                 if (match.teamA) {
-                    records.push({
-                        tournament_id: tournamentId, team_name: match.teamA.name, club: match.teamA.club || null,
-                        group_name: match.isBye ? 'BYE' : 'Vòng 1', position: i * 2 + 1,
-                        draw_type: 'knockout', round_number: 1, match_number: i + 1, category: category,
-                        match_date: sched?.fullDate || null, match_session: sched?.session || null,
-                        match_time: sched?.time || null, match_table: sched?.table || null,
-                        created_by: session.user.id,
-                    });
+                    records.push({ tournament_id: tournamentId, team_name: match.teamA.name, club: match.teamA.club || null, group_name: match.isBye ? 'BYE' : 'Vòng 1', position: i * 2 + 1, draw_type: 'knockout', round_number: 1, match_number: i + 1, category: category, match_date: sched?.fullDate || null, match_session: sched?.session || null, match_time: sched?.time || null, match_table: sched?.table || null, created_by: session.user.id });
                 }
                 if (match.teamB) {
-                    records.push({
-                        tournament_id: tournamentId, team_name: match.teamB.name, club: match.teamB.club || null,
-                        group_name: 'Vòng 1', position: i * 2 + 2,
-                        draw_type: 'knockout', round_number: 1, match_number: i + 1, category: category,
-                        match_date: sched?.fullDate || null, match_session: sched?.session || null,
-                        match_time: sched?.time || null, match_table: sched?.table || null,
-                        created_by: session.user.id,
-                    });
+                    records.push({ tournament_id: tournamentId, team_name: match.teamB.name, club: match.teamB.club || null, group_name: 'Vòng 1', position: i * 2 + 2, draw_type: 'knockout', round_number: 1, match_number: i + 1, category: category, match_date: sched?.fullDate || null, match_session: sched?.session || null, match_time: sched?.time || null, match_table: sched?.table || null, created_by: session.user.id });
                 }
             });
         }
@@ -2367,17 +1642,9 @@
         el.textContent = message;
         el.className = 'alert show ' + type;
     }
-    function escapeHtml(text) {
-        return String(text || '').replace(/&/g, '&amp;').replace(/</g, '&lt;')
-            .replace(/>/g, '&gt;').replace(/"/g, '&quot;');
-    }
-    function showLoading(text) {
-        document.getElementById('loadingText').textContent = text || 'Đang xử lý...';
-        document.getElementById('loadingOverlay').classList.add('active');
-    }
-    function hideLoading() {
-        document.getElementById('loadingOverlay').classList.remove('active');
-    }
+    function escapeHtml(text) { return String(text || '').replace(/&/g, '&amp;').replace(/</g, '&lt;').replace(/>/g, '&gt;').replace(/"/g, '&quot;'); }
+    function showLoading(text) { document.getElementById('loadingText').textContent = text || 'Đang xử lý...'; document.getElementById('loadingOverlay').classList.add('active'); }
+    function hideLoading() { document.getElementById('loadingOverlay').classList.remove('active'); }
 
     // ==========================================
     // INIT
@@ -2385,7 +1652,7 @@
     renderTeams();
     loadCategories();
     renderSessionsConfig();
-    console.log('✅ draw.html v9 - Fixed + flexible schedule loaded');
+    console.log('✅ draw.html v10 loaded');
 })();
 </script>
 </body>
