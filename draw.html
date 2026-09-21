@@ -182,6 +182,11 @@
         .selection-info.ok { background: #d4edda; color: #155724; }
         .selection-info.warn { background: #fff3cd; color: #856404; }
         .selection-info.error { background: #f8d7da; color: #721c24; }
+        .pair-select-row { display: flex; flex-direction: column; gap: 4px; }
+        .pair-select-row select { width: 100%; padding: 5px 8px; border: 2px solid #e9ecef; border-radius: 6px; font-size: 11px; font-weight: 700; color: #1a1a2e; background: #fff; cursor: pointer; }
+        .pair-select-row select:focus { border-color: #0984e3; outline: none; }
+        .pair-select-row select:hover { border-color: #1a3a7a; }
+        .pair-tools { display: flex; gap: 10px; flex-wrap: wrap; margin-bottom: 16px; }
     </style>
 </head>
 <body>
@@ -190,7 +195,7 @@
     <div class="draw-header">
         <div>
             <h1>🎲 Bốc thăm tự động</h1>
-            <p>Vòng tròn + Knockout · Tự chọn đội vào KO · Tùy chỉnh tên vòng · Xuất Excel 1 sheet</p>
+            <p>Vòng tròn + Knockout · Tự chọn cặp đấu · Xuất Excel 1 sheet</p>
         </div>
         <a href="tournaments.html" class="btn-outline"><i class="fas fa-arrow-left"></i> Quay lại</a>
     </div>
@@ -444,7 +449,7 @@
 (function() {
     'use strict';
 
-    console.log('🚀 draw.html v14 - Single clean version');
+    console.log('🚀 draw.html v15 - Custom pair knockout');
 
     const config = window.SPORTSVN_CONFIG || {};
     const supabaseClient = window.supabase.createClient(config.SUPABASE_URL, config.SUPABASE_ANON_KEY);
@@ -706,7 +711,8 @@
     };
 
     // ==========================================
-    // SELECT DRAW TYPE    // ==========================================
+    // SELECT DRAW TYPE
+    // ==========================================
     window.selectDrawType = function(type) {
         currentDrawType = type;
         document.querySelectorAll('.draw-type-card').forEach(card => {
@@ -966,6 +972,7 @@
         const autoLabel = getAutoRoundLabel(bracketSize);
         const finalLabel = (result.koRoundLabel === 'auto' || !result.koRoundLabel) ? autoLabel : result.koRoundLabel;
 
+        // Chọn BYE tự động
         if (koState.selectedByes.length === 0 && numByes > 0) {
             const priorityInput = result.koByePriorityInput || '';
             const priorityGroups = priorityInput.split(',').map(s => s.trim().toUpperCase()).filter(s => s.length > 0);
@@ -989,56 +996,52 @@
             }
         }
 
-        const allQualified = [...koState.selectedChampions, ...koState.selectedRunnersUp];
-        const nonBye = allQualified.filter(t => !koState.selectedByes.includes(t));
-        const champList = nonBye.filter(t => t.startsWith('Nhất'));
-        const runnerList = nonBye.filter(t => t.startsWith('Nhì'));
+        // Tạo cặp đấu: Nhất X vs Nhì Y (X≠Y), dùng công thức đối xứng
+        // Nhất A vs Nhì B, Nhất B vs Nhì A, Nhất C vs Nhì D, Nhất D vs Nhì C...
+        const champs = koState.selectedChampions.filter(c => !koState.selectedByes.includes(c));
+        const runners = koState.selectedRunnersUp.filter(r => !koState.selectedByes.includes(r));
 
-        // Ghép cặp: Nhất bảng X vs Nhì bảng Y (X ≠ Y, ưu tiên đối xứng qua trục)
-        // Cách làm: sắp xếp Nhất theo bảng A, B, C...; sắp xếp Nhì đảo ngược Z, Y, X...
+        // Sắp xếp theo A→Z
+        champs.sort((a, b) => a.localeCompare(b));
+        runners.sort((a, b) => a.localeCompare(b));
+
+        // Ghép cặp đối xứng: cặp i ghép champ[i XOR 1 trong nhóm 2] vs runner[i XOR 1]
+        // Cách: nhóm 2 phần tử liên tiếp, đảo ngược
         const pairings = [];
+        const maxPairs = Math.max(champs.length, runners.length);
+        const usedChamps = new Set();
         const usedRunners = new Set();
 
-        // Sắp xếp Nhất theo thứ tự bảng A → Z
-        champList.sort((a, b) => a.localeCompare(b));
-        // Sắp xếp Nhì theo thứ tự bảng Z → A (đảo ngược)
-        runnerList.sort((a, b) => b.localeCompare(a));
+        for (let i = 0; i < maxPairs; i++) {
+            const pairGroup = Math.floor(i / 2);
+            const cIdx = pairGroup * 2 + (i % 2);
+            const rIdx = pairGroup * 2 + (1 - (i % 2));
 
-        for (const champ of champList) {
-            // Tìm Nhì khác bảng với champ này
-            let matchedIdx = -1;
-            for (let i = 0; i < runnerList.length; i++) {
-                if (usedRunners.has(i)) continue;
-                const runner = runnerList[i];
-                // Kiểm tra khác bảng: "Nhất A" vs "Nhì A" → cùng bảng → bỏ qua
-                const champGroup = champ.replace('Nhất ', '').trim();
-                const runnerGroup = runner.replace('Nhì ', '').trim();
-                if (champGroup !== runnerGroup) {
-                    matchedIdx = i;
-                    break;
-                }
+            const cName = champs[cIdx] || null;
+            const rName = runners[rIdx] || null;
+
+            // Đảm bảo không trùng
+            let finalC = cName;
+            let finalR = rName;
+            if (cName && usedChamps.has(cName)) {
+                finalC = champs.find(c => !usedChamps.has(c)) || null;
             }
-            // Nếu không tìm được Nhì khác bảng (hiếm), lấy đại 1 Nhì chưa dùng
-            if (matchedIdx === -1) {
-                for (let i = 0; i < runnerList.length; i++) {
-                    if (!usedRunners.has(i)) { matchedIdx = i; break; }
-                }
+            if (rName && usedRunners.has(rName)) {
+                finalR = runners.find(r => !usedRunners.has(r)) || null;
             }
-            if (matchedIdx >= 0) {
-                usedRunners.add(matchedIdx);
-                pairings.push({ a: champ, b: runnerList[matchedIdx] });
-            } else {
-                // Không còn Nhì → để trống slot B (sẽ là BYE hoặc placeholder)
-                pairings.push({ a: champ, b: null });
+            if (finalC) usedChamps.add(finalC);
+            if (finalR) usedRunners.add(finalR);
+
+            if (finalC || finalR) {
+                pairings.push({ a: finalC, b: finalR });
             }
         }
 
-        // Nếu còn Nhì chưa dùng (khi qualify = 3), ghép thêm cặp Nhì vs Ba
-        // hoặc để trống — tùy logic. Hiện tại chỉ ghép Nhất vs Nhì.
-
         result.knockoutData = {
             bracketSize, numByes, numGroups, totalQualified, needRunnersUp, groupNames,
-            roundLabel: finalLabel, autoLabel, pairings, allQualified, nonBye
+            roundLabel: finalLabel, autoLabel, pairings,
+            allQualified: [...koState.selectedChampions, ...koState.selectedRunnersUp],
+            nonBye: [...champs, ...runners]
         };
     }
 
@@ -1166,7 +1169,7 @@
     function drawRoundRobinSingle(teams, protectClub) {
         return { type: 'round-robin', groups: [shuffleArray([...teams])], numGroups: 1, thirdPlaceMatch: { teamA: null, teamB: null, winner: null } };
     }
-    // ==========================================
+        // ==========================================
     // RENDER RESULT
     // ==========================================
     function renderResult(result) {
@@ -1386,62 +1389,68 @@
         const roundNames = getRoundNamesWithCustomFirst(totalRounds, d.roundLabel);
 
         let html = `<div class="stage-header knockout"><i class="fas fa-trophy"></i> GIAI ĐOẠN 2: VÒNG LOẠI TRỰC TIẾP (Top ${d.totalQualified} — Bracket ${d.bracketSize}, ${d.numByes} BYE)</div>`;
+
+        // Nút điều khiển
+        html += `
+            <div class="pair-tools">
+                <button class="btn-warning-sm" onclick="autoPairKnockout()" style="padding:10px 18px;">
+                    <i class="fas fa-magic"></i> ⚙️ Tự động xếp cặp (Nhất A vs Nhì B, Nhất B vs Nhì A...)
+                </button>
+                <button class="btn-info-sm" onclick="resetPairKnockout()" style="padding:10px 18px;">
+                    <i class="fas fa-undo"></i> ↺ Reset về mặc định
+                </button>
+                <button class="btn-success-sm" onclick="validatePairs()" style="padding:10px 18px;">
+                    <i class="fas fa-check-circle"></i> ✅ Kiểm tra cặp đấu
+                </button>
+            </div>
+        `;
+
         html += `<div class="bracket-wrapper"><div class="bracket-tree">`;
 
-        const allSlots = [];
-        d.pairings.forEach(p => allSlots.push({ a: p.a, b: p.b, isBye: false }));
-        koState.selectedByes.forEach(name => allSlots.push({ a: name, b: null, isBye: true }));
-        const byeSlots = allSlots.filter(s => s.isBye);
-        const normalSlots = allSlots.filter(s => !s.isBye);
-        const combined = [];
-        const maxLen = Math.max(byeSlots.length, normalSlots.length);
-        for (let i = 0; i < maxLen; i++) {
-            if (i < normalSlots.length) combined.push(normalSlots[i]);
-            if (i < byeSlots.length) combined.push(byeSlots[i]);
-        }
-        while (combined.length < d.bracketSize / 2) {
-            combined.push({ a: 'Chưa xác định', b: 'Chưa xác định', isBye: false, placeholder: true });
-        }
+        // Danh sách đội có thể chọn
+        const allChampions = koState.selectedChampions;
+        const allRunners = koState.selectedRunnersUp;
+        const allOptions = [...allChampions, ...allRunners];
 
-        html += `<div class="bracket-round" style="min-width:260px;width:260px;">`;
+        // VÒNG 1: dropdown chọn đội
+        const rowHeight = 100;
+        html += `<div class="bracket-round" style="min-width:320px;width:320px;">`;
         html += `<div class="bracket-round-header editable" onclick="openRoundLabelPicker()" title="Click để đổi tên vòng">${d.roundLabel}</div>`;
-        html += `<div class="bracket-round-body" style="height:${combined.length * 80}px;position:relative;">`;
-        combined.forEach((s, idx) => {
-            const top = idx * 80 + 4;
-            if (s.isBye) {
-                html += `
-                    <div class="bracket-match bye" style="position:absolute;top:${top}px;left:0;right:0;height:72px;">
-                        <span class="match-label">BYE</span>
-                        <div class="player selected" style="height:30px;">
-                            <span class="name">${escapeHtml(s.a)}</span>
-                            <span class="byex">⭐ BYE</span>
-                        </div>
-                        <div class="match-sep"></div>
-                        <div class="player bye" style="height:30px;"><span class="name">—</span></div>
+        html += `<div class="bracket-round-body" style="height:${d.pairings.length * rowHeight}px;position:relative;">`;
+
+        d.pairings.forEach((p, idx) => {
+            const top = idx * rowHeight + 4;
+            html += `
+                <div class="bracket-match" style="position:absolute;top:${top}px;left:0;right:0;height:92px;padding:6px 8px;">
+                    <span class="match-label">T${idx + 1}</span>
+                    <div class="pair-select-row">
+                        <select onchange="changePairSlot(${idx}, 'a', this.value)">
+                            <option value="">-- Chọn đội A --</option>
+                            ${allOptions.map(t => `<option value="${escapeHtml(t)}" ${p.a === t ? 'selected' : ''}>${escapeHtml(t)}</option>`).join('')}
+                        </select>
+                        <div style="text-align:center;font-size:10px;color:#adb5bd;font-weight:800;">VS</div>
+                        <select onchange="changePairSlot(${idx}, 'b', this.value)">
+                            <option value="">-- Chọn đội B --</option>
+                            ${allOptions.map(t => `<option value="${escapeHtml(t)}" ${p.b === t ? 'selected' : ''}>${escapeHtml(t)}</option>`).join('')}
+                        </select>
                     </div>
-                `;
-            } else {
-                html += `
-                    <div class="bracket-match ${s.placeholder ? 'placeholder' : ''}" style="position:absolute;top:${top}px;left:0;right:0;height:72px;">
-                        <span class="match-label">T${idx + 1}</span>
-                        <div class="player" style="height:30px;"><span class="name">${escapeHtml(s.a)}</span></div>
-                        <div class="match-sep"></div>
-                        <div class="player" style="height:30px;"><span class="name">${escapeHtml(s.b)}</span></div>
-                    </div>
-                `;
-            }
+                    <button class="edit-btn" onclick="swapPair(${idx})" title="Đảo A ↔ B" style="opacity:1;color:#0984e3;left:auto;right:8px;"><i class="fas fa-exchange-alt"></i></button>
+                </div>
+            `;
         });
+
         html += `</div></div>`;
 
-        let prevCount = combined.length;
+        // Các vòng sau
+        let prevCount = d.pairings.length;
         for (let r = 1; r < totalRounds; r++) {
             const matchCount = Math.ceil(prevCount / 2);
-            html += `<div class="bracket-connector" style="width:60px;height:${combined.length * 80}px;"></div>`;
+            html += `<div class="bracket-connector" style="width:60px;height:${d.pairings.length * rowHeight}px;"></div>`;
             html += `<div class="bracket-round" style="min-width:200px;width:200px;">`;
             html += `<div class="bracket-round-header">${roundNames[r]}</div>`;
-            html += `<div class="bracket-round-body" style="height:${combined.length * 80}px;position:relative;">`;
+            html += `<div class="bracket-round-body" style="height:${d.pairings.length * rowHeight}px;position:relative;">`;
             for (let m = 0; m < matchCount; m++) {
-                const spacing = (combined.length * 80) / matchCount;
+                const spacing = (d.pairings.length * rowHeight) / matchCount;
                 const top = m * spacing + spacing / 2 - 36;
                 html += `
                     <div class="bracket-match placeholder" style="position:absolute;top:${top}px;left:0;right:0;height:72px;">
@@ -1456,16 +1465,138 @@
             prevCount = matchCount;
         }
 
-        html += `<div class="bracket-connector" style="width:30px;height:${combined.length * 80}px;"></div>`;
+        // Tranh hạng 3
+        html += `<div class="bracket-connector" style="width:30px;height:${d.pairings.length * rowHeight}px;"></div>`;
         html += `<div class="bracket-round" style="min-width:200px;width:200px;background:#fff8f0;">`;
         html += `<div class="bracket-round-header" style="background:linear-gradient(135deg,#e67e22,#d35400);">🥉 TRANH HẠNG 3</div>`;
-        html += `<div class="bracket-round-body" style="height:${combined.length * 80}px;position:relative;">`;
-        html += `<div class="bracket-match third-place" style="position:absolute;top:${combined.length * 40 - 36}px;left:0;right:0;height:72px;"><div class="player placeholder" style="height:30px;"><span class="name">Chờ thua BK 1</span></div><div class="match-sep"></div><div class="player placeholder" style="height:30px;"><span class="name">Chờ thua BK 2</span></div></div>`;
+        html += `<div class="bracket-round-body" style="height:${d.pairings.length * rowHeight}px;position:relative;">`;
+        html += `<div class="bracket-match third-place" style="position:absolute;top:${d.pairings.length * rowHeight / 2 - 36}px;left:0;right:0;height:72px;"><div class="player placeholder" style="height:30px;"><span class="name">Chờ thua BK 1</span></div><div class="match-sep"></div><div class="player placeholder" style="height:30px;"><span class="name">Chờ thua BK 2</span></div></div>`;
         html += `</div></div>`;
 
         html += `</div></div>`;
         return html;
     }
+
+    // ==========================================
+    // TỰ CHỌN CẶP ĐẤU KNOCKOUT
+    // ==========================================
+    window.changePairSlot = function(pairIdx, slot, teamName) {
+        if (!lastResult || !lastResult.knockoutData) return;
+        const d = lastResult.knockoutData;
+        if (!d.pairings[pairIdx]) return;
+
+        // Kiểm tra trùng
+        if (teamName) {
+            for (let i = 0; i < d.pairings.length; i++) {
+                const p = d.pairings[i];
+                if (i === pairIdx) {
+                    if (slot === 'a' && p.b === teamName) {
+                        showAlert(`Đội "${teamName}" đã ở slot B của trận ${i + 1}!`, 'error');
+                        renderResult(lastResult);
+                        return;
+                    }
+                    if (slot === 'b' && p.a === teamName) {
+                        showAlert(`Đội "${teamName}" đã ở slot A của trận ${i + 1}!`, 'error');
+                        renderResult(lastResult);
+                        return;
+                    }
+                } else {
+                    if (p.a === teamName || p.b === teamName) {
+                        showAlert(`Đội "${teamName}" đã được xếp ở trận ${i + 1}!`, 'error');
+                        renderResult(lastResult);
+                        return;
+                    }
+                }
+            }
+        }
+
+        // Gán
+        if (slot === 'a') d.pairings[pairIdx].a = teamName || null;
+        else d.pairings[pairIdx].b = teamName || null;
+
+        renderResult(lastResult);
+    };
+
+    window.swapPair = function(pairIdx) {
+        if (!lastResult || !lastResult.knockoutData) return;
+        const d = lastResult.knockoutData;
+        if (!d.pairings[pairIdx]) return;
+        const p = d.pairings[pairIdx];
+        const tmp = p.a;
+        p.a = p.b;
+        p.b = tmp;
+        renderResult(lastResult);
+    };
+
+    window.autoPairKnockout = function() {
+        if (!lastResult || !lastResult.knockoutData) return;
+        const d = lastResult.knockoutData;
+
+        const champs = koState.selectedChampions.filter(c => !koState.selectedByes.includes(c));
+        const runners = koState.selectedRunnersUp.filter(r => !koState.selectedByes.includes(r));
+
+        champs.sort((a, b) => a.localeCompare(b));
+        runners.sort((a, b) => a.localeCompare(b));
+
+        const newPairings = [];
+        const numPairs = Math.max(champs.length, runners.length);
+        for (let i = 0; i < numPairs; i++) {
+            const pairGroup = Math.floor(i / 2);
+            const cIdx = pairGroup * 2 + (i % 2);
+            const rIdx = pairGroup * 2 + (1 - (i % 2));
+            const cName = champs[cIdx] || null;
+            const rName = runners[rIdx] || null;
+            if (cName || rName) {
+                newPairings.push({ a: cName, b: rName });
+            }
+        }
+
+        d.pairings = newPairings;
+        renderResult(lastResult);
+        showAlert('✅ Đã tự động xếp cặp: Nhất A vs Nhì B, Nhất B vs Nhì A...', 'success');
+    };
+
+    window.resetPairKnockout = function() {
+        if (!lastResult) return;
+        buildKnockoutData(lastResult);
+        renderResult(lastResult);
+        showAlert('✅ Đã reset về cặp đấu mặc định!', 'success');
+    };
+
+    window.validatePairs = function() {
+        if (!lastResult || !lastResult.knockoutData) return;
+        const d = lastResult.knockoutData;
+        const issues = [];
+        const used = new Set();
+
+        d.pairings.forEach((p, i) => {
+            if (!p.a && !p.b) {
+                issues.push(`Trận ${i + 1}: chưa chọn đội`);
+            } else if (!p.a || !p.b) {
+                issues.push(`Trận ${i + 1}: thiếu 1 đội`);
+            }
+            if (p.a) {
+                if (used.has(p.a)) issues.push(`Trận ${i + 1}: đội A "${p.a}" bị trùng`);
+                used.add(p.a);
+            }
+            if (p.b) {
+                if (used.has(p.b)) issues.push(`Trận ${i + 1}: đội B "${p.b}" bị trùng`);
+                used.add(p.b);
+            }
+        });
+
+        // Kiểm tra các đội đã có mặt
+        const allQualified = [...koState.selectedChampions, ...koState.selectedRunnersUp].filter(t => !koState.selectedByes.includes(t));
+        allQualified.forEach(t => {
+            if (!used.has(t)) issues.push(`Đội "${t}" chưa được xếp vào trận nào`);
+        });
+
+        if (issues.length === 0) {
+            showAlert('✅ Tất cả cặp đấu hợp lệ!', 'success');
+        } else {
+            showAlert('⚠️ ' + issues.join(' · '), 'error');
+        }
+    };
 
     window.openRoundLabelPicker = function() {
         if (!lastResult) return;
@@ -1657,7 +1788,6 @@
         const ctx = editingContext;
         if (!ctx) return;
         const match = ctx.match; const a = match.teamA; const b = match.teamB;
-        const otherTeams = teams.filter(t => t !== a && t !== b);
         const body = document.getElementById('edit-modal-body');
         body.innerHTML = `
             <div style="margin-bottom:20px;"><h3 style="color:#1a3a7a;margin-bottom:12px;">VĐV A (trên)</h3>
@@ -2173,7 +2303,7 @@
         }
     });
 
-    console.log('✅ draw.html v14 loaded');
+    console.log('✅ draw.html v15 loaded');
 
 })();
 </script>
