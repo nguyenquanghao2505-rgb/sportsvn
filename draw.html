@@ -452,7 +452,7 @@
 (function() {
     'use strict';
 
-    console.log('🚀 draw.html v17 - Compact Excel Layout');
+    console.log('🚀 draw.html v18 - Berger schedule + Compact Excel');
 
     const config = window.SPORTSVN_CONFIG || {};
     const supabaseClient = window.supabase.createClient(config.SUPABASE_URL, config.SUPABASE_ANON_KEY);
@@ -553,6 +553,38 @@
     function getGroupIndex(name) {
         const g = getGroupLetter(name);
         return g ? g.charCodeAt(0) - 65 : -1;
+    }
+
+    // ==========================================
+    // SINH LỊCH VÒNG TRÒN CHUẨN BERGER TABLES
+    // Input: n = số đội
+    // Output: Mảng các vòng, mỗi vòng chứa các cặp [i, j] (0-based)
+    // ==========================================
+    function generateRoundRobinSchedule(n) {
+        const hasBye = (n % 2 === 1);
+        const numPlayers = hasBye ? n + 1 : n;
+        const numRounds = numPlayers - 1;
+        const halfSize = numPlayers / 2;
+
+        const players = [];
+        for (let i = 0; i < n; i++) players.push(i);
+        if (hasBye) players.push(-1);
+
+        const rounds = [];
+        for (let r = 0; r < numRounds; r++) {
+            const roundPairs = [];
+            for (let i = 0; i < halfSize; i++) {
+                const a = players[i];
+                const b = players[numPlayers - 1 - i];
+                if (a === -1 || b === -1) continue;
+                if (a < b) roundPairs.push([a, b]);
+                else roundPairs.push([b, a]);
+            }
+            rounds.push(roundPairs);
+            const last = players.pop();
+            players.splice(1, 0, last);
+        }
+        return rounds;
     }
 
     // ==========================================
@@ -959,7 +991,7 @@
     };
 
     // ==========================================
-    // BUILD KNOCKOUT DATA — CHIA NHÁNH TRÊN/DƯỚI
+    // BUILD KNOCKOUT DATA
     // ==========================================
     function buildKnockoutData(result) {
         const numGroups = result.numGroups;
@@ -1972,7 +2004,7 @@
     }
 
     // ==========================================
-    // BUILD ALL-IN-ONE SHEET — LAYOUT GỌN GÀNG (như ảnh 2)
+    // BUILD ALL-IN-ONE SHEET — Layout gọn + Lịch Berger
     // ==========================================
     async function buildAllInOneSheet(wb, result, categoryName) {
         const sheetName = categoryName.replace(/[\\\/\?\*\[\]:]/g, '_').slice(0, 31) || 'Sheet1';
@@ -2023,43 +2055,46 @@
                 // Body VĐV + Ma trận gộp
                 group.forEach((team, i) => {
                     const rowData = [i + 1, '', '', team.name, team.club || '—'];
-                    // Ma trận: đường chéo \ hoặc cặp đấu
                     for (let j = 0; j < n; j++) {
                         if (i === j) rowData.push('\\');
                         else if (i < j) rowData.push(`${i + 1}-${j + 1}`);
                         else rowData.push('');
                     }
-                    rowData.push('', '', ''); // Điểm, T/B, XH
+                    rowData.push('', '', '');
                     while (rowData.length < 13) rowData.push('');
                     const r = ws.addRow(rowData);
                     styleDataRow(r); currentRow++;
                     r.getCell(1).alignment = { horizontal: 'center', vertical: 'middle' };
                     r.getCell(4).font = { bold: true, color: { argb: COLORS.clubFg } };
-                    // Căn giữa ma trận (cột F → F+n-1)
                     for (let c = 6; c <= 5 + n; c++) {
                         r.getCell(c).alignment = { horizontal: 'center', vertical: 'middle' };
                         r.getCell(c).font = { size: 11, bold: true, color: { argb: 'FF1A3A7A' } };
                     }
-                    // Đường chéo \ in đậm
                     const diagCol = 6 + i;
                     r.getCell(diagCol).font = { bold: true, color: { argb: 'FFADB5BD' } };
                     r.getCell(diagCol).fill = { type: 'pattern', pattern: 'solid', fgColor: { argb: 'FFE9ECEF' } };
                 });
 
-                // Dòng trống nhỏ
                 ws.addRow([]); currentRow++;
 
                 // HEADER DANH SÁCH TRẬN
                 const mHeader = ws.addRow(['MS', 'VĐV', 'vs', 'VĐV', '', '', '', '', 'Thời gian', 'Bàn', 'Trận', 'KQ', '']);
                 styleHeaderRow(mHeader); currentRow++;
 
-                // Danh sách trận
+                // ======================
+                // DANH SÁCH TRẬN — DÙNG BERGER SCHEDULE
+                // ======================
+                const rrSchedule = generateRoundRobinSchedule(n);
                 const matchesList = [];
-                for (let i = 0; i < n; i++) {
-                    for (let j = i + 1; j < n; j++) {
-                        matchesList.push({ p1: i, p2: j, ms: `${i + 1}-${j + 1}` });
-                    }
-                }
+                rrSchedule.forEach((roundPairs) => {
+                    roundPairs.forEach(([i, j]) => {
+                        matchesList.push({
+                            p1: i, p2: j,
+                            ms: `${i + 1}-${j + 1}`
+                        });
+                    });
+                });
+
                 const scheduled = assignScheduleToMatches(matchesList, scheduleCfg);
                 scheduled.forEach((s, idx) => {
                     const t1 = group[s.p1]; const t2 = group[s.p2];
@@ -2076,11 +2111,10 @@
                     r.getCell(9).font = { size: 10, color: { argb: 'FF856404' }, bold: true };
                 });
 
-                // Dòng trống giữa các bảng
                 ws.addRow([]); currentRow++;
             });
 
-            // GIAI ĐOẠN 2: Knockout (giữ nguyên)
+            // GIAI ĐOẠN 2: Knockout
             if (result.numGroups >= 2 && result.knockoutData) {
                 const d = result.knockoutData;
                 const totalRounds = Math.log2(d.bracketSize);
@@ -2352,7 +2386,7 @@
         }
     });
 
-    console.log('✅ draw.html v17 loaded');
+    console.log('✅ draw.html v18 loaded');
 
 })();
 </script>
