@@ -99,6 +99,8 @@
         .alert.show { display: block; }
         .alert.error { background: #f8d7da; color: #721c24; }
         .alert.success { background: #d4edda; color: #155724; }
+
+        /* Knockout tree */
         .bracket-wrap { display: flex; gap: 24px; overflow-x: auto; padding: 20px 0;
                         background: #f8f9fa; border-radius: 12px; }
         .bracket-round { min-width: 260px; flex-shrink: 0; padding: 0 10px; }
@@ -115,6 +117,7 @@
         .matchup:hover { transform: translateY(-2px); box-shadow: 0 4px 15px rgba(26,58,122,0.2); }
         .matchup.completed { border-left-color: #00b894; background: #f0fdf4; }
         .matchup.empty { cursor: not-allowed; opacity: 0.6; border-left-color: #adb5bd; }
+        .matchup.third-place { border-left-color: #e67e22; background: #fff8f0; }
         .matchup .match-number {
             position: absolute; top: 4px; right: 8px;
             font-size: 9px; color: #999; font-weight: 700;
@@ -135,178 +138,34 @@
             padding: 3px 8px; background: #00b894; color: #fff;
             border-radius: 4px; font-weight: 700; margin-top: 5px;
         }
-        .matchup .edit-btn {
-            position: absolute;
-            top: 4px;
-            left: 8px;
-            background: #0984e3;
-            color: #fff;
-            border: none;
-            width: 22px;
-            height: 22px;
-            border-radius: 4px;
-            cursor: pointer;
-            font-size: 10px;
-            display: none;
-            align-items: center;
-            justify-content: center;
+
+        /* Excel button in control panel */
+        .excel-btn-inline {
+            background: linear-gradient(135deg, #00b894, #00926f);
+            color: #fff; border: none;
+            padding: 10px 20px; border-radius: 8px;
+            font-size: 14px; font-weight: 700;
+            cursor: pointer; display: inline-flex;
+            align-items: center; gap: 8px;
             transition: all 0.2s ease;
+            box-shadow: 0 4px 12px rgba(0,184,148,0.3);
         }
-        .matchup:hover .edit-btn {
-            display: flex;
+        .excel-btn-inline:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 8px 20px rgba(0,184,148,0.5);
         }
-        .matchup .edit-btn:hover {
-            background: #0770c9;
-            transform: scale(1.15);
-        }
-        .group-match .edit-btn {
-            position: absolute;
-            top: 2px;
-            left: 6px;
-            background: #0984e3;
-            color: #fff;
-            border: none;
-            width: 20px;
-            height: 20px;
-            border-radius: 4px;
-            cursor: pointer;
-            font-size: 9px;
-            display: none;
+        .control-actions-bar {
+            display: flex; gap: 12px; flex-wrap: wrap;
+            padding: 16px 20px; background: #f8f9fa;
+            border-radius: 10px; margin-bottom: 20px;
             align-items: center;
-            justify-content: center;
         }
-        .group-match:hover .edit-btn {
-            display: flex;
-        }
-        .group-section {
-            background: #fff; border-radius: 12px; padding: 16px;
-            margin-bottom: 20px; border: 2px solid #1a3a7a;
-            box-shadow: 0 2px 10px rgba(0,0,0,0.05);
-        }
-        .group-section h3 {
-            font-size: 16px; font-weight: 800; color: #1a3a7a;
-            margin-bottom: 14px; padding-bottom: 10px;
-            border-bottom: 2px solid #1a3a7a;
-            display: flex; justify-content: space-between; align-items: center;
-        }
-        .group-section h3 .group-count {
-            font-size: 12px; font-weight: 600; background: #e7f3ff;
-            color: #1a3a7a; padding: 3px 10px; border-radius: 12px;
-        }
-        .group-matches-grid {
-            display: grid; grid-template-columns: repeat(auto-fill, minmax(280px, 1fr));
-            gap: 10px;
-        }
-        .group-match {
-            background: #f8f9fa; border-radius: 8px; padding: 10px;
-            border-left: 3px solid #1a3a7a; cursor: pointer;
-            transition: all 0.2s ease; position: relative;
-        }
-        .group-match:hover { background: #fff; transform: translateX(4px);
-                            box-shadow: 0 2px 8px rgba(0,0,0,0.1); }
-        .group-match.completed { border-left-color: #00b894; background: #f0fdf4; }
-        .group-match .match-num {
-            position: absolute; top: 4px; right: 8px;
-            font-size: 9px; color: #999; font-weight: 700;
-        }
-        .group-match .team {
-            padding: 5px 8px; background: #fff; border-radius: 5px;
-            margin-bottom: 3px; font-size: 12px; font-weight: 600;
-            display: flex; justify-content: space-between; align-items: center;
-        }
-        .group-match .team.winner { background: #d4edda; color: #155724; font-weight: 800; }
-        .group-match .team .score { font-size: 11px; font-weight: 800; color: #00b894; }
-        .group-match .vs { text-align: center; color: #999; font-size: 9px; font-weight: 700; margin: 2px 0; }
-        .group-match .result-badge {
-            display: block; text-align: center; font-size: 10px;
-            padding: 2px 6px; background: #00b894; color: #fff;
-            border-radius: 4px; font-weight: 700; margin-top: 4px;
-        }
-        .standings-table {
-            width: 100%; border-collapse: collapse; margin-top: 12px;
-            background: #fff; border-radius: 8px; overflow: hidden;
-        }
-        .standings-table th {
-            background: #1a3a7a; color: #fff; padding: 8px 10px;
-            font-size: 11px; text-transform: uppercase; letter-spacing: 0.5px;
-        }
-        .standings-table td {
-            padding: 8px 10px; font-size: 13px;
-            border-bottom: 1px solid #e9ecef; text-align: center;
-        }
-        .standings-table td:first-child {
-            text-align: left; font-weight: 700; color: #1a1a2e;
-        }
-        .standings-table tr:nth-child(2) td:first-child { color: #00b894; }
-        .standings-table tr:nth-child(3) td:first-child { color: #0984e3; }
-        .standings-table tr:last-child td { border-bottom: none; }
-        .score-modal-overlay { display: none; position: fixed; top: 0; left: 0; right: 0; bottom: 0;
-                               background: rgba(0,0,0,0.7); z-index: 2000; align-items: center;
-                               justify-content: center; padding: 20px; }
-        .score-modal-overlay.show { display: flex; }
-        .score-modal-content { background: #fff; border-radius: 20px; max-width: 650px;
-                               width: 100%; max-height: 90vh; overflow-y: auto; }
-        .score-modal-content .modal-header { background: linear-gradient(135deg, #d63031, #e94560); }
-        .match-display {
-            text-align: center; margin-bottom: 24px; padding: 20px;
-            background: linear-gradient(135deg, #f8f9fa, #e9ecef);
-            border-radius: 12px;
-        }
-        .match-display .teams {
-            display: flex; justify-content: space-around; align-items: center;
-            font-size: 18px; font-weight: 800; color: #1a1a2e;
-        }
-        .match-display .vs { color: #e94560; font-size: 22px; font-weight: 900; }
-        .set-row {
-            display: grid; grid-template-columns: 70px 1fr 50px 1fr;
-            gap: 12px; align-items: center; margin-bottom: 12px;
-            padding: 14px; background: #f8f9fa; border-radius: 10px;
-            border-left: 4px solid #1a3a7a;
-        }
-        .set-row .set-label {
-            font-weight: 800; color: #1a3a7a; font-size: 13px; text-align: center;
-        }
-        .set-row input {
-            width: 100%; padding: 10px; border: 2px solid #e9ecef;
-            border-radius: 8px; text-align: center; font-weight: 800;
-            font-size: 18px; color: #1a3a7a;
-        }
-        .set-row input:focus { border-color: #1a3a7a; outline: none; }
-        .set-row input.winner { background: #d4edda; color: #155724; border-color: #00b894; }
-        .set-row input.loser { background: #f8d7da; color: #721c24; }
-        .set-row .team-label {
-            font-weight: 700; color: #1a1a2e; font-size: 13px;
-            white-space: nowrap; overflow: hidden; text-overflow: ellipsis;
-        }
-        .set-row .team-label.right { text-align: right; }
-        .winner-info {
-            background: linear-gradient(135deg, #00b894, #00a859);
-            color: #fff; padding: 16px 20px; border-radius: 12px;
-            margin-top: 20px; text-align: center; display: none;
-            font-weight: 800; font-size: 16px;
-        }
-        .winner-info.show { display: block; }
-        .winner-info small {
-            display: block; font-size: 12px;
-            font-weight: 600; opacity: 0.9; margin-top: 4px;
-        }
-        .stage-header {
-            background: #fff3cd; padding: 14px 18px; border-radius: 10px;
-            margin: 24px 0 20px; font-weight: 800; color: #856404;
-            border-left: 4px solid #fdcb6e;
-            display: flex; align-items: center; gap: 10px;
-        }
-        .stage-header.knockout {
-            background: #e7f3ff; color: #1a3a7a;
-            border-left-color: #1a3a7a;
-        }
+
         @media (max-width: 768px) {
             .form-grid { grid-template-columns: 1fr; }
             .category-main { flex-direction: column; }
             .bracket-wrap { flex-direction: column; }
             .bracket-round { min-width: 100%; }
-            .set-row { grid-template-columns: 60px 1fr 40px 1fr; gap: 6px; padding: 10px; }
-            .set-row input { font-size: 15px; padding: 8px 4px; }
         }
         @media print {
             .modal-close, .modal-actions, .no-print { display: none !important; }
@@ -444,6 +303,17 @@
                  font-size: 14px; color: #856404; font-weight: 700;">
                 <i class="fas fa-info-circle"></i> Nhấn vào trận đấu để nhập điểm
             </div>
+
+            <!-- NÚT XUẤT EXCEL + ĐIỀU KHIỂN -->
+            <div class="control-actions-bar" id="control-actions-bar">
+                <button class="excel-btn-inline" onclick="exportControlExcel()">
+                    <i class="fas fa-file-excel"></i> 📊 Xuất Excel (sơ đồ + kết quả)
+                </button>
+                <button class="excel-btn-inline" onclick="window.print()" style="background: linear-gradient(135deg, #0984e3, #0066b3);">
+                    <i class="fas fa-print"></i> 🖨 In sơ đồ
+                </button>
+            </div>
+
             <div id="control-bracket"></div>
         </div>
     </div>
@@ -493,22 +363,22 @@
 </div>
 
 <!-- MODAL NHẬP ĐIỂM -->
-<div class="score-modal-overlay" id="score-modal">
-    <div class="score-modal-content">
-        <div class="modal-header">
+<div class="score-modal-overlay" id="score-modal" style="display: none; position: fixed; top: 0; left: 0; right: 0; bottom: 0; background: rgba(0,0,0,0.7); z-index: 2000; align-items: center; justify-content: center; padding: 20px;">
+    <div class="score-modal-content" style="background: #fff; border-radius: 20px; max-width: 650px; width: 100%; max-height: 90vh; overflow-y: auto;">
+        <div class="modal-header" style="background: linear-gradient(135deg, #d63031, #e94560);">
             <h2 id="score-title">🏸 Nhập điểm trận đấu</h2>
             <button class="modal-close" onclick="closeScoreModal()">×</button>
         </div>
         <div class="modal-body">
-            <div class="match-display">
-                <div class="teams">
+            <div class="match-display" style="text-align: center; margin-bottom: 24px; padding: 20px; background: linear-gradient(135deg, #f8f9fa, #e9ecef); border-radius: 12px;">
+                <div class="teams" style="display: flex; justify-content: space-around; align-items: center; font-size: 18px; font-weight: 800; color: #1a1a2e;">
                     <span id="display-team-a">—</span>
-                    <span class="vs">VS</span>
+                    <span class="vs" style="color: #e94560; font-size: 22px; font-weight: 900;">VS</span>
                     <span id="display-team-b">—</span>
                 </div>
             </div>
             <div id="score-sets-container"></div>
-            <div class="winner-info" id="winner-info"></div>
+            <div class="winner-info" id="winner-info" style="background: linear-gradient(135deg, #00b894, #00a859); color: #fff; padding: 16px 20px; border-radius: 12px; margin-top: 20px; text-align: center; display: none; font-weight: 800; font-size: 16px;"></div>
             <div class="modal-actions">
                 <button class="btn btn-outline" style="color: #1a1a2e; border-color: #e9ecef;" onclick="closeScoreModal()">Hủy</button>
                 <button class="btn btn-success" onclick="saveScore()" id="score-save-btn">
@@ -519,16 +389,19 @@
     </div>
 </div>
 
+<script src="https://cdn.jsdelivr.net/npm/xlsx@0.18.5/dist/xlsx.full.min.js"></script>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/exceljs/4.4.0/exceljs.min.js"></script>
 <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
 <script src="config.js"></script>
 <script>
 (function() {
     'use strict';
 
-    console.log('🚀 categories.html v6 - DELETE CASCADE FULL FIX');
+    console.log('🚀 categories.html v7 - Nút Xuất Excel trong Điều hành');
 
     const config = window.SPORTSVN_CONFIG || {};
     const supabaseClient = window.supabase.createClient(config.SUPABASE_URL, config.SUPABASE_ANON_KEY);
+    window.supabaseClient = supabaseClient;
 
     let currentUser = null;
     let tournamentId = null;
@@ -537,6 +410,7 @@
     let allSchedules = [];
     let allMatchScores = [];
     let currentScoreMatch = null;
+    let currentControlCategory = null;
 
     async function init() {
         const { data: { session } } = await supabaseClient.auth.getSession();
@@ -754,7 +628,6 @@
     }
 
     function renderKnockoutBracket(draws, catName, isEditable) {
-        const cat = categories.find(c => c.name === catName);
         const totalTeams = draws.filter(d => d.group_name !== 'BYE').length;
         let bracketSize = 1;
         while (bracketSize < totalTeams) bracketSize *= 2;
@@ -819,12 +692,6 @@
                     <div class="matchup ${isCompleted ? 'completed' : ''} ${!hasTeams ? 'empty' : ''}"
                          onclick="${isEditable && hasTeams && teamA && teamB ? `openScoreModal('${escapeHtml(catName)}', ${roundNum}, ${m + 1}, '${escapeHtml(teamA.name)}', '${escapeHtml(teamB.name)}')` : ''}">
                         <span class="match-number">Trận ${m + 1}</span>
-                        
-                        ${hasTeams && teamA && teamB ? `
-                            <button class="edit-btn" style="left: 8px;" onclick="event.stopPropagation(); openEditPlayerModal('${escapeHtml(catName)}', ${roundNum}, ${m + 1}, '${escapeHtml(teamA.name)}', '${escapeHtml(teamA.name)}')" title="Sửa VĐV A"><i class="fas fa-edit"></i></button>
-                            <button class="edit-btn" style="left: 34px;" onclick="event.stopPropagation(); openEditPlayerModal('${escapeHtml(catName)}', ${roundNum}, ${m + 1}, '${escapeHtml(teamB.name)}', '${escapeHtml(teamB.name)}')" title="Sửa VĐV B"><i class="fas fa-edit"></i></button>
-                        ` : ''}
-                        
                         <div class="team ${winnerA ? 'winner' : ''} ${!teamA ? 'bye' : ''}">
                             <span>${teamA ? escapeHtml(teamA.name) : 'Chưa xác định'}</span>
                             ${scoreA !== '' ? `<span class="score">${scoreA}</span>` : ''}
@@ -845,8 +712,64 @@
             `;
         }
 
+        // TRẬN TRANH HẠNG 3
+        const thirdPlace = getThirdPlaceMatch(catName, bracketData, totalRounds, scoresMap);
+        html += `
+            <div class="bracket-round" style="background: #fff8f0; border-radius: 12px;">
+                <h4 style="color: #e67e22; border-bottom-color: #e67e22;">🥉 TRANH HẠNG 3</h4>
+                <div class="bracket-matchups">
+                    <div class="matchup third-place ${thirdPlace.isCompleted ? 'completed' : ''} ${!thirdPlace.teamA || !thirdPlace.teamB ? 'empty' : ''}"
+                         onclick="${isEditable && thirdPlace.teamA && thirdPlace.teamB && !thirdPlace.isCompleted ? `openScoreModal('${escapeHtml(catName)}', ${totalRounds + 200 - 1}, 99, '${escapeHtml(thirdPlace.teamA.name)}', '${escapeHtml(thirdPlace.teamB.name)}')` : ''}">
+                        <div class="team ${thirdPlace.winnerA ? 'winner' : ''}">
+                            <span>${thirdPlace.teamA ? escapeHtml(thirdPlace.teamA.name) : 'Chờ thua BK 1'}</span>
+                            ${thirdPlace.scoreA !== '' ? `<span class="score">${thirdPlace.scoreA}</span>` : ''}
+                        </div>
+                        <div class="vs">VS</div>
+                        <div class="team ${thirdPlace.winnerB ? 'winner' : ''}">
+                            <span>${thirdPlace.teamB ? escapeHtml(thirdPlace.teamB.name) : 'Chờ thua BK 2'}</span>
+                            ${thirdPlace.scoreB !== '' ? `<span class="score">${thirdPlace.scoreB}</span>` : ''}
+                        </div>
+                        ${thirdPlace.isCompleted ? `<span class="result-badge" style="background: #e67e22;">🥉 ${escapeHtml(thirdPlace.winner_name)} thắng</span>` : ''}
+                    </div>
+                </div>
+            </div>
+        `;
+
         html += '</div>';
         return html;
+    }
+
+    function getThirdPlaceMatch(catName, bracketData, totalRounds, scoresMap) {
+        if (totalRounds < 2) {
+            return { teamA: null, teamB: null, isCompleted: false, winnerA: false, winnerB: false, scoreA: '', scoreB: '', winner_name: '' };
+        }
+        const semiRoundNum = totalRounds - 1;
+        const finalRoundNum = totalRounds;
+
+        const semi1 = scoresMap[`${semiRoundNum}-1`];
+        const semi2 = scoresMap[`${semiRoundNum}-2`];
+
+        let teamA = null, teamB = null;
+        if (semi1 && semi2) {
+            const loser1 = semi1.winner_name === semi1.team_a_name ? semi1.team_b_name : semi1.team_a_name;
+            const loser2 = semi2.winner_name === semi2.team_a_name ? semi2.team_b_name : semi2.team_a_name;
+            teamA = { name: loser1 };
+            teamB = { name: loser2 };
+        }
+
+        const thirdScore = scoresMap[`${finalRoundNum}-99`];
+        const isCompleted = !!thirdScore;
+        const winnerA = isCompleted && thirdScore.winner_name === teamA?.name;
+        const winnerB = isCompleted && thirdScore.winner_name === teamB?.name;
+
+        let scoreA = '', scoreB = '';
+        if (isCompleted && thirdScore.score_summary) {
+            const parts = thirdScore.score_summary.split(', ');
+            scoreA = parts.filter(p => { const [a, b] = p.split('-').map(Number); return a > b; }).length;
+            scoreB = parts.filter(p => { const [a, b] = p.split('-').map(Number); return b > a; }).length;
+        }
+
+        return { teamA, teamB, isCompleted, winnerA, winnerB, scoreA, scoreB, winner_name: thirdScore?.winner_name || '' };
     }
 
     function buildFullBracket(draws, catName, totalRounds) {
@@ -916,11 +839,12 @@
         if (score.winner_name === match.teamB?.name) return match.teamB;
         return null;
     }
-
+    
     // ==========================================
     // ĐIỀU HÀNH TRẬN ĐẤU
     // ==========================================
     window.openControlPanel = function(catName) {
+        currentControlCategory = catName;
         const drawsForCat = allDraws.filter(d => d.category === catName);
         if (drawsForCat.length === 0) {
             alert('Chưa có kết quả bốc thăm!');
@@ -967,7 +891,7 @@
             groups[g].sort((a, b) => (a.position || 0) - (b.position || 0));
         });
 
-        let html = '<div class="stage-header"><i class="fas fa-layer-group"></i> GIAI ĐOẠN 1: VÒNG TRÒN CÁC BẢNG</div>';
+        let html = '<div class="stage-header" style="background: #fff3cd; padding: 14px 18px; border-radius: 10px; margin: 24px 0 20px; font-weight: 800; color: #856404; border-left: 4px solid #fdcb6e; display: flex; align-items: center; gap: 10px;"><i class="fas fa-layer-group"></i> GIAI ĐOẠN 1: VÒNG TRÒN CÁC BẢNG</div>';
 
         let matchCounter = 1;
         const groupKeys = Object.keys(groups).sort();
@@ -977,12 +901,12 @@
             const n = groupTeams.length;
 
             html += `
-                <div class="group-section">
-                    <h3>
+                <div class="group-section" style="background: #fff; border-radius: 12px; padding: 16px; margin-bottom: 20px; border: 2px solid #1a3a7a; box-shadow: 0 2px 10px rgba(0,0,0,0.05);">
+                    <h3 style="font-size: 16px; font-weight: 800; color: #1a3a7a; margin-bottom: 14px; padding-bottom: 10px; border-bottom: 2px solid #1a3a7a; display: flex; justify-content: space-between; align-items: center;">
                         <span>🏆 BẢNG ${escapeHtml(groupName)}</span>
-                        <span class="group-count">${n} VĐV · ${(n * (n - 1)) / 2} trận</span>
+                        <span style="font-size: 12px; font-weight: 600; background: #e7f3ff; color: #1a3a7a; padding: 3px 10px; border-radius: 12px;">${n} VĐV · ${(n * (n - 1)) / 2} trận</span>
                     </h3>
-                    <div class="group-matches-grid">
+                    <div style="display: grid; grid-template-columns: repeat(auto-fill, minmax(280px, 1fr)); gap: 10px;">
             `;
 
             for (let i = 0; i < n; i++) {
@@ -993,7 +917,8 @@
                     const existingScore = allMatchScores.find(s =>
                         s.category === catName &&
                         s.round_number === 100 &&
-                        s.match_number === matchCounter
+                        ((s.team_a_name === teamA.team_name && s.team_b_name === teamB.team_name) ||
+                         (s.team_a_name === teamB.team_name && s.team_b_name === teamA.team_name))
                     );
 
                     const isCompleted = !!existingScore;
@@ -1009,20 +934,18 @@
 
                     html += `
                         <div class="group-match ${isCompleted ? 'completed' : ''}"
+                             style="background: #f8f9fa; border-radius: 8px; padding: 10px; border-left: 3px solid ${isCompleted ? '#00b894' : '#1a3a7a'}; cursor: pointer; transition: all 0.2s ease;"
                              onclick="openScoreModal('${escapeHtml(catName)}', 100, ${matchCounter}, '${escapeHtml(teamA.team_name)}', '${escapeHtml(teamB.team_name)}')">
-                            <span class="match-num">T${i * n + j}</span>
-                            <div class="team ${winnerA ? 'winner' : ''}">
+                            <div class="team ${winnerA ? 'winner' : ''}" style="padding: 5px 8px; background: ${winnerA ? '#d4edda' : '#fff'}; border-radius: 5px; margin-bottom: 3px; font-size: 12px; font-weight: 600; display: flex; justify-content: space-between; align-items: center;">
                                 <span><strong>${escapeHtml(teamA.team_name)}</strong>${teamA.club ? ` <small style="color:#1a3a7a;font-weight:600;">(${escapeHtml(teamA.club)})</small>` : ''}</span>
-                                <button class="edit-btn" style="position: static; margin-left: 6px; display: inline-flex;" onclick="event.stopPropagation(); openEditGroupPlayer('${escapeHtml(catName)}', '${escapeHtml(teamA.team_name)}', '${escapeHtml(teamA.club || '')}')" title="Sửa VĐV A"><i class="fas fa-edit"></i></button>
-                                ${scoreA !== '' ? `<span class="score">${scoreA}</span>` : ''}
+                                ${scoreA !== '' ? `<span style="font-size: 11px; font-weight: 800; color: #00b894;">${scoreA}</span>` : ''}
                             </div>
-                            <div class="vs">VS</div>
-                            <div class="team ${winnerB ? 'winner' : ''}">
+                            <div class="vs" style="text-align: center; color: #999; font-size: 9px; font-weight: 700; margin: 2px 0;">VS</div>
+                            <div class="team ${winnerB ? 'winner' : ''}" style="padding: 5px 8px; background: ${winnerB ? '#d4edda' : '#fff'}; border-radius: 5px; margin-bottom: 3px; font-size: 12px; font-weight: 600; display: flex; justify-content: space-between; align-items: center;">
                                 <span><strong>${escapeHtml(teamB.team_name)}</strong>${teamB.club ? ` <small style="color:#1a3a7a;font-weight:600;">(${escapeHtml(teamB.club)})</small>` : ''}</span>
-                                <button class="edit-btn" style="position: static; margin-left: 6px; display: inline-flex;" onclick="event.stopPropagation(); openEditGroupPlayer('${escapeHtml(catName)}', '${escapeHtml(teamB.team_name)}', '${escapeHtml(teamB.club || '')}')" title="Sửa VĐV B"><i class="fas fa-edit"></i></button>
-                                ${scoreB !== '' ? `<span class="score">${scoreB}</span>` : ''}
+                                ${scoreB !== '' ? `<span style="font-size: 11px; font-weight: 800; color: #00b894;">${scoreB}</span>` : ''}
                             </div>
-                            ${isCompleted ? `<span class="result-badge">✅ ${escapeHtml(existingScore.winner_name)} thắng</span>` : ''}
+                            ${isCompleted ? `<span class="result-badge" style="display: block; text-align: center; font-size: 10px; padding: 2px 6px; background: #00b894; color: #fff; border-radius: 4px; font-weight: 700; margin-top: 4px;">✅ ${escapeHtml(existingScore.winner_name)} thắng</span>` : ''}
                         </div>
                     `;
 
@@ -1034,26 +957,26 @@
 
             const standings = computeStandings(groupName, groupTeams, catName);
             html += `
-                <table class="standings-table">
+                <table class="standings-table" style="width: 100%; border-collapse: collapse; margin-top: 12px; background: #fff; border-radius: 8px; overflow: hidden;">
                     <thead>
                         <tr>
-                            <th style="text-align: left;">VĐV</th>
-                            <th style="text-align: left;">Đơn vị</th>
-                            <th>Tr</th>
-                            <th>T</th>
-                            <th>B</th>
-                            <th>Đ</th>
+                            <th style="background: #1a3a7a; color: #fff; padding: 8px 10px; font-size: 11px; text-transform: uppercase; text-align: left;">VĐV</th>
+                            <th style="background: #1a3a7a; color: #fff; padding: 8px 10px; font-size: 11px; text-transform: uppercase; text-align: left;">Đơn vị</th>
+                            <th style="background: #1a3a7a; color: #fff; padding: 8px 10px; font-size: 11px;">Tr</th>
+                            <th style="background: #1a3a7a; color: #fff; padding: 8px 10px; font-size: 11px;">T</th>
+                            <th style="background: #1a3a7a; color: #fff; padding: 8px 10px; font-size: 11px;">B</th>
+                            <th style="background: #1a3a7a; color: #fff; padding: 8px 10px; font-size: 11px;">Đ</th>
                         </tr>
                     </thead>
                     <tbody>
-                        ${standings.map(s => `
+                        ${standings.map((s, idx) => `
                             <tr>
-                                <td>${escapeHtml(s.name)}</td>
-                                <td style="text-align: left; font-size: 12px; color: #6c757d;">${escapeHtml(s.club || '—')}</td>
-                                <td>${s.played}</td>
-                                <td>${s.wins}</td>
-                                <td>${s.losses}</td>
-                                <td><strong>${s.points}</strong></td>
+                                <td style="padding: 8px 10px; font-size: 13px; border-bottom: 1px solid #e9ecef; font-weight: ${idx < 2 ? '800' : '600'}; color: ${idx === 0 ? '#00b894' : idx === 1 ? '#0984e3' : '#1a1a2e'};">${escapeHtml(s.name)}</td>
+                                <td style="padding: 8px 10px; font-size: 12px; border-bottom: 1px solid #e9ecef; color: #6c757d;">${escapeHtml(s.club || '—')}</td>
+                                <td style="padding: 8px 10px; text-align: center; border-bottom: 1px solid #e9ecef;">${s.played}</td>
+                                <td style="padding: 8px 10px; text-align: center; border-bottom: 1px solid #e9ecef;">${s.wins}</td>
+                                <td style="padding: 8px 10px; text-align: center; border-bottom: 1px solid #e9ecef;">${s.losses}</td>
+                                <td style="padding: 8px 10px; text-align: center; border-bottom: 1px solid #e9ecef;"><strong>${s.points}</strong></td>
                             </tr>
                         `).join('')}
                     </tbody>
@@ -1063,218 +986,7 @@
             html += '</div>';
         });
 
-        // GIAI ĐOẠN 2: KNOCKOUT
-        if (groupKeys.length >= 2) {
-            let knockoutTeams = groupKeys.length * 2;
-            let bracketSize = 2;
-            while (bracketSize < knockoutTeams) bracketSize *= 2;
-            if (bracketSize > 16) bracketSize = 16;
-
-            html += `<div class="stage-header knockout"><i class="fas fa-trophy"></i> GIAI ĐOẠN 2: VÒNG LOẠI TRỰC TIẾP (Top ${knockoutTeams} đội)</div>`;
-            html += '<div class="bracket-wrap">';
-
-            const totalRounds = Math.log2(bracketSize);
-            const roundNames = [];
-            const standard = ['Chung kết', 'Bán kết', 'Tứ kết', 'Vòng 1/8'];
-            for (let i = 0; i < totalRounds; i++) {
-                const fromEnd = totalRounds - 1 - i;
-                roundNames.push(fromEnd < standard.length ? standard[fromEnd] : `Vòng ${i + 1}`);
-            }
-
-            const groupWinners = [];
-            const groupRunners = [];
-
-            groupKeys.forEach(g => {
-                const standings = computeStandings(g, groups[g], catName);
-                const expectedMatches = (groups[g].length * (groups[g].length - 1)) / 2;
-                const playedMatches = countPlayedMatchesInGroup(g, groups[g], catName);
-
-                if (playedMatches >= expectedMatches) {
-                    groupWinners.push({ name: standings[0]?.name || null, rank: 'Nhất ' + g });
-                    groupRunners.push({ name: standings[1]?.name || null, rank: 'Nhì ' + g });
-                } else {
-                    groupWinners.push({ name: null, rank: 'Nhất ' + g + ' (chờ)' });
-                    groupRunners.push({ name: null, rank: 'Nhì ' + g + ' (chờ)' });
-                }
-            });
-
-            const qualifiedTeams = [];
-            const numGroups = groupWinners.length;
-
-            for (let i = 0; i < numGroups; i += 2) {
-                const g1 = i;
-                const g2 = i + 1;
-
-                if (g2 < numGroups) {
-                    qualifiedTeams.push(groupWinners[g1]);
-                    qualifiedTeams.push(groupRunners[g2]);
-                    qualifiedTeams.push(groupWinners[g2]);
-                    qualifiedTeams.push(groupRunners[g1]);
-                } else {
-                    qualifiedTeams.push(groupWinners[g1]);
-                    qualifiedTeams.push(groupRunners[g1]);
-                }
-            }
-
-            let anyMatches = false;
-            for (let r = 0; r < totalRounds; r++) {
-                const roundNum = 200 + r;
-                const numMatches = bracketSize / Math.pow(2, r + 1);
-                anyMatches = true;
-
-                html += `
-                    <div class="bracket-round">
-                        <h4>${roundNames[r]}</h4>
-                        <div class="bracket-matchups">
-                `;
-
-                for (let m = 0; m < numMatches; m++) {
-                    const matchNum = m + 1;
-                    const score = allMatchScores.find(s =>
-                        s.category === catName &&
-                        s.round_number === roundNum &&
-                        s.match_number === matchNum
-                    );
-
-                    let teamA = null, teamB = null;
-
-                    if (r === 0) {
-                        const pairIdx1 = m * 2;
-                        const pairIdx2 = m * 2 + 1;
-                        if (qualifiedTeams[pairIdx1]) teamA = { name: qualifiedTeams[pairIdx1].name };
-                        if (qualifiedTeams[pairIdx2]) teamB = { name: qualifiedTeams[pairIdx2].name };
-                    } else {
-                        const prevRoundNum = roundNum - 1;
-                        const prevMatch1 = allMatchScores.find(s =>
-                            s.category === catName && s.round_number === prevRoundNum && s.match_number === m * 2 + 1
-                        );
-                        const prevMatch2 = allMatchScores.find(s =>
-                            s.category === catName && s.round_number === prevRoundNum && s.match_number === m * 2 + 2
-                        );
-                        if (prevMatch1) teamA = { name: prevMatch1.winner_name };
-                        if (prevMatch2) teamB = { name: prevMatch2.winner_name };
-                    }
-
-                    if (score) {
-                        teamA = score.team_a_name ? { name: score.team_a_name } : teamA;
-                        teamB = score.team_b_name ? { name: score.team_b_name } : teamB;
-                    }
-
-                    const hasBothTeams = teamA && teamB;
-                    const isCompleted = !!score;
-                    const winnerA = isCompleted && score.winner_name === teamA?.name;
-                    const winnerB = isCompleted && score.winner_name === teamB?.name;
-
-                    let scoreA = '', scoreB = '';
-                    if (isCompleted && score.score_summary) {
-                        const parts = score.score_summary.split(', ');
-                        scoreA = parts.filter(p => { const [a, b] = p.split('-').map(Number); return a > b; }).length;
-                        scoreB = parts.filter(p => { const [a, b] = p.split('-').map(Number); return b > a; }).length;
-                    }
-
-                    html += `
-                        <div class="matchup ${isCompleted ? 'completed' : ''} ${!hasBothTeams ? 'empty' : ''}"
-                             onclick="${hasBothTeams && !isCompleted ? `openScoreModal('${escapeHtml(catName)}', ${roundNum}, ${matchNum}, '${escapeHtml(teamA.name)}', '${escapeHtml(teamB.name)}')` : ''}">
-                            <span class="match-number">Trận ${matchNum}</span>
-                            <div class="team ${winnerA ? 'winner' : ''} ${!teamA ? 'bye' : ''}">
-                                <span>${teamA ? escapeHtml(teamA.name) : 'Chờ KQ bảng'}</span>
-                                ${teamA && hasBothTeams ? `<button class="edit-btn" onclick="event.stopPropagation(); openEditKnockoutPlayer('${escapeHtml(catName)}', ${roundNum}, ${matchNum}, '${escapeHtml(teamA.name)}', '${escapeHtml(teamB.name)}')" title="Sửa VĐV A"><i class="fas fa-edit"></i></button>` : ''}
-                                ${scoreA !== '' ? `<span class="score">${scoreA}</span>` : ''}
-                            </div>
-                            <div class="vs">VS</div>
-                            <div class="team ${winnerB ? 'winner' : ''} ${!teamB ? 'bye' : ''}">
-                                <span>${teamB ? escapeHtml(teamB.name) : 'Chờ KQ bảng'}</span>
-                                ${teamB && hasBothTeams ? `<button class="edit-btn" onclick="event.stopPropagation(); openEditKnockoutPlayer('${escapeHtml(catName)}', ${roundNum}, ${matchNum}, '${escapeHtml(teamA.name)}', '${escapeHtml(teamB.name)}')" title="Sửa VĐV B"><i class="fas fa-edit"></i></button>` : ''}
-                                ${scoreB !== '' ? `<span class="score">${scoreB}</span>` : ''}
-                            </div>
-                            ${isCompleted ? `<span class="result-badge">✅ ${escapeHtml(score.winner_name)} thắng</span>` : ''}
-                        </div>
-                    `;
-                }
-
-                html += `</div></div>`;
-            }
-
-            // TRẬN TRANH HẠNG 3
-            if (totalRounds >= 2) {
-                const finalRoundNum = 200 + totalRounds - 1;
-                const semiRoundNum = 200 + totalRounds - 2;
-                
-                const semi1 = allMatchScores.find(s =>
-                    s.category === catName && s.round_number === semiRoundNum && s.match_number === 1
-                );
-                const semi2 = allMatchScores.find(s =>
-                    s.category === catName && s.round_number === semiRoundNum && s.match_number === 2
-                );
-
-                let teamA3 = null, teamB3 = null;
-                if (semi1 && semi2) {
-                    const loser1 = semi1.winner_name === semi1.team_a_name ? semi1.team_b_name : semi1.team_a_name;
-                    const loser2 = semi2.winner_name === semi2.team_a_name ? semi2.team_b_name : semi2.team_a_name;
-                    teamA3 = { name: loser1 };
-                    teamB3 = { name: loser2 };
-                }
-
-                const thirdScore = allMatchScores.find(s =>
-                    s.category === catName && s.round_number === finalRoundNum && s.match_number === 99
-                );
-
-                const is3rdDone = !!thirdScore;
-                const winA3 = is3rdDone && thirdScore.winner_name === teamA3?.name;
-                const winB3 = is3rdDone && thirdScore.winner_name === teamB3?.name;
-
-                let sA3 = '', sB3 = '';
-                if (is3rdDone && thirdScore.score_summary) {
-                    const parts = thirdScore.score_summary.split(', ');
-                    sA3 = parts.filter(p => { const [a, b] = p.split('-').map(Number); return a > b; }).length;
-                    sB3 = parts.filter(p => { const [a, b] = p.split('-').map(Number); return b > a; }).length;
-                }
-
-                html += `
-                    <div class="bracket-round" style="background: #fff8f0;">
-                        <h4 style="color: #e67e22; border-bottom-color: #e67e22;">🥉 TRANH HẠNG 3</h4>
-                        <div class="bracket-matchups">
-                            <div class="matchup ${is3rdDone ? 'completed' : ''} ${!teamA3 || !teamB3 ? 'empty' : ''}"
-                                 style="border-left-color: #e67e22;"
-                                 onclick="${teamA3 && teamB3 && !is3rdDone ? `openScoreModal('${escapeHtml(catName)}', ${finalRoundNum}, 99, '${escapeHtml(teamA3.name)}', '${escapeHtml(teamB3.name)}')` : ''}">
-                                <div class="team ${winA3 ? 'winner' : ''}">
-                                    <span>${teamA3 ? escapeHtml(teamA3.name) : 'Chờ thua BK'}</span>
-                                    ${sA3 !== '' ? `<span class="score">${sA3}</span>` : ''}
-                                </div>
-                                <div class="vs">VS</div>
-                                <div class="team ${winB3 ? 'winner' : ''}">
-                                    <span>${teamB3 ? escapeHtml(teamB3.name) : 'Chờ thua BK'}</span>
-                                    ${sB3 !== '' ? `<span class="score">${sB3}</span>` : ''}
-                                </div>
-                                ${is3rdDone ? `<span class="result-badge" style="background: #e67e22;">🥉 ${escapeHtml(thirdScore.winner_name)} thắng</span>` : ''}
-                            </div>
-                        </div>
-                    </div>
-                `;
-            }
-
-            html += '</div>';
-        }
-
         return html;
-    }
-
-    function countPlayedMatchesInGroup(groupName, groupTeams, catName) {
-        let count = 0;
-        groupTeams.forEach((tA, i) => {
-            groupTeams.forEach((tB, j) => {
-                if (j > i) {
-                    const played = allMatchScores.find(s =>
-                        s.category === catName &&
-                        s.round_number === 100 &&
-                        ((s.team_a_name === tA.team_name && s.team_b_name === tB.team_name) ||
-                         (s.team_a_name === tB.team_name && s.team_b_name === tA.team_name))
-                    );
-                    if (played) count++;
-                }
-            });
-        });
-        return count;
     }
 
     function computeStandings(groupName, groupTeams, catName) {
@@ -1314,289 +1026,483 @@
     }
 
     // ==========================================
-    // NHẬP ĐIỂM
+    // XUẤT EXCEL TRONG ĐIỀU HÀNH
     // ==========================================
-    window.openScoreModal = function(catName, roundNum, matchNum, teamA, teamB) {
-        if (!teamA || !teamB || teamA === 'null' || teamB === 'null' || teamA === 'undefined' || teamB === 'undefined') {
-            alert('Chưa xác định đủ 2 VĐV!');
+    window.exportControlExcel = async function() {
+        if (!currentControlCategory) {
+            alert('Không xác định được nội dung!');
+            return;
+        }
+        const catName = currentControlCategory;
+        const drawsForCat = allDraws.filter(d => d.category === catName);
+        if (drawsForCat.length === 0) {
+            alert('Chưa có dữ liệu bốc thăm!');
             return;
         }
 
-        currentScoreMatch = { catName, roundNum, matchNum, teamA, teamB };
+        try {
+            const wb = new ExcelJS.Workbook();
+            wb.creator = 'SportsVN Control Panel';
+            wb.created = new Date();
 
-        const cat = categories.find(c => c.name === catName);
-        const setsFormat = cat?.sets_format || 'best-of-3';
-        const maxSets = setsFormat === 'best-of-7' ? 7 : (setsFormat === 'best-of-5' ? 5 : 3);
-        const setsToWin = Math.ceil(maxSets / 2);
-        const pointsPerSet = cat?.points_per_set || 21;
+            // === SHEET 1: KẾT QUẢ BẢNG (nếu vòng tròn) ===
+            const isKnockout = drawsForCat[0]?.draw_type === 'knockout';
+            if (!isKnockout) {
+                await buildRoundRobinResultSheet(wb, catName, drawsForCat);
+            }
 
-        let roundLabel = '';
-        if (roundNum === 100) roundLabel = 'Vòng bảng';
-        else if (roundNum >= 200) roundLabel = 'Knockout';
-        else roundLabel = `Vòng ${roundNum}`;
+            // === SHEET 2: SƠ ĐỒ KNOCKOUT CÓ ĐƯỜNG KẺ ===
+            await buildKnockoutExcelSheet(wb, catName, drawsForCat);
 
-        document.getElementById('score-title').textContent = `🏸 Nhập điểm - ${roundLabel} · Trận ${matchNum}`;
-        document.getElementById('display-team-a').textContent = teamA;
-        document.getElementById('display-team-b').textContent = teamB;
+            // === SHEET 3: DANH SÁCH TRẬN + KẾT QUẢ ===
+            await buildMatchListSheet(wb, catName);
 
-        let html = `
-            <div style="background: #e7f3ff; padding: 10px 14px; border-radius: 8px; margin-bottom: 16px; font-size: 13px; color: #1a3a7a; font-weight: 700; text-align: center;">
-                <i class="fas fa-info-circle"></i> Thể thức: ${setsFormat.toUpperCase()} · Điểm/séc: ${pointsPerSet} · Cần thắng ${setsToWin} séc
-            </div>
-        `;
+            const buffer = await wb.xlsx.writeBuffer();
+            const blob = new Blob([buffer], { type: 'application/vnd.openxmlformats-officedocument.spreadsheetml.sheet' });
+            const url = URL.createObjectURL(blob);
+            const a = document.createElement('a');
+            a.href = url;
+            const safeName = catName.replace(/[^\w\u00C0-\u024F\u1E00-\u1EFF]/g, '_');
+            a.download = `${safeName}_Dieuhanh_${new Date().toISOString().slice(0, 10)}.xlsx`;
+            a.click();
+            URL.revokeObjectURL(url);
+            alert('✅ Đã xuất file Excel!');
+        } catch (error) {
+            console.error(error);
+            alert('Lỗi xuất Excel: ' + error.message);
+        }
+    };
 
-        for (let i = 1; i <= maxSets; i++) {
-            html += `
-                <div class="set-row" id="set-row-${i}">
-                    <span class="set-label">SÉC ${i}</span>
-                    <div class="team-label">${escapeHtml(teamA)}</div>
-                    <input type="number" id="set-${i}-a" min="0" max="99" 
-                           oninput="checkSetWinner(${i})" placeholder="0">
-                    <input type="number" id="set-${i}-b" min="0" max="99" 
-                           oninput="checkSetWinner(${i})" placeholder="0">
-                    <div class="team-label right">${escapeHtml(teamB)}</div>
-                </div>
-            `;
+    async function buildRoundRobinResultSheet(wb, catName, drawsForCat) {
+        const ws = wb.addWorksheet('Kết quả bảng', {
+            pageSetup: { paperSize: 9, orientation: 'landscape', fitToPage: true, fitToWidth: 1, fitToHeight: 0 }
+        });
+        ws.columns = [
+            { width: 5 }, { width: 30 }, { width: 22 }, { width: 8 }, { width: 8 }, { width: 8 }, { width: 8 }
+        ];
+
+        const headerBg = 'FF1A3A7A';
+        const headerFg = 'FFFFFFFF';
+        const thinBorder = {
+            top: { style: 'thin', color: { argb: 'FFDEE2E6' } },
+            left: { style: 'thin', color: { argb: 'FFDEE2E6' } },
+            bottom: { style: 'thin', color: { argb: 'FFDEE2E6' } },
+            right: { style: 'thin', color: { argb: 'FFDEE2E6' } }
+        };
+
+        // Group draws by group name
+        const groups = {};
+        drawsForCat.forEach(d => {
+            const g = d.group_name || 'A';
+            if (!groups[g]) groups[g] = [];
+            groups[g].push(d);
+        });
+        Object.keys(groups).forEach(g => {
+            groups[g].sort((a, b) => (a.position || 0) - (b.position || 0));
+        });
+
+        let currentRow = 1;
+
+        // Tiêu đề
+        ws.addRow([`${catName.toUpperCase()} - KẾT QUẢ VÒNG BẢNG`]);
+        ws.mergeCells(`A${currentRow}:G${currentRow}`);
+        const titleCell = ws.getCell(`A${currentRow}`);
+        titleCell.font = { bold: true, size: 15, color: { argb: headerFg } };
+        titleCell.fill = { type: 'pattern', pattern: 'solid', fgColor: { argb: 'FF0D1B3E' } };
+        titleCell.alignment = { horizontal: 'center', vertical: 'middle' };
+        ws.getRow(currentRow).height = 35;
+        currentRow++;
+        ws.addRow([]); currentRow++;
+
+        Object.keys(groups).sort().forEach(gName => {
+            const groupTeams = groups[gName];
+
+            // Group title
+            ws.addRow([`BẢNG ${gName} (${groupTeams.length} VĐV)`]);
+            ws.mergeCells(`A${currentRow}:G${currentRow}`);
+            const gCell = ws.getCell(`A${currentRow}`);
+            gCell.font = { bold: true, size: 13, color: { argb: headerFg } };
+            gCell.fill = { type: 'pattern', pattern: 'solid', fgColor: { argb: headerBg } };
+            gCell.alignment = { horizontal: 'center', vertical: 'middle' };
+            ws.getRow(currentRow).height = 28;
+            currentRow++;
+
+            // Header row
+            const headerRow = ws.addRow(['Stt', 'Tên VĐV', 'CLB/Đơn vị', 'Tr', 'T', 'B', 'Điểm']);
+            headerRow.eachCell(cell => {
+                cell.font = { bold: true, color: { argb: headerFg }, size: 11 };
+                cell.fill = { type: 'pattern', pattern: 'solid', fgColor: { argb: headerBg } };
+                cell.alignment = { horizontal: 'center', vertical: 'middle' };
+                cell.border = thinBorder;
+            });
+            currentRow++;
+
+            const standings = computeStandings(gName, groupTeams, catName);
+            standings.forEach((s, idx) => {
+                const r = ws.addRow([idx + 1, s.name, s.club || '—', s.played, s.wins, s.losses, s.points]);
+                r.eachCell(cell => {
+                    cell.border = thinBorder;
+                    cell.alignment = { vertical: 'middle' };
+                });
+                r.getCell(1).alignment = { horizontal: 'center', vertical: 'middle' };
+                r.getCell(2).font = { bold: true, color: { argb: idx === 0 ? 'FF00b894' : idx === 1 ? 'FF0984e3' : 'FF1a1a2e' } };
+                [4, 5, 6, 7].forEach(c => r.getCell(c).alignment = { horizontal: 'center', vertical: 'middle' });
+                currentRow++;
+            });
+
+            ws.addRow([]); currentRow++;
+        });
+    }
+
+    async function buildKnockoutExcelSheet(wb, catName, drawsForCat) {
+        const ws = wb.addWorksheet('Sơ đồ Knockout', {
+            pageSetup: { paperSize: 9, orientation: 'landscape', fitToPage: true, fitToWidth: 1, fitToHeight: 0 }
+        });
+
+        // 13 cột: A-M
+        ws.columns = [
+            { width: 5 }, { width: 6 }, { width: 6 }, { width: 26 }, { width: 20 },
+            { width: 6 }, { width: 6 }, { width: 6 }, { width: 10 }, { width: 8 },
+            { width: 6 }, { width: 8 }, { width: 8 }
+        ];
+
+        const headerBg = 'FF1A3A7A';
+        const headerFg = 'FFFFFFFF';
+        const borderColor = 'FFDEE2E6';
+        const thinBorder = {
+            top: { style: 'thin', color: { argb: borderColor } },
+            left: { style: 'thin', color: { argb: borderColor } },
+            bottom: { style: 'thin', color: { argb: borderColor } },
+            right: { style: 'thin', color: { argb: borderColor } }
+        };
+        const mediumBorder = {
+            top: { style: 'medium', color: { argb: 'FF1A3A7A' } },
+            left: { style: 'medium', color: { argb: 'FF1A3A7A' } },
+            bottom: { style: 'medium', color: { argb: 'FF1A3A7A' } },
+            right: { style: 'medium', color: { argb: 'FF1A3A7A' } }
+        };
+
+        const isKnockout = drawsForCat[0]?.draw_type === 'knockout';
+
+        let currentRow = 1;
+
+        // Tiêu đề
+        ws.addRow([`${catName.toUpperCase()} - SƠ ĐỒ THI ĐẤU`]);
+        ws.mergeCells(`A${currentRow}:M${currentRow}`);
+        const titleCell = ws.getCell(`A${currentRow}`);
+        titleCell.font = { bold: true, size: 16, color: { argb: headerFg } };
+        titleCell.fill = { type: 'pattern', pattern: 'solid', fgColor: { argb: 'FF0D1B3E' } };
+        titleCell.alignment = { horizontal: 'center', vertical: 'middle' };
+        ws.getRow(currentRow).height = 40;
+        currentRow++;
+        ws.addRow([]); currentRow++;
+
+        let bracketData, totalRounds, roundNames;
+
+        if (isKnockout) {
+            // Knockout thuần
+            const totalTeams = drawsForCat.filter(d => d.group_name !== 'BYE').length;
+            let bracketSize = 1;
+            while (bracketSize < totalTeams) bracketSize *= 2;
+            totalRounds = Math.log2(bracketSize);
+            roundNames = getRoundNames(totalRounds);
+            bracketData = buildFullBracket(drawsForCat, catName, totalRounds);
+        } else {
+            // Vòng tròn → Giai đoạn 2 Knockout
+            // Lấy top 2 mỗi bảng + tính bracket
+            const groups = {};
+            drawsForCat.forEach(d => {
+                const g = d.group_name || 'A';
+                if (!groups[g]) groups[g] = [];
+                groups[g].push(d);
+            });
+            const numGroups = Object.keys(groups).length;
+            const totalQualified = numGroups * 2;
+            let bracketSize = 2;
+            while (bracketSize < totalQualified) bracketSize *= 2;
+            if (bracketSize < 4) bracketSize = 4;
+            totalRounds = Math.log2(bracketSize);
+            roundNames = getRoundNames(totalRounds);
+
+            // Build pairings từ kết quả bảng nếu có
+            bracketData = buildKnockoutFromRoundRobin(catName, groups, bracketSize, totalRounds);
         }
 
-        document.getElementById('score-sets-container').innerHTML = html;
-        document.getElementById('winner-info').className = 'winner-info';
+        // HEADER CÁC VÒNG
+        const topRow = currentRow;
+        for (let ci = 0; ci < totalRounds; ci++) {
+            const colStart = ci * 2 + 1;
+            if (colStart > 13) break;
+            const headerCell = ws.getCell(topRow, colStart);
+            ws.mergeCells(topRow, colStart, topRow, colStart + 1);
+            headerCell.value = roundNames[ci].toUpperCase();
+            headerCell.font = { bold: true, size: 11, color: { argb: headerFg } };
+            headerCell.fill = { type: 'pattern', pattern: 'solid', fgColor: { argb: headerBg } };
+            headerCell.alignment = { horizontal: 'center', vertical: 'middle' };
+            headerCell.border = mediumBorder;
+        }
+        // Cột Tranh hạng 3
+        const thirdColStart = totalRounds * 2 + 1;
+        if (thirdColStart <= 13) {
+            const thirdHeaderCell = ws.getCell(topRow, thirdColStart);
+            ws.mergeCells(topRow, thirdColStart, topRow, thirdColStart + 1);
+            thirdHeaderCell.value = '🥉 TRANH HẠNG 3';
+            thirdHeaderCell.font = { bold: true, size: 11, color: { argb: headerFg } };
+            thirdHeaderCell.fill = { type: 'pattern', pattern: 'solid', fgColor: { argb: 'FFE67E22' } };
+            thirdHeaderCell.alignment = { horizontal: 'center', vertical: 'middle' };
+            thirdHeaderCell.border = mediumBorder;
+        }
+        ws.getRow(topRow).height = 25;
+        currentRow = topRow + 1;
 
-        const existingScore = allMatchScores.find(s => 
-            s.category === catName && s.round_number === roundNum && s.match_number === matchNum
-        );
+        // VẼ TỪNG VÒNG
+        const scoresMap = {};
+        allMatchScores.filter(s => s.category === catName).forEach(s => {
+            scoresMap[`${s.round_number}-${s.match_number}`] = s;
+        });
 
-        if (existingScore) {
-            const setKeys = ['set_1', 'set_2', 'set_3', 'set_4', 'set_5', 'set_6', 'set_7'];
-            setKeys.forEach((key, idx) => {
-                const a = existingScore[`${key}_a`];
-                const b = existingScore[`${key}_b`];
-                const aEl = document.getElementById(`set-${idx + 1}-a`);
-                const bEl = document.getElementById(`set-${idx + 1}-b`);
-                if (aEl && bEl && a !== null && b !== null) {
-                    aEl.value = a;
-                    bEl.value = b;
+        const maxMatchesInRound = Math.max(...Object.values(bracketData).map(r => r.length), 0);
+        const rowPerMatch = 3; // Mỗi trận chiếm 3 dòng (A / VS / B)
+
+        for (let r = 1; r <= totalRounds; r++) {
+            const roundMatches = bracketData[r] || [];
+            const colStart = (r - 1) * 2 + 1;
+            if (colStart > 13) continue;
+
+            roundMatches.forEach((match, mi) => {
+                const baseRow = currentRow + mi * rowPerMatch;
+                const score = isKnockout ? scoresMap[`${r}-${mi + 1}`] : null;
+
+                // Team A row
+                const cellA = ws.getCell(baseRow, colStart);
+                ws.mergeCells(baseRow, colStart, baseRow, colStart + 1);
+                cellA.value = match?.teamA?.name || '—';
+                cellA.font = { size: 10, bold: true, color: { argb: score?.winner_name === match?.teamA?.name ? 'FF00b894' : 'FF1a1a2e' } };
+                cellA.alignment = { horizontal: 'left', vertical: 'middle' };
+                cellA.border = thinBorder;
+                if (score?.winner_name === match?.teamA?.name) {
+                    cellA.fill = { type: 'pattern', pattern: 'solid', fgColor: { argb: 'FFD4EDDA' } };
+                }
+
+                // VS row
+                const cellVS = ws.getCell(baseRow + 1, colStart);
+                ws.mergeCells(baseRow + 1, colStart, baseRow + 1, colStart + 1);
+                cellVS.value = 'vs';
+                cellVS.font = { size: 9, italic: true, color: { argb: 'FFADB5BD' } };
+                cellVS.alignment = { horizontal: 'center', vertical: 'middle' };
+                cellVS.border = thinBorder;
+
+                // Team B row
+                const cellB = ws.getCell(baseRow + 2, colStart);
+                ws.mergeCells(baseRow + 2, colStart, baseRow + 2, colStart + 1);
+                cellB.value = match?.teamB?.name || '—';
+                cellB.font = { size: 10, bold: true, color: { argb: score?.winner_name === match?.teamB?.name ? 'FF00b894' : 'FF1a1a2e' } };
+                cellB.alignment = { horizontal: 'left', vertical: 'middle' };
+                cellB.border = thinBorder;
+                if (score?.winner_name === match?.teamB?.name) {
+                    cellB.fill = { type: 'pattern', pattern: 'solid', fgColor: { argb: 'FFD4EDDA' } };
                 }
             });
-            checkAllSets();
         }
 
-        document.getElementById('score-modal').classList.add('show');
-    };
+        // TRANH HẠNG 3
+        const thirdPlaceRow = currentRow + Math.floor(maxMatchesInRound * rowPerMatch / 2);
+        if (thirdColStart <= 13 && totalRounds >= 2) {
+            const semiRoundNum = isKnockout ? (totalRounds - 1) : (200 + totalRounds - 2);
+            const finalRoundNum = isKnockout ? totalRounds : (200 + totalRounds - 1);
 
-    window.closeScoreModal = function() {
-        document.getElementById('score-modal').classList.remove('show');
-        currentScoreMatch = null;
-    };
+            const semi1 = scoresMap[`${semiRoundNum}-1`];
+            const semi2 = scoresMap[`${semiRoundNum}-2`];
 
-    window.checkSetWinner = function(setNum) {
-        const a = document.getElementById(`set-${setNum}-a`);
-        const b = document.getElementById(`set-${setNum}-b`);
-        if (!a || !b) return;
-
-        const valA = parseInt(a.value) || 0;
-        const valB = parseInt(b.value) || 0;
-
-        a.classList.remove('winner', 'loser');
-        b.classList.remove('winner', 'loser');
-
-        if (a.value !== '' && b.value !== '' && valA !== valB) {
-            if (valA > valB) {
-                a.classList.add('winner');
-                b.classList.add('loser');
-            } else {
-                b.classList.add('winner');
-                a.classList.add('loser');
+            let teamA3 = null, teamB3 = null;
+            if (semi1 && semi2) {
+                teamA3 = semi1.winner_name === semi1.team_a_name ? semi1.team_b_name : semi1.team_a_name;
+                teamB3 = semi2.winner_name === semi2.team_a_name ? semi2.team_b_name : semi2.team_a_name;
             }
-        }
+            const thirdScore = scoresMap[`${finalRoundNum}-99`];
 
-        checkAllSets();
-    };
+            const cellA3 = ws.getCell(thirdPlaceRow, thirdColStart);
+            ws.mergeCells(thirdPlaceRow, thirdColStart, thirdPlaceRow, thirdColStart + 1);
+            cellA3.value = teamA3 || 'Chờ thua BK 1';
+            cellA3.font = { size: 10, bold: true, color: { argb: 'FFE67E22' } };
+            cellA3.alignment = { horizontal: 'left', vertical: 'middle' };
+            cellA3.border = thinBorder;
+            cellA3.fill = { type: 'pattern', pattern: 'solid', fgColor: { argb: 'FFFFF8F0' } };
 
-    function checkAllSets() {
-        if (!currentScoreMatch) return;
-        const cat = categories.find(c => c.name === currentScoreMatch.catName);
-        const setsFormat = cat?.sets_format || 'best-of-3';
-        const maxSets = setsFormat === 'best-of-7' ? 7 : (setsFormat === 'best-of-5' ? 5 : 3);
-        const setsToWin = Math.ceil(maxSets / 2);
+            const cellVS3 = ws.getCell(thirdPlaceRow + 1, thirdColStart);
+            ws.mergeCells(thirdPlaceRow + 1, thirdColStart, thirdPlaceRow + 1, thirdColStart + 1);
+            cellVS3.value = 'vs';
+            cellVS3.font = { size: 9, italic: true, color: { argb: 'FFADB5BD' } };
+            cellVS3.alignment = { horizontal: 'center', vertical: 'middle' };
+            cellVS3.border = thinBorder;
 
-        let winsA = 0, winsB = 0;
-        let validSets = 0;
+            const cellB3 = ws.getCell(thirdPlaceRow + 2, thirdColStart);
+            ws.mergeCells(thirdPlaceRow + 2, thirdColStart, thirdPlaceRow + 2, thirdColStart + 1);
+            cellB3.value = teamB3 || 'Chờ thua BK 2';
+            cellB3.font = { size: 10, bold: true, color: { argb: 'FFE67E22' } };
+            cellB3.alignment = { horizontal: 'left', vertical: 'middle' };
+            cellB3.border = thinBorder;
+            cellB3.fill = { type: 'pattern', pattern: 'solid', fgColor: { argb: 'FFFFF8F0' } };
 
-        for (let i = 1; i <= maxSets; i++) {
-            const aEl = document.getElementById(`set-${i}-a`);
-            const bEl = document.getElementById(`set-${i}-b`);
-            if (!aEl || !bEl) continue;
-
-            const a = parseInt(aEl.value);
-            const b = parseInt(bEl.value);
-
-            if (!isNaN(a) && !isNaN(b) && aEl.value !== '' && bEl.value !== '') {
-                validSets++;
-                if (a > b) winsA++;
-                else if (b > a) winsB++;
-            }
-        }
-
-        const winnerInfo = document.getElementById('winner-info');
-
-        if (winsA >= setsToWin || winsB >= setsToWin) {
-            const winner = winsA >= setsToWin ? currentScoreMatch.teamA : currentScoreMatch.teamB;
-            const loser = winsA >= setsToWin ? currentScoreMatch.teamB : currentScoreMatch.teamA;
-            winnerInfo.className = 'winner-info show';
-            winnerInfo.innerHTML = `
-                🏆 <strong>${escapeHtml(winner)}</strong> THẮNG ${Math.max(winsA, winsB)}-${Math.min(winsA, winsB)}
-                <small>${validSets} séc đã nhập · ${escapeHtml(loser)} thua</small>
-            `;
-        } else {
-            winnerInfo.className = 'winner-info';
-        }
-
-        for (let i = 1; i <= maxSets; i++) {
-            const aEl = document.getElementById(`set-${i}-a`);
-            const bEl = document.getElementById(`set-${i}-b`);
-            if (!aEl) continue;
-
-            if (winsA >= setsToWin || winsB >= setsToWin) {
-                if (aEl.value === '' && bEl.value === '') {
-                    aEl.disabled = true;
-                    bEl.disabled = true;
-                }
-            } else {
-                aEl.disabled = false;
-                bEl.disabled = false;
+            if (thirdScore) {
+                const resultRow = thirdPlaceRow + 3;
+                const resultCell = ws.getCell(resultRow, thirdColStart);
+                ws.mergeCells(resultRow, thirdColStart, resultRow, thirdColStart + 1);
+                resultCell.value = `🥉 ${thirdScore.winner_name} thắng`;
+                resultCell.font = { size: 10, bold: true, color: { argb: 'FFFFFFFF' } };
+                resultCell.fill = { type: 'pattern', pattern: 'solid', fgColor: { argb: 'FFE67E22' } };
+                resultCell.alignment = { horizontal: 'center', vertical: 'middle' };
+                resultCell.border = thinBorder;
             }
         }
     }
 
-    window.saveScore = async function() {
-        if (!currentScoreMatch) return;
+    function buildKnockoutFromRoundRobin(catName, groups, bracketSize, totalRounds) {
+        // Dự kiến bracket từ vòng bảng (Nhất vs Nhì khác bảng)
+        const groupNames = Object.keys(groups).sort();
+        const bracketData = {};
 
-        const { catName, roundNum, matchNum, teamA, teamB } = currentScoreMatch;
-        const cat = categories.find(c => c.name === catName);
-        const setsFormat = cat?.sets_format || 'best-of-3';
-        const maxSets = setsFormat === 'best-of-7' ? 7 : (setsFormat === 'best-of-5' ? 5 : 3);
-        const setsToWin = Math.ceil(maxSets / 2);
+        // Vòng 1: Nhất A vs Nhì B, Nhất B vs Nhì A...
+        const pairings = [];
+        for (let i = 0; i < groupNames.length; i += 2) {
+            const g1 = groupNames[i];
+            const g2 = groupNames[i + 1];
+            if (g2) {
+                pairings.push({ a: `Nhất ${g1}`, b: `Nhì ${g2}` });
+                pairings.push({ a: `Nhất ${g2}`, b: `Nhì ${g1}` });
+            }
+        }
 
-        let winsA = 0, winsB = 0;
-        const setScores = [];
-        const payload = {
-            tournament_id: tournamentId,
-            category: catName,
-            round_number: roundNum,
-            match_number: matchNum,
-            team_a_name: teamA,
-            team_b_name: teamB
+        bracketData[1] = pairings.map(p => ({
+            teamA: { name: p.a },
+            teamB: { name: p.b }
+        }));
+
+        // Các vòng sau: placeholder
+        for (let r = 2; r <= totalRounds; r++) {
+            const prevCount = bracketData[r - 1]?.length || 0;
+            const numMatches = Math.ceil(prevCount / 2);
+            bracketData[r] = Array.from({ length: numMatches }, () => ({ teamA: null, teamB: null }));
+        }
+
+        return bracketData;
+    }
+
+    function getRoundNames(totalRounds) {
+        const names = [];
+        const standard = ['Chung kết', 'Bán kết', 'Tứ kết', 'Vòng 1/8', 'Vòng 1/16', 'Vòng 1/32', 'Vòng 1/64'];
+        for (let i = 0; i < totalRounds; i++) {
+            const fromEnd = totalRounds - 1 - i;
+            names.push(fromEnd < standard.length ? standard[fromEnd] : `Vòng ${i + 1}`);
+        }
+        return names;
+    }
+
+    async function buildMatchListSheet(wb, catName) {
+        const ws = wb.addWorksheet('Danh sách trận', {
+            pageSetup: { paperSize: 9, orientation: 'landscape', fitToPage: true }
+        });
+        ws.columns = [
+            { width: 6 }, { width: 8 }, { width: 20 }, { width: 20 }, { width: 20 }, { width: 20 }, { width: 15 }, { width: 8 }
+        ];
+
+        const headerBg = 'FF1A3A7A';
+        const headerFg = 'FFFFFFFF';
+        const thinBorder = {
+            top: { style: 'thin', color: { argb: 'FFDEE2E6' } },
+            left: { style: 'thin', color: { argb: 'FFDEE2E6' } },
+            bottom: { style: 'thin', color: { argb: 'FFDEE2E6' } },
+            right: { style: 'thin', color: { argb: 'FFDEE2E6' } }
         };
 
-        for (let i = 1; i <= maxSets; i++) {
-            const aEl = document.getElementById(`set-${i}-a`);
-            const bEl = document.getElementById(`set-${i}-b`);
-            if (!aEl || !bEl) continue;
+        // Tiêu đề
+        // Tiêu đề
+        ws.addRow([`${catName.toUpperCase()} - DANH SÁCH TRẬN & KẾT QUẢ`]);
+        ws.mergeCells(`A1:H1`);
+        const titleCell = ws.getCell('A1');
+        titleCell.font = { bold: true, size: 15, color: { argb: headerFg } };
+        titleCell.fill = { type: 'pattern', pattern: 'solid', fgColor: { argb: 'FF0D1B3E' } };
+        titleCell.alignment = { horizontal: 'center', vertical: 'middle' };
+        ws.getRow(1).height = 35;
+        ws.addRow([]);
 
-            const a = aEl.value !== '' ? parseInt(aEl.value) : null;
-            const b = bEl.value !== '' ? parseInt(bEl.value) : null;
+        // Header
+        const headerRow = ws.addRow(['STT', 'Vòng', 'VĐV A', 'VĐV B', 'Tỷ số', 'Người thắng', 'Trạng thái', 'Ghi chú']);
+        headerRow.eachCell(cell => {
+            cell.font = { bold: true, color: { argb: headerFg }, size: 11 };
+            cell.fill = { type: 'pattern', pattern: 'solid', fgColor: { argb: headerBg } };
+            cell.alignment = { horizontal: 'center', vertical: 'middle' };
+            cell.border = thinBorder;
+        });
 
-            payload[`set_${i}_a`] = a;
-            payload[`set_${i}_b`] = b;
+        const scores = allMatchScores.filter(s => s.category === catName);
+        scores.sort((a, b) => {
+            if (a.round_number !== b.round_number) return a.round_number - b.round_number;
+            return a.match_number - b.match_number;
+        });
 
-            if (a !== null && b !== null) {
-                setScores.push(`${a}-${b}`);
-                if (a > b) winsA++;
-                else if (b > a) winsB++;
-            }
+        let stt = 1;
+        scores.forEach(s => {
+            let roundLabel = '';
+            if (s.round_number === 100) roundLabel = 'Vòng bảng';
+            else if (s.round_number >= 200) roundLabel = `KO - Vòng ${s.round_number - 199}`;
+            else roundLabel = `Vòng ${s.round_number}`;
+
+            const r = ws.addRow([
+                stt++,
+                roundLabel,
+                s.team_a_name || '—',
+                s.team_b_name || '—',
+                s.score_summary || '—',
+                s.winner_name || '—',
+                s.status === 'completed' ? 'Đã xong' : 'Đang đấu',
+                ''
+            ]);
+            r.eachCell(cell => {
+                cell.border = thinBorder;
+                cell.alignment = { vertical: 'middle' };
+            });
+            r.getCell(1).alignment = { horizontal: 'center', vertical: 'middle' };
+            r.getCell(2).alignment = { horizontal: 'center', vertical: 'middle' };
+            r.getCell(5).alignment = { horizontal: 'center', vertical: 'middle' };
+            r.getCell(6).font = { bold: true, color: { argb: 'FF00b894' } };
+            r.getCell(7).alignment = { horizontal: 'center', vertical: 'middle' };
+        });
+
+        if (scores.length === 0) {
+            ws.addRow(['(Chưa có trận nào được nhập kết quả)']);
         }
-
-        if (winsA < setsToWin && winsB < setsToWin) {
-            alert(`Chưa xác định được người thắng! Cần ${setsToWin} séc thắng.`);
-            return;
-        }
-
-        payload.winner_name = winsA >= setsToWin ? teamA : teamB;
-        payload.score_summary = setScores.join(', ');
-        payload.status = 'completed';
-
-        const btn = document.getElementById('score-save-btn');
-        btn.disabled = true;
-        btn.innerHTML = '<i class="fas fa-spinner fa-spin"></i> Đang lưu...';
-
-        try {
-            await supabaseClient.from('match_scores')
-                .delete()
-                .eq('tournament_id', tournamentId)
-                .eq('category', catName)
-                .eq('round_number', roundNum)
-                .eq('match_number', matchNum);
-
-            const { error } = await supabaseClient.from('match_scores').insert(payload);
-            if (error) throw error;
-
-            const { data: scoresData } = await supabaseClient.from('match_scores')
-                .select('*').eq('tournament_id', tournamentId);
-            allMatchScores = scoresData || [];
-
-            closeScoreModal();
-
-            if (document.getElementById('control-modal').classList.contains('show')) {
-                const drawsForCat = allDraws.filter(d => d.category === catName);
-                const isKnockout = drawsForCat[0]?.draw_type === 'knockout';
-                if (isKnockout) {
-                    document.getElementById('control-bracket').innerHTML = renderKnockoutBracket(drawsForCat, catName, true);
-                } else {
-                    document.getElementById('control-bracket').innerHTML = renderRoundRobinControl(drawsForCat, catName);
-                }
-                
-                const scoresForCat = allMatchScores.filter(s => s.category === catName);
-                document.getElementById('control-info').innerHTML = `
-                    <i class="fas fa-check-circle" style="color: #00b894;"></i> 
-                    <strong>${escapeHtml(catName)}</strong> · 
-                    Đã hoàn thành: <strong>${scoresForCat.length}</strong> trận · 
-                    <span style="color: #d63031;">Nhấn vào trận để nhập điểm</span>
-                `;
-            }
-
-            renderCategories();
-
-            alert(`✅ Đã lưu kết quả! ${payload.winner_name} thắng ${Math.max(winsA, winsB)}-${Math.min(winsA, winsB)}`);
-
-        } catch (error) {
-            console.error(error);
-            alert('Lỗi lưu: ' + error.message);
-        } finally {
-            btn.disabled = false;
-            btn.innerHTML = '<i class="fas fa-save"></i> Lưu kết quả';
-        }
-    };
+    }
 
     // ==========================================
-    // CHỈNH SỬA VĐV TRONG TRẬN
+    // CHỈNH SỬA VĐV TRONG TRẬN (KNOCKOUT)
     // ==========================================
     let currentEditPlayer = null;
 
     window.openEditPlayerModal = function(catName, roundNum, matchNum, teamAName, teamBName) {
         currentEditPlayer = { catName, roundNum, matchNum, teamAName, teamBName };
-        
+
         let teamAClub = '';
         let teamBClub = '';
-        
+
         const drawA = allDraws.find(d => d.team_name === teamAName && d.category === catName);
         const drawB = allDraws.find(d => d.team_name === teamBName && d.category === catName);
-        
+
         if (drawA) teamAClub = drawA.club || '';
         if (drawB) teamBClub = drawB.club || '';
-        
+
         document.getElementById('edit-team-a-name').value = teamAName;
         document.getElementById('edit-team-a-club').value = teamAClub;
         document.getElementById('edit-team-b-name').value = teamBName;
         document.getElementById('edit-team-b-club').value = teamBClub;
-        
+
         let roundLabel = roundNum === 100 ? 'Vòng bảng' : (roundNum >= 200 ? `Vòng KO ${roundNum - 199}` : `Vòng ${roundNum}`);
         document.getElementById('edit-player-info').innerHTML = `
             <i class="fas fa-info-circle"></i> 
             <strong>${escapeHtml(catName)}</strong> · 
             ${roundLabel} · Trận ${matchNum}
         `;
-        
+
         document.getElementById('edit-player-modal').classList.add('show');
     };
 
@@ -1607,19 +1513,19 @@
 
     window.saveEditPlayer = async function() {
         if (!currentEditPlayer) return;
-        
+
         const { catName, roundNum, matchNum, teamAName, teamBName } = currentEditPlayer;
-        
+
         const newTeamAName = document.getElementById('edit-team-a-name').value.trim();
         const newTeamAClub = document.getElementById('edit-team-a-club').value.trim();
         const newTeamBName = document.getElementById('edit-team-b-name').value.trim();
         const newTeamBClub = document.getElementById('edit-team-b-club').value.trim();
-        
+
         if (!newTeamAName || !newTeamBName) {
             alert('Tên VĐV không được để trống!');
             return;
         }
-        
+
         try {
             if (teamAName) {
                 await supabaseClient.from('draws')
@@ -1635,51 +1541,51 @@
                     .eq('category', catName)
                     .eq('team_name', teamBName);
             }
-            
+
             await supabaseClient.from('schedules')
                 .update({ team_a_name: newTeamAName })
                 .eq('tournament_id', tournamentId)
                 .eq('team_a_name', teamAName);
-            
+
             await supabaseClient.from('schedules')
                 .update({ team_b_name: newTeamBName })
                 .eq('tournament_id', tournamentId)
                 .eq('team_b_name', teamBName);
-            
+
             await supabaseClient.from('match_scores')
                 .update({ team_a_name: newTeamAName })
                 .eq('tournament_id', tournamentId)
                 .eq('category', catName)
                 .eq('team_a_name', teamAName);
-            
+
             await supabaseClient.from('match_scores')
                 .update({ team_b_name: newTeamBName })
                 .eq('tournament_id', tournamentId)
                 .eq('category', catName)
                 .eq('team_b_name', teamBName);
-            
+
             await supabaseClient.from('match_scores')
                 .update({ winner_name: newTeamAName })
                 .eq('tournament_id', tournamentId)
                 .eq('category', catName)
                 .eq('winner_name', teamAName);
-            
+
             await supabaseClient.from('match_scores')
                 .update({ winner_name: newTeamBName })
                 .eq('tournament_id', tournamentId)
                 .eq('category', catName)
                 .eq('winner_name', teamBName);
-            
+
             await loadAllData();
             closeEditPlayerModal();
-            
+
             if (document.getElementById('control-modal').classList.contains('show')) {
                 closeControlModal();
                 setTimeout(() => openControlPanel(catName), 100);
             }
-            
+
             alert('✅ Đã lưu thay đổi!');
-            
+
         } catch (error) {
             console.error(error);
             alert('Lỗi lưu: ' + error.message);
@@ -1691,52 +1597,52 @@
     // ==========================================
     window.openEditGroupPlayer = async function(catName, teamName, teamClub) {
         const newName = prompt(`Sửa tên VĐV "${teamName}"\n\n⚠️ Tên sẽ đổi ở TẤT CẢ các trận trong bảng!`, teamName);
-        
+
         if (!newName || newName === teamName) return;
-        
+
         const newClub = prompt(`Sửa CLB/Đơn vị cho "${newName}"`, teamClub || '');
-        
+
         try {
             await supabaseClient.from('draws')
                 .update({ team_name: newName, club: newClub || null })
                 .eq('tournament_id', tournamentId)
                 .eq('category', catName)
                 .eq('team_name', teamName);
-            
+
             await supabaseClient.from('schedules')
                 .update({ team_a_name: newName })
                 .eq('tournament_id', tournamentId)
                 .eq('team_a_name', teamName);
-            
+
             await supabaseClient.from('schedules')
                 .update({ team_b_name: newName })
                 .eq('tournament_id', tournamentId)
                 .eq('team_b_name', teamName);
-            
+
             await supabaseClient.from('match_scores')
                 .update({ team_a_name: newName })
                 .eq('tournament_id', tournamentId)
                 .eq('category', catName)
                 .eq('team_a_name', teamName);
-            
+
             await supabaseClient.from('match_scores')
                 .update({ team_b_name: newName })
                 .eq('tournament_id', tournamentId)
                 .eq('category', catName)
                 .eq('team_b_name', teamName);
-            
+
             await supabaseClient.from('match_scores')
                 .update({ winner_name: newName })
                 .eq('tournament_id', tournamentId)
                 .eq('category', catName)
                 .eq('winner_name', teamName);
-            
+
             await loadAllData();
             closeControlModal();
             setTimeout(() => openControlPanel(catName), 100);
-            
+
             alert(`✅ Đã đổi "${teamName}" → "${newName}"\nở tất cả các trận!`);
-            
+
         } catch (error) {
             console.error(error);
             alert('Lỗi: ' + error.message);
@@ -1749,32 +1655,32 @@
     window.openEditKnockoutPlayer = async function(catName, roundNum, matchNum, teamAName, teamBName) {
         const newA = prompt(`Sửa tên VĐV A\n\nChỉ đổi ở TRẬN NÀY`, teamAName);
         if (newA === null) return;
-        
+
         const newB = prompt(`Sửa tên VĐV B\n\nChỉ đổi ở TRẬN NÀY`, teamBName);
         if (newB === null) return;
-        
+
         if (!newA || !newB) return;
-        
+
         try {
             await supabaseClient.from('schedules')
                 .update({ team_a_name: newA, team_b_name: newB })
                 .eq('tournament_id', tournamentId)
                 .eq('round_number', roundNum)
                 .eq('match_number', matchNum);
-            
+
             await supabaseClient.from('match_scores')
                 .update({ team_a_name: newA, team_b_name: newB })
                 .eq('tournament_id', tournamentId)
                 .eq('category', catName)
                 .eq('round_number', roundNum)
                 .eq('match_number', matchNum);
-            
+
             await loadAllData();
             closeControlModal();
             setTimeout(() => openControlPanel(catName), 100);
-            
+
             alert(`✅ Đã sửa trận ${matchNum}!`);
-            
+
         } catch (error) {
             console.error(error);
             alert('Lỗi: ' + error.message);
@@ -1870,17 +1776,16 @@
     };
 
     // ==========================================
-    // XÓA NỘI DUNG - FIX CASCADE FULL
+    // XÓA NỘI DUNG - FIX CASCADE
     // ==========================================
     window.deleteCategory = async function(id) {
         const c = categories.find(x => x.id == id);
         if (!c) return;
-        
-        // Đếm dữ liệu liên quan để cảnh báo
+
         const drawsCount = allDraws.filter(d => d.category === c.name).length;
         const schedulesCount = allSchedules.filter(s => s.category_id === c.id || s.category === c.name).length;
         const scoresCount = allMatchScores.filter(s => s.category === c.name).length;
-        
+
         let warning = `Xóa nội dung "${c.name}"?\n\n`;
         if (drawsCount > 0) warning += `⚠️ Sẽ xóa ${drawsCount} dòng draws\n`;
         if (schedulesCount > 0) warning += `⚠️ Sẽ xóa ${schedulesCount} trận schedules\n`;
@@ -1889,57 +1794,25 @@
             warning += `(Không có dữ liệu liên quan)\n`;
         }
         warning += `\nHành động này KHÔNG THỂ HOÀN TÁC!`;
-        
+
         if (!confirm(warning)) return;
-        
+
         try {
-            // 1. Xóa match_scores liên quan theo category name
-            await supabaseClient
-                .from('match_scores')
-                .delete()
-                .eq('tournament_id', tournamentId)
-                .eq('category', c.name);
-            
-            // 2. Xóa schedules theo category_id
-            await supabaseClient
-                .from('schedules')
-                .delete()
-                .eq('tournament_id', tournamentId)
-                .eq('category_id', c.id);
-            
-            // 3. Xóa schedules theo category name (fallback cho dữ liệu cũ)
-            await supabaseClient
-                .from('schedules')
-                .delete()
-                .eq('tournament_id', tournamentId)
-                .eq('category', c.name);
-            
-            // 4. Xóa draws liên quan
-            await supabaseClient
-                .from('draws')
-                .delete()
-                .eq('tournament_id', tournamentId)
-                .eq('category', c.name);
-            
-            // 5. Xóa matches liên quan (nếu có bảng này)
-            await supabaseClient
-                .from('matches')
-                .delete()
-                .eq('tournament_id', tournamentId)
-                .eq('category', c.name);
-            
-            // 6. Cuối cùng xóa category
+            await supabaseClient.from('match_scores').delete().eq('tournament_id', tournamentId).eq('category', c.name);
+            await supabaseClient.from('schedules').delete().eq('tournament_id', tournamentId).eq('category_id', c.id);
+            await supabaseClient.from('schedules').delete().eq('tournament_id', tournamentId).eq('category', c.name);
+            await supabaseClient.from('draws').delete().eq('tournament_id', tournamentId).eq('category', c.name);
+            await supabaseClient.from('matches').delete().eq('tournament_id', tournamentId).eq('category', c.name);
+
             const { error } = await supabaseClient.from('categories').delete().eq('id', id);
             if (error) throw error;
-            
+
             const summary = [];
             if (drawsCount > 0) summary.push(`${drawsCount} draws`);
             if (schedulesCount > 0) summary.push(`${schedulesCount} schedules`);
             if (scoresCount > 0) summary.push(`${scoresCount} scores`);
-            
+
             showAlert(`✅ Đã xóa nội dung "${c.name}"${summary.length > 0 ? ' + ' + summary.join(' + ') : ''}!`, 'success');
-            
-            // QUAN TRỌNG: Load lại toàn bộ dữ liệu để xóa cache cục bộ
             await loadAllData();
         } catch (error) {
             console.error(error);
@@ -1951,6 +1824,272 @@
         window.location.href = 'draw.html?tournament_id=' + tournamentId;
     };
 
+    // ==========================================
+    // NHẬP ĐIỂM
+    // ==========================================
+    window.openScoreModal = function(catName, roundNum, matchNum, teamA, teamB) {
+        if (!teamA || !teamB || teamA === 'null' || teamB === 'null' || teamA === 'undefined' || teamB === 'undefined') {
+            alert('Chưa xác định đủ 2 VĐV!');
+            return;
+        }
+
+        currentScoreMatch = { catName, roundNum, matchNum, teamA, teamB };
+
+        const cat = categories.find(c => c.name === catName);
+        const setsFormat = cat?.sets_format || 'best-of-3';
+        const maxSets = setsFormat === 'best-of-7' ? 7 : (setsFormat === 'best-of-5' ? 5 : 3);
+        const setsToWin = Math.ceil(maxSets / 2);
+        const pointsPerSet = cat?.points_per_set || 21;
+
+        let roundLabel = '';
+        if (roundNum === 100) roundLabel = 'Vòng bảng';
+        else if (roundNum >= 200) roundLabel = 'Knockout';
+        else roundLabel = `Vòng ${roundNum}`;
+
+        document.getElementById('score-title').textContent = `🏸 Nhập điểm - ${roundLabel} · Trận ${matchNum}`;
+        document.getElementById('display-team-a').textContent = teamA;
+        document.getElementById('display-team-b').textContent = teamB;
+
+        let html = `
+            <div style="background: #e7f3ff; padding: 10px 14px; border-radius: 8px; margin-bottom: 16px; font-size: 13px; color: #1a3a7a; font-weight: 700; text-align: center;">
+                <i class="fas fa-info-circle"></i> Thể thức: ${setsFormat.toUpperCase()} · Điểm/séc: ${pointsPerSet} · Cần thắng ${setsToWin} séc
+            </div>
+        `;
+
+        for (let i = 1; i <= maxSets; i++) {
+            html += `
+                <div class="set-row" id="set-row-${i}" style="display: grid; grid-template-columns: 70px 1fr 50px 1fr 1fr; gap: 12px; align-items: center; margin-bottom: 12px; padding: 14px; background: #f8f9fa; border-radius: 10px; border-left: 4px solid #1a3a7a;">
+                    <span style="font-weight: 800; color: #1a3a7a; font-size: 13px; text-align: center;">SÉC ${i}</span>
+                    <div style="font-weight: 700; color: #1a1a2e; font-size: 13px; white-space: nowrap; overflow: hidden; text-overflow: ellipsis;">${escapeHtml(teamA)}</div>
+                    <input type="number" id="set-${i}-a" min="0" max="99" oninput="checkSetWinner(${i})" placeholder="0" style="width: 100%; padding: 10px; border: 2px solid #e9ecef; border-radius: 8px; text-align: center; font-weight: 800; font-size: 18px; color: #1a3a7a;">
+                    <input type="number" id="set-${i}-b" min="0" max="99" oninput="checkSetWinner(${i})" placeholder="0" style="width: 100%; padding: 10px; border: 2px solid #e9ecef; border-radius: 8px; text-align: center; font-weight: 800; font-size: 18px; color: #1a3a7a;">
+                    <div style="font-weight: 700; color: #1a1a2e; font-size: 13px; text-align: right; white-space: nowrap; overflow: hidden; text-overflow: ellipsis;">${escapeHtml(teamB)}</div>
+                </div>
+            `;
+        }
+
+        document.getElementById('score-sets-container').innerHTML = html;
+        document.getElementById('winner-info').className = 'winner-info';
+
+        const existingScore = allMatchScores.find(s => 
+            s.category === catName && s.round_number === roundNum && s.match_number === matchNum
+        );
+
+        if (existingScore) {
+            const setKeys = ['set_1', 'set_2', 'set_3', 'set_4', 'set_5', 'set_6', 'set_7'];
+            setKeys.forEach((key, idx) => {
+                const a = existingScore[`${key}_a`];
+                const b = existingScore[`${key}_b`];
+                const aEl = document.getElementById(`set-${idx + 1}-a`);
+                const bEl = document.getElementById(`set-${idx + 1}-b`);
+                if (aEl && bEl && a !== null && b !== null) {
+                    aEl.value = a;
+                    bEl.value = b;
+                }
+            });
+            checkAllSets();
+        }
+
+        document.getElementById('score-modal').style.display = 'flex';
+    };
+
+    window.closeScoreModal = function() {
+        document.getElementById('score-modal').style.display = 'none';
+        currentScoreMatch = null;
+    };
+
+    window.checkSetWinner = function(setNum) {
+        const a = document.getElementById(`set-${setNum}-a`);
+        const b = document.getElementById(`set-${setNum}-b`);
+        if (!a || !b) return;
+
+        const valA = parseInt(a.value) || 0;
+        const valB = parseInt(b.value) || 0;
+
+        a.classList.remove('winner', 'loser');
+        b.classList.remove('winner', 'loser');
+
+        if (a.value !== '' && b.value !== '' && valA !== valB) {
+            if (valA > valB) {
+                a.classList.add('winner');
+                b.classList.add('loser');
+                a.style.background = '#d4edda';
+                b.style.background = '#f8d7da';
+            } else {
+                b.classList.add('winner');
+                a.classList.add('loser');
+                b.style.background = '#d4edda';
+                a.style.background = '#f8d7da';
+            }
+        } else {
+            a.style.background = '#fff';
+            b.style.background = '#fff';
+        }
+
+        checkAllSets();
+    };
+
+    function checkAllSets() {
+        if (!currentScoreMatch) return;
+        const cat = categories.find(c => c.name === currentScoreMatch.catName);
+        const setsFormat = cat?.sets_format || 'best-of-3';
+        const maxSets = setsFormat === 'best-of-7' ? 7 : (setsFormat === 'best-of-5' ? 5 : 3);
+        const setsToWin = Math.ceil(maxSets / 2);
+
+        let winsA = 0, winsB = 0;
+        let validSets = 0;
+
+        for (let i = 1; i <= maxSets; i++) {
+            const aEl = document.getElementById(`set-${i}-a`);
+            const bEl = document.getElementById(`set-${i}-b`);
+            if (!aEl || !bEl) continue;
+
+            const a = parseInt(aEl.value);
+            const b = parseInt(bEl.value);
+
+            if (!isNaN(a) && !isNaN(b) && aEl.value !== '' && bEl.value !== '') {
+                validSets++;
+                if (a > b) winsA++;
+                else if (b > a) winsB++;
+            }
+        }
+
+        const winnerInfo = document.getElementById('winner-info');
+
+        if (winsA >= setsToWin || winsB >= setsToWin) {
+            const winner = winsA >= setsToWin ? currentScoreMatch.teamA : currentScoreMatch.teamB;
+            const loser = winsA >= setsToWin ? currentScoreMatch.teamB : currentScoreMatch.teamA;
+            winnerInfo.className = 'winner-info show';
+            winnerInfo.style.display = 'block';
+            winnerInfo.innerHTML = `
+                🏆 <strong>${escapeHtml(winner)}</strong> THẮNG ${Math.max(winsA, winsB)}-${Math.min(winsA, winsB)}
+                <small>${validSets} séc đã nhập · ${escapeHtml(loser)} thua</small>
+            `;
+        } else {
+            winnerInfo.className = 'winner-info';
+            winnerInfo.style.display = 'none';
+        }
+
+        for (let i = 1; i <= maxSets; i++) {
+            const aEl = document.getElementById(`set-${i}-a`);
+            const bEl = document.getElementById(`set-${i}-b`);
+            if (!aEl) continue;
+
+            if (winsA >= setsToWin || winsB >= setsToWin) {
+                if (aEl.value === '' && bEl.value === '') {
+                    aEl.disabled = true;
+                    bEl.disabled = true;
+                }
+            } else {
+                aEl.disabled = false;
+                bEl.disabled = false;
+            }
+        }
+    }
+
+    window.saveScore = async function() {
+        if (!currentScoreMatch) return;
+
+        const { catName, roundNum, matchNum, teamA, teamB } = currentScoreMatch;
+        const cat = categories.find(c => c.name === catName);
+        const setsFormat = cat?.sets_format || 'best-of-3';
+        const maxSets = setsFormat === 'best-of-7' ? 7 : (setsFormat === 'best-of-5' ? 5 : 3);
+        const setsToWin = Math.ceil(maxSets / 2);
+
+        let winsA = 0, winsB = 0;
+        const setScores = [];
+        const payload = {
+            tournament_id: tournamentId,
+            category: catName,
+            round_number: roundNum,
+            match_number: matchNum,
+            team_a_name: teamA,
+            team_b_name: teamB
+        };
+
+        for (let i = 1; i <= maxSets; i++) {
+            const aEl = document.getElementById(`set-${i}-a`);
+            const bEl = document.getElementById(`set-${i}-b`);
+            if (!aEl || !bEl) continue;
+
+            const a = aEl.value !== '' ? parseInt(aEl.value) : null;
+            const b = bEl.value !== '' ? parseInt(bEl.value) : null;
+
+            payload[`set_${i}_a`] = a;
+            payload[`set_${i}_b`] = b;
+
+            if (a !== null && b !== null) {
+                setScores.push(`${a}-${b}`);
+                if (a > b) winsA++;
+                else if (b > a) winsB++;
+            }
+        }
+
+        if (winsA < setsToWin && winsB < setsToWin) {
+            alert(`Chưa xác định được người thắng! Cần ${setsToWin} séc thắng.`);
+            return;
+        }
+
+        payload.winner_name = winsA >= setsToWin ? teamA : teamB;
+        payload.score_summary = setScores.join(', ');
+        payload.status = 'completed';
+
+        const btn = document.getElementById('score-save-btn');
+        btn.disabled = true;
+        btn.innerHTML = '<i class="fas fa-spinner fa-spin"></i> Đang lưu...';
+
+        try {
+            await supabaseClient.from('match_scores')
+                .delete()
+                .eq('tournament_id', tournamentId)
+                .eq('category', catName)
+                .eq('round_number', roundNum)
+                .eq('match_number', matchNum);
+
+            const { error } = await supabaseClient.from('match_scores').insert(payload);
+            if (error) throw error;
+
+            const { data: scoresData } = await supabaseClient.from('match_scores')
+                .select('*').eq('tournament_id', tournamentId);
+            allMatchScores = scoresData || [];
+
+            closeScoreModal();
+
+            // Refresh control panel
+            if (document.getElementById('control-modal').classList.contains('show')) {
+                const drawsForCat = allDraws.filter(d => d.category === catName);
+                const isKnockout = drawsForCat[0]?.draw_type === 'knockout';
+                if (isKnockout) {
+                    document.getElementById('control-bracket').innerHTML = renderKnockoutBracket(drawsForCat, catName, true);
+                } else {
+                    document.getElementById('control-bracket').innerHTML = renderRoundRobinControl(drawsForCat, catName);
+                }
+
+                const scoresForCat = allMatchScores.filter(s => s.category === catName);
+                document.getElementById('control-info').innerHTML = `
+                    <i class="fas fa-check-circle" style="color: #00b894;"></i> 
+                    <strong>${escapeHtml(catName)}</strong> · 
+                    Đã hoàn thành: <strong>${scoresForCat.length}</strong> trận · 
+                    <span style="color: #d63031;">Nhấn vào trận để nhập điểm</span>
+                `;
+            }
+
+            renderCategories();
+
+            alert(`✅ Đã lưu kết quả! ${payload.winner_name} thắng ${Math.max(winsA, winsB)}-${Math.min(winsA, winsB)}`);
+
+        } catch (error) {
+            console.error(error);
+            alert('Lỗi lưu: ' + error.message);
+        } finally {
+            btn.disabled = false;
+            btn.innerHTML = '<i class="fas fa-save"></i> Lưu kết quả';
+        }
+    };
+
+    // ==========================================
+    // HELPERS
+    // ==========================================
     function showAlert(message, type) {
         const el = document.getElementById('alert');
         el.textContent = message;
