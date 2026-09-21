@@ -993,16 +993,48 @@
         const nonBye = allQualified.filter(t => !koState.selectedByes.includes(t));
         const champList = nonBye.filter(t => t.startsWith('Nhất'));
         const runnerList = nonBye.filter(t => t.startsWith('Nhì'));
-        const interleaved = [];
-        while (champList.length > 0 || runnerList.length > 0) {
-            if (champList.length > 0) interleaved.push(champList.shift());
-            if (runnerList.length > 0) interleaved.push(runnerList.shift());
+
+        // Ghép cặp: Nhất bảng X vs Nhì bảng Y (X ≠ Y, ưu tiên đối xứng qua trục)
+        // Cách làm: sắp xếp Nhất theo bảng A, B, C...; sắp xếp Nhì đảo ngược Z, Y, X...
+        const pairings = [];
+        const usedRunners = new Set();
+
+        // Sắp xếp Nhất theo thứ tự bảng A → Z
+        champList.sort((a, b) => a.localeCompare(b));
+        // Sắp xếp Nhì theo thứ tự bảng Z → A (đảo ngược)
+        runnerList.sort((a, b) => b.localeCompare(a));
+
+        for (const champ of champList) {
+            // Tìm Nhì khác bảng với champ này
+            let matchedIdx = -1;
+            for (let i = 0; i < runnerList.length; i++) {
+                if (usedRunners.has(i)) continue;
+                const runner = runnerList[i];
+                // Kiểm tra khác bảng: "Nhất A" vs "Nhì A" → cùng bảng → bỏ qua
+                const champGroup = champ.replace('Nhất ', '').trim();
+                const runnerGroup = runner.replace('Nhì ', '').trim();
+                if (champGroup !== runnerGroup) {
+                    matchedIdx = i;
+                    break;
+                }
+            }
+            // Nếu không tìm được Nhì khác bảng (hiếm), lấy đại 1 Nhì chưa dùng
+            if (matchedIdx === -1) {
+                for (let i = 0; i < runnerList.length; i++) {
+                    if (!usedRunners.has(i)) { matchedIdx = i; break; }
+                }
+            }
+            if (matchedIdx >= 0) {
+                usedRunners.add(matchedIdx);
+                pairings.push({ a: champ, b: runnerList[matchedIdx] });
+            } else {
+                // Không còn Nhì → để trống slot B (sẽ là BYE hoặc placeholder)
+                pairings.push({ a: champ, b: null });
+            }
         }
 
-        const pairings = [];
-        for (let i = 0; i < interleaved.length - 1; i += 2) {
-            pairings.push({ a: interleaved[i], b: interleaved[i + 1] });
-        }
+        // Nếu còn Nhì chưa dùng (khi qualify = 3), ghép thêm cặp Nhì vs Ba
+        // hoặc để trống — tùy logic. Hiện tại chỉ ghép Nhất vs Nhì.
 
         result.knockoutData = {
             bracketSize, numByes, numGroups, totalQualified, needRunnersUp, groupNames,
