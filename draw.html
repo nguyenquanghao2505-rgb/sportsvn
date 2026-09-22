@@ -28,11 +28,11 @@
         .btn-primary { background: linear-gradient(135deg, #0d1b3e, #1a3a7a); color: #fff; border: none; padding: 13px 24px; border-radius: 10px; font-size: 15px; font-weight: 700; cursor: pointer; transition: all 0.3s ease; display: inline-flex; align-items: center; justify-content: center; gap: 6px; }
         .btn-primary:hover { transform: translateY(-2px); box-shadow: 0 8px 20px rgba(26,58,122,0.3); }
         .btn-primary:disabled { opacity: 0.5; cursor: not-allowed; transform: none; }
-        .btn-success-sm { background: linear-gradient(135deg, #00b894, #00a859); color: #fff; border: none; padding: 12px 20px; border-radius: 10px; font-size: 14px; font-weight: 700; cursor: pointer; display: inline-flex; align-items: center; justify-content: center; gap: 6px; transition: all 0.3s ease; }
+        .btn-success-sm { background: linear-gradient(135deg, #00b894, #00a859); color: #fff; border: none; padding: 12px 20px; border-radius: 10px; font-size: 14px; font-weight: 700; cursor: pointer; display: inline-flex; align-items: center; justify-content: center; gap: 6px; transition: all 0.3s ease; text-decoration: none; }
         .btn-success-sm:hover { transform: translateY(-2px); box-shadow: 0 6px 15px rgba(0,184,148,0.4); }
         .btn-danger-sm { background: #e94560; color: #fff; border: none; padding: 10px 18px; border-radius: 10px; font-size: 14px; font-weight: 700; cursor: pointer; display: inline-flex; align-items: center; gap: 6px; }
         .btn-warning-sm { background: #fdcb6e; color: #1a1a2e; border: none; padding: 12px 20px; border-radius: 10px; font-size: 14px; font-weight: 700; cursor: pointer; display: inline-flex; align-items: center; gap: 6px; }
-        .btn-info-sm { background: #0984e3; color: #fff; border: none; padding: 12px 20px; border-radius: 10px; font-size: 14px; font-weight: 700; cursor: pointer; display: inline-flex; align-items: center; gap: 6px; }
+        .btn-info-sm { background: #0984e3; color: #fff; border: none; padding: 12px 20px; border-radius: 10px; font-size: 14px; font-weight: 700; cursor: pointer; display: inline-flex; align-items: center; gap: 6px; text-decoration: none; }
         .btn-success { background: linear-gradient(135deg, #00b894, #00a859); color: #fff; border: none; padding: 16px 32px; border-radius: 12px; font-size: 17px; font-weight: 800; cursor: pointer; width: 100%; margin-top: 16px; display: inline-flex; align-items: center; justify-content: center; gap: 8px; transition: all 0.3s ease; }
         .btn-success:hover { transform: translateY(-2px); box-shadow: 0 10px 25px rgba(0,184,148,0.4); }
         .action-bar { display: flex; gap: 12px; flex-wrap: wrap; padding: 14px 16px; background: #f8f9fa; border-radius: 12px; margin-bottom: 16px; }
@@ -190,6 +190,14 @@
         .branch-label { position: absolute; left: 0; right: 0; height: 24px; display: flex; align-items: center; justify-content: center; font-size: 11px; font-weight: 800; letter-spacing: 1px; border-radius: 6px; }
         .branch-upper { background: #e7f3ff; color: #1a3a7a; }
         .branch-lower { background: #fff8e6; color: #856404; }
+
+        /* ✅ CSS cho 2 nút quản lý nội dung */
+        .category-actions {
+            margin-top: 12px;
+            display: flex;
+            gap: 10px;
+            flex-wrap: wrap;
+        }
     </style>
 </head>
 <body>
@@ -209,6 +217,16 @@
             <label><i class="fas fa-list"></i> Chọn nội dung thi đấu <span style="color: #e94560;">*</span></label>
             <select id="category-select" onchange="onCategoryChange()"><option value="">-- Đang tải danh sách nội dung... --</option></select>
             <div class="hint"><i class="fas fa-info-circle"></i> Kết quả bốc thăm sẽ lưu theo nội dung này</div>
+
+            <!-- ✅ 2 NÚT QUẢN LÝ NỘI DUNG -->
+            <div class="category-actions">
+                <a id="btnManageCategories" href="categories.html" class="btn-info-sm">
+                    <i class="fas fa-cog"></i> ⚙️ Quản lý nội dung thi đấu
+                </a>
+                <a id="btnAddCategory" href="categories.html" class="btn-success-sm">
+                    <i class="fas fa-plus"></i> ➕ Thêm nội dung mới
+                </a>
+            </div>
         </div>
         <div class="form-row-add">
             <div class="form-group"><label>Tên VĐV / Đội</label><input type="text" id="team-input" placeholder="VD: Nguyễn Văn An"></div>
@@ -452,7 +470,7 @@
 (function() {
     'use strict';
 
-    console.log('🚀 draw.html v19 - Berger schedule + Compact Excel + URL param fix');
+    console.log('🚀 draw.html v20 - Thêm nút Quản lý nội dung');
 
     const config = window.SPORTSVN_CONFIG || {};
     const supabaseClient = window.supabase.createClient(config.SUPABASE_URL, config.SUPABASE_ANON_KEY);
@@ -556,7 +574,7 @@
     }
 
     // ==========================================
-    // SINH LỊCH VÒNG TRÒN CHUẨN BERGER TABLES
+    // SINH LỊCH VÒNG TRÒN CHUẨN BERGER
     // ==========================================
     function generateRoundRobinSchedule(n) {
         const hasBye = (n % 2 === 1);
@@ -587,14 +605,12 @@
 
     // ==========================================
     // LOAD CATEGORIES
-    // ✅ ĐÃ SỬA: Đọc cả ?id= và ?tournament_id=
+    // ✅ Đọc cả ?id= và ?tournament_id=
+    // ✅ Gắn link cho 2 nút Quản lý nội dung
     // ==========================================
     async function loadCategories() {
         const urlParams = new URLSearchParams(window.location.search);
-
-        // ✅ HỖ TRỢ CẢ 2 ĐỊNH DẠNG URL
         tournamentId = urlParams.get('tournament_id') || urlParams.get('id');
-
         window.tournamentId = tournamentId;
 
         if (!tournamentId) {
@@ -604,6 +620,12 @@
         }
 
         console.log('✅ Tournament ID:', tournamentId);
+
+        // ✅ GẮN LINK CHO 2 NÚT QUẢN LÝ NỘI DUNG
+        const btnManage = document.getElementById('btnManageCategories');
+        const btnAdd = document.getElementById('btnAddCategory');
+        if (btnManage) btnManage.href = `categories.html?tournament_id=${tournamentId}`;
+        if (btnAdd) btnAdd.href = `categories.html?tournament_id=${tournamentId}&action=add`;
 
         const { data, error } = await supabaseClient.from('categories')
             .select('id, name, category_type, scoring_type')
@@ -617,7 +639,7 @@
         categoriesList = data || [];
         const select = document.getElementById('category-select');
         if (categoriesList.length === 0) {
-            select.innerHTML = '<option value="">-- Chưa có nội dung nào --</option>';
+            select.innerHTML = '<option value="">-- Chưa có nội dung nào — Bấm "➕ Thêm nội dung mới" --</option>';
             return;
         }
         select.innerHTML = '<option value="">-- Chọn nội dung thi đấu --</option>' +
@@ -2390,7 +2412,7 @@
         }
     });
 
-    console.log('✅ draw.html v19 loaded');
+    console.log('✅ draw.html v20 loaded - Có nút Quản lý nội dung');
 
 })();
 </script>
