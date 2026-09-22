@@ -1,0 +1,702 @@
+<!DOCTYPE html>
+<html lang="vi">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Chuyển Knockout - SportsVN</title>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <style>
+        * { margin: 0; padding: 0; box-sizing: border-box; font-family: 'Segoe UI', system-ui, sans-serif; }
+        body { background: #f0f2f8; min-height: 100vh; padding: 24px; }
+        .container { max-width: 1400px; margin: 0 auto; }
+
+        .header {
+            background: linear-gradient(135deg, #0d1b3e, #1a3a7a);
+            border-radius: 20px; padding: 28px 32px; color: #fff;
+            margin-bottom: 24px; display: flex; justify-content: space-between;
+            align-items: center; flex-wrap: wrap; gap: 16px;
+        }
+        .header h1 { font-size: 26px; margin-bottom: 6px; }
+        .header p { opacity: 0.85; font-size: 14px; }
+        .header-actions { display: flex; gap: 10px; flex-wrap: wrap; }
+        .btn {
+            padding: 11px 22px; border-radius: 10px; font-size: 14px;
+            font-weight: 700; cursor: pointer; border: none;
+            transition: all 0.3s ease; text-decoration: none;
+            display: inline-flex; align-items: center; gap: 8px;
+        }
+        .btn:hover { transform: translateY(-2px); }
+        .btn-primary { background: #e94560; color: #fff; }
+        .btn-outline { background: transparent; color: #fff; border: 2px solid #fff; }
+        .btn-outline:hover { background: #fff; color: #0d1b3e; }
+        .btn-success { background: #00b894; color: #fff; }
+
+        .panel {
+            background: #fff; border-radius: 16px; padding: 24px;
+            box-shadow: 0 4px 20px rgba(0,0,0,0.08); margin-bottom: 20px;
+        }
+        .panel-header {
+            display: flex; justify-content: space-between; align-items: center;
+            margin-bottom: 20px; padding-bottom: 14px;
+            border-bottom: 2px solid #f0f2f8;
+            flex-wrap: wrap; gap: 12px;
+        }
+        .panel-header h2 { font-size: 20px; color: #1a1a2e; }
+        .panel-header p { font-size: 13px; color: #6c757d; margin-top: 4px; }
+
+        .category-select {
+            display: flex; gap: 8px; margin-bottom: 20px;
+            overflow-x: auto; padding-bottom: 8px;
+        }
+        .cat-btn {
+            padding: 12px 20px; border-radius: 10px; cursor: pointer;
+            font-weight: 700; font-size: 13px; color: #6c757d;
+            background: #f8f9fa; border: 2px solid transparent;
+            white-space: nowrap; transition: all 0.2s;
+            font-family: inherit;
+        }
+        .cat-btn.active { background: #0d1b3e; color: #fff; }
+        .cat-btn:hover:not(.active) { border-color: #1a3a7a; color: #1a3a7a; }
+
+        .groups-preview {
+            display: grid; grid-template-columns: repeat(auto-fill, minmax(320px, 1fr));
+            gap: 16px; margin-bottom: 20px;
+        }
+        .group-card {
+            background: #f8f9fa; border: 2px solid #e9ecef;
+            border-radius: 12px; padding: 16px;
+        }
+        .group-card h3 {
+            font-size: 15px; color: #0d47a1; margin-bottom: 12px;
+            padding-bottom: 8px; border-bottom: 2px solid #e9ecef;
+        }
+        .team-standings-row {
+            display: flex; justify-content: space-between; align-items: center;
+            padding: 8px 10px; border-radius: 8px;
+            margin-bottom: 6px; background: #fff;
+            border: 2px solid transparent;
+            cursor: pointer;
+            transition: all 0.2s;
+        }
+        .team-standings-row:hover { border-color: #1a3a7a; }
+        .team-standings-row.selected {
+            background: #d4edda; border-color: #00b894;
+        }
+        .team-standings-row .team-name {
+            font-size: 13px; font-weight: 700; color: #1a1a2e;
+        }
+        .team-standings-row .team-stats {
+            font-size: 11px; color: #6c757d;
+        }
+        .team-standings-row .check-icon {
+            color: #adb5bd; font-size: 18px;
+        }
+        .team-standings-row.selected .check-icon {
+            color: #00b894;
+        }
+
+        .selection-info {
+            background: #e3f2fd; border: 2px solid #64b5f6;
+            border-radius: 12px; padding: 16px 20px;
+            margin-bottom: 20px;
+            display: flex; justify-content: space-between; align-items: center;
+            flex-wrap: wrap; gap: 12px;
+        }
+        .selection-info .info-text {
+            font-size: 14px; color: #0d47a1; font-weight: 700;
+        }
+        .selection-info .info-text strong { color: #e94560; }
+
+        .bracket-preview {
+            background: #fff; border: 2px dashed #64b5f6;
+            border-radius: 12px; padding: 24px;
+            text-align: center; color: #1565c0;
+        }
+        .bracket-preview .bracket-icon {
+            font-size: 48px; margin-bottom: 12px; opacity: 0.5;
+        }
+
+        .alert {
+            padding: 14px 18px; border-radius: 10px; margin-bottom: 16px;
+            font-size: 14px; display: none;
+        }
+        .alert.show { display: block; }
+        .alert.error { background: #f8d7da; color: #721c24; }
+        .alert.success { background: #d4edda; color: #155724; }
+        .alert.info { background: #cce5ff; color: #004085; }
+
+        .loading {
+            text-align: center; padding: 60px 20px; color: #6c757d;
+        }
+        .loading i {
+            font-size: 40px; color: #dee2e6;
+            animation: spin 1s linear infinite; display: block;
+            margin-bottom: 16px;
+        }
+        @keyframes spin { from { transform: rotate(0deg); } to { transform: rotate(360deg); } }
+
+        .empty-state {
+            text-align: center; padding: 60px 20px; color: #6c757d;
+        }
+        .empty-state i {
+            font-size: 56px; color: #dee2e6;
+            margin-bottom: 16px; display: block;
+        }
+    </style>
+</head>
+<body>
+
+<div class="container">
+    <div class="header">
+        <div>
+            <h1>🏆 Chuyển sang vòng Knockout</h1>
+            <p id="tournament-name">Đang tải...</p>
+        </div>
+        <div class="header-actions">
+            <a href="tournaments.html" class="btn btn-outline">
+                <i class="fas fa-arrow-left"></i> Quay lại
+            </a>
+            <a href="#" id="btn-view-schedule" class="btn btn-outline">
+                <i class="fas fa-calendar"></i> Xem lịch
+            </a>
+        </div>
+    </div>
+
+    <div id="alert" class="alert"></div>
+
+    <!-- STEP 1: Chọn nội dung -->
+    <div class="panel">
+        <div class="panel-header">
+            <div>
+                <h2>📋 Bước 1: Chọn nội dung</h2>
+                <p>Chọn nội dung vòng bảng để chuyển sang knockout</p>
+            </div>
+        </div>
+        <div class="category-select" id="category-select"></div>
+    </div>
+
+    <!-- STEP 2: Chọn đội vào knockout -->
+    <div class="panel" id="selection-panel" style="display: none;">
+        <div class="panel-header">
+            <div>
+                <h2>👥 Bước 2: Chọn đội vào vòng Knockout</h2>
+                <p>Click vào từng đội để chọn. Cần chọn đúng số đội (VD: 4, 8, 16)</p>
+            </div>
+        </div>
+
+        <div class="selection-info">
+            <div class="info-text">
+                Đã chọn: <strong id="selected-count">0</strong> / <span id="target-count">8</span> đội
+            </div>
+            <button class="btn btn-success" onclick="autoSelectTop()">
+                <i class="fas fa-magic"></i> Tự động chọn Top
+            </button>
+        </div>
+
+        <div class="groups-preview" id="groups-preview"></div>
+    </div>
+
+    <!-- STEP 3: Tạo bracket -->
+    <div class="panel" id="bracket-panel" style="display: none;">
+        <div class="panel-header">
+            <div>
+                <h2>🎯 Bước 3: Tạo bracket Knockout</h2>
+                <p>Hệ thống sẽ tạo bracket từ các đội đã chọn</p>
+            </div>
+        </div>
+
+        <div class="bracket-preview">
+            <div class="bracket-icon">🏆</div>
+            <p style="margin-bottom: 16px;">
+                Bracket sẽ được tạo tự động dựa trên số đội đã chọn.
+            </p>
+            <div id="bracket-info" style="font-size: 14px; margin-bottom: 16px;"></div>
+            <button class="btn btn-primary" onclick="createKnockoutBracket()" 
+                    style="font-size: 16px; padding: 14px 32px;">
+                <i class="fas fa-trophy"></i> Tạo bracket & Xếp lịch
+            </button>
+        </div>
+    </div>
+</div>
+
+<script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+<script src="config.js"></script>
+<script>
+(function() {
+    'use strict';
+
+    console.log('🚀 knockout.html v1');
+
+    const config = window.SPORTSVN_CONFIG || {};
+    if (!config.SUPABASE_URL || !config.SUPABASE_ANON_KEY) {
+        document.body.innerHTML = '<p style="color:red;padding:40px;">Lỗi cấu hình</p>';
+        return;
+    }
+
+    const supabaseClient = window.supabase.createClient(config.SUPABASE_URL, config.SUPABASE_ANON_KEY);
+
+    let tournamentId = null;
+    let tournament = null;
+    let draws = [];
+    let categories = [];
+    let schedules = [];
+    let selectedCategory = null;
+    let selectedTeams = new Set();
+
+    // ==========================================
+    // INIT
+    // ==========================================
+    async function init() {
+        const params = new URLSearchParams(window.location.search);
+        tournamentId = params.get('id') || params.get('tournament_id');
+
+        if (!tournamentId) {
+            showAlert('Thiếu ID giải đấu', 'error');
+            return;
+        }
+
+        document.getElementById('btn-view-schedule').href = `schedule.html?id=${tournamentId}`;
+
+        const { data: { session } } = await supabaseClient.auth.getSession();
+        if (!session) {
+            window.location.href = 'login.html';
+            return;
+        }
+
+        await loadData();
+    }
+
+    // ==========================================
+    // LOAD DATA
+    // ==========================================
+    async function loadData() {
+        try {
+            const { data: tour } = await supabaseClient
+                .from('tournaments')
+                .select('*')
+                .eq('id', tournamentId)
+                .single();
+            tournament = tour;
+
+            document.getElementById('tournament-name').textContent =
+                `${tournament.name} · ${tournament.sport || ''}`;
+
+            const { data: cats } = await supabaseClient
+                .from('categories')
+                .select('*')
+                .eq('tournament_id', tournamentId);
+            categories = cats || [];
+
+            const { data: drawsData } = await supabaseClient
+                .from('draws')
+                .select('*')
+                .eq('tournament_id', tournamentId);
+            draws = drawsData || [];
+
+            const { data: scheds } = await supabaseClient
+                .from('schedules')
+                .select('*')
+                .eq('tournament_id', tournamentId);
+            schedules = scheds || [];
+
+            renderCategorySelect();
+
+        } catch (error) {
+            console.error('❌', error);
+            showAlert('Lỗi: ' + error.message, 'error');
+        }
+    }
+
+    // ==========================================
+    // RENDER: CATEGORY SELECT
+    // ==========================================
+    function renderCategorySelect() {
+        const container = document.getElementById('category-select');
+
+        if (categories.length === 0) {
+            container.innerHTML = '<p style="color:#6c757d;padding:10px;">Chưa có nội dung</p>';
+            return;
+        }
+
+        container.innerHTML = categories.map(cat => {
+            // Chỉ hiện nội dung vòng bảng
+            const catDraws = draws.filter(d => d.category === cat.name);
+            const isKnockout = catDraws[0]?.draw_type === 'knockout';
+            if (isKnockout) return '';
+
+            return `
+                <button class="cat-btn ${selectedCategory === cat.name ? 'active' : ''}"
+                        onclick="selectCategory('${escapeHtml(cat.name)}')">
+                    ${escapeHtml(cat.name)} (${catDraws.length})
+                </button>
+            `;
+        }).join('');
+    }
+
+    window.selectCategory = function(catName) {
+        selectedCategory = catName;
+        selectedTeams.clear();
+        renderCategorySelect();
+        renderSelectionPanel();
+    };
+
+    // ==========================================
+    // RENDER: SELECTION PANEL
+    // ==========================================
+    function renderSelectionPanel() {
+        const panel = document.getElementById('selection-panel');
+        const preview = document.getElementById('groups-preview');
+
+        if (!selectedCategory) {
+            panel.style.display = 'none';
+            return;
+        }
+
+        panel.style.display = 'block';
+        document.getElementById('bracket-panel').style.display = 'block';
+
+        // Nhóm theo bảng
+        const catDraws = draws.filter(d => d.category === selectedCategory);
+        const groups = {};
+        catDraws.forEach(d => {
+            const g = d.group_name || 'A';
+            if (!groups[g]) groups[g] = [];
+            groups[g].push(d);
+        });
+
+        // Tính BXH mỗi bảng
+        const groupStandings = {};
+        Object.keys(groups).forEach(gName => {
+            const standings = calculateStandings(selectedCategory, gName, groups[gName]);
+            groupStandings[gName] = standings;
+        });
+
+        // Render từng bảng
+        preview.innerHTML = Object.keys(groups).sort().map(gName => {
+            const standings = groupStandings[gName];
+            return `
+                <div class="group-card">
+                    <h3>🏓 BẢNG ${gName}</h3>
+                    ${standings.map((s, idx) => `
+                        <div class="team-standings-row ${selectedTeams.has(s.name) ? 'selected' : ''}"
+                             onclick="toggleTeam('${escapeHtml(s.name)}')">
+                            <div>
+                                <div class="team-name">
+                                    ${idx + 1}. ${escapeHtml(s.name)}
+                                </div>
+                                <div class="team-stats">
+                                    ${s.wins}W - ${s.losses}L · ${s.points} điểm
+                                </div>
+                            </div>
+                            <i class="fas fa-check-circle check-icon"></i>
+                        </div>
+                    `).join('')}
+                </div>
+            `;
+        }).join('');
+
+        updateSelectionInfo();
+    }
+
+    window.toggleTeam = function(teamName) {
+        if (selectedTeams.has(teamName)) {
+            selectedTeams.delete(teamName);
+        } else {
+            selectedTeams.add(teamName);
+        }
+        renderSelectionPanel();
+    };
+
+    window.autoSelectTop = function() {
+        if (!selectedCategory) return;
+
+        const catDraws = draws.filter(d => d.category === selectedCategory);
+        const groups = {};
+        catDraws.forEach(d => {
+            const g = d.group_name || 'A';
+            if (!groups[g]) groups[g] = [];
+            groups[g].push(d);
+        });
+
+        const numGroups = Object.keys(groups).length;
+        // Tự động chọn top 2 từ mỗi bảng
+        const topPerGroup = 2;
+
+        selectedTeams.clear();
+        Object.keys(groups).forEach(gName => {
+            const standings = calculateStandings(selectedCategory, gName, groups[gName]);
+            standings.slice(0, topPerGroup).forEach(s => {
+                selectedTeams.add(s.name);
+            });
+        });
+
+        renderSelectionPanel();
+        showAlert(`✅ Đã tự động chọn top ${topPerGroup} từ mỗi bảng (${selectedTeams.size} đội)`, 'success');
+    };
+
+    function updateSelectionInfo() {
+        const count = selectedTeams.size;
+        const target = document.getElementById('target-count');
+
+        // Tìm bracket size phù hợp
+        let bracketSize = 2;
+        while (bracketSize < count) bracketSize *= 2;
+
+        document.getElementById('selected-count').textContent = count;
+        target.textContent = bracketSize;
+
+        const infoEl = document.getElementById('bracket-info');
+        if (infoEl) {
+            const rounds = Math.log2(bracketSize);
+            let roundNames = [];
+            for (let i = 0; i < rounds; i++) {
+                const teamsInRound = bracketSize / Math.pow(2, i);
+                if (teamsInRound === 2) roundNames.push('Chung kết');
+                else if (teamsInRound === 4) roundNames.push('Bán kết');
+                else if (teamsInRound === 8) roundNames.push('Tứ kết');
+                else if (teamsInRound === 16) roundNames.push('Vòng 1/8');
+            }
+            infoEl.innerHTML = `
+                <strong>Bracket size:</strong> ${bracketSize} đội<br>
+                <strong>Các vòng:</strong> ${roundNames.join(' → ')}
+            `;
+        }
+    }
+
+    // ==========================================
+    // CALCULATE STANDINGS
+    // ==========================================
+    function calculateStandings(catName, groupName, groupDraws) {
+        const standings = {};
+        groupDraws.forEach(d => {
+            standings[d.team_name] = {
+                name: d.team_name,
+                played: 0, wins: 0, losses: 0, points: 0
+            };
+        });
+
+        const catSchedules = schedules.filter(s =>
+            s.notes && s.notes.includes(catName) && s.notes.includes(`Bảng ${groupName}`)
+        );
+
+        catSchedules.forEach(m => {
+            if (m.status !== 'completed') return;
+            if (m.score_a === null || m.score_b === null) return;
+
+            const a = standings[m.team_a_name];
+            const b = standings[m.team_b_name];
+            if (!a || !b) return;
+
+            a.played++; b.played++;
+            if (m.score_a > m.score_b) {
+                a.wins++; a.points += 2;
+                b.losses++;
+            } else {
+                b.wins++; b.points += 2;
+                a.losses++;
+            }
+        });
+
+        return Object.values(standings).sort((x, y) => {
+            if (y.points !== x.points) return y.points - x.points;
+            return y.wins - x.wins;
+        });
+    }
+
+    // ==========================================
+    // CREATE KNOCKOUT BRACKET
+    // ==========================================
+    window.createKnockoutBracket = async function() {
+        if (!selectedCategory) {
+            showAlert('Chọn nội dung trước', 'error');
+            return;
+        }
+
+        if (selectedTeams.size < 2) {
+            showAlert('Cần chọn ít nhất 2 đội', 'error');
+            return;
+        }
+
+        let bracketSize = 2;
+        while (bracketSize < selectedTeams.size) bracketSize *= 2;
+
+        if (bracketSize > 64) {
+            showAlert('Quá nhiều đội (tối đa 64)', 'error');
+            return;
+        }
+
+        if (!confirm(`Tạo bracket ${bracketSize} đội cho "${selectedCategory}"?\nCác trận cũ của nội dung này sẽ bị xóa.`)) return;
+
+        showAlert('⏳ Đang tạo bracket...', 'info');
+
+        try {
+            // Xóa schedules cũ của category này
+            await supabaseClient
+                .from('schedules')
+                .delete()
+                .eq('tournament_id', tournamentId)
+                .like('notes', `${selectedCategory}%`);
+
+            // Tạo match list cho bracket
+            const teams = Array.from(selectedTeams);
+            // Shuffle nhẹ để tránh trùng cặp
+            const shuffled = [...teams].sort(() => Math.random() - 0.5);
+
+            const allMatches = [];
+            let matchNum = 1;
+
+            // Vòng 1 (chỉ tạo khi số đội > bracketSize/2)
+            const numByes = bracketSize - teams.length;
+            const playing = shuffled.slice(numByes);
+
+            for (let i = 0; i < playing.length; i += 2) {
+                if (playing[i] && playing[i + 1]) {
+                    allMatches.push({
+                        team_a_name: playing[i],
+                        team_b_name: playing[i + 1],
+                        round_number: 1,
+                        match_number: matchNum,
+                        is_placeholder: false,
+                        notes: `${selectedCategory} - Bảng A - Vòng 1`
+                    });
+                    matchNum++;
+                }
+            }
+
+            // Placeholder các vòng sau
+            let teamsInNextRound = bracketSize / 2;
+            let roundNum = 2;
+            while (teamsInNextRound >= 2) {
+                let roundName;
+                if (teamsInNextRound === 2) roundName = 'Chung kết';
+                else if (teamsInNextRound === 4) roundName = 'Bán kết';
+                else if (teamsInNextRound === 8) roundName = 'Tứ kết';
+                else if (teamsInNextRound === 16) roundName = 'Vòng 1/8';
+                else roundName = `Vòng ${roundNum}`;
+
+                const numMatches = teamsInNextRound / 2;
+                for (let mi = 0; mi < numMatches; mi++) {
+                    allMatches.push({
+                        team_a_name: 'Chờ KQ',
+                        team_b_name: 'Chờ KQ',
+                        round_number: roundNum,
+                        match_number: mi + 1,
+                        is_placeholder: true,
+                        notes: `${selectedCategory} - Bảng A - ${roundName}`
+                    });
+                }
+                teamsInNextRound /= 2;
+                roundNum++;
+            }
+
+            // Tranh hạng 3
+            if (bracketSize >= 4) {
+                allMatches.push({
+                    team_a_name: 'Thua BK 1',
+                    team_b_name: 'Thua BK 2',
+                    round_number: 99,
+                    match_number: 1,
+                    is_placeholder: true,
+                    notes: `${selectedCategory} - Bảng A - Tranh hạng 3`
+                });
+            }
+
+            // Xếp lịch cho các trận
+            const venuesData = await supabaseClient
+                .from('venues')
+                .select('*')
+                .eq('tournament_id', tournamentId)
+                .order('court_number');
+
+            const venuesList = venuesData.data || [];
+            if (venuesList.length === 0) {
+                showAlert('Chưa có sân. Vào schedule.html để tạo sân trước.', 'error');
+                return;
+            }
+
+            // Xếp slot đơn giản: mỗi slot 45 phút, bắt đầu 08:00
+            const startDate = tournament.start_date || new Date().toISOString().slice(0, 10);
+            const matchDuration = 45;
+            const SLOT_DURATION = matchDuration + 15;
+
+            let dayOffset = 0;
+            let slotIndex = 0;
+            const slotsPerDay = venuesList.length * 10; // 10 slot/sân/ngày
+
+            const records = allMatches.map(m => {
+                const venueIdx = slotIndex % venuesList.length;
+                const slotInDay = Math.floor(slotIndex / venuesList.length);
+                const day = Math.floor(slotInDay / 10);
+                const slotInSession = slotInDay % 10;
+
+                const startTime = addMinutes('08:00', slotInSession * SLOT_DURATION);
+                const endTime = addMinutes(startTime, matchDuration);
+
+                const dateObj = new Date(startDate);
+                dateObj.setDate(dateObj.getDate() + day);
+                const matchDate = dateObj.toISOString().slice(0, 10);
+
+                slotIndex++;
+
+                return {
+                    tournament_id: tournamentId,
+                    venue_id: venuesList[venueIdx].id,
+                    match_date: matchDate,
+                    session: slotInDay < 5 ? 'morning' : 'afternoon',
+                    start_time: startTime,
+                    end_time: endTime,
+                    round_number: m.round_number,
+                    match_number: m.match_number,
+                    team_a_name: m.team_a_name,
+                    team_b_name: m.team_b_name,
+                    status: 'scheduled',
+                    notes: m.notes,
+                    is_placeholder: m.is_placeholder
+                };
+            });
+
+            const { error } = await supabaseClient
+                .from('schedules')
+                .insert(records);
+
+            if (error) throw error;
+
+            showAlert(`✅ Đã tạo bracket ${bracketSize} đội với ${records.length} trận!`, 'success');
+
+            setTimeout(() => {
+                window.location.href = `schedule.html?id=${tournamentId}`;
+            }, 1500);
+
+        } catch (error) {
+            console.error('❌', error);
+            showAlert('Lỗi: ' + error.message, 'error');
+        }
+    };
+
+    // ==========================================
+    // HELPERS
+    // ==========================================
+    function addMinutes(time, mins) {
+        const [h, m] = time.split(':').map(Number);
+        const total = h * 60 + m + mins;
+        return `${String(Math.floor(total / 60) % 24).padStart(2, '0')}:${String(total % 60).padStart(2, '0')}`;
+    }
+
+    function escapeHtml(text) {
+        return String(text || '').replace(/&/g, '&amp;').replace(/</g, '&lt;')
+            .replace(/>/g, '&gt;').replace(/"/g, '&quot;');
+    }
+
+    function showAlert(message, type) {
+        const el = document.getElementById('alert');
+        el.textContent = message;
+        el.className = 'alert show ' + type;
+        if (type !== 'info') setTimeout(() => { el.className = 'alert'; }, 5000);
+    }
+
+    init();
+})();
+</script>
+
+</body>
+</html>
