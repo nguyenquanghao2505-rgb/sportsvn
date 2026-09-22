@@ -191,7 +191,6 @@
         .branch-upper { background: #e7f3ff; color: #1a3a7a; }
         .branch-lower { background: #fff8e6; color: #856404; }
 
-        /* ✅ CSS cho 2 nút quản lý nội dung */
         .category-actions {
             margin-top: 12px;
             display: flex;
@@ -218,7 +217,6 @@
             <select id="category-select" onchange="onCategoryChange()"><option value="">-- Đang tải danh sách nội dung... --</option></select>
             <div class="hint"><i class="fas fa-info-circle"></i> Kết quả bốc thăm sẽ lưu theo nội dung này</div>
 
-            <!-- ✅ 2 NÚT QUẢN LÝ NỘI DUNG -->
             <div class="category-actions">
                 <a id="btnManageCategories" href="categories.html" class="btn-info-sm">
                     <i class="fas fa-cog"></i> ⚙️ Quản lý nội dung thi đấu
@@ -470,7 +468,7 @@
 (function() {
     'use strict';
 
-    console.log('🚀 draw.html v20 - Thêm nút Quản lý nội dung');
+    console.log('🚀 draw.html v21 - Lưu config localStorage');
 
     const config = window.SPORTSVN_CONFIG || {};
     const supabaseClient = window.supabase.createClient(config.SUPABASE_URL, config.SUPABASE_ANON_KEY);
@@ -605,8 +603,6 @@
 
     // ==========================================
     // LOAD CATEGORIES
-    // ✅ Đọc cả ?id= và ?tournament_id=
-    // ✅ Gắn link cho 2 nút Quản lý nội dung
     // ==========================================
     async function loadCategories() {
         const urlParams = new URLSearchParams(window.location.search);
@@ -621,7 +617,6 @@
 
         console.log('✅ Tournament ID:', tournamentId);
 
-        // ✅ GẮN LINK CHO 2 NÚT QUẢN LÝ NỘI DUNG
         const btnManage = document.getElementById('btnManageCategories');
         const btnAdd = document.getElementById('btnAddCategory');
         if (btnManage) btnManage.href = `categories.html?tournament_id=${tournamentId}`;
@@ -2303,6 +2298,7 @@
 
     // ==========================================
     // SAVE TO DATABASE
+    // ✅ ĐÃ THÊM: Lưu config vào localStorage
     // ==========================================
     window.saveToDatabase = async function() {
         const result = lastResult;
@@ -2372,6 +2368,23 @@
             await supabaseClient.from('draws').delete().eq('tournament_id', tournamentId).eq('category', category);
             const { error } = await supabaseClient.from('draws').insert(records);
             if (error) throw error;
+
+            // ✅ LƯU CẤU HÌNH VÀO LOCALSTORAGE ĐỂ SCHEDULE.HTML ĐỌC
+            const scheduleConfigToSave = {
+                startDate: document.getElementById('start-date')?.value || new Date().toISOString().slice(0, 10),
+                numDays: parseInt(document.getElementById('num-days')?.value) || 3,
+                numSessions: parseInt(document.getElementById('num-sessions')?.value) || 5,
+                numTables: parseInt(document.getElementById('num-tables')?.value) || 4,
+                timeMorning: document.getElementById('time-morning')?.value || '07:30',
+                timeAfternoon: document.getElementById('time-afternoon')?.value || '13:30',
+                timeEvening: document.getElementById('time-evening')?.value || '18:00',
+                matchDuration: 45
+            };
+
+            localStorage.setItem(`sportsvn_config_${tournamentId}`, JSON.stringify(scheduleConfigToSave));
+            localStorage.setItem('sportsvn_config', JSON.stringify(scheduleConfigToSave));
+            console.log('✅ Đã lưu config vào localStorage:', scheduleConfigToSave);
+
             showAlert(`✅ Đã lưu ${records.length} VĐV cho "${category}"! Đang chuyển trang...`, 'success');
             setTimeout(() => { window.location.href = 'categories.html?tournament_id=' + tournamentId; }, 1500);
         } catch (error) {
@@ -2412,7 +2425,7 @@
         }
     });
 
-    console.log('✅ draw.html v20 loaded - Có nút Quản lý nội dung');
+    console.log('✅ draw.html v21 loaded - Lưu config localStorage');
 
 })();
 </script>
