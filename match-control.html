@@ -1,0 +1,840 @@
+<!DOCTYPE html>
+<html lang="vi">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Điều hành trận đấu - SportsVN</title>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <style>
+        * { margin: 0; padding: 0; box-sizing: border-box; font-family: 'Segoe UI', system-ui, sans-serif; }
+        body { background: #f0f2f8; min-height: 100vh; padding: 24px; }
+        .container { max-width: 1600px; margin: 0 auto; }
+
+        .header {
+            background: linear-gradient(135deg, #0d1b3e, #1a3a7a);
+            border-radius: 20px; padding: 28px 32px; color: #fff;
+            margin-bottom: 24px; display: flex; justify-content: space-between;
+            align-items: center; flex-wrap: wrap; gap: 16px;
+        }
+        .header h1 { font-size: 26px; margin-bottom: 6px; }
+        .header p { opacity: 0.85; font-size: 14px; }
+        .header-actions { display: flex; gap: 10px; flex-wrap: wrap; }
+        .btn {
+            padding: 11px 22px; border-radius: 10px; font-size: 14px;
+            font-weight: 700; cursor: pointer; border: none;
+            transition: all 0.3s ease; text-decoration: none;
+            display: inline-flex; align-items: center; gap: 8px;
+        }
+        .btn:hover { transform: translateY(-2px); }
+        .btn-primary { background: #e94560; color: #fff; }
+        .btn-outline { background: transparent; color: #fff; border: 2px solid #fff; }
+        .btn-outline:hover { background: #fff; color: #0d1b3e; }
+        .btn-success { background: #00b894; color: #fff; }
+        .btn-warning { background: #f39c12; color: #fff; }
+        .btn-info { background: #0984e3; color: #fff; }
+
+        .stats-bar {
+            display: grid; grid-template-columns: repeat(auto-fit, minmax(180px, 1fr));
+            gap: 16px; margin-bottom: 24px;
+        }
+        .stat-card {
+            background: #fff; border-radius: 14px; padding: 18px 20px;
+            box-shadow: 0 4px 15px rgba(0,0,0,0.06);
+        }
+        .stat-card .label { font-size: 12px; color: #6c757d; text-transform: uppercase; letter-spacing: 0.5px; margin-bottom: 6px; }
+        .stat-card .value { font-size: 26px; font-weight: 800; color: #1a3a7a; }
+        .stat-card .sub { font-size: 12px; color: #6c757d; margin-top: 4px; }
+
+        .panel {
+            background: #fff; border-radius: 16px; padding: 24px;
+            box-shadow: 0 4px 20px rgba(0,0,0,0.08); margin-bottom: 20px;
+        }
+        .panel-header {
+            display: flex; justify-content: space-between; align-items: center;
+            margin-bottom: 20px; padding-bottom: 14px;
+            border-bottom: 2px solid #f0f2f8;
+            flex-wrap: wrap; gap: 12px;
+        }
+        .panel-header h2 { font-size: 20px; color: #1a1a2e; }
+        .panel-header p { font-size: 13px; color: #6c757d; margin-top: 4px; }
+
+        .filter-row {
+            display: flex; gap: 12px; margin-bottom: 16px;
+            flex-wrap: wrap; align-items: center;
+        }
+        .filter-row label {
+            font-size: 12px; font-weight: 700; color: #6c757d;
+            text-transform: uppercase;
+        }
+        .filter-row select, .filter-row input {
+            padding: 9px 14px; border: 2px solid #e9ecef;
+            border-radius: 8px; font-size: 13px;
+            font-family: inherit; background: #fff;
+            transition: all 0.2s;
+        }
+        .filter-row select:focus, .filter-row input:focus {
+            border-color: #1a3a7a; outline: none;
+        }
+
+        .courts-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fill, minmax(380px, 1fr));
+            gap: 16px;
+        }
+
+        .court-control {
+            background: #f8f9fa; border: 2px solid #e9ecef;
+            border-radius: 14px; padding: 16px;
+        }
+        .court-control.active { border-color: #00b894; background: #f0fdf4; }
+        .court-control.live { border-color: #e94560; background: #fff5f7; animation: pulse 2s infinite; }
+        @keyframes pulse {
+            0%, 100% { box-shadow: 0 0 0 0 rgba(233,69,96,0.3); }
+            50% { box-shadow: 0 0 0 8px rgba(233,69,96,0); }
+        }
+
+        .court-header {
+            display: flex; justify-content: space-between; align-items: center;
+            margin-bottom: 12px; padding-bottom: 10px;
+            border-bottom: 2px solid rgba(0,0,0,0.05);
+        }
+        .court-name {
+            font-size: 14px; font-weight: 800; color: #1a3a7a;
+            text-transform: uppercase;
+        }
+        .court-status {
+            font-size: 11px; padding: 4px 10px; border-radius: 12px;
+            font-weight: 700; text-transform: uppercase;
+        }
+        .court-status.free { background: #e9ecef; color: #6c757d; }
+        .court-status.busy { background: #fff3cd; color: #856404; }
+        .court-status.live { background: #f8d7da; color: #721c24; }
+
+        .match-control-item {
+            background: #fff; border-radius: 10px; padding: 14px;
+            margin-bottom: 10px; border: 1px solid #e9ecef;
+        }
+        .match-control-item:last-child { margin-bottom: 0; }
+
+        .match-control-header {
+            display: flex; justify-content: space-between; align-items: center;
+            margin-bottom: 10px;
+        }
+        .match-control-time {
+            font-size: 13px; font-weight: 800; color: #1a3a7a;
+        }
+        .match-control-badge {
+            font-size: 10px; padding: 3px 8px; border-radius: 8px;
+            font-weight: 700; text-transform: uppercase;
+        }
+        .badge-scheduled { background: #dbeafe; color: #1e40af; }
+        .badge-live { background: #fee2e2; color: #991b1b; }
+        .badge-completed { background: #d1fae5; color: #065f46; }
+
+        .match-control-teams {
+            display: grid; grid-template-columns: 1fr auto 1fr;
+            gap: 8px; align-items: center; margin-bottom: 10px;
+        }
+        .match-control-team {
+            font-size: 13px; font-weight: 700;
+            padding: 8px 10px; border-radius: 6px;
+            background: #f8f9fa; text-align: center;
+        }
+        .match-control-team.winner {
+            background: #d1fae5; color: #065f46;
+        }
+        .match-control-vs {
+            font-weight: 800; color: #adb5bd; font-size: 11px;
+        }
+
+        .match-control-score {
+            display: flex; justify-content: center; gap: 8px;
+            margin-bottom: 10px;
+        }
+        .score-input-sm {
+            width: 50px; padding: 6px 8px;
+            border: 2px solid #e9ecef; border-radius: 6px;
+            font-size: 16px; font-weight: 800;
+            text-align: center; font-family: inherit;
+        }
+        .score-input-sm:focus {
+            border-color: #1a3a7a; outline: none;
+        }
+
+        .match-control-actions {
+            display: flex; gap: 6px; justify-content: flex-end;
+            flex-wrap: wrap;
+        }
+        .btn-xs {
+            padding: 6px 12px; border-radius: 6px;
+            font-size: 11px; font-weight: 700;
+            cursor: pointer; border: none;
+            display: inline-flex; align-items: center; gap: 4px;
+            transition: all 0.2s;
+        }
+        .btn-xs:hover { transform: translateY(-1px); }
+        .btn-start { background: #0984e3; color: #fff; }
+        .btn-finish { background: #00b894; color: #fff; }
+        .btn-cancel { background: #e94560; color: #fff; }
+        .btn-save-xs { background: #f39c12; color: #fff; }
+
+        .empty-state {
+            text-align: center; padding: 60px 20px; color: #6c757d;
+        }
+        .empty-state i {
+            font-size: 56px; color: #dee2e6;
+            margin-bottom: 16px; display: block;
+        }
+
+        .alert {
+            padding: 14px 18px; border-radius: 10px; margin-bottom: 16px;
+            font-size: 14px; display: none;
+        }
+        .alert.show { display: block; }
+        .alert.error { background: #f8d7da; color: #721c24; }
+        .alert.success { background: #d4edda; color: #155724; }
+        .alert.info { background: #cce5ff; color: #004085; }
+
+        .loading {
+            text-align: center; padding: 60px 20px; color: #6c757d;
+        }
+        .loading i {
+            font-size: 40px; color: #dee2e6;
+            animation: spin 1s linear infinite; display: block;
+            margin-bottom: 16px;
+        }
+        @keyframes spin { from { transform: rotate(0deg); } to { transform: rotate(360deg); } }
+    </style>
+</head>
+<body>
+
+<div class="container">
+    <div class="header">
+        <div>
+            <h1>🎮 Điều hành trận đấu</h1>
+            <p id="tournament-name">Đang tải...</p>
+        </div>
+        <div class="header-actions">
+            <a href="tournaments.html" class="btn btn-outline">
+                <i class="fas fa-arrow-left"></i> Quay lại
+            </a>
+            <a href="#" id="btn-view-results" class="btn btn-info">
+                <i class="fas fa-edit"></i> Nhập kết quả
+            </a>
+            <button class="btn btn-warning" onclick="autoRefresh()">
+                <i class="fas fa-sync"></i> Làm mới
+            </button>
+        </div>
+    </div>
+
+    <div id="alert" class="alert"></div>
+
+    <!-- STATS -->
+    <div class="stats-bar" id="stats-bar"></div>
+
+    <!-- FILTER -->
+    <div class="panel">
+        <div class="panel-header">
+            <div>
+                <h2>🔍 Bộ lọc</h2>
+                <p>Chọn ngày và buổi để xem trận đấu</p>
+            </div>
+        </div>
+        <div class="filter-row">
+            <label>Ngày:</label>
+            <select id="filter-date" onchange="renderCourts()"></select>
+            <label>Buổi:</label>
+            <select id="filter-session" onchange="renderCourts()">
+                <option value="all">Tất cả</option>
+                <option value="morning">Sáng</option>
+                <option value="afternoon">Chiều</option>
+                <option value="evening">Tối</option>
+            </select>
+            <label>Sân:</label>
+            <select id="filter-venue" onchange="renderCourts()">
+                <option value="all">Tất cả</option>
+            </select>
+            <label>Trạng thái:</label>
+            <select id="filter-status" onchange="renderCourts()">
+                <option value="all">Tất cả</option>
+                <option value="scheduled">Sắp đấu</option>
+                <option value="ongoing">Đang đấu</option>
+                <option value="completed">Đã xong</option>
+            </select>
+        </div>
+    </div>
+
+    <!-- COURTS -->
+    <div class="panel">
+        <div class="panel-header">
+            <div>
+                <h2>🏟️ Sân đấu</h2>
+                <p id="courts-count">Đang tải...</p>
+            </div>
+        </div>
+        <div class="courts-grid" id="courts-grid">
+            <div class="loading" style="grid-column:1/-1;">
+                <i class="fas fa-spinner"></i>
+                <p>Đang tải sân đấu...</p>
+            </div>
+        </div>
+    </div>
+</div>
+
+<script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+<script src="config.js"></script>
+<script>
+(function() {
+    'use strict';
+
+    console.log('🚀 match-control.html v1');
+
+    const config = window.SPORTSVN_CONFIG || {};
+    if (!config.SUPABASE_URL || !config.SUPABASE_ANON_KEY) {
+        document.body.innerHTML = '<p style="color:red;padding:40px;">Lỗi cấu hình</p>';
+        return;
+    }
+
+    const supabaseClient = window.supabase.createClient(config.SUPABASE_URL, config.SUPABASE_ANON_KEY);
+
+    let tournamentId = null;
+    let tournament = null;
+    let schedules = [];
+    let venues = [];
+    let categories = [];
+
+    // ==========================================
+    // INIT
+    // ==========================================
+    async function init() {
+        const params = new URLSearchParams(window.location.search);
+        tournamentId = params.get('id') || params.get('tournament_id');
+
+        if (!tournamentId) {
+            showAlert('Thiếu ID giải đấu', 'error');
+            return;
+        }
+
+        document.getElementById('btn-view-results').href = `results.html?id=${tournamentId}`;
+
+        const { data: { session } } = await supabaseClient.auth.getSession();
+        if (!session) {
+            window.location.href = 'login.html';
+            return;
+        }
+
+        await loadData();
+    }
+
+    // ==========================================
+    // LOAD DATA
+    // ==========================================
+    async function loadData() {
+        try {
+            const { data: tour } = await supabaseClient
+                .from('tournaments')
+                .select('*')
+                .eq('id', tournamentId)
+                .single();
+            tournament = tour;
+
+            document.getElementById('tournament-name').textContent =
+                `${tournament.name} · ${tournament.sport || ''}`;
+
+            const { data: vens } = await supabaseClient
+                .from('venues')
+                .select('*')
+                .eq('tournament_id', tournamentId)
+                .order('court_number');
+            venues = vens || [];
+
+            const { data: cats } = await supabaseClient
+                .from('categories')
+                .select('*')
+                .eq('tournament_id', tournamentId);
+            categories = cats || [];
+
+            const { data: scheds } = await supabaseClient
+                .from('schedules')
+                .select('*')
+                .eq('tournament_id', tournamentId)
+                .order('match_date')
+                .order('start_time');
+            schedules = scheds || [];
+
+            console.log('📊 Loaded:', { venues: venues.length, schedules: schedules.length });
+
+            renderStats();
+            renderFilters();
+            renderCourts();
+
+        } catch (error) {
+            console.error('❌', error);
+            showAlert('Lỗi: ' + error.message, 'error');
+        }
+    }
+
+    // ==========================================
+    // STATS
+    // ==========================================
+    function renderStats() {
+        const completed = schedules.filter(s => s.status === 'completed').length;
+        const live = schedules.filter(s => s.status === 'ongoing').length;
+        const pending = schedules.filter(s => s.status === 'scheduled' && !s.is_placeholder).length;
+
+        document.getElementById('stats-bar').innerHTML = `
+            <div class="stat-card">
+                <div class="label">Tổng trận</div>
+                <div class="value">${schedules.length}</div>
+                <div class="sub">${venues.length} sân</div>
+            </div>
+            <div class="stat-card">
+                <div class="label">Đang đấu</div>
+                <div class="value" style="color:#e94560;">${live}</div>
+                <div class="sub">Live</div>
+            </div>
+            <div class="stat-card">
+                <div class="label">Đã xong</div>
+                <div class="value" style="color:#00b894;">${completed}</div>
+                <div class="sub">Hoàn thành</div>
+            </div>
+            <div class="stat-card">
+                <div class="label">Chưa đấu</div>
+                <div class="value" style="color:#f39c12;">${pending}</div>
+                <div class="sub">Sắp diễn ra</div>
+            </div>
+        `;
+    }
+
+    // ==========================================
+    // FILTERS
+    // ==========================================
+    function renderFilters() {
+        const dates = [...new Set(schedules.map(s => s.match_date))].sort();
+        const dateSel = document.getElementById('filter-date');
+        dateSel.innerHTML = dates.map((d, i) => 
+            `<option value="${d}">Ngày ${i + 1} - ${formatDate(d)}</option>`
+        ).join('');
+
+        const venueSel = document.getElementById('filter-venue');
+        venueSel.innerHTML = '<option value="all">Tất cả</option>' + 
+            venues.map(v => 
+                `<option value="${v.id}">${v.court_name || 'Sân ' + v.court_number}</option>`
+            ).join('');
+    }
+
+    // ==========================================
+    // RENDER COURTS
+    // ==========================================
+    function renderCourts() {
+        const grid = document.getElementById('courts-grid');
+        const dateFilter = document.getElementById('filter-date').value;
+        const sessionFilter = document.getElementById('filter-session').value;
+        const venueFilter = document.getElementById('filter-venue').value;
+        const statusFilter = document.getElementById('filter-status').value;
+
+        let filtered = schedules.filter(s => s.match_date === dateFilter);
+
+        if (sessionFilter !== 'all') {
+            filtered = filtered.filter(s => s.session === sessionFilter);
+        }
+        if (venueFilter !== 'all') {
+            filtered = filtered.filter(s => s.venue_id === venueFilter);
+        }
+        if (statusFilter !== 'all') {
+            filtered = filtered.filter(s => s.status === statusFilter);
+        }
+
+        if (filtered.length === 0) {
+            grid.innerHTML = `
+                <div class="empty-state" style="grid-column:1/-1;">
+                    <i class="fas fa-calendar-times"></i>
+                    <h3>Không có trận nào</h3>
+                    <p>Thử đổi bộ lọc hoặc chọn ngày khác</p>
+                </div>
+            `;
+            document.getElementById('courts-count').textContent = '0 trận';
+            return;
+        }
+
+        // Nhóm theo sân
+        const byVenue = {};
+        filtered.forEach(s => {
+            if (!byVenue[s.venue_id]) byVenue[s.venue_id] = [];
+            byVenue[s.venue_id].push(s);
+        });
+
+        let html = '';
+        venues.forEach(venue => {
+            const matches = byVenue[venue.id] || [];
+            const hasLive = matches.some(m => m.status === 'ongoing');
+            const hasBusy = matches.some(m => m.status === 'ongoing' || m.status === 'completed');
+
+            let courtClass = 'court-control';
+            let statusText = 'Trống';
+            let statusClass = 'free';
+
+            if (hasLive) {
+                courtClass += ' live';
+                statusText = 'Đang đấu';
+                statusClass = 'live';
+            } else if (hasBusy) {
+                courtClass += ' active';
+                statusText = 'Có trận';
+                statusClass = 'busy';
+            }
+
+            html += `
+                <div class="${courtClass}">
+                    <div class="court-header">
+                        <div class="court-name">${escapeHtml(venue.court_name || 'Sân ' + venue.court_number)}</div>
+                        <span class="court-status ${statusClass}">${statusText}</span>
+                    </div>
+                    ${matches.length === 0 ? 
+                        '<p style="color:#adb5bd;font-style:italic;text-align:center;padding:20px 0;">Không có trận</p>' :
+                        matches.map(m => renderMatchControl(m)).join('')
+                    }
+                </div>
+            `;
+        });
+
+        grid.innerHTML = html;
+        document.getElementById('courts-count').textContent = 
+            `${filtered.length} trận · ${Object.keys(byVenue).length} sân`;
+    }
+
+    function renderMatchControl(m) {
+        const badgeMap = {
+            scheduled: { class: 'badge-scheduled', text: 'Sắp đấu' },
+            ongoing: { class: 'badge-live', text: '🔴 Đang đấu' },
+            completed: { class: 'badge-completed', text: '✓ Đã xong' }
+        };
+        const badge = badgeMap[m.status] || badgeMap.scheduled;
+
+        const winnerA = m.winner_name && m.winner_name === m.team_a_name;
+        const winnerB = m.winner_name && m.winner_name === m.team_b_name;
+
+        const catName = extractCategoryName(m.notes) || '';
+        const roundInfo = m.round_number ? `V${m.round_number}` : '';
+
+        return `
+            <div class="match-control-item">
+                <div class="match-control-header">
+                    <span class="match-control-time">
+                        ${formatTime(m.start_time)} · ${escapeHtml(catName)}
+                    </span>
+                    <span class="match-control-badge ${badge.class}">${badge.text}</span>
+                </div>
+
+                <div class="match-control-teams">
+                    <div class="match-control-team ${winnerA ? 'winner' : ''}">
+                        ${escapeHtml(m.team_a_name || '—')}
+                    </div>
+                    <div class="match-control-vs">VS</div>
+                    <div class="match-control-team ${winnerB ? 'winner' : ''}">
+                        ${escapeHtml(m.team_b_name || '—')}
+                    </div>
+                </div>
+
+                ${!m.is_placeholder ? `
+                    <div class="match-control-score">
+                        <input type="number" class="score-input-sm"
+                               value="${m.score_a ?? ''}" placeholder="0"
+                               data-match-id="${m.id}" data-side="a"
+                               ${m.status === 'completed' ? 'disabled' : ''}>
+                        <span style="font-weight:800;color:#adb5bd;font-size:18px;line-height:36px;">-</span>
+                        <input type="number" class="score-input-sm"
+                               value="${m.score_b ?? ''}" placeholder="0"
+                               data-match-id="${m.id}" data-side="b"
+                               ${m.status === 'completed' ? 'disabled' : ''}>
+                    </div>
+                ` : `
+                    <div style="text-align:center;font-size:11px;color:#1565c0;font-style:italic;margin:8px 0;">
+                        ⏳ Chờ KQ
+                    </div>
+                `}
+
+                <div class="match-control-actions">
+                    ${m.status === 'scheduled' && !m.is_placeholder ? `
+                        <button class="btn-xs btn-start" onclick="startMatch('${m.id}')">
+                            <i class="fas fa-play"></i> Bắt đầu
+                        </button>
+                    ` : ''}
+                    ${m.status === 'ongoing' ? `
+                        <button class="btn-xs btn-save-xs" onclick="saveLiveScore('${m.id}')">
+                            <i class="fas fa-save"></i> Lưu điểm
+                        </button>
+                        <button class="btn-xs btn-finish" onclick="finishMatch('${m.id}')">
+                            <i class="fas fa-flag-checkered"></i> Kết thúc
+                        </button>
+                    ` : ''}
+                    ${m.status === 'completed' ? `
+                        <button class="btn-xs btn-cancel" onclick="reopenMatch('${m.id}')">
+                            <i class="fas fa-undo"></i> Mở lại
+                        </button>
+                    ` : ''}
+                </div>
+            </div>
+        `;
+    }
+
+    // ==========================================
+    // ACTIONS
+    // ==========================================
+    window.startMatch = async function(matchId) {
+        try {
+            const { error } = await supabaseClient
+                .from('schedules')
+                .update({
+                    status: 'ongoing',
+                    actual_start_time: new Date().toISOString()
+                })
+                .eq('id', matchId);
+
+            if (error) throw error;
+
+            const m = schedules.find(s => s.id === matchId);
+            if (m) {
+                m.status = 'ongoing';
+                m.actual_start_time = new Date().toISOString();
+            }
+
+            showAlert('🔴 Trận đấu bắt đầu!', 'success');
+            renderStats();
+            renderCourts();
+
+        } catch (error) {
+            console.error('❌', error);
+            showAlert('Lỗi: ' + error.message, 'error');
+        }
+    };
+
+    window.saveLiveScore = async function(matchId) {
+        const inputA = document.querySelector(`input[data-match-id="${matchId}"][data-side="a"]`);
+        const inputB = document.querySelector(`input[data-match-id="${matchId}"][data-side="b"]`);
+        if (!inputA || !inputB) return;
+
+        const scoreA = parseInt(inputA.value) || 0;
+        const scoreB = parseInt(inputB.value) || 0;
+
+        try {
+            const { error } = await supabaseClient
+                .from('schedules')
+                .update({
+                    score_a: scoreA,
+                    score_b: scoreB,
+                    live_score: `${scoreA}-${scoreB}`
+                })
+                .eq('id', matchId);
+
+            if (error) throw error;
+
+            const m = schedules.find(s => s.id === matchId);
+            if (m) {
+                m.score_a = scoreA;
+                m.score_b = scoreB;
+            }
+
+            showAlert(`✅ Đã lưu điểm: ${scoreA}-${scoreB}`, 'success');
+
+        } catch (error) {
+            console.error('❌', error);
+            showAlert('Lỗi: ' + error.message, 'error');
+        }
+    };
+
+    window.finishMatch = async function(matchId) {
+        const inputA = document.querySelector(`input[data-match-id="${matchId}"][data-side="a"]`);
+        const inputB = document.querySelector(`input[data-match-id="${matchId}"][data-side="b"]`);
+        if (!inputA || !inputB) return;
+
+        const scoreA = parseInt(inputA.value);
+        const scoreB = parseInt(inputB.value);
+
+        if (isNaN(scoreA) || isNaN(scoreB)) {
+            showAlert('Vui lòng nhập đầy đủ tỷ số', 'error');
+            return;
+        }
+        if (scoreA === scoreB) {
+            showAlert('Tỷ số không được hòa', 'error');
+            return;
+        }
+
+        const m = schedules.find(s => s.id === matchId);
+        if (!m) return;
+
+        const winner = scoreA > scoreB ? m.team_a_name : m.team_b_name;
+
+        if (!confirm(`Kết thúc trận? Người thắng: ${winner} (${Math.max(scoreA, scoreB)}-${Math.min(scoreA, scoreB)})`)) return;
+
+        try {
+            const { error } = await supabaseClient
+                .from('schedules')
+                .update({
+                    score_a: scoreA,
+                    score_b: scoreB,
+                    winner_name: winner,
+                    status: 'completed',
+                    actual_end_time: new Date().toISOString(),
+                    result_note: `${scoreA}-${scoreB}`
+                })
+                .eq('id', matchId);
+
+            if (error) throw error;
+
+            Object.assign(m, {
+                score_a: scoreA,
+                score_b: scoreB,
+                winner_name: winner,
+                status: 'completed'
+            });
+
+            showAlert(`✅ Trận kết thúc: ${winner} thắng!`, 'success');
+
+            // Tự động cập nhật vòng sau
+            await propagateWinner(m);
+
+            renderStats();
+            renderCourts();
+
+        } catch (error) {
+            console.error('❌', error);
+            showAlert('Lỗi: ' + error.message, 'error');
+        }
+    };
+
+    window.reopenMatch = async function(matchId) {
+        if (!confirm('Mở lại trận đấu? Kết quả sẽ bị xóa.')) return;
+
+        try {
+            const { error } = await supabaseClient
+                .from('schedules')
+                .update({
+                    status: 'ongoing',
+                    score_a: null,
+                    score_b: null,
+                    winner_name: null,
+                    actual_end_time: null,
+                    result_note: null
+                })
+                .eq('id', matchId);
+
+            if (error) throw error;
+
+            const m = schedules.find(s => s.id === matchId);
+            if (m) {
+                m.status = 'ongoing';
+                m.score_a = null;
+                m.score_b = null;
+                m.winner_name = null;
+            }
+
+            showAlert('✅ Đã mở lại trận đấu', 'success');
+            renderStats();
+            renderCourts();
+
+        } catch (error) {
+            console.error('❌', error);
+            showAlert('Lỗi: ' + error.message, 'error');
+        }
+    };
+
+    // ==========================================
+    // PROPAGATE WINNER
+    // ==========================================
+    async function propagateWinner(match) {
+        if (!match.winner_name) return;
+
+        const catName = extractCategoryName(match.notes);
+        const groupName = extractGroupName(match.notes);
+        if (!catName || !groupName) return;
+
+        const currentRound = match.round_number || 1;
+        const nextRound = currentRound + 1;
+        const matchNum = match.match_number || 1;
+        const nextMatchNum = Math.ceil(matchNum / 2);
+        const isSlotA = matchNum % 2 === 1;
+
+        const nextMatch = schedules.find(s =>
+            s.is_placeholder &&
+            s.round_number === nextRound &&
+            s.match_number === nextMatchNum &&
+            s.notes && s.notes.includes(catName) && s.notes.includes(`Bảng ${groupName}`)
+        );
+
+        if (!nextMatch) return;
+
+        const updateData = {};
+        if (isSlotA) updateData.team_a_name = match.winner_name;
+        else updateData.team_b_name = match.winner_name;
+
+        const newA = isSlotA ? match.winner_name : nextMatch.team_a_name;
+        const newB = isSlotA ? nextMatch.team_b_name : match.winner_name;
+        if (newA && newB && !newA.includes('Chờ') && !newB.includes('Chờ') &&
+            !newA.includes('Thua') && !newB.includes('Thua')) {
+            updateData.is_placeholder = false;
+        }
+
+        try {
+            const { error } = await supabaseClient
+                .from('schedules')
+                .update(updateData)
+                .eq('id', nextMatch.id);
+
+            if (!error) {
+                Object.assign(nextMatch, updateData);
+                console.log('✅ Đã cập nhật vòng sau');
+            }
+        } catch (error) {
+            console.error('Lỗi propagate:', error);
+        }
+    }
+
+    window.autoRefresh = async function() {
+        await loadData();
+        showAlert('✅ Đã làm mới dữ liệu', 'success');
+    };
+
+    // ==========================================
+    // HELPERS
+    // ==========================================
+    function extractCategoryName(notes) {
+        if (!notes) return null;
+        return notes.split(' - ')[0] || null;
+    }
+
+    function extractGroupName(notes) {
+        if (!notes) return null;
+        const m = notes.match(/Bảng\s+([A-Z])/);
+        return m ? m[1] : null;
+    }
+
+    function formatDate(dateStr) {
+        if (!dateStr) return '—';
+        const [y, m, d] = dateStr.split('-').map(Number);
+        return new Date(y, m - 1, d).toLocaleDateString('vi-VN');
+    }
+
+    function formatTime(timeStr) {
+        if (!timeStr) return '';
+        return timeStr.slice(0, 5);
+    }
+
+    function escapeHtml(text) {
+        return String(text || '').replace(/&/g, '&amp;').replace(/</g, '&lt;')
+            .replace(/>/g, '&gt;').replace(/"/g, '&quot;');
+    }
+
+    function showAlert(message, type) {
+        const el = document.getElementById('alert');
+        el.textContent = message;
+        el.className = 'alert show ' + type;
+        if (type !== 'info') setTimeout(() => { el.className = 'alert'; }, 5000);
+    }
+
+    init();
+})();
+</script>
+
+</body>
+</html>
