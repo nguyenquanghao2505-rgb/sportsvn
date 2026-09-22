@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <meta name="description" content="SportsVN - Nền tảng công nghệ thể thao Việt Nam">
+    <meta name="description" content="SportsVN Admin - Nền tảng quản lý giải thể thao">
     <title>Admin Dashboard - SportsVN</title>
     <link rel="stylesheet" href="styles.css">
     <script src="football.js" defer></script>
@@ -42,8 +42,8 @@
 
                     <button class="icon-button" title="Tìm kiếm">⌕</button>
 
-                    <div class="top-user" id="topUser">
-                        <div class="avatar">H</div>
+                    <div class="top-user" id="topUser" title="Bấm để đăng xuất">
+                        <div class="avatar">A</div>
                         <div class="top-user-info">
                             <strong>Quản trị viên</strong>
                             <span>SportsVN</span>
@@ -329,18 +329,20 @@
     <script src="config.js"></script>
     <script>
         // ==========================================
-        // SPORTSVN ADMIN DASHBOARD - SUPABASE
+        // SPORTSVN ADMIN DASHBOARD
+        // Yêu cầu đăng nhập + quyền admin
         // ==========================================
-        
+
         window.supabaseClient = null;
         window.currentSession = null;
-        
+
         document.addEventListener('DOMContentLoaded', async function() {
             'use strict';
 
             const config = window.SPORTSVN_CONFIG || {};
             if (!config.SUPABASE_URL || !config.SUPABASE_ANON_KEY) {
                 console.warn('⚠️ Chưa cấu hình Supabase trong config.js');
+                alert('Chưa cấu hình Supabase. Vui lòng kiểm tra file config.js');
                 return;
             }
 
@@ -352,59 +354,72 @@
 
             const ADMIN_EMAIL = 'nguyenquanghao2505@gmail.com';
 
-            // ================================
-            // 1. KIỂM TRA ĐĂNG NHẬP
-            // ================================
+            // ==========================================
+            // 1. KIỂM TRA ĐĂNG NHẬP + QUYỀN ADMIN
+            // ==========================================
             async function checkAuth() {
-                const { data: { session } } = await supabase.auth.getSession();
+                try {
+                    const { data: { session }, error } = await supabase.auth.getSession();
 
-                if (!session) {
+                    if (error || !session) {
+                        console.log('Chưa đăng nhập → chuyển về login.html');
+                        window.location.href = 'login.html';
+                        return false;
+                    }
+
+                    window.currentSession = session;
+
+                    // Kiểm tra role admin
+                    const { data: roleData, error: roleError } = await supabase
+                        .from('user_roles')
+                        .select('role')
+                        .eq('user_id', session.user.id)
+                        .single();
+
+                    if (roleError || !roleData || roleData.role !== 'admin') {
+                        alert('Tài khoản không có quyền Admin');
+                        await supabase.auth.signOut();
+                        window.location.href = 'login.html';
+                        return false;
+                    }
+
+                    // Cập nhật tên + avatar
+                    const name = session.user.user_metadata?.full_name ||
+                                 session.user.email.split('@')[0];
+                    const initials = name.split(' ')
+                        .map(w => w[0])
+                        .join('')
+                        .slice(0, 2)
+                        .toUpperCase();
+
+                    document.querySelectorAll('.avatar').forEach(el => el.textContent = initials);
+                    document.querySelectorAll('.user-info strong, .top-user-info strong')
+                        .forEach(el => el.textContent = name);
+
+                    // Chỉ admin chính mới thấy nút "Đổi ảnh bìa"
+                    const userEmail = session.user.email;
+                    const changeBannerBtn = document.getElementById('changeBannerBtn');
+
+                    if (changeBannerBtn && userEmail === ADMIN_EMAIL) {
+                        changeBannerBtn.classList.add('visible');
+                        console.log('✅ Admin chính đã đăng nhập');
+                    }
+
+                    return true;
+
+                } catch (err) {
+                    console.error('Lỗi checkAuth:', err);
                     window.location.href = 'login.html';
                     return false;
                 }
-
-                window.currentSession = session;
-
-                // Kiểm tra role admin
-                const { data: roleData } = await supabase
-                    .from('user_roles')
-                    .select('role')
-                    .eq('user_id', session.user.id)
-                    .single();
-
-                if (!roleData || roleData.role !== 'admin') {
-                    alert('Tài khoản không có quyền Admin');
-                    await supabase.auth.signOut();
-                    window.location.href = 'login.html';
-                    return false;
-                }
-
-                // Cập nhật tên + avatar
-                const name = session.user.user_metadata?.full_name ||
-                             session.user.email.split('@')[0];
-                const initials = name.split(' ').map(w => w[0]).join('').slice(0, 2).toUpperCase();
-
-                document.querySelectorAll('.avatar').forEach(el => el.textContent = initials);
-                document.querySelectorAll('.user-info strong, .top-user-info strong').forEach(el => el.textContent = name);
-
-                // Chỉ admin chính mới thấy nút "Đổi ảnh bìa"
-                const userEmail = session.user.email;
-                const changeBannerBtn = document.getElementById('changeBannerBtn');
-
-                if (changeBannerBtn && userEmail === ADMIN_EMAIL) {
-                    changeBannerBtn.classList.add('visible');
-                    console.log('✅ Admin chính đã đăng nhập');
-                }
-
-                return true;
             }
 
             const isAuth = await checkAuth();
             if (!isAuth) return;
 
-            // ================================
-            // 2. ĐĂNG XUẤT
-            // ================================
+            // ==========================================
+            // 2. ĐĂNG XUẤT (bấm vào tên user)
+            // ==========================================
             const topUser = document.getElementById('topUser');
             if (topUser) {
                 topUser.addEventListener('click', async function() {
@@ -416,7 +431,7 @@
             }
 
             // ==========================================
-            // 3. ĐỔI ẢNH BÌA
+            // 3. ĐỔI ẢNH BÌA (chỉ admin chính)
             // ==========================================
             var bannerImage = document.getElementById('bannerImage');
             var changeBtn = document.getElementById('changeBannerBtn');
@@ -444,6 +459,7 @@
 
                         if (imageFiles.length === 0) return;
 
+                        // Ưu tiên ảnh có prefix "banner-", mới nhất lên đầu
                         imageFiles.sort(function(a, b) {
                             var aIsSystem = a.name.startsWith('banner-');
                             var bIsSystem = b.name.startsWith('banner-');
@@ -478,11 +494,13 @@
 
                 loadBanner();
 
+                // Nút đổi ảnh
                 changeBtn.addEventListener('click', function(e) {
                     e.stopPropagation();
                     fileInput.click();
                 });
 
+                // Upload ảnh mới
                 fileInput.addEventListener('change', async function(e) {
                     var file = e.target.files[0];
                     if (!file) return;
@@ -523,7 +541,7 @@
 
                         bannerImage.src = urlData.publicUrl;
 
-                        // Xóa ảnh cũ
+                        // Dọn ảnh cũ
                         try {
                             const { data: oldFiles } = await supabase
                                 .storage
@@ -670,24 +688,29 @@
                 }
             }
 
+            // Tab giải đấu
             document.querySelectorAll('#footballLeagueTabs .result-tab').forEach(tab => {
                 tab.addEventListener('click', () => {
-                    document.querySelectorAll('#footballLeagueTabs .result-tab').forEach(t => t.classList.remove('active'));
+                    document.querySelectorAll('#footballLeagueTabs .result-tab')
+                        .forEach(t => t.classList.remove('active'));
                     tab.classList.add('active');
                     currentLeague = tab.dataset.league;
                     loadFootballMatches();
                 });
             });
 
+            // Tab trạng thái
             document.querySelectorAll('#footballStatusTabs .result-tab').forEach(tab => {
                 tab.addEventListener('click', () => {
-                    document.querySelectorAll('#footballStatusTabs .result-tab').forEach(t => t.classList.remove('active'));
+                    document.querySelectorAll('#footballStatusTabs .result-tab')
+                        .forEach(t => t.classList.remove('active'));
                     tab.classList.add('active');
                     currentStatus = tab.dataset.status;
                     loadFootballMatches();
                 });
             });
 
+            // Đợi Football API load xong
             setTimeout(() => loadFootballMatches(), 500);
 
             // ==========================================
