@@ -225,7 +225,7 @@
 (function() {
     'use strict';
 
-    console.log('🚀 schedule.html v9 - Tạo placeholder cho vòng knockout');
+    console.log('🚀 schedule.html v10 - Placeholder + Export Excel theo layout bốc thăm');
 
     const config = window.SPORTSVN_CONFIG || {};
     if (!config.SUPABASE_URL || !config.SUPABASE_ANON_KEY) {
@@ -423,7 +423,7 @@
 
         const athleteSlots = {};
         schedules.forEach(s => {
-            if (s.is_placeholder) return; // Bỏ qua placeholder
+            if (s.is_placeholder) return;
             const slotKey = `${s.match_date}|${s.start_time}`;
             if (s.team_a_name && !s.team_a_name.includes('Chờ') && !s.team_a_name.includes('Thua')) {
                 if (!athleteSlots[s.team_a_name]) athleteSlots[s.team_a_name] = [];
@@ -680,12 +680,10 @@
 
                         if (totalTeams < 2) return;
 
-                        // Tạo trận Vòng 1 (thực tế)
                         let bracketSize = 1;
                         while (bracketSize < totalTeams) bracketSize *= 2;
                         const numByes = bracketSize - totalTeams;
 
-                        // Sắp xếp: những người BYE lên đầu, những người đấu ở vòng 1 ở cuối
                         const playing = groupTeams.slice(numByes);
 
                         console.log(`  Nhóm "${groupName}": ${totalTeams} VĐV → Bracket ${bracketSize} (${numByes} BYE)`);
@@ -707,11 +705,9 @@
                         }
 
                         // === TẠO PLACEHOLDER CHO CÁC VÒNG SAU ===
-                        // Số đội vào vòng sau = bracketSize / 2
                         let teamsInNextRound = bracketSize / 2;
-                        let roundNum = 2; // Bắt đầu từ vòng 2 (1/8 nếu bracket 16, Tứ kết nếu bracket 8...)
+                        let roundNum = 2;
 
-                        // Xác định tên vòng dựa trên số đội còn lại
                         while (teamsInNextRound >= 2) {
                             let roundName = '';
                             if (teamsInNextRound === 16) roundName = 'Vòng 1/8';
@@ -736,12 +732,11 @@
                             roundNum++;
                         }
 
-                        // Thêm trận tranh hạng 3 (nếu bracket >= 4)
                         if (bracketSize >= 4) {
                             allMatches.push({
                                 team_a: 'Thua BK 1',
                                 team_b: 'Thua BK 2',
-                                round: 99, // Đánh dấu riêng
+                                round: 99,
                                 match_num: 1,
                                 category: `${catName} - Bảng ${groupName} - Tranh hạng 3`,
                                 cat_id: cat?.id,
@@ -814,7 +809,6 @@
 
             console.log(`📊 Tổng slot: ${allSlots.length}`);
 
-            // Ưu tiên xếp trận thực trước, placeholder sau
             allMatches.sort((a, b) => {
                 if (a.is_placeholder !== b.is_placeholder) return a.is_placeholder ? 1 : -1;
                 return (a.round || 1) - (b.round || 1);
@@ -930,9 +924,300 @@
         console.log(`✅ Đã tạo ${numTables} sân mặc định`);
     }
 
+    // ==========================================
+    // XUẤT EXCEL THEO LAYOUT BỐC THĂM
+    // ==========================================
     window.exportScheduleExcel = function() {
         if (schedules.length === 0) { showAlert('Chưa có lịch!', 'error'); return; }
 
+        try {
+            const wb = XLSX.utils.book_new();
+
+            // Nhóm schedules theo category (nội dung)
+            const schedulesByCategory = {};
+            schedules.forEach(s => {
+                const catName = extractCategoryName(s.notes) || 'Khác';
+                if (!schedulesByCategory[catName]) schedulesByCategory[catName] = [];
+                schedulesByCategory[catName].push(s);
+            });
+
+            // Với mỗi nội dung, kiểm tra loại (knockout hay round robin)
+            Object.keys(schedulesByCategory).forEach(catName => {
+                const catSchedules = schedulesByCategory[catName];
+                const cat = categories.find(c => c.name === catName);
+                const isKnockout = draws.some(d => 
+                    d.category === catName && d.draw_type === 'knockout'
+                );
+
+                const sheetName = catName.substring(0, 31);
+
+                if (isKnockout) {
+                    exportKnockoutSheet(wb, sheetName, catName, catSchedules, cat);
+                } else {
+                    exportRoundRobinSheet(wb, sheetName, catName, catSchedules, cat);
+                }
+            });
+
+            if (Object.keys(schedulesByCategory).length === 0) {
+                exportFlatSheet(wb);
+            }
+
+            XLSX.writeFile(wb, `LichThiDau_${new Date().toISOString().slice(0, 10)}.xlsx`);
+            showAlert('✅ Đã xuất file Excel!', 'success');
+
+        } catch (error) {
+            console.error('❌ Lỗi xuất Excel:', error);
+            showAlert('Lỗi xuất Excel: ' + error.message, 'error');
+        }
+    };
+
+    function extractCategoryName(notes) {
+        if (!notes) return null;
+        const parts = notes.split(' - ');
+        return parts[0] || null;
+    }
+
+    // ==========================================
+    // XUẤT SHEET KNOCKOUT (SƠ ĐỒ NHÁNH ĐẤU)
+    // ==========================================
+    function exportKnockoutSheet(wb, sheetName, catName, catSchedules, cat) {
+        const ws = {};
+        const range = { s: { r: 0, c: 0 }, e: { r: 0, c: 0 } };
+
+        const catDraws = draws.filter(d => d.category === catName && d.group_name !== 'BYE');
+
+        const groups = {};
+        catDraws.forEach(d => {
+            const g = d.group_name || 'A';
+            if (!groups[g]) groups[g] = [];
+            groups[g].push(d);
+        });
+
+        let currentRow = 0;
+
+        ws[XLSX.utils.encode_cell({ r: currentRow, c: 0 })] = { 
+            v: catName.toUpperCase(), t: 's', 
+            s: { font: { bold: true, size: 14 } } 
+        };
+        currentRow += 2;
+
+        Object.keys(groups).sort().forEach(groupName => {
+            const groupDraws = groups[groupName];
+            const groupSchedules = catSchedules.filter(s => 
+                s.notes && s.notes.includes(`Bảng ${groupName}`)
+            );
+
+            const allRounds = [...new Set(groupSchedules.map(s => s.round_number))].sort((a, b) => a - b);
+
+            ws[XLSX.utils.encode_cell({ r: currentRow, c: 0 })] = { 
+                v: `BẢNG ${groupName}`, t: 's', 
+                s: { font: { bold: true, size: 12 }, fill: { fgColor: { rgb: 'FFD966' } } } 
+            };
+            currentRow += 1;
+
+            const totalTeams = groupDraws.length;
+            let bracketSize = 1;
+            while (bracketSize < totalTeams) bracketSize *= 2;
+            const numByes = bracketSize - totalTeams;
+
+            const startRow = currentRow;
+
+            groupDraws.forEach((d, i) => {
+                const isBye = i < numByes;
+                const row = startRow + i;
+
+                ws[XLSX.utils.encode_cell({ r: row, c: 0 })] = { 
+                    v: d.team_name, t: 's',
+                    s: isBye ? { fill: { fgColor: { rgb: 'FFFF00' } }, font: { bold: true } } : {}
+                };
+
+                if (d.player_code) {
+                    ws[XLSX.utils.encode_cell({ r: row, c: 1 })] = { 
+                        v: d.player_code, t: 's',
+                        s: isBye ? { fill: { fgColor: { rgb: 'FFFF00' } } } : {}
+                    };
+                }
+
+                if (isBye) {
+                    ws[XLSX.utils.encode_cell({ r: row, c: 2 })] = { 
+                        v: 'X', t: 's',
+                        s: { fill: { fgColor: { rgb: 'FFFF00' } }, font: { bold: true } }
+                    };
+                }
+            });
+
+            let colOffset = 3;
+            allRounds.forEach(roundNum => {
+                const roundMatches = groupSchedules.filter(s => s.round_number === roundNum);
+                const roundName = getRoundName(roundNum, bracketSize);
+                
+                ws[XLSX.utils.encode_cell({ r: startRow - 1, c: colOffset })] = { 
+                    v: roundName, t: 's',
+                    s: { font: { bold: true }, fill: { fgColor: { rgb: '4472C4' } }, color: { rgb: 'FFFFFF' } }
+                };
+
+                roundMatches.forEach((m, idx) => {
+                    const row = startRow + idx * 2;
+                    
+                    ws[XLSX.utils.encode_cell({ r: row, c: colOffset })] = { 
+                        v: m.team_a_name || '—', t: 's',
+                        s: m.is_placeholder ? { font: { italic: true }, fill: { fgColor: { rgb: 'E3F2FD' } } } : {}
+                    };
+                    ws[XLSX.utils.encode_cell({ r: row + 1, c: colOffset })] = { 
+                        v: m.team_b_name || '—', t: 's',
+                        s: m.is_placeholder ? { font: { italic: true }, fill: { fgColor: { rgb: 'E3F2FD' } } } : {}
+                    };
+                });
+
+                colOffset += 1;
+            });
+
+            const qCol = 16;
+            const rCol = 17;
+            
+            ws[XLSX.utils.encode_cell({ r: startRow - 1, c: qCol })] = { v: 'TT', t: 's', s: { font: { bold: true } } };
+            ws[XLSX.utils.encode_cell({ r: startRow - 1, c: qCol + 1 })] = { v: 'nhập', t: 's', s: { font: { bold: true }, fill: { fgColor: { rgb: 'FFFF00' } } } };
+            ws[XLSX.utils.encode_cell({ r: startRow - 1, c: rCol + 1 })] = { v: catName, t: 's', s: { font: { bold: true } } };
+
+            groupDraws.forEach((d, i) => {
+                const row = startRow + i;
+                ws[XLSX.utils.encode_cell({ r: row, c: qCol })] = { v: i + 1, t: 'n' };
+                ws[XLSX.utils.encode_cell({ r: row, c: qCol + 1 })] = { v: d.team_name, t: 's' };
+            });
+
+            currentRow = startRow + Math.max(groupDraws.length, allRounds.length * 2) + 3;
+        });
+
+        range.e.r = currentRow;
+        range.e.c = 20;
+        ws['!ref'] = XLSX.utils.encode_range(range);
+
+        ws['!cols'] = [
+            { wch: 25 }, { wch: 15 }, { wch: 5 },
+            { wch: 25 }, { wch: 25 }, { wch: 25 }, { wch: 25 },
+            { wch: 3 }, { wch: 3 }, { wch: 3 }, { wch: 3 },
+            { wch: 3 }, { wch: 3 }, { wch: 3 }, { wch: 3 },
+            { wch: 5 }, { wch: 25 }, { wch: 30 }
+        ];
+
+        XLSX.utils.book_append_sheet(wb, ws, sheetName);
+    }
+
+    // ==========================================
+    // XUẤT SHEET ROUND ROBIN (VÒNG TRÒN)
+    // ==========================================
+    function exportRoundRobinSheet(wb, sheetName, catName, catSchedules, cat) {
+        const ws = {};
+        const range = { s: { r: 0, c: 0 }, e: { r: 0, c: 0 } };
+
+        const catDraws = draws.filter(d => d.category === catName);
+        const groups = {};
+        catDraws.forEach(d => {
+            const g = d.group_name || 'A';
+            if (!groups[g]) groups[g] = [];
+            groups[g].push(d);
+        });
+
+        let currentRow = 0;
+
+        ws[XLSX.utils.encode_cell({ r: currentRow, c: 0 })] = { 
+            v: `NỘI DUNG: ${catName.toUpperCase()}`, t: 's', 
+            s: { font: { bold: true, size: 14 } } 
+        };
+        currentRow += 2;
+
+        Object.keys(groups).sort().forEach(groupName => {
+            const groupDraws = groups[groupName];
+            const groupSchedules = catSchedules.filter(s => 
+                s.notes && s.notes.includes(`Bảng ${groupName}`)
+            );
+
+            ws[XLSX.utils.encode_cell({ r: currentRow, c: 0 })] = { 
+                v: `BẢNG ${groupName}`, t: 's', 
+                s: { font: { bold: true, size: 12 }, fill: { fgColor: { rgb: '4472C4' } }, color: { rgb: 'FFFFFF' } } 
+            };
+            currentRow += 1;
+
+            ws[XLSX.utils.encode_cell({ r: currentRow, c: 0 })] = { v: 'Stt', t: 's', s: { font: { bold: true } } };
+            ws[XLSX.utils.encode_cell({ r: currentRow, c: 1 })] = { v: 'Tên', t: 's', s: { font: { bold: true } } };
+            
+            groupDraws.forEach((_, i) => {
+                ws[XLSX.utils.encode_cell({ r: currentRow, c: 2 + i })] = { v: i + 1, t: 'n', s: { font: { bold: true } } };
+            });
+            
+            ws[XLSX.utils.encode_cell({ r: currentRow, c: 2 + groupDraws.length })] = { v: 'Điểm', t: 's', s: { font: { bold: true } } };
+            ws[XLSX.utils.encode_cell({ r: currentRow, c: 3 + groupDraws.length })] = { v: 'T/B', t: 's', s: { font: { bold: true } } };
+            ws[XLSX.utils.encode_cell({ r: currentRow, c: 4 + groupDraws.length })] = { v: 'XH', t: 's', s: { font: { bold: true } } };
+            
+            currentRow += 1;
+
+            groupDraws.forEach((d, i) => {
+                ws[XLSX.utils.encode_cell({ r: currentRow, c: 0 })] = { v: i + 1, t: 'n' };
+                ws[XLSX.utils.encode_cell({ r: currentRow, c: 1 })] = { v: d.team_name, t: 's' };
+                
+                groupDraws.forEach((_, j) => {
+                    ws[XLSX.utils.encode_cell({ r: currentRow, c: 2 + j })] = { v: '', t: 's' };
+                });
+                
+                ws[XLSX.utils.encode_cell({ r: currentRow, c: 2 + groupDraws.length })] = { v: '', t: 's' };
+                ws[XLSX.utils.encode_cell({ r: currentRow, c: 3 + groupDraws.length })] = { v: '', t: 's' };
+                ws[XLSX.utils.encode_cell({ r: currentRow, c: 4 + groupDraws.length })] = { v: '', t: 's' };
+                
+                currentRow += 1;
+            });
+
+            currentRow += 1;
+
+            ws[XLSX.utils.encode_cell({ r: currentRow, c: 0 })] = { v: 'MS', t: 's', s: { font: { bold: true }, fill: { fgColor: { rgb: 'D9E1F2' } } } };
+            ws[XLSX.utils.encode_cell({ r: currentRow, c: 1 })] = { v: 'VĐV', t: 's', s: { font: { bold: true }, fill: { fgColor: { rgb: 'D9E1F2' } } } };
+            ws[XLSX.utils.encode_cell({ r: currentRow, c: 2 })] = { v: 'vs', t: 's', s: { font: { bold: true }, fill: { fgColor: { rgb: 'D9E1F2' } } } };
+            ws[XLSX.utils.encode_cell({ r: currentRow, c: 3 })] = { v: 'VĐV', t: 's', s: { font: { bold: true }, fill: { fgColor: { rgb: 'D9E1F2' } } } };
+            ws[XLSX.utils.encode_cell({ r: currentRow, c: 4 })] = { v: 'Thời gian', t: 's', s: { font: { bold: true }, fill: { fgColor: { rgb: 'D9E1F2' } } } };
+            ws[XLSX.utils.encode_cell({ r: currentRow, c: 5 })] = { v: 'Bàn', t: 's', s: { font: { bold: true }, fill: { fgColor: { rgb: 'D9E1F2' } } } };
+            ws[XLSX.utils.encode_cell({ r: currentRow, c: 6 })] = { v: 'Trận', t: 's', s: { font: { bold: true }, fill: { fgColor: { rgb: 'D9E1F2' } } } };
+            ws[XLSX.utils.encode_cell({ r: currentRow, c: 7 })] = { v: 'KQ', t: 's', s: { font: { bold: true }, fill: { fgColor: { rgb: 'D9E1F2' } } } };
+            
+            currentRow += 1;
+
+            const sortedMatches = [...groupSchedules].sort((a, b) => {
+                if (a.match_date !== b.match_date) return a.match_date.localeCompare(b.match_date);
+                return a.start_time.localeCompare(b.start_time);
+            });
+
+            sortedMatches.forEach((m, idx) => {
+                const venue = venues.find(v => v.id === m.venue_id);
+                
+                ws[XLSX.utils.encode_cell({ r: currentRow, c: 0 })] = { v: idx + 1, t: 'n' };
+                ws[XLSX.utils.encode_cell({ r: currentRow, c: 1 })] = { v: m.team_a_name || '', t: 's' };
+                ws[XLSX.utils.encode_cell({ r: currentRow, c: 2 })] = { v: '-', t: 's' };
+                ws[XLSX.utils.encode_cell({ r: currentRow, c: 3 })] = { v: m.team_b_name || '', t: 's' };
+                ws[XLSX.utils.encode_cell({ r: currentRow, c: 4 })] = { v: `${formatDate(m.match_date)} ${formatTime(m.start_time)}`, t: 's' };
+                ws[XLSX.utils.encode_cell({ r: currentRow, c: 5 })] = { v: venue?.court_name || '', t: 's' };
+                ws[XLSX.utils.encode_cell({ r: currentRow, c: 6 })] = { v: m.match_number || idx + 1, t: 'n' };
+                ws[XLSX.utils.encode_cell({ r: currentRow, c: 7 })] = { v: '', t: 's' };
+                
+                currentRow += 1;
+            });
+
+            currentRow += 3;
+        });
+
+        range.e.r = currentRow;
+        range.e.c = 12;
+        ws['!ref'] = XLSX.utils.encode_range(range);
+
+        ws['!cols'] = [
+            { wch: 5 }, { wch: 30 }, { wch: 5 }, { wch: 30 },
+            { wch: 18 }, { wch: 12 }, { wch: 8 }, { wch: 8 }
+        ];
+
+        XLSX.utils.book_append_sheet(wb, ws, sheetName);
+    }
+
+    // ==========================================
+    // XUẤT SHEET PHẲNG (DỰ PHÒNG)
+    // ==========================================
+    function exportFlatSheet(wb) {
         const data = schedules.map((s, i) => {
             const venue = venues.find(v => v.id === s.venue_id);
             return {
@@ -952,13 +1237,22 @@
 
         const ws = XLSX.utils.json_to_sheet(data);
         ws['!cols'] = [{ wch: 5 }, { wch: 12 }, { wch: 10 }, { wch: 8 }, { wch: 12 }, { wch: 35 }, { wch: 6 }, { wch: 6 }, { wch: 25 }, { wch: 25 }, { wch: 15 }];
-
-        const wb = XLSX.utils.book_new();
         XLSX.utils.book_append_sheet(wb, ws, 'Lịch thi đấu');
-        XLSX.writeFile(wb, `LichThiDau_${new Date().toISOString().slice(0, 10)}.xlsx`);
-        showAlert('✅ Đã xuất file!', 'success');
-    };
+    }
 
+    function getRoundName(roundNum, bracketSize) {
+        const teamsInRound = bracketSize / Math.pow(2, roundNum - 1);
+        if (teamsInRound === 2) return 'Chung kết';
+        if (teamsInRound === 4) return 'Bán kết';
+        if (teamsInRound === 8) return 'Tứ kết';
+        if (teamsInRound === 16) return 'Vòng 1/8';
+        if (teamsInRound === 32) return 'Vòng 1/16';
+        return `Vòng ${roundNum}`;
+    }
+
+    // ==========================================
+    // HELPERS
+    // ==========================================
     function getSessions() {
         const sessionsPerDay = tournamentConfig.numSessions || 2;
         const all = [
