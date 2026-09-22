@@ -3,1165 +3,1151 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <meta name="description" content="Chi tiết giải đấu - SportsVN">
     <title>Chi tiết giải đấu - SportsVN</title>
-    <link rel="stylesheet" href="styles.css">
-    <script src="football.js" defer></script>
-    <script src="provinces.js" defer></script>
-    <script src="sidebar.js" defer></script>
-
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
     <style>
-        /* ========== HERO ========== */
-        .detail-hero {
-            position: relative;
-            padding: 36px 32px;
-            background: linear-gradient(135deg, #0d47a1 0%, #08306b 100%);
-            border-radius: var(--radius-xl);
-            color: #fff;
-            margin-bottom: 24px;
-            overflow: hidden;
+        * { margin: 0; padding: 0; box-sizing: border-box; font-family: 'Segoe UI', system-ui, sans-serif; }
+        body { background: #f0f2f8; min-height: 100vh; }
+
+        /* ===== LAYOUT ===== */
+        .layout { display: flex; min-height: 100vh; }
+        .sidebar {
+            width: 240px; background: linear-gradient(180deg, #0d1b3e, #1a3a7a);
+            color: #fff; padding: 20px 0; position: fixed; height: 100vh;
+            overflow-y: auto; z-index: 100;
         }
-        .detail-hero::before {
-            content: '';
-            position: absolute;
-            top: -50%; right: -10%;
-            width: 500px; height: 500px;
-            border-radius: 50%;
-            background: radial-gradient(circle, rgba(255,255,255,0.1) 0%, transparent 70%);
+        .sidebar .logo {
+            padding: 0 20px 20px; border-bottom: 1px solid rgba(255,255,255,0.1);
+            margin-bottom: 20px;
         }
-        .detail-hero-content {
-            position: relative;
-            display: flex;
-            align-items: center;
-            gap: 24px;
-            flex-wrap: wrap;
+        .sidebar .logo h2 { font-size: 20px; }
+        .sidebar .logo p { font-size: 11px; opacity: 0.7; margin-top: 2px; }
+        .sidebar nav a {
+            display: flex; align-items: center; gap: 12px;
+            padding: 12px 20px; color: rgba(255,255,255,0.8);
+            text-decoration: none; font-size: 14px; transition: all 0.2s;
         }
-        .detail-hero-icon {
-            width: 90px; height: 90px;
+        .sidebar nav a:hover, .sidebar nav a.active {
+            background: rgba(255,255,255,0.1); color: #fff;
+            border-left: 3px solid #e94560;
+        }
+        .main-content {
+            margin-left: 240px; flex: 1; padding: 24px;
+            max-width: calc(100vw - 240px);
+        }
+
+        /* ===== TOP BAR ===== */
+        .topbar {
+            display: flex; justify-content: space-between; align-items: center;
+            background: #fff; padding: 16px 24px; border-radius: 12px;
+            margin-bottom: 20px; box-shadow: 0 2px 10px rgba(0,0,0,0.05);
+        }
+        .topbar .brand { font-size: 13px; color: #6c757d; }
+        .topbar .user-info { display: flex; align-items: center; gap: 10px; }
+        .topbar .user-info .avatar {
+            width: 36px; height: 36px; border-radius: 50%;
+            background: linear-gradient(135deg, #e94560, #f39c12);
             display: flex; align-items: center; justify-content: center;
-            border-radius: 24px;
-            background: rgba(255,255,255,0.15);
-            backdrop-filter: blur(10px);
-            font-size: 44px;
-            flex-shrink: 0;
+            color: #fff; font-weight: 700; font-size: 14px;
         }
-        .detail-hero-info { flex: 1; min-width: 250px; }
-        .detail-hero-info h1 {
-            font-size: 28px;
-            font-weight: 900;
-            line-height: 1.2;
-            letter-spacing: -0.5px;
-            margin-bottom: 8px;
+        .btn-logout {
+            padding: 8px 16px; border-radius: 8px; border: none;
+            background: #f8f9fa; color: #495057; font-weight: 600;
+            cursor: pointer; font-size: 13px;
         }
-        .detail-hero-meta {
-            display: flex;
-            flex-wrap: wrap;
-            gap: 16px;
-            font-size: 13px;
-            opacity: 0.9;
-        }
-        .detail-hero-meta span {
-            display: inline-flex;
-            align-items: center;
-            gap: 6px;
-        }
-        .detail-hero-status {
-            display: inline-flex;
-            align-items: center;
-            gap: 6px;
-            padding: 6px 14px;
-            border-radius: 20px;
-            font-size: 11px;
-            font-weight: 800;
-            text-transform: uppercase;
-            letter-spacing: 0.5px;
-            background: rgba(255,255,255,0.2);
-            backdrop-filter: blur(10px);
-            margin-top: 12px;
-        }
-        .detail-hero-status.active { background: rgba(16,185,129,0.25); color: #a7f3d0; }
-        .detail-hero-status.upcoming { background: rgba(245,158,11,0.25); color: #fde68a; }
-        .detail-hero-status.completed { background: rgba(156,163,175,0.25); color: #e5e7eb; }
+        .btn-logout:hover { background: #e9ecef; }
 
-        .back-link {
-            display: inline-flex;
-            align-items: center;
-            gap: 6px;
-            color: rgba(255,255,255,0.8);
-            font-size: 13px;
-            font-weight: 600;
-            margin-bottom: 16px;
-            text-decoration: none;
-            transition: color 0.2s;
-        }
-        .back-link:hover { color: #fff; }
-
-        /* ========== ADMIN TOOLBAR ========== */
-        .admin-toolbar {
-            display: none;
-            gap: 12px;
-            flex-wrap: wrap;
-            padding: 16px 20px;
-            background: linear-gradient(135deg, #fff8e6 0%, #fff3cd 100%);
-            border: 2px solid #fdcb6e;
-            border-radius: var(--radius-lg);
+        /* ===== TOURNAMENT HEADER ===== */
+        .tournament-header {
+            background: linear-gradient(135deg, #0d1b3e, #1a3a7a);
+            border-radius: 16px; padding: 24px 32px; color: #fff;
             margin-bottom: 20px;
-            box-shadow: 0 4px 12px rgba(253, 203, 110, 0.2);
         }
-        .admin-toolbar.visible { display: flex; }
-        .admin-toolbar-title {
-            width: 100%;
-            font-size: 13px;
-            font-weight: 800;
-            color: #856404;
-            text-transform: uppercase;
-            letter-spacing: 0.5px;
-            margin-bottom: 4px;
-            display: flex;
-            align-items: center;
-            gap: 8px;
+        .tournament-header .back-link {
+            color: rgba(255,255,255,0.7); text-decoration: none;
+            font-size: 13px; margin-bottom: 12px; display: inline-block;
         }
-        .admin-toolbar-btn {
-            display: inline-flex;
-            align-items: center;
-            gap: 8px;
-            padding: 11px 20px;
-            border-radius: 10px;
-            font-size: 13.5px;
-            font-weight: 700;
-            border: none;
-            cursor: pointer;
-            text-decoration: none;
-            transition: all 0.25s ease;
-            white-space: nowrap;
-            font-family: inherit;
+        .tournament-header .back-link:hover { color: #fff; }
+        .tournament-header h1 { font-size: 28px; margin-bottom: 10px; }
+        .tournament-header .meta {
+            display: flex; gap: 16px; flex-wrap: wrap;
+            font-size: 13px; opacity: 0.9;
         }
-        .admin-toolbar-btn:hover {
-            transform: translateY(-2px);
-            box-shadow: 0 6px 16px rgba(0,0,0,0.15);
+        .tournament-header .meta span {
+            display: inline-flex; align-items: center; gap: 6px;
         }
-        .admin-toolbar-btn.draw {
-            background: linear-gradient(135deg, #8b5cf6, #a78bfa);
-            color: #fff; box-shadow: 0 4px 12px rgba(139,92,246,0.3);
+        .tournament-header .status-badge {
+            display: inline-block; padding: 4px 12px; border-radius: 20px;
+            font-size: 11px; font-weight: 700; text-transform: uppercase;
+            margin-top: 10px;
         }
-        .admin-toolbar-btn.schedule {
-            background: linear-gradient(135deg, #0984e3, #4d94ff);
-            color: #fff; box-shadow: 0 4px 12px rgba(9,132,227,0.3);
-        }
-        .admin-toolbar-btn.teams {
-            background: linear-gradient(135deg, #00b894, #34d399);
-            color: #fff; box-shadow: 0 4px 12px rgba(0,184,148,0.3);
-        }
-        .admin-toolbar-btn.results {
-            background: linear-gradient(135deg, #f59e0b, #fbbf24);
-            color: #fff; box-shadow: 0 4px 12px rgba(245,158,11,0.3);
-        }
-        .admin-toolbar-btn.edit {
-            background: linear-gradient(135deg, #6b7280, #9ca3af);
-            color: #fff; box-shadow: 0 4px 12px rgba(107,114,128,0.3);
-        }
-        .admin-toolbar-btn.delete {
-            background: linear-gradient(135deg, #e94560, #f87171);
-            color: #fff; box-shadow: 0 4px 12px rgba(233,69,96,0.3);
-        }
+        .status-upcoming { background: #f39c12; color: #fff; }
+        .status-ongoing { background: #00b894; color: #fff; }
+        .status-completed { background: #6c757d; color: #fff; }
 
-        /* ========== TABS ========== */
-        .tabs-nav {
-            display: flex;
-            gap: 4px;
-            padding: 6px;
-            background: #fff;
-            border: 1px solid var(--border);
-            border-radius: var(--radius-md);
-            margin-bottom: 20px;
-            overflow-x: auto;
+        /* ===== ADMIN TOOLS ===== */
+        .admin-tools {
+            background: #fff8e6; border: 2px solid #fdcb6e;
+            border-radius: 12px; padding: 16px 20px; margin-bottom: 20px;
         }
-        .tabs-nav button {
-            flex: 1;
-            min-width: 120px;
-            padding: 10px 16px;
-            border-radius: var(--radius-sm);
-            font-size: 13px;
-            font-weight: 700;
-            color: var(--text-muted);
-            transition: all 0.2s;
-            white-space: nowrap;
-            border: 0;
-            background: none;
-            cursor: pointer;
-            font-family: inherit;
+        .admin-tools .title {
+            font-size: 13px; font-weight: 800; color: #856404;
+            margin-bottom: 12px; display: flex; align-items: center; gap: 8px;
         }
-        .tabs-nav button.active {
-            background: linear-gradient(135deg, var(--primary), #4d94ff);
+        .admin-tools .actions { display: flex; gap: 10px; flex-wrap: wrap; }
+        .admin-tools .btn {
+            padding: 10px 18px; border-radius: 8px; font-size: 13px;
+            font-weight: 700; cursor: pointer; border: none;
+            text-decoration: none; display: inline-flex;
+            align-items: center; gap: 6px; transition: all 0.2s;
+        }
+        .admin-tools .btn:hover { transform: translateY(-2px); }
+        .btn-purple { background: #a29bfe; color: #fff; }
+        .btn-blue { background: #0984e3; color: #fff; }
+        .btn-green { background: #00b894; color: #fff; }
+        .btn-orange { background: #f39c12; color: #fff; }
+        .btn-gray { background: #636e72; color: #fff; }
+        .btn-red { background: #e94560; color: #fff; }
+
+        /* ===== TABS ===== */
+        .tabs {
+            display: flex; gap: 8px; background: #fff;
+            padding: 8px; border-radius: 12px; margin-bottom: 20px;
+            box-shadow: 0 2px 10px rgba(0,0,0,0.05);
+        }
+        .tab {
+            flex: 1; padding: 12px 20px; border-radius: 8px;
+            cursor: pointer; font-weight: 700; font-size: 14px;
+            color: #6c757d; background: transparent; border: none;
+            transition: all 0.2s; text-align: center;
+        }
+        .tab:hover { background: #f8f9fa; color: #1a3a7a; }
+        .tab.active {
+            background: linear-gradient(135deg, #0d1b3e, #1a3a7a);
             color: #fff;
-            box-shadow: 0 4px 10px rgba(23,105,255,0.3);
         }
-        .tabs-nav button:hover:not(.active) {
-            background: var(--primary-light);
-            color: var(--primary);
-        }
+        .tab i { margin-right: 6px; }
 
+        /* ===== TAB CONTENT ===== */
         .tab-content { display: none; }
         .tab-content.active { display: block; }
 
-        /* ========== TEAMS GRID ========== */
-        .teams-grid {
-            display: grid;
-            grid-template-columns: repeat(auto-fill, minmax(200px, 1fr));
-            gap: 12px;
-            padding: 16px;
+        .panel {
+            background: #fff; border-radius: 16px; padding: 24px;
+            box-shadow: 0 4px 20px rgba(0,0,0,0.08);
         }
-        .team-card {
-            display: flex;
-            align-items: center;
-            gap: 12px;
-            padding: 14px;
-            background: #f9fafb;
-            border: 1px solid var(--border-light);
-            border-radius: var(--radius-md);
-            transition: all 0.2s;
+        .panel-header {
+            display: flex; justify-content: space-between; align-items: center;
+            margin-bottom: 20px; padding-bottom: 14px;
+            border-bottom: 2px solid #f0f2f8;
         }
-        .team-card:hover {
-            background: #fff;
-            border-color: var(--primary);
-            box-shadow: 0 4px 12px rgba(23,105,255,0.15);
-            transform: translateY(-2px);
-        }
-        .team-logo {
-            width: 44px; height: 44px;
-            display: flex; align-items: center; justify-content: center;
-            border-radius: 12px;
-            background: linear-gradient(135deg, #dbeafe, #bfdbfe);
-            color: var(--primary);
-            font-weight: 800;
-            font-size: 16px;
-            flex-shrink: 0;
-        }
-        .team-info { min-width: 0; flex: 1; display: flex; flex-direction: column; }
-        .team-info strong {
-            font-size: 13px; font-weight: 700;
-            color: var(--text-dark);
-            white-space: nowrap; overflow: hidden; text-overflow: ellipsis;
-        }
-        .team-info span { font-size: 11px; color: var(--text-muted); }
+        .panel-header h2 { font-size: 20px; color: #1a1a2e; }
+        .panel-header p { font-size: 13px; color: #6c757d; margin-top: 4px; }
 
-        /* ========== MATCHES ========== */
-        .match-row {
-            display: grid;
-            grid-template-columns: 1fr auto 1fr;
-            align-items: center;
-            gap: 16px;
-            padding: 16px;
-            border-bottom: 1px solid var(--border-light);
+        /* ===== TEAM LIST ===== */
+        .team-table {
+            width: 100%; border-collapse: collapse;
         }
-        .match-row:last-child { border-bottom: 0; }
-        .match-team {
-            display: flex;
-            align-items: center;
-            gap: 8px;
-            font-size: 13px;
-            font-weight: 700;
-            color: var(--text-dark);
+        .team-table thead th {
+            background: #0d1b3e; color: #fff; padding: 12px;
+            text-align: left; font-size: 12px;
+            text-transform: uppercase; letter-spacing: 0.5px;
         }
-        .match-team.away { justify-content: flex-end; }
-        .match-score {
-            display: flex;
-            align-items: center;
-            gap: 8px;
-            padding: 6px 14px;
-            background: #f3f4f6;
-            border-radius: 8px;
-            font-size: 16px;
-            font-weight: 900;
-            color: var(--text-dark);
-            white-space: nowrap;
-        }
-        .match-score.live { background: #fee2e2; color: #dc2626; }
-        .match-score.scheduled { background: #dbeafe; color: #1769ff; }
-        .match-meta {
-            text-align: center;
-            font-size: 11px;
-            color: var(--text-muted);
-            margin-top: 6px;
-        }
-
-        /* ========== EMPTY STATE ========== */
-        .empty-state {
-            text-align: center;
-            padding: 60px 20px;
-            color: var(--text-muted);
+        .team-table tbody td {
+            padding: 12px; border-bottom: 1px solid #f0f2f8;
             font-size: 14px;
         }
-        .empty-state .icon {
-            font-size: 56px;
-            margin-bottom: 16px;
-            opacity: 0.5;
+        .team-table tbody tr:hover { background: #f8f9fa; }
+        .team-table .player-name { font-weight: 700; color: #1a3a7a; }
+        .team-table .unit-name { color: #6c757d; font-size: 13px; }
+        .team-table .group-badge {
+            display: inline-block; padding: 3px 10px; border-radius: 12px;
+            background: #e3f2fd; color: #1565c0;
+            font-size: 11px; font-weight: 700;
         }
 
-        /* ========== STANDINGS TABLE ========== */
+        /* ===== SCHEDULE ===== */
+        .day-tabs { display: flex; gap: 8px; margin-bottom: 16px; overflow-x: auto; padding-bottom: 8px; }
+        .day-tab {
+            padding: 10px 18px; border-radius: 8px; cursor: pointer;
+            font-weight: 700; font-size: 13px; color: #6c757d;
+            background: #f8f9fa; border: 2px solid transparent;
+            white-space: nowrap; transition: all 0.2s;
+        }
+        .day-tab.active { background: #0d1b3e; color: #fff; }
+        .session-block { margin-bottom: 24px; }
+        .session-title {
+            font-size: 15px; font-weight: 800; color: #1a3a7a;
+            padding: 10px 14px; background: #f8f9fa; border-radius: 8px;
+            margin-bottom: 12px; border-left: 4px solid #1a3a7a;
+        }
+        .match-cards { display: grid; grid-template-columns: repeat(auto-fill, minmax(280px, 1fr)); gap: 12px; }
+        .match-card {
+            background: #fff; border: 2px solid #e9ecef; border-radius: 10px;
+            padding: 12px;
+        }
+        .match-card.completed { border-color: #00b894; background: #f0fdf4; }
+        .match-card.placeholder { border-style: dashed; border-color: #64b5f6; background: #e3f2fd; }
+        .match-card .time {
+            display: inline-block; padding: 3px 10px; border-radius: 6px;
+            background: #0d1b3e; color: #fff; font-size: 11px;
+            font-weight: 800; margin-bottom: 8px;
+        }
+        .match-card.placeholder .time { background: #1565c0; }
+        .match-card .category {
+            font-size: 10px; color: #6c757d; text-transform: uppercase;
+            font-weight: 700; margin-bottom: 8px;
+        }
+        .match-card .teams { font-size: 13px; }
+        .match-card .team {
+            display: flex; justify-content: space-between;
+            padding: 4px 0; font-weight: 600;
+        }
+        .match-card .team.winner { color: #00b894; font-weight: 800; }
+        .match-card .vs {
+            text-align: center; color: #adb5bd; font-size: 11px;
+            margin: 2px 0; font-weight: 700;
+        }
+        .match-card .score {
+            display: flex; justify-content: space-between;
+            font-weight: 800; color: #e94560; font-size: 15px;
+            padding: 4px 0;
+        }
+        .match-card .court {
+            margin-top: 8px; font-size: 11px; color: #6c757d;
+            display: flex; justify-content: space-between;
+        }
+
+        /* ===== STANDINGS ===== */
+        .category-section { margin-bottom: 32px; }
+        .category-title {
+            font-size: 18px; font-weight: 800; color: #1a3a7a;
+            padding: 12px 16px; background: linear-gradient(135deg, #e3f2fd, #bbdefb);
+            border-radius: 10px; margin-bottom: 16px;
+            display: flex; align-items: center; gap: 10px;
+        }
+        .group-title {
+            font-size: 14px; font-weight: 800; color: #0d47a1;
+            padding: 8px 14px; background: #f8f9fa; border-radius: 8px;
+            margin: 16px 0 12px; border-left: 4px solid #0d47a1;
+        }
         .standings-table {
-            width: 100%;
-            border-collapse: collapse;
-            font-size: 13px;
+            width: 100%; border-collapse: collapse;
+            box-shadow: 0 2px 10px rgba(0,0,0,0.05);
+            border-radius: 10px; overflow: hidden;
         }
-        .standings-table th {
-            background: linear-gradient(135deg, #0d47a1, #08306b);
-            color: #fff;
-            padding: 12px 10px;
-            text-align: center;
-            font-weight: 700;
-            font-size: 11px;
+        .standings-table thead th {
+            background: #0d1b3e; color: #fff; padding: 12px;
+            text-align: center; font-size: 12px;
             text-transform: uppercase;
-            letter-spacing: 0.3px;
         }
-        .standings-table td {
-            padding: 12px 10px;
-            border-bottom: 1px solid var(--border-light);
-            text-align: center;
+        .standings-table thead th:first-child,
+        .standings-table thead th:nth-child(2) { text-align: left; }
+        .standings-table tbody td {
+            padding: 12px; border-bottom: 1px solid #f0f2f8;
+            text-align: center; font-size: 14px;
         }
-        .standings-table tbody tr:hover {
-            background: #f9fafb;
+        .standings-table tbody td:first-child,
+        .standings-table tbody td:nth-child(2) { text-align: left; }
+        .standings-table tbody tr:hover { background: #f8f9fa; }
+        .standings-table .rank {
+            display: inline-block; width: 26px; height: 26px;
+            line-height: 26px; border-radius: 50%;
+            background: #f0f2f8; font-weight: 800; font-size: 12px;
         }
-        .standings-table .team-name-cell {
-            text-align: left;
-            font-weight: 700;
-            color: var(--text-dark);
-        }
-        .standings-table .pos-badge {
-            display: inline-flex;
-            align-items: center;
-            justify-content: center;
-            width: 26px;
-            height: 26px;
-            border-radius: 50%;
-            background: #e5e7eb;
-            color: #374151;
-            font-weight: 800;
-            font-size: 12px;
-        }
-        .standings-table .pos-1 { background: linear-gradient(135deg, #fbbf24, #f59e0b); color: #fff; }
-        .standings-table .pos-2 { background: linear-gradient(135deg, #d1d5db, #9ca3af); color: #fff; }
-        .standings-table .pos-3 { background: linear-gradient(135deg, #fb923c, #ea580c); color: #fff; }
+        .standings-table .rank.gold { background: #ffd700; color: #856404; }
+        .standings-table .rank.silver { background: #c0c0c0; color: #495057; }
+        .standings-table .rank.bronze { background: #cd7f32; color: #fff; }
+        .standings-table .team-name { font-weight: 700; color: #1a3a7a; }
+        .standings-table .unit-name { font-size: 12px; color: #6c757d; }
 
-        /* ========== TEAM MODAL ========== */
-        .team-modal {
-            position: fixed;
-            inset: 0;
-            z-index: 1000;
-            display: none;
-            align-items: center;
-            justify-content: center;
-            padding: 24px;
-            background: rgba(15, 23, 42, 0.5);
-            backdrop-filter: blur(4px);
+        /* ===== FINAL RESULTS ===== */
+        .final-results {
+            background: linear-gradient(135deg, #fff8e6, #fff3cd);
+            border-radius: 16px; padding: 24px; margin-top: 24px;
+            border: 2px solid #fdcb6e;
         }
-        .team-modal.show { display: flex; }
-        .team-modal-card {
-            width: min(500px, 100%);
-            max-height: 88vh;
-            overflow: auto;
-            background: #fff;
-            border-radius: 20px;
-            box-shadow: 0 20px 60px rgba(0,0,0,0.3);
-            animation: slideUp 0.3s cubic-bezier(0.16, 1, 0.3, 1);
+        .final-results h3 {
+            font-size: 18px; color: #856404; margin-bottom: 20px;
+            display: flex; align-items: center; gap: 10px;
         }
-        @keyframes slideUp {
-            from { opacity: 0; transform: translateY(20px) scale(0.98); }
-            to { opacity: 1; transform: translateY(0) scale(1); }
+        .podium {
+            display: grid; grid-template-columns: 1fr 1fr 1fr;
+            gap: 16px; align-items: end;
         }
-        .team-modal-head {
-            display: flex;
-            align-items: center;
-            justify-content: space-between;
-            padding: 20px 24px;
-            border-bottom: 1px solid #f3f4f6;
+        .podium-place {
+            background: #fff; border-radius: 12px; padding: 16px;
+            text-align: center; box-shadow: 0 4px 12px rgba(0,0,0,0.08);
         }
-        .team-modal-head h2 {
-            font-size: 18px;
-            font-weight: 800;
-            color: #111827;
+        .podium-place.first { padding-top: 30px; }
+        .podium-place.third { padding-top: 20px; }
+        .podium-place .medal { font-size: 32px; margin-bottom: 8px; }
+        .podium-place .place-label {
+            font-size: 12px; color: #6c757d; text-transform: uppercase;
+            font-weight: 700; margin-bottom: 8px;
         }
-        .team-modal-close {
-            width: 32px;
-            height: 32px;
-            border-radius: 8px;
-            background: #f3f4f6;
-            color: #6b7280;
-            font-size: 20px;
-            display: flex;
-            align-items: center;
-            justify-content: center;
-            cursor: pointer;
-            border: 0;
-            transition: all 0.2s;
+        .podium-place .team-name {
+            font-size: 15px; font-weight: 800; color: #1a3a7a;
+            margin-bottom: 4px;
         }
-        .team-modal-close:hover {
-            background: #fee2e2;
-            color: #dc2626;
-            transform: rotate(90deg);
+        .podium-place .unit-name {
+            font-size: 12px; color: #6c757d;
         }
-        .team-modal-body { padding: 20px 24px; }
-        .team-modal-body label {
-            display: block;
-            font-size: 13px;
-            font-weight: 700;
-            color: #111827;
-            margin-bottom: 6px;
+        .other-ranks {
+            margin-top: 20px; display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+            gap: 12px;
         }
-        .team-modal-body input,
-        .team-modal-body select {
-            width: 100%;
-            padding: 11px 14px;
-            border: 1.5px solid #e5e7eb;
-            border-radius: 8px;
-            font-size: 14px;
-            background: #f9fafb;
+        .rank-card {
+            background: #fff; border-radius: 10px; padding: 12px 16px;
+            border-left: 4px solid #fdcb6e;
+        }
+        .rank-card .rank-label {
+            font-size: 11px; color: #856404; font-weight: 800;
+            text-transform: uppercase; margin-bottom: 6px;
+        }
+        .rank-card .rank-teams {
+            font-size: 13px; color: #1a1a2e; font-weight: 600;
+            line-height: 1.6;
+        }
+
+        /* ===== EMPTY / LOADING ===== */
+        .empty-state {
+            text-align: center; padding: 60px 20px; color: #6c757d;
+        }
+        .empty-state i {
+            font-size: 56px; color: #dee2e6;
+            margin-bottom: 16px; display: block;
+        }
+        .empty-state h3 { font-size: 18px; color: #1a1a2e; margin-bottom: 8px; }
+        .empty-state p { font-size: 14px; }
+
+        .loading {
+            text-align: center; padding: 60px 20px; color: #6c757d;
+        }
+        .loading i {
+            font-size: 40px; color: #dee2e6;
+            animation: spin 1s linear infinite; display: block;
             margin-bottom: 16px;
-            transition: all 0.2s;
-            font-family: inherit;
         }
-        .team-modal-body input:focus,
-        .team-modal-body select:focus {
-            border-color: #1769ff;
-            background: #fff;
-            outline: none;
-            box-shadow: 0 0 0 3px rgba(23,105,255,0.1);
+        @keyframes spin { from { transform: rotate(0deg); } to { transform: rotate(360deg); } }
+
+        /* ===== ALERT ===== */
+        .alert {
+            padding: 14px 18px; border-radius: 10px; margin-bottom: 16px;
+            font-size: 14px; display: none;
         }
-        .team-modal-actions {
-            display: flex;
-            justify-content: flex-end;
-            gap: 10px;
-            padding-top: 16px;
-            border-top: 1px solid #f3f4f6;
+        .alert.show { display: block; }
+        .alert.error { background: #f8d7da; color: #721c24; }
+        .alert.success { background: #d4edda; color: #155724; }
+        .alert.info { background: #cce5ff; color: #004085; }
+
+        /* ===== RESPONSIVE ===== */
+        @media (max-width: 768px) {
+            .sidebar { transform: translateX(-100%); }
+            .main-content { margin-left: 0; max-width: 100vw; padding: 12px; }
+            .tabs { flex-wrap: wrap; }
+            .tab { flex: 1 1 45%; font-size: 12px; padding: 10px; }
+            .tournament-header h1 { font-size: 20px; }
+            .podium { grid-template-columns: 1fr; }
+            .podium-place.first { padding-top: 16px; }
         }
     </style>
 </head>
-
 <body>
 
-    <div class="app">
-        <main class="main">
-
-            <!-- TOPBAR -->
-            <header class="topbar">
-                <div class="topbar-left">
-                    <button class="mobile-menu" id="mobileMenu" aria-label="Mở menu">☰</button>
-                    <div class="topbar-brand">
-                        <span class="topbar-label">SPORTS MANAGEMENT PLATFORM</span>
-                        <h1 class="topbar-title-main">SPORTS<span>VN</span></h1>
-                        <p class="topbar-subtitle">Chi tiết giải đấu</p>
-                    </div>
-                </div>
-
-                <div class="topbar-right">
-                    <a href="index.html" class="topbar-cta" style="background:linear-gradient(135deg,#6b7280,#9ca3af);box-shadow:none;">
-                        ← Về trang chủ
-                    </a>
-                    <div class="top-user" id="topUser">
-                        <div class="avatar">A</div>
-                        <div class="top-user-info">
-                            <strong>Khách</strong>
-                            <span>SportsVN</span>
-                        </div>
-                        <span class="arrow">▾</span>
-                    </div>
-                </div>
-            </header>
-
-
-            <!-- CONTENT -->
-            <section class="content">
-
-                <!-- ADMIN TOOLBAR -->
-                <div class="admin-toolbar" id="adminToolbar">
-                    <div class="admin-toolbar-title">
-                        ⚙️ Công cụ quản trị viên
-                    </div>
-
-                    <a href="#" id="btnDraw" class="admin-toolbar-btn draw">
-                        🎲 Bốc thăm
-                    </a>
-
-                    <a href="#" id="btnSchedule" class="admin-toolbar-btn schedule">
-                        📅 Xếp lịch thi đấu
-                    </a>
-
-                    <button id="btnAddTeam" class="admin-toolbar-btn teams">
-                        👥 Thêm đội
-                    </button>
-
-                    <a href="#" id="btnResults" class="admin-toolbar-btn results">
-                        📊 Nhập kết quả
-                    </a>
-
-                    <button id="btnEditTournament" class="admin-toolbar-btn edit">
-                        ✏️ Sửa giải đấu
-                    </button>
-
-                    <button id="btnDeleteTournament" class="admin-toolbar-btn delete">
-                        🗑 Xóa giải
-                    </button>
-                </div>
-
-
-                <!-- HERO -->
-                <div class="detail-hero" id="detailHero">
-                    <a href="index.html" class="back-link">← Quay lại trang chủ</a>
-
-                    <div class="detail-hero-content">
-                        <div class="detail-hero-icon" id="heroIcon">🏆</div>
-                        <div class="detail-hero-info">
-                            <h1 id="heroTitle">Đang tải...</h1>
-                            <div class="detail-hero-meta">
-                                <span>📅 <span id="heroDate">—</span></span>
-                                <span>👥 <span id="heroTeams">—</span> đội</span>
-                                <span>🏅 <span id="heroSport">—</span></span>
-                            </div>
-                            <div class="detail-hero-status" id="heroStatus">—</div>
-                        </div>
-                    </div>
-                </div>
-
-
-                <!-- TABS -->
-                <div class="tabs-nav" id="tabsNav">
-                    <button class="active" data-tab="teams">👥 Danh sách đội</button>
-                    <button data-tab="matches">⚽ Lịch thi đấu</button>
-                    <button data-tab="standings">📊 Bảng xếp hạng</button>
-                    <button data-tab="info">ℹ️ Thông tin</button>
-                </div>
-
-
-                <!-- TAB 1: DANH SÁCH ĐỘI -->
-                <div class="panel tab-content active" id="tab-teams">
-                    <div class="panel-header">
-                        <div>
-                            <h2>👥 Danh sách đội tham gia</h2>
-                            <p>Các đội đã đăng ký giải đấu</p>
-                        </div>
-                    </div>
-                    <div class="teams-grid" id="teamsContainer">
-                        <div class="empty-state" style="grid-column:1/-1;">
-                            <div class="icon">⏳</div>
-                            <p>Đang tải danh sách đội...</p>
-                        </div>
-                    </div>
-                </div>
-
-
-                <!-- TAB 2: LỊCH THI ĐẤU -->
-                <div class="panel tab-content" id="tab-matches">
-                    <div class="panel-header">
-                        <div>
-                            <h2>⚽ Lịch thi đấu & Kết quả</h2>
-                            <p>Các trận đấu trong giải</p>
-                        </div>
-                    </div>
-                    <div id="matchesContainer">
-                        <div class="empty-state">
-                            <div class="icon">⏳</div>
-                            <p>Đang tải lịch thi đấu...</p>
-                        </div>
-                    </div>
-                </div>
-
-
-                <!-- TAB 3: BẢNG XẾP HẠNG -->
-                <div class="panel tab-content" id="tab-standings">
-                    <div class="panel-header">
-                        <div>
-                            <h2>📊 Bảng xếp hạng</h2>
-                            <p>Thứ hạng các đội trong giải</p>
-                        </div>
-                    </div>
-                    <div id="standingsContainer">
-                        <div class="empty-state">
-                            <div class="icon">📊</div>
-                            <p>Chưa có dữ liệu bảng xếp hạng</p>
-                        </div>
-                    </div>
-                </div>
-
-
-                <!-- TAB 4: THÔNG TIN -->
-                <div class="panel tab-content" id="tab-info">
-                    <div class="panel-header">
-                        <div>
-                            <h2>ℹ️ Thông tin giải đấu</h2>
-                        </div>
-                    </div>
-                    <div id="infoContainer" style="padding:20px;">
-                        <div class="empty-state">
-                            <div class="icon">⏳</div>
-                            <p>Đang tải thông tin...</p>
-                        </div>
-                    </div>
-                </div>
-
-            </section>
-
-
-            <!-- FOOTER -->
-            <footer class="footer">
-                <span>© 2026 SportsVN</span>
-                <span>Nền tảng công nghệ thể thao Việt Nam</span>
-            </footer>
-
-        </main>
-    </div>
-
-
-    <!-- MODAL THÊM ĐỘI -->
-    <div class="team-modal" id="addTeamModal">
-        <div class="team-modal-card">
-            <div class="team-modal-head">
-                <h2>👥 Thêm đội tham gia</h2>
-                <button class="team-modal-close" onclick="closeAddTeamModal()">×</button>
-            </div>
-
-            <form class="team-modal-body" id="addTeamForm">
-                <label>Tên đội / VĐV <span style="color:#e94560;">*</span></label>
-                <input type="text" id="teamName" placeholder="VD: Đội Cầu lông Hà Nội" required>
-
-                <label>CLB / Đơn vị</label>
-                <input type="text" id="teamClub" placeholder="VD: CLB Hà Nội">
-
-                <label>Bảng đấu (nếu đã chia bảng)</label>
-                <select id="teamGroup">
-                    <option value="">-- Chưa xếp bảng --</option>
-                    <option value="A">Bảng A</option>
-                    <option value="B">Bảng B</option>
-                    <option value="C">Bảng C</option>
-                    <option value="D">Bảng D</option>
-                    <option value="E">Bảng E</option>
-                    <option value="F">Bảng F</option>
-                    <option value="G">Bảng G</option>
-                    <option value="H">Bảng H</option>
-                </select>
-
-                <div id="addTeamMsg" style="font-size:13px;font-weight:600;margin-bottom:12px;"></div>
-
-                <div class="team-modal-actions">
-                    <button type="button" class="admin-toolbar-btn edit" onclick="closeAddTeamModal()" style="padding:10px 20px;">Hủy</button>
-                    <button type="submit" class="admin-toolbar-btn teams" id="submitAddTeam" style="padding:10px 20px;">
-                        ➕ Thêm đội
-                    </button>
-                </div>
-            </form>
+<div class="layout">
+    <!-- SIDEBAR -->
+    <aside class="sidebar">
+        <div class="logo">
+            <h2>🏆 SportsVN</h2>
+            <p>Nền tảng thể thao</p>
         </div>
-    </div>
+        <nav>
+            <a href="index.html"><i class="fas fa-home"></i> Trang chủ</a>
+            <a href="tournaments.html" class="active"><i class="fas fa-trophy"></i> Giải đấu</a>
+            <a href="news.html"><i class="fas fa-newspaper"></i> Tin thể thao</a>
+            <a href="videos.html"><i class="fas fa-video"></i> Video</a>
+            <a href="images.html"><i class="fas fa-images"></i> Hình ảnh</a>
+        </nav>
+    </aside>
 
+    <!-- MAIN CONTENT -->
+    <main class="main-content">
+        <!-- TOPBAR -->
+        <div class="topbar">
+            <div class="brand">
+                <strong>SPORTS MANAGEMENT PLATFORM</strong>
+            </div>
+            <div class="user-info">
+                <div class="avatar">SV</div>
+                <span id="user-email">Đang tải...</span>
+                <button class="btn-logout" onclick="logout()">Đăng xuất</button>
+            </div>
+        </div>
 
-    <!-- SCRIPTS -->
-    <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
-    <script src="config.js"></script>
-    <script>
-        // ==========================================
-        // CHI TIẾT GIẢI ĐẤU - SPORTSVN
-        // ==========================================
+        <!-- TOURNAMENT HEADER -->
+        <div class="tournament-header">
+            <a href="tournaments.html" class="back-link">
+                <i class="fas fa-arrow-left"></i> Quay lại danh sách giải
+            </a>
+            <h1 id="tournament-name">Đang tải...</h1>
+            <div class="meta" id="tournament-meta"></div>
+            <span class="status-badge" id="tournament-status"></span>
+        </div>
 
-        document.addEventListener('DOMContentLoaded', async function() {
-            'use strict';
+        <!-- ALERT -->
+        <div id="alert" class="alert"></div>
 
-            const config = window.SPORTSVN_CONFIG || {};
-            if (!config.SUPABASE_URL || !config.SUPABASE_ANON_KEY) {
-                console.warn('⚠️ Chưa cấu hình Supabase');
-                return;
+        <!-- ADMIN TOOLS (chỉ hiện khi login) -->
+        <div class="admin-tools" id="admin-tools" style="display: none;">
+            <div class="title">
+                <i class="fas fa-cog"></i> CÔNG CỤ QUẢN TRỊ VIÊN
+            </div>
+            <div class="actions">
+                <a href="#" id="btn-draw" class="btn btn-purple">
+                    <i class="fas fa-dice"></i> Bốc thăm
+                </a>
+                <a href="#" id="btn-schedule" class="btn btn-blue">
+                    <i class="fas fa-calendar-alt"></i> Xếp lịch thi đấu
+                </a>
+                <a href="#" id="btn-add-team" class="btn btn-green">
+                    <i class="fas fa-user-plus"></i> Thêm đội
+                </a>
+                <a href="#" id="btn-results" class="btn btn-orange">
+                    <i class="fas fa-edit"></i> Nhập kết quả
+                </a>
+                <a href="#" id="btn-categories" class="btn btn-gray">
+                    <i class="fas fa-list"></i> Quản lý nội dung
+                </a>
+            </div>
+        </div>
+
+        <!-- TABS -->
+        <div class="tabs">
+            <button class="tab active" onclick="switchTab('teams')">
+                <i class="fas fa-users"></i> Danh sách đội
+            </button>
+            <button class="tab" onclick="switchTab('schedule')">
+                <i class="fas fa-futbol"></i> Lịch thi đấu
+            </button>
+            <button class="tab" onclick="switchTab('standings')">
+                <i class="fas fa-chart-bar"></i> Bảng xếp hạng
+            </button>
+            <button class="tab" onclick="switchTab('info')">
+                <i class="fas fa-info-circle"></i> Thông tin
+            </button>
+        </div>
+
+        <!-- TAB: TEAMS -->
+        <div class="tab-content active" id="tab-teams">
+            <div class="panel">
+                <div class="panel-header">
+                    <div>
+                        <h2>👥 Danh sách đội tham gia</h2>
+                        <p id="teams-count">Đang tải...</p>
+                    </div>
+                </div>
+                <div id="teams-content">
+                    <div class="loading">
+                        <i class="fas fa-spinner"></i>
+                        <p>Đang tải danh sách...</p>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- TAB: SCHEDULE -->
+        <div class="tab-content" id="tab-schedule">
+            <div class="panel">
+                <div class="panel-header">
+                    <div>
+                        <h2>📅 Lịch thi đấu</h2>
+                        <p id="schedule-count">Đang tải...</p>
+                    </div>
+                </div>
+                <div id="schedule-content">
+                    <div class="loading">
+                        <i class="fas fa-spinner"></i>
+                        <p>Đang tải lịch thi đấu...</p>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- TAB: STANDINGS -->
+        <div class="tab-content" id="tab-standings">
+            <div class="panel">
+                <div class="panel-header">
+                    <div>
+                        <h2>🏆 Bảng xếp hạng</h2>
+                        <p>Bảng xếp hạng vòng bảng + Kết quả chung cuộc</p>
+                    </div>
+                </div>
+                <div id="standings-content">
+                    <div class="loading">
+                        <i class="fas fa-spinner"></i>
+                        <p>Đang tính toán...</p>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- TAB: INFO -->
+        <div class="tab-content" id="tab-info">
+            <div class="panel">
+                <div class="panel-header">
+                    <div>
+                        <h2>ℹ️ Thông tin giải đấu</h2>
+                    </div>
+                </div>
+                <div id="info-content"></div>
+            </div>
+        </div>
+    </main>
+</div>
+
+<script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+<script src="config.js"></script>
+<script src="sports-config.js"></script>
+<script>
+(function() {
+    'use strict';
+
+    console.log('🚀 tournament-detail.html v1 - Public view');
+
+    const config = window.SPORTSVN_CONFIG || {};
+    if (!config.SUPABASE_URL || !config.SUPABASE_ANON_KEY) {
+        document.body.innerHTML = '<p style="color:red;padding:40px;">Lỗi cấu hình Supabase</p>';
+        return;
+    }
+
+    const supabaseClient = window.supabase.createClient(config.SUPABASE_URL, config.SUPABASE_ANON_KEY);
+
+    let tournamentId = null;
+    let tournament = null;
+    let schedules = [];
+    let draws = [];
+    let categories = [];
+    let venues = [];
+    let currentUser = null;
+    let selectedDay = 1;
+
+    // ==========================================
+    // INIT
+    // ==========================================
+    async function init() {
+        const params = new URLSearchParams(window.location.search);
+        tournamentId = params.get('id') || params.get('tournament_id');
+
+        if (!tournamentId) {
+            showAlert('Thiếu ID giải đấu', 'error');
+            return;
+        }
+
+        // Kiểm tra đăng nhập (không bắt buộc)
+        const { data: { session } } = await supabaseClient.auth.getSession();
+        if (session) {
+            currentUser = session.user;
+            document.getElementById('user-email').textContent = session.user.email;
+            document.getElementById('admin-tools').style.display = 'block';
+            // Gán link admin tools
+            document.getElementById('btn-draw').href = `draw.html?id=${tournamentId}`;
+            document.getElementById('btn-schedule').href = `schedule.html?id=${tournamentId}`;
+            document.getElementById('btn-add-team').href = `add-team.html?id=${tournamentId}`;
+            document.getElementById('btn-results').href = `results.html?id=${tournamentId}`;
+            document.getElementById('btn-categories').href = `categories.html?tournament_id=${tournamentId}`;
+        } else {
+            document.getElementById('user-email').textContent = 'Khách';
+        }
+
+        await loadData();
+    }
+
+    // ==========================================
+    // LOAD DATA
+    // ==========================================
+    async function loadData() {
+        try {
+            // Tournament
+            const { data: tour, error: tourErr } = await supabaseClient
+                .from('tournaments')
+                .select('*')
+                .eq('id', tournamentId)
+                .single();
+
+            if (tourErr) throw tourErr;
+            tournament = tour;
+
+            renderTournamentHeader();
+
+            // Categories
+            const { data: cats } = await supabaseClient
+                .from('categories')
+                .select('*')
+                .eq('tournament_id', tournamentId);
+            categories = cats || [];
+
+            // Venues
+            const { data: vens } = await supabaseClient
+                .from('venues')
+                .select('*')
+                .eq('tournament_id', tournamentId)
+                .order('court_number');
+            venues = vens || [];
+
+            // Draws
+            const { data: drawsData } = await supabaseClient
+                .from('draws')
+                .select('*')
+                .eq('tournament_id', tournamentId);
+            draws = drawsData || [];
+
+            // Schedules
+            const { data: scheds } = await supabaseClient
+                .from('schedules')
+                .select('*')
+                .eq('tournament_id', tournamentId)
+                .order('match_date')
+                .order('start_time');
+            schedules = scheds || [];
+
+            console.log('📊 Data:', {
+                categories: categories.length,
+                venues: venues.length,
+                draws: draws.length,
+                schedules: schedules.length
+            });
+
+            renderTeams();
+            renderSchedule();
+            renderStandings();
+            renderInfo();
+
+        } catch (error) {
+            console.error('❌', error);
+            showAlert('Lỗi: ' + error.message, 'error');
+        }
+    }
+
+    // ==========================================
+    // RENDER: TOURNAMENT HEADER
+    // ==========================================
+    function renderTournamentHeader() {
+        document.title = tournament.name + ' - SportsVN';
+        document.getElementById('tournament-name').textContent = tournament.name;
+
+        const sportIcon = tournament.sport === 'Cầu lông' ? '🏸' :
+                         tournament.sport === 'Bóng bàn' ? '🏓' :
+                         tournament.sport === 'Bóng đá' ? '⚽' : '🏆';
+
+        const startDate = tournament.start_date ? formatDate(tournament.start_date) : '—';
+        const endDate = tournament.end_date ? formatDate(tournament.end_date) : '—';
+
+        document.getElementById('tournament-meta').innerHTML = `
+            <span><i class="fas fa-calendar"></i> ${startDate} - ${endDate}</span>
+            <span><i class="fas fa-users"></i> ${draws.length} VĐV</span>
+            <span>${sportIcon} ${tournament.sport || 'Thể thao'}</span>
+            <span><i class="fas fa-map-marker-alt"></i> ${tournament.location || '—'}</span>
+        `;
+
+        const statusEl = document.getElementById('tournament-status');
+        const statusMap = {
+            upcoming: { text: 'Sắp diễn ra', class: 'status-upcoming' },
+            ongoing: { text: 'Đang diễn ra', class: 'status-ongoing' },
+            completed: { text: 'Đã kết thúc', class: 'status-completed' }
+        };
+        const st = statusMap[tournament.status] || statusMap.upcoming;
+        statusEl.textContent = st.text;
+        statusEl.className = 'status-badge ' + st.class;
+    }
+
+    // ==========================================
+    // RENDER: TEAMS
+    // ==========================================
+    function renderTeams() {
+        const container = document.getElementById('teams-content');
+        const countEl = document.getElementById('teams-count');
+
+        if (draws.length === 0) {
+            countEl.textContent = 'Chưa có đội nào';
+            container.innerHTML = `
+                <div class="empty-state">
+                    <i class="fas fa-users"></i>
+                    <h3>Chưa có đội nào đăng ký</h3>
+                    <p>Admin có thể bấm "Thêm đội" để thêm VĐV/đội vào giải</p>
+                </div>
+            `;
+            return;
+        }
+
+        // Nhóm theo category
+        const byCategory = {};
+        draws.forEach(d => {
+            const cat = d.category || 'Chung';
+            if (!byCategory[cat]) byCategory[cat] = [];
+            byCategory[cat].push(d);
+        });
+
+        countEl.textContent = `Tổng ${draws.length} VĐV/đội · ${Object.keys(byCategory).length} nội dung`;
+
+        let html = '';
+        Object.keys(byCategory).forEach(catName => {
+            const catDraws = byCategory[catName];
+            const cat = categories.find(c => c.name === catName);
+            const isKnockout = catDraws[0]?.draw_type === 'knockout';
+
+            html += `
+                <div class="category-section">
+                    <div class="category-title">
+                        <i class="fas fa-trophy"></i>
+                        ${escapeHtml(catName)}
+                        <span style="font-size:12px;font-weight:600;color:#6c757d;margin-left:auto;">
+                            ${catDraws.length} VĐV · ${isKnockout ? 'Loại trực tiếp' : 'Vòng tròn'}
+                        </span>
+                    </div>
+                    <table class="team-table">
+                        <thead>
+                            <tr>
+                                <th style="width:50px;">STT</th>
+                                <th>Tên VĐV/Đội</th>
+                                <th>Đơn vị</th>
+                                <th>Bảng</th>
+                                <th>Mã VĐV</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            ${catDraws.map((d, i) => `
+                                <tr>
+                                    <td>${i + 1}</td>
+                                    <td class="player-name">${escapeHtml(d.team_name)}</td>
+                                    <td class="unit-name">${escapeHtml(d.unit_name || '—')}</td>
+                                    <td><span class="group-badge">Bảng ${escapeHtml(d.group_name || 'A')}</span></td>
+                                    <td>${escapeHtml(d.player_code || '—')}</td>
+                                </tr>
+                            `).join('')}
+                        </tbody>
+                    </table>
+                </div>
+            `;
+        });
+
+        container.innerHTML = html;
+    }
+
+    // ==========================================
+    // RENDER: SCHEDULE
+    // ==========================================
+    function renderSchedule() {
+        const container = document.getElementById('schedule-content');
+        const countEl = document.getElementById('schedule-count');
+
+        if (schedules.length === 0) {
+            countEl.textContent = 'Chưa có lịch thi đấu';
+            container.innerHTML = `
+                <div class="empty-state">
+                    <i class="fas fa-calendar-times"></i>
+                    <h3>Chưa có lịch thi đấu</h3>
+                    <p>Admin chưa xếp lịch cho giải này</p>
+                </div>
+            `;
+            return;
+        }
+
+        const uniqueDates = [...new Set(schedules.map(s => s.match_date))].sort();
+        countEl.textContent = `${schedules.length} trận · ${uniqueDates.length} ngày`;
+
+        // Day tabs
+        let dayTabsHtml = uniqueDates.map((date, i) => {
+            const count = schedules.filter(s => s.match_date === date).length;
+            return `
+                <button class="day-tab ${selectedDay === i + 1 ? 'active' : ''}"
+                        onclick="selectDay(${i + 1}, '${date}')">
+                    📅 Ngày ${i + 1} · ${formatDate(date)} · ${count} trận
+                </button>
+            `;
+        }).join('');
+
+        const currentDate = uniqueDates[selectedDay - 1];
+        const daySchedules = schedules.filter(s => s.match_date === currentDate);
+
+        // Sessions
+        const sessions = [
+            { key: 'morning', label: 'Buổi Sáng', icon: 'sun' },
+            { key: 'afternoon', label: 'Buổi Chiều', icon: 'cloud-sun' },
+            { key: 'evening', label: 'Buổi Tối', icon: 'moon' }
+        ];
+
+        let sessionsHtml = sessions.map(session => {
+            const sessionMatches = daySchedules.filter(s => s.session === session.key);
+            if (sessionMatches.length === 0) return '';
+
+            return `
+                <div class="session-block">
+                    <div class="session-title">
+                        <i class="fas fa-${session.icon}"></i> ${session.label}
+                        <span style="font-weight:600;font-size:12px;color:#6c757d;margin-left:10px;">
+                            ${sessionMatches.length} trận
+                        </span>
+                    </div>
+                    <div class="match-cards">
+                        ${sessionMatches.map(m => renderMatchCard(m)).join('')}
+                    </div>
+                </div>
+            `;
+        }).join('');
+
+        container.innerHTML = `
+            <div class="day-tabs">${dayTabsHtml}</div>
+            ${sessionsHtml}
+        `;
+    }
+
+    function renderMatchCard(m) {
+        const venue = venues.find(v => v.id === m.venue_id);
+        const isCompleted = m.status === 'completed';
+        const isPlaceholder = m.is_placeholder;
+        const hasScore = m.score_a !== null && m.score_b !== null;
+
+        const winnerA = m.winner_name && m.winner_name === m.team_a_name;
+        const winnerB = m.winner_name && m.winner_name === m.team_b_name;
+
+        return `
+            <div class="match-card ${isCompleted ? 'completed' : ''} ${isPlaceholder ? 'placeholder' : ''}">
+                <span class="time">${formatTime(m.start_time)}</span>
+                <div class="category">${escapeHtml(m.notes || '')}</div>
+                <div class="teams">
+                    <div class="team ${winnerA ? 'winner' : ''}">
+                        <span>${escapeHtml(m.team_a_name || '—')}</span>
+                        ${hasScore ? `<span>${m.score_a}</span>` : ''}
+                    </div>
+                    <div class="vs">VS</div>
+                    <div class="team ${winnerB ? 'winner' : ''}">
+                        <span>${escapeHtml(m.team_b_name || '—')}</span>
+                        ${hasScore ? `<span>${m.score_b}</span>` : ''}
+                    </div>
+                </div>
+                <div class="court">
+                    <span><i class="fas fa-map-marker-alt"></i> ${escapeHtml(venue?.court_name || '—')}</span>
+                    ${isCompleted ? '<span style="color:#00b894;font-weight:700;">✓ Đã xong</span>' :
+                      isPlaceholder ? '<span style="color:#1565c0;font-weight:700;">Chờ KQ</span>' :
+                      '<span style="color:#f39c12;font-weight:700;">Sắp đấu</span>'}
+                </div>
+            </div>
+        `;
+    }
+
+    window.selectDay = function(dayNum, date) {
+        selectedDay = dayNum;
+        renderSchedule();
+    };
+
+    // ==========================================
+    // RENDER: STANDINGS
+    // ==========================================
+    function renderStandings() {
+        const container = document.getElementById('standings-content');
+
+        if (categories.length === 0) {
+            container.innerHTML = `
+                <div class="empty-state">
+                    <i class="fas fa-chart-bar"></i>
+                    <h3>Chưa có nội dung thi đấu</h3>
+                </div>
+            `;
+            return;
+        }
+
+        // Lấy config điểm số theo môn
+        const sportConfig = window.getSportConfig ? window.getSportConfig(tournament.sport) : null;
+        const winPoints = sportConfig?.winPoints ?? 2;
+        const drawPoints = sportConfig?.drawPoints ?? 1;
+        const lossPoints = sportConfig?.lossPoints ?? 0;
+
+        let html = '';
+
+        categories.forEach(cat => {
+            const catDraws = draws.filter(d => d.category === cat.name);
+            if (catDraws.length === 0) return;
+
+            const isKnockout = catDraws[0]?.draw_type === 'knockout';
+
+            html += `<div class="category-section">`;
+            html += `
+                <div class="category-title">
+                    <i class="fas fa-trophy"></i> ${escapeHtml(cat.name)}
+                    <span style="font-size:12px;font-weight:600;color:#6c757d;margin-left:auto;">
+                        ${isKnockout ? 'Loại trực tiếp' : 'Vòng tròn'}
+                    </span>
+                </div>
+            `;
+
+            if (!isKnockout) {
+                // Vòng tròn → tính BXH
+                html += renderRoundRobinStandings(cat.name, catDraws, winPoints, drawPoints, lossPoints);
+            } else {
+                // Knockout → chỉ hiển thị kết quả chung cuộc
+                html += `<p style="padding:16px;color:#6c757d;font-style:italic;">
+                    Nội dung loại trực tiếp — xem kết quả chung cuộc bên dưới.
+                </p>`;
             }
 
-            const supabase = window.supabase.createClient(
-                config.SUPABASE_URL,
-                config.SUPABASE_ANON_KEY
+            // Kết quả chung cuộc
+            html += renderFinalResults(cat.name);
+
+            html += `</div>`;
+        });
+
+        if (html === '') {
+            html = `
+                <div class="empty-state">
+                    <i class="fas fa-chart-bar"></i>
+                    <h3>Chưa có dữ liệu</h3>
+                </div>
+            `;
+        }
+
+        container.innerHTML = html;
+    }
+
+    // Tính BXH vòng tròn
+    function renderRoundRobinStandings(catName, catDraws, winPoints, drawPoints, lossPoints) {
+        // Nhóm theo bảng
+        const groups = {};
+        catDraws.forEach(d => {
+            const g = d.group_name || 'A';
+            if (!groups[g]) groups[g] = [];
+            groups[g].push(d);
+        });
+
+        // Lấy schedules của category này
+        const catSchedules = schedules.filter(s =>
+            s.notes && s.notes.includes(catName) && !s.is_placeholder
+        );
+
+        let html = '';
+
+        Object.keys(groups).sort().forEach(groupName => {
+            const groupDraws = groups[groupName];
+            const groupSchedules = catSchedules.filter(s =>
+                s.notes && s.notes.includes(`Bảng ${groupName}`)
             );
 
-            // ================================
-            // 1. LẤY ID TỪ URL
-            // ================================
-            const params = new URLSearchParams(window.location.search);
-            const tournamentId = params.get('id');
-
-            if (!tournamentId) {
-                document.getElementById('heroTitle').textContent = '❌ Không tìm thấy giải đấu';
-                document.getElementById('heroIcon').textContent = '⚠️';
-                return;
-            }
-
-            // ================================
-            // 2. HELPERS
-            // ================================
-            function getSportIcon(sport) {
-                const icons = {
-                    football: '⚽', swimming: '🏊', basketball: '🏀',
-                    pickleball: '◉', volleyball: '🏐', tennis: '🎾',
-                    badminton: '🏸', chess: '♟️', athletics: '🏃',
-                    martial_arts: '🥋', default: '🏆'
+            // Tính điểm từng VĐV
+            const standings = {};
+            groupDraws.forEach(d => {
+                standings[d.team_name] = {
+                    name: d.team_name,
+                    unit: d.unit_name || '—',
+                    played: 0, wins: 0, draws: 0, losses: 0,
+                    points: 0, scoreFor: 0, scoreAgainst: 0
                 };
-                return icons[sport] || icons.default;
-            }
+            });
 
-            function getStatusInfo(status) {
-                if (status === 'active') return { text: 'Đang diễn ra', cls: 'active' };
-                if (status === 'upcoming') return { text: 'Sắp diễn ra', cls: 'upcoming' };
-                return { text: 'Đã kết thúc', cls: 'completed' };
-            }
+            groupSchedules.forEach(m => {
+                if (m.status !== 'completed') return;
+                if (m.score_a === null || m.score_b === null) return;
 
-            function formatDate(d) {
-                if (!d) return '—';
-                return new Date(d).toLocaleDateString('vi-VN');
-            }
+                const a = standings[m.team_a_name];
+                const b = standings[m.team_b_name];
+                if (!a || !b) return;
 
-            function formatDateTime(d) {
-                if (!d) return '—';
-                const date = new Date(d);
-                return date.toLocaleDateString('vi-VN') + ' · ' +
-                       date.toLocaleTimeString('vi-VN', { hour: '2-digit', minute: '2-digit' });
-            }
+                a.played++; b.played++;
+                a.scoreFor += m.score_a; a.scoreAgainst += m.score_b;
+                b.scoreFor += m.score_b; b.scoreAgainst += m.score_a;
 
-            function getInitials(name) {
-                return (name || '?')
-                    .split(' ')
-                    .map(w => w[0])
-                    .join('')
-                    .slice(0, 2)
-                    .toUpperCase();
-            }
-
-            // ================================
-            // 3. LOAD THÔNG TIN GIẢI ĐẤU
-            // ================================
-            async function loadTournament() {
-                try {
-                    const { data, error } = await supabase
-                        .from('tournaments')
-                        .select('*')
-                        .eq('id', tournamentId)
-                        .single();
-
-                    if (error || !data) {
-                        document.getElementById('heroTitle').textContent = '❌ Không tìm thấy giải đấu';
-                        return;
-                    }
-
-                    document.getElementById('heroIcon').textContent = getSportIcon(data.sport);
-                    document.getElementById('heroTitle').textContent = data.name || '—';
-                    document.getElementById('heroSport').textContent = data.sport_name || '—';
-                    document.getElementById('heroTeams').textContent = data.team_count || 0;
-
-                    const start = data.start_date ? new Date(data.start_date).toLocaleDateString('vi-VN') : '';
-                    const end = data.end_date ? new Date(data.end_date).toLocaleDateString('vi-VN') : '';
-                    document.getElementById('heroDate').textContent = start + (end ? ' - ' + end : '');
-
-                    const statusInfo = getStatusInfo(data.status);
-                    const statusEl = document.getElementById('heroStatus');
-                    statusEl.textContent = statusInfo.text;
-                    statusEl.className = 'detail-hero-status ' + statusInfo.cls;
-
-                    document.getElementById('infoContainer').innerHTML = `
-                        <div style="display:grid;grid-template-columns:repeat(auto-fit,minmax(200px,1fr));gap:16px;">
-                            <div style="padding:16px;background:#f9fafb;border-radius:12px;">
-                                <div style="font-size:11px;color:#6b7280;font-weight:700;text-transform:uppercase;margin-bottom:6px;">Tên giải</div>
-                                <div style="font-size:14px;font-weight:700;color:#111827;">${data.name}</div>
-                            </div>
-                            <div style="padding:16px;background:#f9fafb;border-radius:12px;">
-                                <div style="font-size:11px;color:#6b7280;font-weight:700;text-transform:uppercase;margin-bottom:6px;">Môn thể thao</div>
-                                <div style="font-size:14px;font-weight:700;color:#111827;">${getSportIcon(data.sport)} ${data.sport_name || '—'}</div>
-                            </div>
-                            <div style="padding:16px;background:#f9fafb;border-radius:12px;">
-                                <div style="font-size:11px;color:#6b7280;font-weight:700;text-transform:uppercase;margin-bottom:6px;">Số đội</div>
-                                <div style="font-size:14px;font-weight:700;color:#111827;">${data.team_count || 0} đội</div>
-                            </div>
-                            <div style="padding:16px;background:#f9fafb;border-radius:12px;">
-                                <div style="font-size:11px;color:#6b7280;font-weight:700;text-transform:uppercase;margin-bottom:6px;">Trạng thái</div>
-                                <div style="font-size:14px;font-weight:700;color:#111827;">${statusInfo.text}</div>
-                            </div>
-                            <div style="padding:16px;background:#f9fafb;border-radius:12px;">
-                                <div style="font-size:11px;color:#6b7280;font-weight:700;text-transform:uppercase;margin-bottom:6px;">Ngày bắt đầu</div>
-                                <div style="font-size:14px;font-weight:700;color:#111827;">${start || '—'}</div>
-                            </div>
-                            <div style="padding:16px;background:#f9fafb;border-radius:12px;">
-                                <div style="font-size:11px;color:#6b7280;font-weight:700;text-transform:uppercase;margin-bottom:6px;">Ngày kết thúc</div>
-                                <div style="font-size:14px;font-weight:700;color:#111827;">${end || '—'}</div>
-                            </div>
-                        </div>
-                    `;
-
-                } catch (err) {
-                    console.error('Lỗi load tournament:', err);
+                if (m.score_a > m.score_b) {
+                    a.wins++; a.points += winPoints;
+                    b.losses++; b.points += lossPoints;
+                } else if (m.score_a < m.score_b) {
+                    b.wins++; b.points += winPoints;
+                    a.losses++; a.points += lossPoints;
+                } else {
+                    a.draws++; a.points += drawPoints;
+                    b.draws++; b.points += drawPoints;
                 }
-            }
+            });
 
-            await loadTournament();
+            // Sắp xếp: điểm → hiệu số → đối đầu
+            const sorted = Object.values(standings).sort((x, y) => {
+                if (y.points !== x.points) return y.points - x.points;
+                const diffX = x.scoreFor - x.scoreAgainst;
+                const diffY = y.scoreFor - y.scoreAgainst;
+                if (diffY !== diffX) return diffY - diffX;
+                return y.scoreFor - x.scoreFor;
+            });
 
-            // ================================
-            // 4. LOAD DANH SÁCH ĐỘI
-            // ================================
-            async function loadTeams() {
-                const container = document.getElementById('teamsContainer');
-                try {
-                    const { data, error } = await supabase
-                        .from('teams')
-                        .select('*')
-                        .eq('tournament_id', tournamentId)
-                        .order('name', { ascending: true });
-
-                    if (error || !data || data.length === 0) {
-                        container.innerHTML = `
-                            <div class="empty-state" style="grid-column:1/-1;">
-                                <div class="icon">👥</div>
-                                <p>Chưa có đội nào đăng ký giải đấu này</p>
-                                <p style="font-size:12px;margin-top:8px;opacity:0.7;">Admin có thể bấm "👥 Thêm đội" để thêm</p>
-                            </div>
-                        `;
-                        return;
-                    }
-
-                    container.innerHTML = data.map(team => `
-                        <div class="team-card">
-                            <div class="team-logo">
-                                ${team.logo_url 
-                                    ? `<img src="${team.logo_url}" alt="${team.name}" style="width:100%;height:100%;object-fit:cover;border-radius:12px;">` 
-                                    : getInitials(team.name)}
-                            </div>
-                            <div class="team-info">
-                                <strong>${team.name}</strong>
-                                <span>${team.club ? '🛡 ' + team.club : (team.group_name ? 'Bảng ' + team.group_name : 'Chưa xếp bảng')}</span>
-                            </div>
-                        </div>
-                    `).join('');
-
-                } catch (err) {
-                    console.error('Lỗi load teams:', err);
-                    container.innerHTML = `
-                        <div class="empty-state" style="grid-column:1/-1;">
-                            <div class="icon">👥</div>
-                            <p>Chưa có dữ liệu đội</p>
-                        </div>
-                    `;
-                }
-            }
-
-            loadTeams();
-
-            // ================================
-            // 5. LOAD LỊCH THI ĐẤU
-            // ================================
-            async function loadMatches() {
-                const container = document.getElementById('matchesContainer');
-                try {
-                    const { data, error } = await supabase
-                        .from('matches')
-                        .select('*')
-                        .eq('tournament_id', tournamentId)
-                        .order('match_date', { ascending: true });
-
-                    if (error || !data || data.length === 0) {
-                        container.innerHTML = `
-                            <div class="empty-state">
-                                <div class="icon">⚽</div>
-                                <p>Chưa có lịch thi đấu cho giải đấu này</p>
-                                <p style="font-size:12px;margin-top:8px;opacity:0.7;">Admin có thể bấm "📅 Xếp lịch thi đấu" để tạo</p>
-                            </div>
-                        `;
-                        return;
-                    }
-
-                    container.innerHTML = data.map(m => {
-                        const isFinished = m.status === 'finished' ||
-                                          (m.home_score !== null && m.away_score !== null);
-                        const isLive = m.status === 'live';
-
-                        const scoreClass = isLive ? 'live' :
-                                          isFinished ? '' : 'scheduled';
-
-                        const homeScore = m.home_score ?? '-';
-                        const awayScore = m.away_score ?? '-';
-
-                        return `
-                            <div class="match-row">
-                                <div class="match-team">
-                                    <div class="team-logo" style="width:32px;height:32px;font-size:12px;">
-                                        ${getInitials(m.home_team)}
-                                    </div>
-                                    ${m.home_team || '—'}
-                                </div>
-                                <div style="text-align:center;">
-                                    <div class="match-score ${scoreClass}">
-                                        <span>${homeScore}</span>
-                                        <span style="opacity:0.5;">-</span>
-                                        <span>${awayScore}</span>
-                                    </div>
-                                    <div class="match-meta">
-                                        ${m.round ? m.round + ' · ' : ''}${formatDateTime(m.match_date)}
-                                    </div>
-                                </div>
-                                <div class="match-team away">
-                                    ${m.away_team || '—'}
-                                    <div class="team-logo" style="width:32px;height:32px;font-size:12px;">
-                                        ${getInitials(m.away_team)}
-                                    </div>
-                                </div>
-                            </div>
-                        `;
-                    }).join('');
-
-                } catch (err) {
-                    console.error('Lỗi load matches:', err);
-                    container.innerHTML = `
-                        <div class="empty-state">
-                            <div class="icon">⚽</div>
-                            <p>Chưa có dữ liệu lịch thi đấu</p>
-                        </div>
-                    `;
-                }
-            }
-
-            loadMatches();
-
-            // ================================
-            // 6. LOAD BẢNG XẾP HẠNG
-            // ================================
-            async function loadStandings() {
-                const container = document.getElementById('standingsContainer');
-                try {
-                    const { data, error } = await supabase
-                        .from('standings')
-                        .select('*')
-                        .eq('tournament_id', tournamentId)
-                        .order('position', { ascending: true });
-
-                    if (error || !data || data.length === 0) {
-                        container.innerHTML = `
-                            <div class="empty-state">
-                                <div class="icon">📊</div>
-                                <p>Chưa có dữ liệu bảng xếp hạng</p>
-                                <p style="font-size:12px;margin-top:8px;opacity:0.7;">Bảng xếp hạng sẽ tự động cập nhật khi có kết quả</p>
-                            </div>
-                        `;
-                        return;
-                    }
-
-                    container.innerHTML = `
-                        <table class="standings-table">
-                            <thead>
+            html += `
+                <div class="group-title">
+                    <i class="fas fa-layer-group"></i> BẢNG ${escapeHtml(groupName)}
+                    <span style="font-weight:600;font-size:12px;color:#6c757d;margin-left:10px;">
+                        ${groupDraws.length} VĐV
+                    </span>
+                </div>
+                <table class="standings-table">
+                    <thead>
+                        <tr>
+                            <th style="width:50px;">Hạng</th>
+                            <th>Tên VĐV/Đội</th>
+                            <th style="width:50px;">Tr</th>
+                            <th style="width:50px;">T</th>
+                            <th style="width:50px;">H</th>
+                            <th style="width:50px;">B</th>
+                            <th style="width:60px;">Điểm</th>
+                            <th style="width:80px;">Hiệu số</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        ${sorted.map((s, i) => {
+                            const rankClass = i === 0 ? 'gold' : i === 1 ? 'silver' : i === 2 ? 'bronze' : '';
+                            const diff = s.scoreFor - s.scoreAgainst;
+                            return `
                                 <tr>
-                                    <th style="width:50px;">Hạng</th>
-                                    <th style="text-align:left;">Đội</th>
-                                    <th>Trận</th>
-                                    <th>Thắng</th>
-                                    <th>Hòa</th>
-                                    <th>Thua</th>
-                                    <th>Điểm</th>
-                                    <th>HS</th>
+                                    <td><span class="rank ${rankClass}">${i + 1}</span></td>
+                                    <td>
+                                        <div class="team-name">${escapeHtml(s.name)}</div>
+                                        <div class="unit-name">${escapeHtml(s.unit)}</div>
+                                    </td>
+                                    <td>${s.played}</td>
+                                    <td>${s.wins}</td>
+                                    <td>${s.draws}</td>
+                                    <td>${s.losses}</td>
+                                    <td style="font-weight:800;color:#1a3a7a;">${s.points}</td>
+                                    <td>${diff > 0 ? '+' : ''}${diff}</td>
                                 </tr>
-                            </thead>
-                            <tbody>
-                                ${data.map((s, idx) => {
-                                    const posClass = s.position === 1 ? 'pos-1' :
-                                                    s.position === 2 ? 'pos-2' :
-                                                    s.position === 3 ? 'pos-3' : '';
-                                    return `
-                                        <tr>
-                                            <td><span class="pos-badge ${posClass}">${s.position || idx + 1}</span></td>
-                                            <td class="team-name-cell">${s.team_name || '—'}</td>
-                                            <td>${s.played || 0}</td>
-                                            <td>${s.won || 0}</td>
-                                            <td>${s.drawn || 0}</td>
-                                            <td>${s.lost || 0}</td>
-                                            <td><strong style="color:#1769ff;">${s.points || 0}</strong></td>
-                                            <td>${s.goal_diff || 0}</td>
-                                        </tr>
-                                    `;
-                                }).join('')}
-                            </tbody>
-                        </table>
-                    `;
-                } catch (err) {
-                    console.error('Lỗi load standings:', err);
-                    container.innerHTML = `
-                        <div class="empty-state">
-                            <div class="icon">📊</div>
-                            <p>Chưa có dữ liệu bảng xếp hạng</p>
-                        </div>
-                    `;
-                }
-            }
-
-            loadStandings();
-
-            // ================================
-            // 7. TAB SWITCHING
-            // ================================
-            document.querySelectorAll('#tabsNav button').forEach(btn => {
-                btn.addEventListener('click', () => {
-                    const tab = btn.dataset.tab;
-                    document.querySelectorAll('#tabsNav button').forEach(b => b.classList.remove('active'));
-                    btn.classList.add('active');
-                    document.querySelectorAll('.tab-content').forEach(c => c.classList.remove('active'));
-                    document.getElementById('tab-' + tab)?.classList.add('active');
-                });
-            });
-
-            // ================================
-            // 8. TOP USER
-            // ================================
-            const { data: { session } } = await supabase.auth.getSession();
-            const topUser = document.getElementById('topUser');
-            const topUserName = topUser?.querySelector('strong');
-            const topAvatar = topUser?.querySelector('.avatar');
-
-            if (session) {
-                const name = session.user.user_metadata?.full_name ||
-                             session.user.email.split('@')[0];
-                const initials = getInitials(name);
-                if (topUserName) topUserName.textContent = name;
-                if (topAvatar) topAvatar.textContent = initials;
-
-                topUser?.addEventListener('click', async () => {
-                    if (confirm('Bạn có muốn đăng xuất không?')) {
-                        await supabase.auth.signOut();
-                        window.location.href = 'index.html';
-                    }
-                });
-            } else {
-                if (topUserName) topUserName.textContent = 'Khách';
-                topUser?.addEventListener('click', () => {
-                    window.location.href = 'login.html';
-                });
-            }
-
-            // ================================
-            // 9. ADMIN TOOLBAR
-            // ================================
-            async function setupAdminToolbar() {
-                try {
-                    if (!session) return;
-
-                    const { data: roleData } = await supabase
-                        .from('user_roles')
-                        .select('role')
-                        .eq('user_id', session.user.id)
-                        .single();
-
-                    if (!roleData || roleData.role !== 'admin') return;
-
-                    // Hiện toolbar
-                    const toolbar = document.getElementById('adminToolbar');
-                    if (toolbar) toolbar.classList.add('visible');
-
-                    // Gắn link
-                    document.getElementById('btnDraw').href = `draw.html?id=${tournamentId}`;
-                    document.getElementById('btnSchedule').href = `schedule.html?id=${tournamentId}`;
-                    document.getElementById('btnResults').href = `results.html?id=${tournamentId}`;
-
-                    // Nút thêm đội
-                    document.getElementById('btnAddTeam').addEventListener('click', () => {
-                        document.getElementById('addTeamModal').classList.add('show');
-                    });
-
-                    // Sửa giải
-                    document.getElementById('btnEditTournament').addEventListener('click', () => {
-                        alert('Chức năng sửa giải đấu — Bạn có thể vào tournaments.html để sửa.');
-                    });
-
-                    // Xóa giải
-                    document.getElementById('btnDeleteTournament').addEventListener('click', async () => {
-                        if (!confirm('⚠️ Bạn có chắc muốn XÓA giải đấu này? Hành động không thể hoàn tác!')) return;
-                        try {
-                            const { error } = await supabase
-                                .from('tournaments')
-                                .delete()
-                                .eq('id', tournamentId);
-                            if (error) throw error;
-                            alert('✅ Đã xóa giải đấu!');
-                            window.location.href = 'tournaments.html';
-                        } catch (err) {
-                            alert('Lỗi xóa: ' + err.message);
-                        }
-                    });
-
-                    // Form thêm đội
-                    document.getElementById('addTeamForm').addEventListener('submit', async (e) => {
-                        e.preventDefault();
-                        const name = document.getElementById('teamName').value.trim();
-                        const club = document.getElementById('teamClub').value.trim();
-                        const group = document.getElementById('teamGroup').value;
-                        const msgEl = document.getElementById('addTeamMsg');
-                        const submitBtn = document.getElementById('submitAddTeam');
-
-                        if (!name) {
-                            msgEl.style.color = '#dc2626';
-                            msgEl.textContent = '⚠️ Vui lòng nhập tên đội';
-                            return;
-                        }
-
-                        submitBtn.disabled = true;
-                        submitBtn.textContent = '⏳ Đang thêm...';
-
-                        try {
-                            const { error } = await supabase
-                                .from('teams')
-                                .insert([{
-                                    tournament_id: tournamentId,
-                                    name: name,
-                                    club: club || null,
-                                    group_name: group || null
-                                }]);
-
-                            if (error) throw error;
-
-                            msgEl.style.color = '#00b894';
-                            msgEl.textContent = '✅ Đã thêm đội thành công!';
-
-                            setTimeout(() => {
-                                closeAddTeamModal();
-                                loadTeams();
-                                // Cập nhật lại số đội ở hero
-                                loadTournament();
-                            }, 800);
-                        } catch (err) {
-                            msgEl.style.color = '#dc2626';
-                            msgEl.textContent = '❌ Lỗi: ' + err.message;
-                        } finally {
-                            submitBtn.disabled = false;
-                            submitBtn.textContent = '➕ Thêm đội';
-                        }
-                    });
-
-                    console.log('✅ Admin toolbar đã kích hoạt');
-
-                } catch (err) {
-                    console.error('Lỗi setup admin toolbar:', err);
-                }
-            }
-
-            await setupAdminToolbar();
-
-            // ================================
-            // 10. ĐÓNG MODAL THÊM ĐỘI
-            // ================================
-            window.closeAddTeamModal = function() {
-                document.getElementById('addTeamModal').classList.remove('show');
-                document.getElementById('addTeamForm').reset();
-                document.getElementById('addTeamMsg').textContent = '';
-            };
-
-            // Click ra ngoài modal để đóng
-            document.getElementById('addTeamModal')?.addEventListener('click', (e) => {
-                if (e.target.id === 'addTeamModal') {
-                    closeAddTeamModal();
-                }
-            });
-
-            // ================================
-            // 11. MOBILE MENU
-            // ================================
-            document.getElementById('mobileMenu')?.addEventListener('click', () => {
-                document.querySelector('.sidebar')?.classList.toggle('open');
-            });
-
-            console.log('✅ Trang chi tiết giải đấu đã load');
+                            `;
+                        }).join('')}
+                    </tbody>
+                </table>
+            `;
         });
-    </script>
+
+        return html;
+    }
+
+    // Kết quả chung cuộc
+    function renderFinalResults(catName) {
+        const finalResults = tournament.final_results || {};
+        const catResults = finalResults[catName] || {};
+
+        const hasResults = catResults.first || catResults.second || 
+                          (catResults.third && catResults.third.length > 0);
+
+        if (!hasResults) {
+            return `
+                <div class="final-results">
+                    <h3><i class="fas fa-trophy"></i> Kết quả chung cuộc</h3>
+                    <p style="color:#856404;font-style:italic;">
+                        Chưa có kết quả. Admin có thể nhập kết quả tại trang Nhập kết quả.
+                    </p>
+                </div>
+            `;
+        }
+
+        const third = Array.isArray(catResults.third) ? catResults.third : 
+                     catResults.third ? [catResults.third] : [];
+        const fifth = Array.isArray(catResults.fifth) ? catResults.fifth : 
+                     catResults.fifth ? [catResults.fifth] : [];
+
+        return `
+            <div class="final-results">
+                <h3><i class="fas fa-trophy"></i> Kết quả chung cuộc - ${escapeHtml(catName)}</h3>
+                <div class="podium">
+                    <div class="podium-place second">
+                        <div class="medal">🥈</div>
+                        <div class="place-label">Giải Nhì</div>
+                        <div class="team-name">${escapeHtml(catResults.second || '—')}</div>
+                        <div class="unit-name">${escapeHtml(catResults.second_unit || '')}</div>
+                    </div>
+                    <div class="podium-place first">
+                        <div class="medal">🥇</div>
+                        <div class="place-label">Giải Nhất</div>
+                        <div class="team-name">${escapeHtml(catResults.first || '—')}</div>
+                        <div class="unit-name">${escapeHtml(catResults.first_unit || '')}</div>
+                    </div>
+                    <div class="podium-place third">
+                        <div class="medal">🥉</div>
+                        <div class="place-label">Giải Ba</div>
+                        <div class="team-name">${third.length > 0 ? third.map(t => escapeHtml(t)).join('<br>') : '—'}</div>
+                    </div>
+                </div>
+                ${fifth.length > 0 ? `
+                    <div class="other-ranks">
+                        <div class="rank-card">
+                            <div class="rank-label">Đồng hạng 5</div>
+                            <div class="rank-teams">${fifth.map(t => escapeHtml(t)).join('<br>')}</div>
+                        </div>
+                    </div>
+                ` : ''}
+            </div>
+        `;
+    }
+
+    // ==========================================
+    // RENDER: INFO
+    // ==========================================
+    function renderInfo() {
+        const container = document.getElementById('info-content');
+        container.innerHTML = `
+            <div style="padding:16px;line-height:1.8;color:#1a1a2e;">
+                <p><strong>Tên giải:</strong> ${escapeHtml(tournament.name)}</p>
+                <p><strong>Môn:</strong> ${escapeHtml(tournament.sport || '—')}</p>
+                <p><strong>Địa điểm:</strong> ${escapeHtml(tournament.location || '—')}</p>
+                <p><strong>Thời gian:</strong> ${formatDate(tournament.start_date)} - ${formatDate(tournament.end_date)}</p>
+                <p><strong>Số sân:</strong> ${tournament.num_tables || 0}</p>
+                <p><strong>Số ngày:</strong> ${tournament.num_days || 0}</p>
+                <p><strong>Số buổi/ngày:</strong> ${tournament.sessions_per_day || 0}</p>
+                <p><strong>Mô tả:</strong> ${escapeHtml(tournament.description || '—')}</p>
+            </div>
+        `;
+    }
+
+    // ==========================================
+    // TAB SWITCHING
+    // ==========================================
+    window.switchTab = function(tabName) {
+        document.querySelectorAll('.tab').forEach(t => t.classList.remove('active'));
+        document.querySelectorAll('.tab-content').forEach(t => t.classList.remove('active'));
+
+        event.target.closest('.tab').classList.add('active');
+        document.getElementById('tab-' + tabName).classList.add('active');
+    };
+
+    // ==========================================
+    // HELPERS
+    // ==========================================
+    function formatDate(dateStr) {
+        if (!dateStr) return '—';
+        const [y, m, d] = dateStr.split('-').map(Number);
+        const date = new Date(y, m - 1, d);
+        return date.toLocaleDateString('vi-VN', { day: '2-digit', month: '2-digit', year: 'numeric' });
+    }
+
+    function formatTime(timeStr) {
+        if (!timeStr) return '';
+        return timeStr.slice(0, 5);
+    }
+
+    function escapeHtml(text) {
+        return String(text || '').replace(/&/g, '&amp;').replace(/</g, '&lt;')
+            .replace(/>/g, '&gt;').replace(/"/g, '&quot;');
+    }
+
+    function showAlert(message, type) {
+        const el = document.getElementById('alert');
+        el.textContent = message;
+        el.className = 'alert show ' + type;
+        setTimeout(() => { el.className = 'alert'; }, 5000);
+    }
+
+    window.logout = async function() {
+        await supabaseClient.auth.signOut();
+        window.location.href = 'login.html';
+    };
+
+    init();
+})();
+</script>
 
 </body>
 </html>
