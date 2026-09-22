@@ -60,9 +60,43 @@
             outline: none;
             font-family: inherit;
             background: #f9fafb;
-            min-width: 250px;
+            min-width: 220px;
         }
         .filter-bar select:focus { border-color: #1a3a7a; background: #fff; }
+
+        /* TYPE TABS */
+        .type-tabs {
+            display: flex;
+            gap: 8px;
+            margin-bottom: 20px;
+            overflow-x: auto;
+            padding-bottom: 4px;
+        }
+        .type-tab {
+            padding: 10px 18px;
+            border-radius: 20px;
+            background: #fff;
+            border: 2px solid #e9ecef;
+            font-size: 13px;
+            font-weight: 700;
+            color: #6c757d;
+            cursor: pointer;
+            white-space: nowrap;
+            transition: all 0.2s;
+            display: inline-flex;
+            align-items: center;
+            gap: 6px;
+            font-family: inherit;
+        }
+        .type-tab.active {
+            background: #0d1b3e;
+            color: #fff;
+            border-color: #0d1b3e;
+        }
+        .type-tab:hover:not(.active) {
+            border-color: #1a3a7a;
+            color: #1a3a7a;
+        }
 
         /* ALBUM GRID */
         .album-grid {
@@ -100,14 +134,31 @@
             font-size: 64px;
         }
         .album-body { padding: 18px; flex: 1; display: flex; flex-direction: column; }
-        .album-tournament {
+
+        /* Badge loại album */
+        .album-type-badge {
             display: inline-block;
             padding: 4px 10px;
-            background: #e3f2fd;
-            color: #1769ff;
             border-radius: 20px;
             font-size: 10px;
             font-weight: 800;
+            text-transform: uppercase;
+            width: fit-content;
+            margin-bottom: 6px;
+        }
+        .album-type-badge.tournament { background: #e3f2fd; color: #1769ff; }
+        .album-type-badge.event { background: #fef3c7; color: #92400e; }
+        .album-type-badge.training { background: #d1fae5; color: #065f46; }
+        .album-type-badge.general { background: #ede9fe; color: #5b21b6; }
+
+        .album-tournament {
+            display: inline-block;
+            padding: 4px 10px;
+            background: #f3f4f6;
+            color: #4b5563;
+            border-radius: 20px;
+            font-size: 10px;
+            font-weight: 700;
             text-transform: uppercase;
             width: fit-content;
             margin-bottom: 10px;
@@ -323,6 +374,26 @@
                     </button>
                 </div>
 
+                <!-- TYPE TABS -->
+                <div class="type-tabs" id="typeTabs">
+                    <button class="type-tab active" data-type="all">
+                        <i class="fas fa-th-large"></i> Tất cả
+                    </button>
+                    <button class="type-tab" data-type="tournament">
+                        🏆 Giải đấu
+                    </button>
+                    <button class="type-tab" data-type="event">
+                        🎉 Sự kiện
+                    </button>
+                    <button class="type-tab" data-type="training">
+                        💪 Tập luyện
+                    </button>
+                    <button class="type-tab" data-type="general">
+                        📷 Khác
+                    </button>
+                </div>
+
+                <!-- FILTER BAR -->
                 <div class="filter-bar">
                     <span class="filter-label">🏆 Lọc theo giải:</span>
                     <select id="tournamentFilter">
@@ -330,6 +401,7 @@
                     </select>
                 </div>
 
+                <!-- ALBUM GRID -->
                 <div class="album-grid" id="albumGrid">
                     <div class="empty-state">
                         <div class="empty-state-icon">⏳</div>
@@ -356,23 +428,64 @@
                 <div class="form-message" id="albumFormMessage"></div>
                 <form id="albumForm">
                     <div class="form-grid">
+                        <!-- LOẠI ALBUM -->
                         <div class="form-field full">
+                            <label class="form-label">Loại Album <span>*</span></label>
+                            <select class="form-select" name="album_type" id="albumType" required>
+                                <option value="tournament">🏆 Giải đấu</option>
+                                <option value="event">🎉 Sự kiện</option>
+                                <option value="training">💪 Tập luyện</option>
+                                <option value="general">📷 Khác</option>
+                            </select>
+                        </div>
+
+                        <!-- CHỌN GIẢI (chỉ hiện khi type=tournament) -->
+                        <div class="form-field full" id="tournamentField">
                             <label class="form-label">Thuộc giải đấu <span>*</span></label>
-                            <select class="form-select" name="tournament_id" id="albumTournament" required>
+                            <select class="form-select" name="tournament_id" id="albumTournament">
                                 <option value="">-- Chọn giải đấu --</option>
                             </select>
                         </div>
+
+                        <!-- TÊN SỰ KIỆN (chỉ hiện khi type!=tournament) -->
+                        <div class="form-field full" id="eventField" style="display: none;">
+                            <label class="form-label">Tên sự kiện / chủ đề <span>*</span></label>
+                            <input type="text" class="form-input" name="event_name" 
+                                   placeholder="VD: Giao lưu CLB An Khê 2026">
+                        </div>
+
+                        <!-- ĐỊA ĐIỂM (chỉ hiện khi type!=tournament) -->
+                        <div class="form-field full" id="locationField" style="display: none;">
+                            <label class="form-label">Địa điểm</label>
+                            <input type="text" class="form-input" name="location" 
+                                   placeholder="VD: Nhà thi đấu Phú Thọ">
+                        </div>
+
+                        <!-- NGÀY SỰ KIỆN (chỉ hiện khi type!=tournament) -->
+                        <div class="form-field full" id="dateField" style="display: none;">
+                            <label class="form-label">Ngày sự kiện</label>
+                            <input type="date" class="form-input" name="event_date">
+                        </div>
+
+                        <!-- TIÊU ĐỀ -->
                         <div class="form-field full">
                             <label class="form-label">Tiêu đề album <span>*</span></label>
-                            <input type="text" class="form-input" name="title" placeholder="VD: Ảnh khai mạc, Chung kết..." required>
+                            <input type="text" class="form-input" name="title" 
+                                   placeholder="VD: Ảnh khai mạc, Chung kết..." required>
                         </div>
+
+                        <!-- MÔ TẢ -->
                         <div class="form-field full">
                             <label class="form-label">Mô tả</label>
-                            <textarea class="form-textarea" name="description" placeholder="Mô tả ngắn về album..."></textarea>
+                            <textarea class="form-textarea" name="description" 
+                                      placeholder="Mô tả ngắn về album..."></textarea>
                         </div>
+
+                        <!-- ẢNH BÌA -->
                         <div class="form-field full">
                             <label class="form-label">Ảnh đại diện (URL)</label>
-                            <input type="text" class="form-input" name="cover_image" placeholder="https://example.com/cover.jpg">
+                            <input type="text" class="form-input" name="cover_image" 
+                                   placeholder="https://example.com/cover.jpg">
                         </div>
                     </div>
                     <div class="form-actions">
@@ -422,6 +535,7 @@
     let allAlbums = [];
     let allTournaments = [];
     let currentAlbum = null;
+    let selectedType = 'all';
 
     const ADMIN_EMAIL = 'nguyenquanghao2505@gmail.com';
     const STORAGE_BUCKET = 'sports-images';
@@ -536,7 +650,7 @@
                 album.photo_count = count || 0;
             }
 
-            renderAlbums(allAlbums);
+            renderAlbums();
             console.log('✅ Đã load', allAlbums.length, 'album');
         } catch (err) {
             console.error('❌ Lỗi load albums:', err);
@@ -551,12 +665,24 @@
     }
 
     // ==========================================
-    // 4. RENDER ALBUM
+    // 4. RENDER ALBUM (đã thêm filter type)
     // ==========================================
-    function renderAlbums(albums) {
+    function renderAlbums() {
         const grid = document.getElementById('albumGrid');
 
-        if (!albums || albums.length === 0) {
+        // Filter theo type
+        let filtered = [...allAlbums];
+        if (selectedType !== 'all') {
+            filtered = filtered.filter(a => (a.album_type || 'tournament') === selectedType);
+        }
+
+        // Filter theo tournament (nếu đang chọn)
+        const tournamentFilter = document.getElementById('tournamentFilter').value;
+        if (tournamentFilter) {
+            filtered = filtered.filter(a => a.tournament_id === tournamentFilter);
+        }
+
+        if (!filtered || filtered.length === 0) {
             grid.innerHTML = `
                 <div class="empty-state">
                     <div class="empty-state-icon">📸</div>
@@ -567,9 +693,27 @@
             return;
         }
 
-        grid.innerHTML = albums.map(album => {
+        grid.innerHTML = filtered.map(album => {
             const tournament = allTournaments.find(t => t.id === album.tournament_id);
             const coverUrl = album.cover_image || null;
+            const albumType = album.album_type || 'tournament';
+
+            // Thông tin badge theo loại
+            const typeInfo = {
+                tournament: { icon: '🏆', label: 'Giải đấu' },
+                event: { icon: '🎉', label: 'Sự kiện' },
+                training: { icon: '💪', label: 'Tập luyện' },
+                general: { icon: '📷', label: 'Khác' }
+            };
+            const type = typeInfo[albumType] || typeInfo.tournament;
+
+            // Dòng phụ: tên giải hoặc tên sự kiện
+            let subtitle = '';
+            if (albumType === 'tournament' && tournament) {
+                subtitle = tournament.name;
+            } else if (album.event_name) {
+                subtitle = album.event_name;
+            }
 
             return `
                 <div class="album-card" onclick="viewAlbum(${album.id})">
@@ -578,11 +722,14 @@
                         : `<div class="album-cover-placeholder">📸</div>`
                     }
                     <div class="album-body">
-                        <span class="album-tournament">🏆 ${escapeHtml(tournament?.name || 'Không rõ')}</span>
+                        <span class="album-type-badge ${albumType}">
+                            ${type.icon} ${type.label}
+                        </span>
+                        ${subtitle ? `<span class="album-tournament">${escapeHtml(subtitle)}</span>` : ''}
                         <h3 class="album-title">${escapeHtml(album.title)}</h3>
                         <div class="album-meta">
                             <span>📷 ${album.photo_count} ảnh</span>
-                            <span>${formatDate(album.created_at)}</span>
+                            <span>${formatDate(album.event_date || album.created_at)}</span>
                         </div>
                     </div>
                 </div>
@@ -594,13 +741,19 @@
     // 5. BIND EVENTS
     // ==========================================
     function bindEvents() {
-        // Filter
-        document.getElementById('tournamentFilter').addEventListener('change', (e) => {
-            const tournamentId = e.target.value;
-            const filtered = tournamentId 
-                ? allAlbums.filter(a => a.tournament_id === tournamentId)
-                : allAlbums;
-            renderAlbums(filtered);
+        // Filter tournament
+        document.getElementById('tournamentFilter').addEventListener('change', () => {
+            renderAlbums();
+        });
+
+        // Type tabs
+        document.querySelectorAll('.type-tab').forEach(tab => {
+            tab.addEventListener('click', () => {
+                document.querySelectorAll('.type-tab').forEach(t => t.classList.remove('active'));
+                tab.classList.add('active');
+                selectedType = tab.dataset.type;
+                renderAlbums();
+            });
         });
 
         // Nút tạo album
@@ -610,6 +763,9 @@
         document.getElementById('albumModal').addEventListener('click', (e) => {
             if (e.target.id === 'albumModal') closeAlbumModal();
         });
+
+        // Đổi loại album → ẩn/hiện trường
+        document.getElementById('albumType').addEventListener('change', onAlbumTypeChange);
 
         // Submit form album
         document.getElementById('albumForm').addEventListener('submit', handleAlbumSubmit);
@@ -639,7 +795,34 @@
     }
 
     // ==========================================
-    // 6. MODAL TẠO ALBUM
+    // 6. XỬ LÝ ĐỔI LOẠI ALBUM
+    // ==========================================
+    function onAlbumTypeChange() {
+        const type = document.getElementById('albumType').value;
+        const isTournament = type === 'tournament';
+
+        // Hiện/ẩn trường
+        document.getElementById('tournamentField').style.display = isTournament ? 'flex' : 'none';
+        document.getElementById('eventField').style.display = isTournament ? 'none' : 'flex';
+        document.getElementById('locationField').style.display = isTournament ? 'none' : 'flex';
+        document.getElementById('dateField').style.display = isTournament ? 'none' : 'flex';
+
+        // Required
+        document.getElementById('albumTournament').required = isTournament;
+        document.querySelector('input[name="event_name"]').required = !isTournament;
+
+        // Reset trường không dùng
+        if (isTournament) {
+            document.querySelector('input[name="event_name"]').value = '';
+            document.querySelector('input[name="location"]').value = '';
+            document.querySelector('input[name="event_date"]').value = '';
+        } else {
+            document.getElementById('albumTournament').value = '';
+        }
+    }
+
+    // ==========================================
+    // 7. MODAL TẠO ALBUM
     // ==========================================
     function openAlbumModal() {
         if (!isAdmin) {
@@ -649,6 +832,7 @@
         document.getElementById('albumModal').hidden = false;
         document.getElementById('albumForm').reset();
         document.getElementById('albumFormMessage').className = 'form-message';
+        onAlbumTypeChange(); // Reset trạng thái form
     }
 
     function closeAlbumModal() {
@@ -659,18 +843,38 @@
         e.preventDefault();
         const formData = new FormData(e.target);
 
+        const albumType = formData.get('album_type') || 'tournament';
+        const tournamentId = formData.get('tournament_id');
+        const eventName = formData.get('event_name');
+        const location = formData.get('location');
+        const eventDate = formData.get('event_date');
+        const title = formData.get('title').trim();
+
+        // Validate
+        if (albumType === 'tournament' && !tournamentId) {
+            showAlbumFormMessage('⚠️ Vui lòng chọn giải đấu!', 'error');
+            return;
+        }
+        if (albumType !== 'tournament' && !eventName?.trim()) {
+            showAlbumFormMessage('⚠️ Vui lòng nhập tên sự kiện!', 'error');
+            return;
+        }
+        if (!title) {
+            showAlbumFormMessage('⚠️ Vui lòng nhập tiêu đề album!', 'error');
+            return;
+        }
+
         const payload = {
-            tournament_id: formData.get('tournament_id'),
-            title: formData.get('title').trim(),
+            tournament_id: albumType === 'tournament' ? tournamentId : null,
+            album_type: albumType,
+            event_name: albumType !== 'tournament' ? eventName.trim() : null,
+            location: albumType !== 'tournament' ? (location?.trim() || null) : null,
+            event_date: albumType !== 'tournament' ? (eventDate || null) : null,
+            title: title,
             description: formData.get('description').trim() || null,
             cover_image: formData.get('cover_image').trim() || null,
             created_by: currentSession?.user?.id || null
         };
-
-        if (!payload.tournament_id || !payload.title) {
-            showAlbumFormMessage('⚠️ Vui lòng nhập đầy đủ thông tin!', 'error');
-            return;
-        }
 
         const btn = document.getElementById('submitAlbumBtn');
         btn.disabled = true;
@@ -705,7 +909,7 @@
     }
 
     // ==========================================
-    // 7. XEM ALBUM
+    // 8. XEM ALBUM
     // ==========================================
     window.viewAlbum = async function(albumId) {
         const album = allAlbums.find(a => a.id === albumId);
@@ -713,13 +917,33 @@
 
         currentAlbum = album;
         const tournament = allTournaments.find(t => t.id === album.tournament_id);
+        const albumType = album.album_type || 'tournament';
+
+        const typeInfo = {
+            tournament: { icon: '🏆', label: 'Giải đấu' },
+            event: { icon: '🎉', label: 'Sự kiện' },
+            training: { icon: '💪', label: 'Tập luyện' },
+            general: { icon: '📷', label: 'Khác' }
+        };
+        const type = typeInfo[albumType] || typeInfo.tournament;
 
         document.getElementById('viewAlbumTitle').textContent = '📸 ' + album.title;
+
+        // Header hiển thị thông tin album
+        let subtitle = '';
+        if (albumType === 'tournament' && tournament) {
+            subtitle = `🏆 ${tournament.name}`;
+        } else if (album.event_name) {
+            subtitle = `${type.icon} ${album.event_name}`;
+        }
+
         document.getElementById('viewAlbumInfo').innerHTML = `
             <div class="album-detail-header">
-                <span style="font-size: 12px; opacity: 0.85;">🏆 ${escapeHtml(tournament?.name || 'Không rõ')}</span>
+                <span style="font-size: 12px; opacity: 0.85;">${escapeHtml(subtitle)}</span>
                 <h2>${escapeHtml(album.title)}</h2>
                 ${album.description ? `<p>${escapeHtml(album.description)}</p>` : ''}
+                ${album.location ? `<p style="font-size: 13px; opacity: 0.75; margin-top: 6px;">📍 ${escapeHtml(album.location)}</p>` : ''}
+                ${album.event_date ? `<p style="font-size: 13px; opacity: 0.75;">📅 ${formatDate(album.event_date)}</p>` : ''}
             </div>
         `;
 
@@ -791,7 +1015,7 @@
     };
 
     // ==========================================
-    // 8. THÊM ẢNH
+    // 9. THÊM ẢNH
     // ==========================================
     async function addPhotoFromUrl() {
         if (!currentAlbum || !isAdmin) return;
@@ -881,7 +1105,7 @@
     }
 
     // ==========================================
-    // 9. HELPERS
+    // 10. HELPERS
     // ==========================================
     function formatDate(dateStr) {
         if (!dateStr) return '—';
