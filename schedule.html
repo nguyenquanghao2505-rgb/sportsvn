@@ -108,6 +108,19 @@
         .loading { text-align: center; padding: 60px 20px; color: #6c757d; }
         .loading i { font-size: 48px; color: #dee2e6; animation: spin 1s linear infinite; display: block; margin-bottom: 16px; }
         @keyframes spin { from { transform: rotate(0deg); } to { transform: rotate(360deg); } }
+
+        /* ✅ CẢNH BÁO TRÙNG GIỜ */
+        .warning-box {
+            background: #fff3cd;
+            border: 2px solid #fdcb6e;
+            border-radius: 12px;
+            padding: 16px 20px;
+            margin-bottom: 16px;
+            color: #856404;
+            font-size: 14px;
+            line-height: 1.6;
+        }
+        .warning-box strong { color: #e67e22; }
     </style>
 </head>
 <body>
@@ -126,6 +139,7 @@
     </div>
 
     <div id="alert" class="alert"></div>
+    <div id="warning-container"></div>
     <div class="stats-bar" id="stats-bar"></div>
 
     <div class="schedule-panel">
@@ -155,7 +169,7 @@
 (function() {
     'use strict';
 
-    console.log('🚀 schedule.html v6 - FIX TIMEZONE');
+    console.log('🚀 schedule.html v7 - Fix URL + localStorage config + tránh trùng giờ xuyên buổi');
 
     const config = window.SPORTSVN_CONFIG || {};
     if (!config.SUPABASE_URL || !config.SUPABASE_ANON_KEY) {
@@ -174,12 +188,37 @@
     let venues = [];
     let selectedDay = 1;
 
+    // ✅ CẤU HÌNH ĐỌC TỪ LOCALSTORAGE (từ draw.html)
+    let tournamentConfig = {
+        startDate: null,
+        numDays: 2,
+        numSessions: 2,
+        numTables: 4,
+        timeMorning: '08:00',
+        timeAfternoon: '14:00',
+        timeEvening: '19:00',
+        matchDuration: 45
+    };
+
+    // ==========================================
+    // KHỞI TẠO
+    // ==========================================
     async function init() {
         const urlParams = new URLSearchParams(window.location.search);
-        tournamentId = urlParams.get('tournament_id');
-        if (!tournamentId) { showError('Thiếu ID giải đấu!'); return; }
 
-        document.getElementById('draw-link').href = `draw.html?tournament_id=${tournamentId}`;
+        // ✅ ĐỌC CẢ ?id= VÀ ?tournament_id=
+        tournamentId = urlParams.get('tournament_id') || urlParams.get('id');
+
+        if (!tournamentId) {
+            showError('Thiếu ID giải đấu! Vui lòng truy cập từ trang Quản lý giải đấu.');
+            return;
+        }
+
+        console.log('✅ Tournament ID:', tournamentId);
+        document.getElementById('draw-link').href = `draw.html?id=${tournamentId}`;
+
+        // ✅ ĐỌC CẤU HÌNH TỪ LOCALSTORAGE
+        loadConfigFromLocalStorage();
 
         const { data: { session } } = await supabaseClient.auth.getSession();
         if (!session) { window.location.href = 'login.html'; return; }
@@ -188,27 +227,102 @@
         await loadData();
     }
 
+    // ==========================================
+    // ĐỌC CẤU HÌNH TỪ LOCALSTORAGE
+    // (đã lưu khi admin cấu hình trong draw.html)
+    // ==========================================
+    function loadConfigFromLocalStorage() {
+        try {
+            // Thử đọc từ key riêng của giải đấu
+            const key = `sportsvn_config_${tournamentId}`;
+            const saved = localStorage.getItem(key);
+
+            if (saved) {
+                const parsed = JSON.parse(saved);
+                Object.assign(tournamentConfig, parsed);
+                console.log('✅ Đã đọc config từ localStorage:', tournamentConfig);
+            } else {
+                // Fallback: đọc key chung
+                const general = localStorage.getItem('sportsvn_config');
+                if (general) {
+                    const parsed = JSON.parse(general);
+                    Object.assign(tournamentConfig, parsed);
+                    console.log('⚠️ Dùng config chung từ localStorage');
+                } else {
+                    console.log('⚠️ Không có config localStorage, dùng giá trị mặc định');
+                }
+            }
+        } catch (err) {
+            console.error('Lỗi đọc config:', err);
+        }
+    }
+
+    // ==========================================
+    // LOAD DỮ LIỆU
+    // ==========================================
     async function loadData() {
         try {
-            const { data: tour } = await supabaseClient.from('tournaments').select('*').eq('id', tournamentId).single();
+            // Load tournament
+            const { data: tour } = await supabaseClient
+                .from('tournaments')
+                .select('*')
+                .eq('id', tournamentId)
+                .single();
             tournament = tour;
 
-            document.getElementById('tournament-name').textContent =
-                `${tournament.name} · ${tournament.num_venues || 0} sân · ${tournament.num_days || 0} ngày · ${tournament.sessions_per_day || 0} buổi/ngày`;
+            // ✅ Đọc cấu hình từ tournament nếu có (fallback)
+            if (tournament) {
+                if (tournament.num_days) tournamentConfig.numDays = tournament.num_days;
+                if (tournament.sessions_per_day) tournamentConfig.numSessions = tournament.sessions_per_day;
+                if (tournament.start_date) tournamentConfig.startDate = tournament.start_date;
+            }
 
-            const { data: cats } = await supabaseClient.from('categories').select('*').eq('tournament_id', tournamentId);
+            // Nếu chưa có startDate, lấy từ tournament
+            if (!tournamentConfig.startDate && tournament?.start_date) {
+                tournamentConfig.startDate = tournament.start_date;
+            }
+
+            document.getElementById('tournament-name').textContent =
+                `${tournament.name} · ${tournamentConfig.numTables} sân · ${tournamentConfig.numDays} ngày · ${tournamentConfig.numSessions} buổi`;
+
+            // Load categories
+            const { data: cats } = await supabaseClient
+                .from('categories')
+                .select('*')
+                .eq('tournament_id', tournamentId);
             categories = cats || [];
 
-            const { data: vens } = await supabaseClient.from('venues').select('*').eq('tournament_id', tournamentId).order('court_number');
+            // Load venues
+            const { data: vens } = await supabaseClient
+                .from('venues')
+                .select('*')
+                .eq('tournament_id', tournamentId)
+                .order('court_number');
             venues = vens || [];
 
-            const { data: scheds } = await supabaseClient.from('schedules').select('*').eq('tournament_id', tournamentId).order('match_date').order('start_time');
+            console.log('📊 Venues load được:', venues.length, venues);
+
+            // Load schedules
+            const { data: scheds } = await supabaseClient
+                .from('schedules')
+                .select('*')
+                .eq('tournament_id', tournamentId)
+                .order('match_date')
+                .order('start_time');
             schedules = scheds || [];
 
-            const { data: drawsData } = await supabaseClient.from('draws').select('*').eq('tournament_id', tournamentId);
+            // Load draws
+            const { data: drawsData } = await supabaseClient
+                .from('draws')
+                .select('*')
+                .eq('tournament_id', tournamentId);
             draws = drawsData || [];
 
             console.log('📊', { cats: categories.length, venues: venues.length, schedules: schedules.length, draws: draws.length });
+
+            // Kiểm tra trùng giờ
+            checkDuplicateSchedule();
+
             render();
         } catch (error) {
             console.error('❌', error);
@@ -216,6 +330,61 @@
         }
     }
 
+    // ==========================================
+    // KIỂM TRA TRÙNG GIỜ VĐV
+    // ==========================================
+    function checkDuplicateSchedule() {
+        const warningContainer = document.getElementById('warning-container');
+        warningContainer.innerHTML = '';
+
+        if (schedules.length === 0) return;
+
+        // Map: VĐV → các slot đã đăng ký
+        const athleteSlots = {};
+
+        schedules.forEach(s => {
+            const slotKey = `${s.match_date}|${s.start_time}`;
+
+            if (s.team_a_name && !s.team_a_name.includes('Chờ') && !s.team_a_name.includes('Thua')) {
+                if (!athleteSlots[s.team_a_name]) athleteSlots[s.team_a_name] = [];
+                athleteSlots[s.team_a_name].push(slotKey);
+            }
+            if (s.team_b_name && !s.team_b_name.includes('Chờ') && !s.team_b_name.includes('Thua')) {
+                if (!athleteSlots[s.team_b_name]) athleteSlots[s.team_b_name] = [];
+                athleteSlots[s.team_b_name].push(slotKey);
+            }
+        });
+
+        // Tìm VĐV bị trùng
+        const conflicts = [];
+        Object.keys(athleteSlots).forEach(name => {
+            const slots = athleteSlots[name];
+            const uniqueSlots = new Set(slots);
+            if (uniqueSlots.size < slots.length) {
+                const duplicated = slots.filter((s, i) => slots.indexOf(s) !== i);
+                conflicts.push({ name, slots: [...new Set(duplicated)] });
+            }
+        });
+
+        if (conflicts.length > 0) {
+            warningContainer.innerHTML = `
+                <div class="warning-box">
+                    <strong>⚠️ CẢNH BÁO TRÙNG GIỜ:</strong> Có ${conflicts.length} VĐV bị xếp trùng giờ thi đấu nhiều nội dung!
+                    <ul style="margin-top:8px;margin-left:20px;">
+                        ${conflicts.slice(0, 5).map(c => 
+                            `<li><strong>${escapeHtml(c.name)}</strong> trùng ở: ${c.slots.join(', ')}</li>`
+                        ).join('')}
+                        ${conflicts.length > 5 ? `<li>... và ${conflicts.length - 5} VĐV khác</li>` : ''}
+                    </ul>
+                    <p style="margin-top:8px;">💡 Nhấn "Tự động xếp lịch" để hệ thống xếp lại và tránh trùng giờ.</p>
+                </div>
+            `;
+        }
+    }
+
+    // ==========================================
+    // RENDER
+    // ==========================================
     function render() {
         document.getElementById('loading').style.display = 'none';
         if (schedules.length === 0) {
@@ -243,12 +412,12 @@
             <div class="stat-card">
                 <div class="label">Sân thi đấu</div>
                 <div class="value">${venues.length}</div>
-                <div class="sub">${tournament?.venue_name || ''}</div>
+                <div class="sub">${venues.length > 0 ? 'Đã cấu hình' : 'Chưa cấu hình'}</div>
             </div>
             <div class="stat-card">
                 <div class="label">Số ngày</div>
-                <div class="value">${uniqueDates.length}</div>
-                <div class="sub">Từ ${formatDate(uniqueDates[0])}</div>
+                <div class="value">${uniqueDates.length || tournamentConfig.numDays}</div>
+                <div class="sub">Từ ${uniqueDates[0] ? formatDate(uniqueDates[0]) : '—'}</div>
             </div>
             <div class="stat-card">
                 <div class="label">Nội dung</div>
@@ -304,7 +473,9 @@
     }
 
     function renderCourtsForSession(sessionSchedules) {
-        if (venues.length === 0) return '<div class="empty-court">Chưa có sân.</div>';
+        if (venues.length === 0) {
+            return '<div class="empty-court" style="grid-column:1/-1;">⚠️ Chưa cấu hình sân thi đấu. Vào "Tạo giải đấu" để thêm sân, hoặc cấu hình trong draw.html.</div>';
+        }
 
         return venues.map(venue => {
             const matchesAtCourt = sessionSchedules.filter(s => s.venue_id === venue.id);
@@ -344,7 +515,7 @@
     }
 
     // ==========================================
-    // HELPER: FORMAT DATE AN TOÀN (FIX TIMEZONE)
+    // HELPER: FORMAT DATE AN TOÀN
     // ==========================================
     function formatDateForDB(date) {
         const y = date.getFullYear();
@@ -355,17 +526,24 @@
 
     function addDaysSafe(baseDate, days) {
         const newDate = new Date(baseDate.getTime());
-        newDate.setHours(12, 0, 0, 0); // Tránh DST
+        newDate.setHours(12, 0, 0, 0);
         newDate.setDate(newDate.getDate() + days);
         return newDate;
     }
 
     // ==========================================
-    // XẾP LỊCH TỰ ĐỘNG
+    // TỰ ĐỘNG XẾP LỊCH (CÓ TRÁNH TRÙNG GIỜ XUYÊN BUỔI)
     // ==========================================
     window.autoGenerateSchedule = async function() {
-        if (draws.length === 0) { showAlert('Chưa có kết quả bốc thăm!', 'error'); return; }
-        if (venues.length === 0) { showAlert('Chưa có sân!', 'error'); return; }
+        if (draws.length === 0) { showAlert('Chưa có kết quả bốc thăm! Hãy bốc thăm trước.', 'error'); return; }
+
+        // Nếu chưa có sân → tự động tạo 4 sân mặc định
+        if (venues.length === 0) {
+            if (!confirm('Chưa cấu hình sân. Tự động tạo ' + tournamentConfig.numTables + ' sân mặc định?')) return;
+            await createDefaultVenues();
+            await loadData();
+        }
+
         if (!confirm('Tự động xếp lịch? Lịch cũ sẽ bị xóa!')) return;
 
         showAlert('⏳ Đang xếp lịch...', 'info');
@@ -373,30 +551,27 @@
         try {
             await supabaseClient.from('schedules').delete().eq('tournament_id', tournamentId);
 
-            // Parse start date AN TOÀN
-            const startDateStr = tournament.start_date;
+            // Parse start date
+            const startDateStr = tournamentConfig.startDate || tournament.start_date;
             const [y, m, d] = startDateStr.split('-').map(Number);
-            const startDate = new Date(y, m - 1, d, 12, 0, 0, 0); // 12h tránh DST
+            const startDate = new Date(y, m - 1, d, 12, 0, 0, 0);
 
-            const numDays = tournament.num_days || 2;
-            const sessionsPerDay = tournament.sessions_per_day || 2;
-            const matchDuration = tournament.match_duration || 45;
+            const numDays = tournamentConfig.numDays;
+            const numSessions = tournamentConfig.numSessions;
+            const matchDuration = tournamentConfig.matchDuration;
             const startTimes = {
-                morning: tournament.start_time_morning || '08:00',
-                afternoon: tournament.start_time_afternoon || '14:00',
-                evening: tournament.start_time_evening || '19:00'
+                morning: tournamentConfig.timeMorning,
+                afternoon: tournamentConfig.timeAfternoon,
+                evening: tournamentConfig.timeEvening
             };
-            const sessionKeys = ['morning', 'afternoon', 'evening'].slice(0, sessionsPerDay);
+            const sessionKeys = ['morning', 'afternoon', 'evening'].slice(0, numSessions);
 
             const SLOT_DURATION = matchDuration + 15;
-            const maxMatchesPerSession = {
-                morning: 4,
-                afternoon: 4,
-                evening: 3
-            };
+            const maxMatchesPerSession = { morning: 4, afternoon: 4, evening: 3 };
 
             const allMatches = [];
 
+            // Phân nhóm draws theo category
             const drawsByCategory = {};
             draws.forEach(d => {
                 const cat = d.category || 'Chung';
@@ -430,22 +605,9 @@
                         while (bracketSize < totalTeams) bracketSize *= 2;
                         const numByes = bracketSize - totalTeams;
 
-                        console.log(`  Nhóm "${groupName}": ${totalTeams} VĐV → Bracket ${bracketSize} (${numByes} BYE)`);
+                        const playing = groupTeams.slice(numByes);
 
                         const round1Matches = [];
-                        const byes = [];
-                        const playing = [];
-
-                        if (numByes > 0) {
-                            for (let i = 0; i < numByes; i++) {
-                                byes.push(groupTeams[i]);
-                            }
-                        }
-
-                        for (let i = numByes; i < totalTeams; i++) {
-                            playing.push(groupTeams[i]);
-                        }
-
                         for (let i = 0; i < playing.length; i += 2) {
                             if (playing[i] && playing[i + 1]) {
                                 round1Matches.push({
@@ -515,13 +677,9 @@
                         groups[g].push(d);
                     });
 
-                    const numGroups = Object.keys(groups).length;
-                    console.log(`  Vòng tròn: ${numGroups} bảng`);
-
                     Object.keys(groups).forEach(groupName => {
                         const groupTeams = groups[groupName];
                         const n = groupTeams.length;
-                        console.log(`    Bảng ${groupName}: ${n} VĐV → ${(n * (n - 1)) / 2} trận`);
 
                         for (let i = 0; i < n; i++) {
                             for (let j = i + 1; j < n; j++) {
@@ -541,13 +699,13 @@
 
             console.log(`\n✅ TỔNG SỐ TRẬN: ${allMatches.length}`);
 
-            // TẠO SLOTS AN TOÀN
+            // Tạo slots
             const allSlots = [];
             for (let dayIdx = 0; dayIdx < numDays; dayIdx++) {
                 const matchDate = addDaysSafe(startDate, dayIdx);
                 const dateStr = formatDateForDB(matchDate);
 
-                for (let s = 0; s < sessionsPerDay; s++) {
+                for (let s = 0; s < numSessions; s++) {
                     const sessionKey = sessionKeys[s];
                     const sessionStartTime = startTimes[sessionKey];
                     const maxMatches = maxMatchesPerSession[sessionKey] || 4;
@@ -570,13 +728,16 @@
 
             console.log(`📊 Tổng slot: ${allSlots.length}`);
 
-            if (allMatches.length > allSlots.length) {
-                console.warn(`⚠️ CẦN THÊM ${allMatches.length - allSlots.length} slot!`);
-            }
+            // ✅ SẮP XẾP: Ưu tiên trận thật trước, placeholder sau
+            allMatches.sort((a, b) => {
+                if (a.is_placeholder && !b.is_placeholder) return 1;
+                if (!a.is_placeholder && b.is_placeholder) return -1;
+                return (a.round || 1) - (b.round || 1);
+            });
 
-            allMatches.sort((a, b) => (a.round || 1) - (b.round || 1));
-
-            const busyAthletes = {};
+            // ✅ LOGIC TRÁNH TRÙNG GIỜ
+            // busyAthletesByDate: { "2026-07-03": { "Nguyễn Văn A": Set([slotKey1, slotKey2]) } }
+            const busyAthletesByDate = {};
             const busySlots = {};
             const records = [];
             let placed = 0, skipped = 0;
@@ -584,28 +745,51 @@
             for (const match of allMatches) {
                 let isPlaced = false;
 
+                const athleteA = match.team_a;
+                const athleteB = match.team_b;
+                const isPlaceholder = match.is_placeholder ||
+                                      (athleteA && (athleteA.includes('Chờ') || athleteA.includes('Thua')));
+                const isByeMatch = athleteA === 'BYE' || athleteB === 'BYE';
+
                 for (const slot of allSlots) {
                     const slotFullKey = `${slot.date}|${slot.session}|${slot.venue.id}|${slot.startTime}`;
                     if (busySlots[slotFullKey]) continue;
 
-                    const slotKey = `${slot.date}|${slot.session}`;
-                    if (!busyAthletes[slotKey]) busyAthletes[slotKey] = new Set();
+                    // ✅ Check trùng giờ theo NGÀY (không phải chỉ trong buổi)
+                    if (!isPlaceholder && !isByeMatch) {
+                        if (!busyAthletesByDate[slot.date]) busyAthletesByDate[slot.date] = {};
 
-                    const athleteA = match.team_a;
-                    const athleteB = match.team_b;
-                    const isPlaceholder = match.is_placeholder ||
-                                          (athleteA && (athleteA.includes('Chờ') || athleteA.includes('Thua')));
+                        // Check VĐV A
+                        if (athleteA) {
+                            if (!busyAthletesByDate[slot.date][athleteA]) {
+                                busyAthletesByDate[slot.date][athleteA] = new Set();
+                            }
+                            // Nếu VĐV A đã có mặt trong slot này → skip
+                            if (busyAthletesByDate[slot.date][athleteA].has(slotFullKey)) continue;
+                        }
 
-                    if (!isPlaceholder) {
-                        if (busyAthletes[slotKey].has(athleteA) || busyAthletes[slotKey].has(athleteB)) {
-                            continue;
+                        // Check VĐV B
+                        if (athleteB) {
+                            if (!busyAthletesByDate[slot.date][athleteB]) {
+                                busyAthletesByDate[slot.date][athleteB] = new Set();
+                            }
+                            if (busyAthletesByDate[slot.date][athleteB].has(slotFullKey)) continue;
                         }
                     }
 
+                    // Đánh dấu bận
                     busySlots[slotFullKey] = true;
-                    if (!isPlaceholder) {
-                        busyAthletes[slotKey].add(athleteA);
-                        busyAthletes[slotKey].add(athleteB);
+
+                    if (!isPlaceholder && !isByeMatch) {
+                        if (!busyAthletesByDate[slot.date]) busyAthletesByDate[slot.date] = {};
+                        if (athleteA) {
+                            if (!busyAthletesByDate[slot.date][athleteA]) busyAthletesByDate[slot.date][athleteA] = new Set();
+                            busyAthletesByDate[slot.date][athleteA].add(slotFullKey);
+                        }
+                        if (athleteB) {
+                            if (!busyAthletesByDate[slot.date][athleteB]) busyAthletesByDate[slot.date][athleteB] = new Set();
+                            busyAthletesByDate[slot.date][athleteB].add(slotFullKey);
+                        }
                     }
 
                     records.push({
@@ -643,7 +827,7 @@
                 if (error) throw error;
             }
 
-            showAlert(`✅ Đã xếp ${records.length} trận!${skipped > 0 ? ` (Bỏ qua ${skipped})` : ''}`, 'success');
+            showAlert(`✅ Đã xếp ${records.length} trận!${skipped > 0 ? ` (Bỏ qua ${skipped} trận không có slot)` : ''}`, 'success');
             await loadData();
 
         } catch (error) {
@@ -651,6 +835,28 @@
             showAlert('Lỗi: ' + error.message, 'error');
         }
     };
+
+    // ==========================================
+    // TỰ ĐỘNG TẠO SÂN MẶC ĐỊNH
+    // ==========================================
+    async function createDefaultVenues() {
+        const numTables = tournamentConfig.numTables || 4;
+        const newVenues = [];
+        for (let i = 1; i <= numTables; i++) {
+            newVenues.push({
+                tournament_id: tournamentId,
+                court_number: i,
+                court_name: `Sân ${i}`
+            });
+        }
+
+        const { error } = await supabaseClient.from('venues').insert(newVenues);
+        if (error) {
+            console.error('Lỗi tạo sân:', error);
+            throw error;
+        }
+        console.log(`✅ Đã tạo ${numTables} sân mặc định`);
+    }
 
     function getRoundName(matches) {
         if (matches === 1) return 'Chung kết';
@@ -693,11 +899,11 @@
     };
 
     function getSessions() {
-        const sessionsPerDay = tournament?.sessions_per_day || 2;
+        const sessionsPerDay = tournamentConfig.numSessions || 2;
         const all = [
-            { key: 'morning', label: 'Buổi Sáng', icon: 'sun', time: tournament?.start_time_morning || '08:00' },
-            { key: 'afternoon', label: 'Buổi Chiều', icon: 'cloud-sun', time: tournament?.start_time_afternoon || '14:00' },
-            { key: 'evening', label: 'Buổi Tối', icon: 'moon', time: tournament?.start_time_evening || '19:00' }
+            { key: 'morning', label: 'Buổi Sáng', icon: 'sun', time: tournamentConfig.timeMorning },
+            { key: 'afternoon', label: 'Buổi Chiều', icon: 'cloud-sun', time: tournamentConfig.timeAfternoon },
+            { key: 'evening', label: 'Buổi Tối', icon: 'moon', time: tournamentConfig.timeEvening }
         ];
         return all.slice(0, sessionsPerDay);
     }
