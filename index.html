@@ -6,12 +6,12 @@
     <meta name="description" content="SportsVN - Nền tảng công nghệ thể thao Việt Nam">
     <title>SportsVN - Nền tảng thể thao Việt Nam</title>
     <link rel="stylesheet" href="styles.css">
+    <script src="sidebar.js" defer></script>
     <script src="football.js" defer></script>
     <script src="provinces.js" defer></script>
-    <!-- KHÔNG load sidebar.js ở trang công khai -->
 </head>
 
-<body>
+<body data-page="index.html">
 
     <div class="app">
 
@@ -22,6 +22,7 @@
             <!-- ============================== -->
             <header class="topbar">
                 <div class="topbar-left">
+                    <button class="mobile-menu" id="mobileMenu" aria-label="Mở menu">☰</button>
                     <div class="topbar-brand">
                         <span class="topbar-label">SPORTS MANAGEMENT PLATFORM</span>
                         <h1 class="topbar-title-main">SPORTS<span>VN</span></h1>
@@ -30,10 +31,20 @@
                 </div>
 
                 <div class="topbar-right">
-                    <!-- CHỈ có nút đăng nhập, KHÔNG có "Tạo giải đấu" -->
-                    <a href="login.html" class="topbar-cta">
+                    <!-- Nút đăng nhập admin -->
+                    <a href="login.html" class="topbar-cta" id="loginBtn">
                         🔐 Đăng nhập Admin
                     </a>
+
+                    <!-- Nút user (hiện khi đã login) -->
+                    <div class="top-user" id="topUser" style="display: none;">
+                        <div class="avatar" id="topAvatar">A</div>
+                        <div class="top-user-info">
+                            <strong id="topUserName">Admin</strong>
+                            <span>SportsVN</span>
+                        </div>
+                        <span class="arrow">▾</span>
+                    </div>
                 </div>
             </header>
 
@@ -43,7 +54,7 @@
             <!-- ============================== -->
             <section class="content">
 
-                <!-- HERO BANNER (không có nút đổi ảnh) -->
+                <!-- HERO BANNER -->
                 <section class="welcome-banner" id="bannerSection">
                     <img src="banner.jpg" alt="SportsVN Banner" class="banner-image" id="bannerImage">
                 </section>
@@ -52,7 +63,7 @@
                 <!-- DASHBOARD 3 CỘT -->
                 <div class="dashboard-grid">
 
-                    <!-- CỘT 1: GIẢI ĐẤU (3 NHÓM TRẠNG THÁI) -->
+                    <!-- CỘT 1: GIẢI ĐẤU -->
                     <section class="panel">
                         <div class="panel-header">
                             <div>
@@ -62,7 +73,7 @@
                             <a href="tournaments.html">Xem tất cả →</a>
                         </div>
 
-                        <!-- NHÓM 1: ĐANG DIỄN RA -->
+                        <!-- ĐANG DIỄN RA -->
                         <div class="tournament-group">
                             <div class="tournament-group-title">
                                 <span class="dot active-dot"></span> Đang diễn ra
@@ -72,7 +83,7 @@
                             </div>
                         </div>
 
-                        <!-- NHÓM 2: SẮP DIỄN RA -->
+                        <!-- SẮP DIỄN RA -->
                         <div class="tournament-group">
                             <div class="tournament-group-title">
                                 <span class="dot upcoming-dot"></span> Sắp diễn ra
@@ -82,7 +93,7 @@
                             </div>
                         </div>
 
-                        <!-- NHÓM 3: ĐÃ KẾT THÚC -->
+                        <!-- ĐÃ KẾT THÚC -->
                         <div class="tournament-group">
                             <div class="tournament-group-title">
                                 <span class="dot completed-dot"></span> Đã kết thúc
@@ -112,7 +123,7 @@
                     </section>
 
 
-                    <!-- CỘT 3: KẾT QUẢ BÓNG ĐÁ -->
+                    <!-- CỘT 3: KẾT QUẢ BÓNG ĐÁ + LIÊN KẾT NHANH -->
                     <section class="panel">
                         <div class="panel-header">
                             <div>
@@ -273,6 +284,56 @@
             );
 
             // ==========================================
+            // 0. MOBILE MENU TOGGLE
+            // ==========================================
+            document.getElementById('mobileMenu')?.addEventListener('click', () => {
+                document.querySelector('.sidebar')?.classList.toggle('open');
+            });
+
+            // ==========================================
+            // 0.1 CHECK LOGIN - HIỆN NÚT ĐĂNG NHẬP/USER
+            // ==========================================
+            async function checkLoginStatus() {
+                try {
+                    const { data: { session } } = await supabase.auth.getSession();
+                    
+                    if (session) {
+                        // Đã login → hiện user info
+                        const loginBtn = document.getElementById('loginBtn');
+                        const topUser = document.getElementById('topUser');
+                        
+                        if (loginBtn) loginBtn.style.display = 'none';
+                        if (topUser) topUser.style.display = 'flex';
+
+                        const userName = session.user.user_metadata?.full_name || 
+                                        session.user.email.split('@')[0];
+                        const initials = userName.split(' ')
+                            .map(w => w[0])
+                            .join('')
+                            .slice(0, 2)
+                            .toUpperCase();
+
+                        const topUserName = document.getElementById('topUserName');
+                        const topAvatar = document.getElementById('topAvatar');
+                        if (topUserName) topUserName.textContent = userName;
+                        if (topAvatar) topAvatar.textContent = initials;
+
+                        // Click user → logout
+                        topUser?.addEventListener('click', async () => {
+                            if (confirm('Bạn có muốn đăng xuất không?')) {
+                                await supabase.auth.signOut();
+                                window.location.reload();
+                            }
+                        });
+                    }
+                } catch (err) {
+                    console.warn('⚠️ Lỗi check login:', err);
+                }
+            }
+
+            checkLoginStatus();
+
+            // ==========================================
             // 1. LOAD BANNER
             // ==========================================
             async function loadBanner() {
@@ -322,7 +383,6 @@
             // ==========================================
             async function loadTournaments() {
                 try {
-                    // Load TẤT CẢ giải đấu, sắp xếp mới nhất trước
                     const { data, error } = await supabase
                         .from('tournaments')
                         .select('*')
@@ -333,12 +393,10 @@
                         return;
                     }
 
-                    // Phân loại theo status
                     const activeList = (data || []).filter(t => t.status === 'active');
                     const upcomingList = (data || []).filter(t => t.status === 'upcoming');
                     const completedList = (data || []).filter(t => t.status === 'completed');
 
-                    // Render từng nhóm
                     renderTournamentGroup('tournamentsActive', activeList, 'active');
                     renderTournamentGroup('tournamentsUpcoming', upcomingList, 'upcoming');
                     renderTournamentGroup('tournamentsCompleted', completedList, 'completed');
@@ -350,7 +408,6 @@
                 }
             }
 
-            // Hàm render 1 nhóm giải đấu
             function renderTournamentGroup(containerId, tournaments, status) {
                 const container = document.getElementById(containerId);
                 if (!container) return;
@@ -363,7 +420,6 @@
                     return;
                 }
 
-                // Chỉ hiển thị tối đa 4 giải mỗi nhóm
                 const displayList = tournaments.slice(0, 4);
 
                 container.innerHTML = displayList.map(t => {
@@ -394,7 +450,6 @@
                 }).join('');
             }
 
-            // Helper: lấy icon theo môn thể thao
             function getSportIcon(sport) {
                 const icons = {
                     football: '⚽',
