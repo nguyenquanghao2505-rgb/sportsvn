@@ -10,8 +10,8 @@
     <script src="provinces.js" defer></script>
     <script src="sidebar.js" defer></script>
 
-    <!-- CSS riêng cho trang chi tiết -->
     <style>
+        /* ========== HERO ========== */
         .detail-hero {
             position: relative;
             padding: 36px 32px;
@@ -21,7 +21,6 @@
             margin-bottom: 24px;
             overflow: hidden;
         }
-
         .detail-hero::before {
             content: '';
             position: absolute;
@@ -30,7 +29,6 @@
             border-radius: 50%;
             background: radial-gradient(circle, rgba(255,255,255,0.1) 0%, transparent 70%);
         }
-
         .detail-hero-content {
             position: relative;
             display: flex;
@@ -38,7 +36,6 @@
             gap: 24px;
             flex-wrap: wrap;
         }
-
         .detail-hero-icon {
             width: 90px; height: 90px;
             display: flex; align-items: center; justify-content: center;
@@ -48,12 +45,7 @@
             font-size: 44px;
             flex-shrink: 0;
         }
-
-        .detail-hero-info {
-            flex: 1;
-            min-width: 250px;
-        }
-
+        .detail-hero-info { flex: 1; min-width: 250px; }
         .detail-hero-info h1 {
             font-size: 28px;
             font-weight: 900;
@@ -61,7 +53,6 @@
             letter-spacing: -0.5px;
             margin-bottom: 8px;
         }
-
         .detail-hero-meta {
             display: flex;
             flex-wrap: wrap;
@@ -69,13 +60,11 @@
             font-size: 13px;
             opacity: 0.9;
         }
-
         .detail-hero-meta span {
             display: inline-flex;
             align-items: center;
             gap: 6px;
         }
-
         .detail-hero-status {
             display: inline-flex;
             align-items: center;
@@ -90,7 +79,6 @@
             backdrop-filter: blur(10px);
             margin-top: 12px;
         }
-
         .detail-hero-status.active { background: rgba(16,185,129,0.25); color: #a7f3d0; }
         .detail-hero-status.upcoming { background: rgba(245,158,11,0.25); color: #fde68a; }
         .detail-hero-status.completed { background: rgba(156,163,175,0.25); color: #e5e7eb; }
@@ -106,9 +94,78 @@
             text-decoration: none;
             transition: color 0.2s;
         }
-
         .back-link:hover { color: #fff; }
 
+        /* ========== ADMIN TOOLBAR ========== */
+        .admin-toolbar {
+            display: none;
+            gap: 12px;
+            flex-wrap: wrap;
+            padding: 16px 20px;
+            background: linear-gradient(135deg, #fff8e6 0%, #fff3cd 100%);
+            border: 2px solid #fdcb6e;
+            border-radius: var(--radius-lg);
+            margin-bottom: 20px;
+            box-shadow: 0 4px 12px rgba(253, 203, 110, 0.2);
+        }
+        .admin-toolbar.visible { display: flex; }
+        .admin-toolbar-title {
+            width: 100%;
+            font-size: 13px;
+            font-weight: 800;
+            color: #856404;
+            text-transform: uppercase;
+            letter-spacing: 0.5px;
+            margin-bottom: 4px;
+            display: flex;
+            align-items: center;
+            gap: 8px;
+        }
+        .admin-toolbar-btn {
+            display: inline-flex;
+            align-items: center;
+            gap: 8px;
+            padding: 11px 20px;
+            border-radius: 10px;
+            font-size: 13.5px;
+            font-weight: 700;
+            border: none;
+            cursor: pointer;
+            text-decoration: none;
+            transition: all 0.25s ease;
+            white-space: nowrap;
+            font-family: inherit;
+        }
+        .admin-toolbar-btn:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 6px 16px rgba(0,0,0,0.15);
+        }
+        .admin-toolbar-btn.draw {
+            background: linear-gradient(135deg, #8b5cf6, #a78bfa);
+            color: #fff; box-shadow: 0 4px 12px rgba(139,92,246,0.3);
+        }
+        .admin-toolbar-btn.schedule {
+            background: linear-gradient(135deg, #0984e3, #4d94ff);
+            color: #fff; box-shadow: 0 4px 12px rgba(9,132,227,0.3);
+        }
+        .admin-toolbar-btn.teams {
+            background: linear-gradient(135deg, #00b894, #34d399);
+            color: #fff; box-shadow: 0 4px 12px rgba(0,184,148,0.3);
+        }
+        .admin-toolbar-btn.results {
+            background: linear-gradient(135deg, #f59e0b, #fbbf24);
+            color: #fff; box-shadow: 0 4px 12px rgba(245,158,11,0.3);
+        }
+        .admin-toolbar-btn.edit {
+            background: linear-gradient(135deg, #6b7280, #9ca3af);
+            color: #fff; box-shadow: 0 4px 12px rgba(107,114,128,0.3);
+        }
+        .admin-toolbar-btn.delete {
+            background: linear-gradient(135deg, #e94560, #f87171);
+            color: #fff; box-shadow: 0 4px 12px rgba(233,69,96,0.3);
+        }
+
+        /* ========== TABS ========== */
         .tabs-nav {
             display: flex;
             gap: 4px;
@@ -119,7 +176,6 @@
             margin-bottom: 20px;
             overflow-x: auto;
         }
-
         .tabs-nav button {
             flex: 1;
             min-width: 120px;
@@ -130,14 +186,16 @@
             color: var(--text-muted);
             transition: all 0.2s;
             white-space: nowrap;
+            border: 0;
+            background: none;
+            cursor: pointer;
+            font-family: inherit;
         }
-
         .tabs-nav button.active {
             background: linear-gradient(135deg, var(--primary), #4d94ff);
             color: #fff;
             box-shadow: 0 4px 10px rgba(23,105,255,0.3);
         }
-
         .tabs-nav button:hover:not(.active) {
             background: var(--primary-light);
             color: var(--primary);
@@ -146,13 +204,13 @@
         .tab-content { display: none; }
         .tab-content.active { display: block; }
 
+        /* ========== TEAMS GRID ========== */
         .teams-grid {
             display: grid;
             grid-template-columns: repeat(auto-fill, minmax(200px, 1fr));
             gap: 12px;
             padding: 16px;
         }
-
         .team-card {
             display: flex;
             align-items: center;
@@ -163,14 +221,12 @@
             border-radius: var(--radius-md);
             transition: all 0.2s;
         }
-
         .team-card:hover {
             background: #fff;
             border-color: var(--primary);
             box-shadow: 0 4px 12px rgba(23,105,255,0.15);
             transform: translateY(-2px);
         }
-
         .team-logo {
             width: 44px; height: 44px;
             display: flex; align-items: center; justify-content: center;
@@ -181,8 +237,7 @@
             font-size: 16px;
             flex-shrink: 0;
         }
-
-        .team-info { min-width: 0; display: flex; flex-direction: column; }
+        .team-info { min-width: 0; flex: 1; display: flex; flex-direction: column; }
         .team-info strong {
             font-size: 13px; font-weight: 700;
             color: var(--text-dark);
@@ -190,6 +245,7 @@
         }
         .team-info span { font-size: 11px; color: var(--text-muted); }
 
+        /* ========== MATCHES ========== */
         .match-row {
             display: grid;
             grid-template-columns: 1fr auto 1fr;
@@ -198,9 +254,7 @@
             padding: 16px;
             border-bottom: 1px solid var(--border-light);
         }
-
         .match-row:last-child { border-bottom: 0; }
-
         .match-team {
             display: flex;
             align-items: center;
@@ -209,9 +263,7 @@
             font-weight: 700;
             color: var(--text-dark);
         }
-
         .match-team.away { justify-content: flex-end; }
-
         .match-score {
             display: flex;
             align-items: center;
@@ -224,10 +276,8 @@
             color: var(--text-dark);
             white-space: nowrap;
         }
-
         .match-score.live { background: #fee2e2; color: #dc2626; }
         .match-score.scheduled { background: #dbeafe; color: #1769ff; }
-
         .match-meta {
             text-align: center;
             font-size: 11px;
@@ -235,17 +285,154 @@
             margin-top: 6px;
         }
 
+        /* ========== EMPTY STATE ========== */
         .empty-state {
             text-align: center;
             padding: 60px 20px;
             color: var(--text-muted);
             font-size: 14px;
         }
-
         .empty-state .icon {
             font-size: 56px;
             margin-bottom: 16px;
             opacity: 0.5;
+        }
+
+        /* ========== STANDINGS TABLE ========== */
+        .standings-table {
+            width: 100%;
+            border-collapse: collapse;
+            font-size: 13px;
+        }
+        .standings-table th {
+            background: linear-gradient(135deg, #0d47a1, #08306b);
+            color: #fff;
+            padding: 12px 10px;
+            text-align: center;
+            font-weight: 700;
+            font-size: 11px;
+            text-transform: uppercase;
+            letter-spacing: 0.3px;
+        }
+        .standings-table td {
+            padding: 12px 10px;
+            border-bottom: 1px solid var(--border-light);
+            text-align: center;
+        }
+        .standings-table tbody tr:hover {
+            background: #f9fafb;
+        }
+        .standings-table .team-name-cell {
+            text-align: left;
+            font-weight: 700;
+            color: var(--text-dark);
+        }
+        .standings-table .pos-badge {
+            display: inline-flex;
+            align-items: center;
+            justify-content: center;
+            width: 26px;
+            height: 26px;
+            border-radius: 50%;
+            background: #e5e7eb;
+            color: #374151;
+            font-weight: 800;
+            font-size: 12px;
+        }
+        .standings-table .pos-1 { background: linear-gradient(135deg, #fbbf24, #f59e0b); color: #fff; }
+        .standings-table .pos-2 { background: linear-gradient(135deg, #d1d5db, #9ca3af); color: #fff; }
+        .standings-table .pos-3 { background: linear-gradient(135deg, #fb923c, #ea580c); color: #fff; }
+
+        /* ========== TEAM MODAL ========== */
+        .team-modal {
+            position: fixed;
+            inset: 0;
+            z-index: 1000;
+            display: none;
+            align-items: center;
+            justify-content: center;
+            padding: 24px;
+            background: rgba(15, 23, 42, 0.5);
+            backdrop-filter: blur(4px);
+        }
+        .team-modal.show { display: flex; }
+        .team-modal-card {
+            width: min(500px, 100%);
+            max-height: 88vh;
+            overflow: auto;
+            background: #fff;
+            border-radius: 20px;
+            box-shadow: 0 20px 60px rgba(0,0,0,0.3);
+            animation: slideUp 0.3s cubic-bezier(0.16, 1, 0.3, 1);
+        }
+        @keyframes slideUp {
+            from { opacity: 0; transform: translateY(20px) scale(0.98); }
+            to { opacity: 1; transform: translateY(0) scale(1); }
+        }
+        .team-modal-head {
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            padding: 20px 24px;
+            border-bottom: 1px solid #f3f4f6;
+        }
+        .team-modal-head h2 {
+            font-size: 18px;
+            font-weight: 800;
+            color: #111827;
+        }
+        .team-modal-close {
+            width: 32px;
+            height: 32px;
+            border-radius: 8px;
+            background: #f3f4f6;
+            color: #6b7280;
+            font-size: 20px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            cursor: pointer;
+            border: 0;
+            transition: all 0.2s;
+        }
+        .team-modal-close:hover {
+            background: #fee2e2;
+            color: #dc2626;
+            transform: rotate(90deg);
+        }
+        .team-modal-body { padding: 20px 24px; }
+        .team-modal-body label {
+            display: block;
+            font-size: 13px;
+            font-weight: 700;
+            color: #111827;
+            margin-bottom: 6px;
+        }
+        .team-modal-body input,
+        .team-modal-body select {
+            width: 100%;
+            padding: 11px 14px;
+            border: 1.5px solid #e5e7eb;
+            border-radius: 8px;
+            font-size: 14px;
+            background: #f9fafb;
+            margin-bottom: 16px;
+            transition: all 0.2s;
+            font-family: inherit;
+        }
+        .team-modal-body input:focus,
+        .team-modal-body select:focus {
+            border-color: #1769ff;
+            background: #fff;
+            outline: none;
+            box-shadow: 0 0 0 3px rgba(23,105,255,0.1);
+        }
+        .team-modal-actions {
+            display: flex;
+            justify-content: flex-end;
+            gap: 10px;
+            padding-top: 16px;
+            border-top: 1px solid #f3f4f6;
         }
     </style>
 </head>
@@ -253,7 +440,6 @@
 <body>
 
     <div class="app">
-
         <main class="main">
 
             <!-- TOPBAR -->
@@ -285,6 +471,38 @@
 
             <!-- CONTENT -->
             <section class="content">
+
+                <!-- ADMIN TOOLBAR -->
+                <div class="admin-toolbar" id="adminToolbar">
+                    <div class="admin-toolbar-title">
+                        ⚙️ Công cụ quản trị viên
+                    </div>
+
+                    <a href="#" id="btnDraw" class="admin-toolbar-btn draw">
+                        🎲 Bốc thăm
+                    </a>
+
+                    <a href="#" id="btnSchedule" class="admin-toolbar-btn schedule">
+                        📅 Xếp lịch thi đấu
+                    </a>
+
+                    <button id="btnAddTeam" class="admin-toolbar-btn teams">
+                        👥 Thêm đội
+                    </button>
+
+                    <a href="#" id="btnResults" class="admin-toolbar-btn results">
+                        📊 Nhập kết quả
+                    </a>
+
+                    <button id="btnEditTournament" class="admin-toolbar-btn edit">
+                        ✏️ Sửa giải đấu
+                    </button>
+
+                    <button id="btnDeleteTournament" class="admin-toolbar-btn delete">
+                        🗑 Xóa giải
+                    </button>
+                </div>
+
 
                 <!-- HERO -->
                 <div class="detail-hero" id="detailHero">
@@ -390,7 +608,47 @@
             </footer>
 
         </main>
+    </div>
 
+
+    <!-- MODAL THÊM ĐỘI -->
+    <div class="team-modal" id="addTeamModal">
+        <div class="team-modal-card">
+            <div class="team-modal-head">
+                <h2>👥 Thêm đội tham gia</h2>
+                <button class="team-modal-close" onclick="closeAddTeamModal()">×</button>
+            </div>
+
+            <form class="team-modal-body" id="addTeamForm">
+                <label>Tên đội / VĐV <span style="color:#e94560;">*</span></label>
+                <input type="text" id="teamName" placeholder="VD: Đội Cầu lông Hà Nội" required>
+
+                <label>CLB / Đơn vị</label>
+                <input type="text" id="teamClub" placeholder="VD: CLB Hà Nội">
+
+                <label>Bảng đấu (nếu đã chia bảng)</label>
+                <select id="teamGroup">
+                    <option value="">-- Chưa xếp bảng --</option>
+                    <option value="A">Bảng A</option>
+                    <option value="B">Bảng B</option>
+                    <option value="C">Bảng C</option>
+                    <option value="D">Bảng D</option>
+                    <option value="E">Bảng E</option>
+                    <option value="F">Bảng F</option>
+                    <option value="G">Bảng G</option>
+                    <option value="H">Bảng H</option>
+                </select>
+
+                <div id="addTeamMsg" style="font-size:13px;font-weight:600;margin-bottom:12px;"></div>
+
+                <div class="team-modal-actions">
+                    <button type="button" class="admin-toolbar-btn edit" onclick="closeAddTeamModal()" style="padding:10px 20px;">Hủy</button>
+                    <button type="submit" class="admin-toolbar-btn teams" id="submitAddTeam" style="padding:10px 20px;">
+                        ➕ Thêm đội
+                    </button>
+                </div>
+            </form>
+        </div>
     </div>
 
 
@@ -459,6 +717,15 @@
                        date.toLocaleTimeString('vi-VN', { hour: '2-digit', minute: '2-digit' });
             }
 
+            function getInitials(name) {
+                return (name || '?')
+                    .split(' ')
+                    .map(w => w[0])
+                    .join('')
+                    .slice(0, 2)
+                    .toUpperCase();
+            }
+
             // ================================
             // 3. LOAD THÔNG TIN GIẢI ĐẤU
             // ================================
@@ -475,7 +742,6 @@
                         return;
                     }
 
-                    // Hero
                     document.getElementById('heroIcon').textContent = getSportIcon(data.sport);
                     document.getElementById('heroTitle').textContent = data.name || '—';
                     document.getElementById('heroSport').textContent = data.sport_name || '—';
@@ -490,7 +756,6 @@
                     statusEl.textContent = statusInfo.text;
                     statusEl.className = 'detail-hero-status ' + statusInfo.cls;
 
-                    // Tab thông tin
                     document.getElementById('infoContainer').innerHTML = `
                         <div style="display:grid;grid-template-columns:repeat(auto-fit,minmax(200px,1fr));gap:16px;">
                             <div style="padding:16px;background:#f9fafb;border-radius:12px;">
@@ -544,33 +809,25 @@
                             <div class="empty-state" style="grid-column:1/-1;">
                                 <div class="icon">👥</div>
                                 <p>Chưa có đội nào đăng ký giải đấu này</p>
+                                <p style="font-size:12px;margin-top:8px;opacity:0.7;">Admin có thể bấm "👥 Thêm đội" để thêm</p>
                             </div>
                         `;
                         return;
                     }
 
-                    container.innerHTML = data.map(team => {
-                        const initials = (team.name || '?')
-                            .split(' ')
-                            .map(w => w[0])
-                            .join('')
-                            .slice(0, 2)
-                            .toUpperCase();
-
-                        return `
-                            <div class="team-card">
-                                <div class="team-logo">
-                                    ${team.logo_url 
-                                        ? `<img src="${team.logo_url}" alt="${team.name}" style="width:100%;height:100%;object-fit:cover;border-radius:12px;">` 
-                                        : initials}
-                                </div>
-                                <div class="team-info">
-                                    <strong>${team.name}</strong>
-                                    <span>${team.group_name ? 'Bảng ' + team.group_name : 'Chưa xếp bảng'}</span>
-                                </div>
+                    container.innerHTML = data.map(team => `
+                        <div class="team-card">
+                            <div class="team-logo">
+                                ${team.logo_url 
+                                    ? `<img src="${team.logo_url}" alt="${team.name}" style="width:100%;height:100%;object-fit:cover;border-radius:12px;">` 
+                                    : getInitials(team.name)}
                             </div>
-                        `;
-                    }).join('');
+                            <div class="team-info">
+                                <strong>${team.name}</strong>
+                                <span>${team.club ? '🛡 ' + team.club : (team.group_name ? 'Bảng ' + team.group_name : 'Chưa xếp bảng')}</span>
+                            </div>
+                        </div>
+                    `).join('');
 
                 } catch (err) {
                     console.error('Lỗi load teams:', err);
@@ -602,6 +859,7 @@
                             <div class="empty-state">
                                 <div class="icon">⚽</div>
                                 <p>Chưa có lịch thi đấu cho giải đấu này</p>
+                                <p style="font-size:12px;margin-top:8px;opacity:0.7;">Admin có thể bấm "📅 Xếp lịch thi đấu" để tạo</p>
                             </div>
                         `;
                         return;
@@ -622,7 +880,7 @@
                             <div class="match-row">
                                 <div class="match-team">
                                     <div class="team-logo" style="width:32px;height:32px;font-size:12px;">
-                                        ${(m.home_team || '?').slice(0, 2).toUpperCase()}
+                                        ${getInitials(m.home_team)}
                                     </div>
                                     ${m.home_team || '—'}
                                 </div>
@@ -639,7 +897,7 @@
                                 <div class="match-team away">
                                     ${m.away_team || '—'}
                                     <div class="team-logo" style="width:32px;height:32px;font-size:12px;">
-                                        ${(m.away_team || '?').slice(0, 2).toUpperCase()}
+                                        ${getInitials(m.away_team)}
                                     </div>
                                 </div>
                             </div>
@@ -660,24 +918,91 @@
             loadMatches();
 
             // ================================
-            // 6. TAB SWITCHING
+            // 6. LOAD BẢNG XẾP HẠNG
+            // ================================
+            async function loadStandings() {
+                const container = document.getElementById('standingsContainer');
+                try {
+                    const { data, error } = await supabase
+                        .from('standings')
+                        .select('*')
+                        .eq('tournament_id', tournamentId)
+                        .order('position', { ascending: true });
+
+                    if (error || !data || data.length === 0) {
+                        container.innerHTML = `
+                            <div class="empty-state">
+                                <div class="icon">📊</div>
+                                <p>Chưa có dữ liệu bảng xếp hạng</p>
+                                <p style="font-size:12px;margin-top:8px;opacity:0.7;">Bảng xếp hạng sẽ tự động cập nhật khi có kết quả</p>
+                            </div>
+                        `;
+                        return;
+                    }
+
+                    container.innerHTML = `
+                        <table class="standings-table">
+                            <thead>
+                                <tr>
+                                    <th style="width:50px;">Hạng</th>
+                                    <th style="text-align:left;">Đội</th>
+                                    <th>Trận</th>
+                                    <th>Thắng</th>
+                                    <th>Hòa</th>
+                                    <th>Thua</th>
+                                    <th>Điểm</th>
+                                    <th>HS</th>
+                                </tr>
+                            </thead>
+                            <tbody>
+                                ${data.map((s, idx) => {
+                                    const posClass = s.position === 1 ? 'pos-1' :
+                                                    s.position === 2 ? 'pos-2' :
+                                                    s.position === 3 ? 'pos-3' : '';
+                                    return `
+                                        <tr>
+                                            <td><span class="pos-badge ${posClass}">${s.position || idx + 1}</span></td>
+                                            <td class="team-name-cell">${s.team_name || '—'}</td>
+                                            <td>${s.played || 0}</td>
+                                            <td>${s.won || 0}</td>
+                                            <td>${s.drawn || 0}</td>
+                                            <td>${s.lost || 0}</td>
+                                            <td><strong style="color:#1769ff;">${s.points || 0}</strong></td>
+                                            <td>${s.goal_diff || 0}</td>
+                                        </tr>
+                                    `;
+                                }).join('')}
+                            </tbody>
+                        </table>
+                    `;
+                } catch (err) {
+                    console.error('Lỗi load standings:', err);
+                    container.innerHTML = `
+                        <div class="empty-state">
+                            <div class="icon">📊</div>
+                            <p>Chưa có dữ liệu bảng xếp hạng</p>
+                        </div>
+                    `;
+                }
+            }
+
+            loadStandings();
+
+            // ================================
+            // 7. TAB SWITCHING
             // ================================
             document.querySelectorAll('#tabsNav button').forEach(btn => {
                 btn.addEventListener('click', () => {
                     const tab = btn.dataset.tab;
-
-                    // Active button
                     document.querySelectorAll('#tabsNav button').forEach(b => b.classList.remove('active'));
                     btn.classList.add('active');
-
-                    // Active content
                     document.querySelectorAll('.tab-content').forEach(c => c.classList.remove('active'));
                     document.getElementById('tab-' + tab)?.classList.add('active');
                 });
             });
 
             // ================================
-            // 7. TOP USER (kiểm tra đăng nhập)
+            // 8. TOP USER
             // ================================
             const { data: { session } } = await supabase.auth.getSession();
             const topUser = document.getElementById('topUser');
@@ -687,7 +1012,7 @@
             if (session) {
                 const name = session.user.user_metadata?.full_name ||
                              session.user.email.split('@')[0];
-                const initials = name.split(' ').map(w => w[0]).join('').slice(0, 2).toUpperCase();
+                const initials = getInitials(name);
                 if (topUserName) topUserName.textContent = name;
                 if (topAvatar) topAvatar.textContent = initials;
 
@@ -705,7 +1030,130 @@
             }
 
             // ================================
-            // 8. MOBILE MENU
+            // 9. ADMIN TOOLBAR
+            // ================================
+            async function setupAdminToolbar() {
+                try {
+                    if (!session) return;
+
+                    const { data: roleData } = await supabase
+                        .from('user_roles')
+                        .select('role')
+                        .eq('user_id', session.user.id)
+                        .single();
+
+                    if (!roleData || roleData.role !== 'admin') return;
+
+                    // Hiện toolbar
+                    const toolbar = document.getElementById('adminToolbar');
+                    if (toolbar) toolbar.classList.add('visible');
+
+                    // Gắn link
+                    document.getElementById('btnDraw').href = `draw.html?id=${tournamentId}`;
+                    document.getElementById('btnSchedule').href = `schedule.html?id=${tournamentId}`;
+                    document.getElementById('btnResults').href = `results.html?id=${tournamentId}`;
+
+                    // Nút thêm đội
+                    document.getElementById('btnAddTeam').addEventListener('click', () => {
+                        document.getElementById('addTeamModal').classList.add('show');
+                    });
+
+                    // Sửa giải
+                    document.getElementById('btnEditTournament').addEventListener('click', () => {
+                        alert('Chức năng sửa giải đấu — Bạn có thể vào tournaments.html để sửa.');
+                    });
+
+                    // Xóa giải
+                    document.getElementById('btnDeleteTournament').addEventListener('click', async () => {
+                        if (!confirm('⚠️ Bạn có chắc muốn XÓA giải đấu này? Hành động không thể hoàn tác!')) return;
+                        try {
+                            const { error } = await supabase
+                                .from('tournaments')
+                                .delete()
+                                .eq('id', tournamentId);
+                            if (error) throw error;
+                            alert('✅ Đã xóa giải đấu!');
+                            window.location.href = 'tournaments.html';
+                        } catch (err) {
+                            alert('Lỗi xóa: ' + err.message);
+                        }
+                    });
+
+                    // Form thêm đội
+                    document.getElementById('addTeamForm').addEventListener('submit', async (e) => {
+                        e.preventDefault();
+                        const name = document.getElementById('teamName').value.trim();
+                        const club = document.getElementById('teamClub').value.trim();
+                        const group = document.getElementById('teamGroup').value;
+                        const msgEl = document.getElementById('addTeamMsg');
+                        const submitBtn = document.getElementById('submitAddTeam');
+
+                        if (!name) {
+                            msgEl.style.color = '#dc2626';
+                            msgEl.textContent = '⚠️ Vui lòng nhập tên đội';
+                            return;
+                        }
+
+                        submitBtn.disabled = true;
+                        submitBtn.textContent = '⏳ Đang thêm...';
+
+                        try {
+                            const { error } = await supabase
+                                .from('teams')
+                                .insert([{
+                                    tournament_id: tournamentId,
+                                    name: name,
+                                    club: club || null,
+                                    group_name: group || null
+                                }]);
+
+                            if (error) throw error;
+
+                            msgEl.style.color = '#00b894';
+                            msgEl.textContent = '✅ Đã thêm đội thành công!';
+
+                            setTimeout(() => {
+                                closeAddTeamModal();
+                                loadTeams();
+                                // Cập nhật lại số đội ở hero
+                                loadTournament();
+                            }, 800);
+                        } catch (err) {
+                            msgEl.style.color = '#dc2626';
+                            msgEl.textContent = '❌ Lỗi: ' + err.message;
+                        } finally {
+                            submitBtn.disabled = false;
+                            submitBtn.textContent = '➕ Thêm đội';
+                        }
+                    });
+
+                    console.log('✅ Admin toolbar đã kích hoạt');
+
+                } catch (err) {
+                    console.error('Lỗi setup admin toolbar:', err);
+                }
+            }
+
+            await setupAdminToolbar();
+
+            // ================================
+            // 10. ĐÓNG MODAL THÊM ĐỘI
+            // ================================
+            window.closeAddTeamModal = function() {
+                document.getElementById('addTeamModal').classList.remove('show');
+                document.getElementById('addTeamForm').reset();
+                document.getElementById('addTeamMsg').textContent = '';
+            };
+
+            // Click ra ngoài modal để đóng
+            document.getElementById('addTeamModal')?.addEventListener('click', (e) => {
+                if (e.target.id === 'addTeamModal') {
+                    closeAddTeamModal();
+                }
+            });
+
+            // ================================
+            // 11. MOBILE MENU
             // ================================
             document.getElementById('mobileMenu')?.addEventListener('click', () => {
                 document.querySelector('.sidebar')?.classList.toggle('open');
