@@ -4,11 +4,11 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <meta name="description" content="SportsVN - Nền tảng công nghệ thể thao Việt Nam">
-    <title>Admin Dashboard - SportsVN</title>
+    <title>SportsVN - Nền tảng thể thao Việt Nam</title>
     <link rel="stylesheet" href="styles.css">
     <script src="football.js" defer></script>
     <script src="provinces.js" defer></script>
-    <script src="sidebar.js" defer></script>
+    <!-- KHÔNG load sidebar.js ở trang công khai -->
 </head>
 
 <body>
@@ -18,11 +18,10 @@
         <main class="main">
 
             <!-- ============================== -->
-            <!-- TOPBAR -->
+            <!-- TOPBAR CÔNG KHAI -->
             <!-- ============================== -->
             <header class="topbar">
                 <div class="topbar-left">
-                    <button class="mobile-menu" id="mobileMenu" aria-label="Mở menu">☰</button>
                     <div class="topbar-brand">
                         <span class="topbar-label">SPORTS MANAGEMENT PLATFORM</span>
                         <h1 class="topbar-title-main">SPORTS<span>VN</span></h1>
@@ -31,25 +30,10 @@
                 </div>
 
                 <div class="topbar-right">
-                    <a href="tournaments.html" class="topbar-cta">
-                        <span>＋</span> Tạo giải đấu
+                    <!-- CHỈ có nút đăng nhập, KHÔNG có "Tạo giải đấu" -->
+                    <a href="login.html" class="topbar-cta">
+                        🔐 Đăng nhập Admin
                     </a>
-
-                    <button class="icon-button" title="Thông báo">
-                        ♢
-                        <span class="notification-dot"></span>
-                    </button>
-
-                    <button class="icon-button" title="Tìm kiếm">⌕</button>
-
-                    <div class="top-user" id="topUser">
-                        <div class="avatar">H</div>
-                        <div class="top-user-info">
-                            <strong>Quản trị viên</strong>
-                            <span>SportsVN</span>
-                        </div>
-                        <span class="arrow">▾</span>
-                    </div>
                 </div>
             </header>
 
@@ -59,15 +43,9 @@
             <!-- ============================== -->
             <section class="content">
 
-                <!-- HERO BANNER -->
+                <!-- HERO BANNER (không có nút đổi ảnh) -->
                 <section class="welcome-banner" id="bannerSection">
                     <img src="banner.jpg" alt="SportsVN Banner" class="banner-image" id="bannerImage">
-                    
-                    <button class="change-banner-btn" id="changeBannerBtn" title="Đổi ảnh bìa">
-                        📷 Đổi ảnh bìa
-                    </button>
-                    
-                    <input type="file" id="bannerInput" accept="image/*" style="display: none;">
                 </section>
 
 
@@ -85,52 +63,8 @@
                         </div>
 
                         <div class="tournament-list" id="homeTournamentList">
-                            <div class="tournament">
-                                <div class="sport-logo football">⚽</div>
-                                <div class="tournament-info">
-                                    <strong>Giải Bóng đá Đại hội TDTT thành phố Đà Nẵng</strong>
-                                    <span>Bóng đá nam · 16 đội</span>
-                                </div>
-                                <div class="tournament-status">
-                                    <span class="status active">Đang diễn ra</span>
-                                    <small>24/08/2026</small>
-                                </div>
-                            </div>
-
-                            <div class="tournament">
-                                <div class="sport-logo swimming">🏊</div>
-                                <div class="tournament-info">
-                                    <strong>Giải Bơi Đại hội TDTT thành phố Đà Nẵng</strong>
-                                    <span>Bơi · 25 đơn vị</span>
-                                </div>
-                                <div class="tournament-status">
-                                    <span class="status upcoming">Sắp diễn ra</span>
-                                    <small>27/08/2026</small>
-                                </div>
-                            </div>
-
-                            <div class="tournament">
-                                <div class="sport-logo basketball">🏀</div>
-                                <div class="tournament-info">
-                                    <strong>Giải Bóng rổ trẻ 5x5 Quốc gia</strong>
-                                    <span>Bóng rổ · U16</span>
-                                </div>
-                                <div class="tournament-status">
-                                    <span class="status active">Đang diễn ra</span>
-                                    <small>24/08/2026</small>
-                                </div>
-                            </div>
-
-                            <div class="tournament">
-                                <div class="sport-logo pickleball">◉</div>
-                                <div class="tournament-info">
-                                    <strong>Giải Pickleball Đại hội TDTT thành phố Đà Nẵng</strong>
-                                    <span>Pickleball · 25 đơn vị</span>
-                                </div>
-                                <div class="tournament-status">
-                                    <span class="status completed">Đã kết thúc</span>
-                                    <small>30/06/2026</small>
-                                </div>
+                            <div style="text-align:center;padding:30px;color:#6b7280;font-size:12px;">
+                                ⏳ Đang tải...
                             </div>
                         </div>
                     </section>
@@ -147,40 +81,8 @@
                         </div>
 
                         <div class="news-list" id="homeNewsList">
-                            <div class="news-item">
-                                <div class="news-thumb">
-                                    <img src="https://images.unsplash.com/photo-1579952363873-27f3bade9f55?w=200&h=150&fit=crop" alt="News">
-                                </div>
-                                <div class="news-content">
-                                    <strong>Khai mạc Giải Bóng đá Đại hội TDTT TP Đà Nẵng lần thứ X</strong>
-                                    <p>Sáng 24/8, tại Nhà thi đấu Trung tâm Cung ứng dịch vụ sự nghiệp công phường An Hải...</p>
-                                    <div class="news-meta">
-                                        <span>24/08/2026</span>
-                                        <span class="news-tag">HOT</span>
-                                    </div>
-                                </div>
-                            </div>
-
-                            <div class="news-item">
-                                <div class="news-thumb">
-                                    <img src="https://images.unsplash.com/photo-1530549387789-4c1017266635?w=200&h=150&fit=crop" alt="News">
-                                </div>
-                                <div class="news-content">
-                                    <strong>Đoàn Đà Nẵng giành 2 HCV tại Giải Đua thuyền truyền thống</strong>
-                                    <p>Với tinh thần thi đấu đoàn kết, các vận động viên Đà Nẵng đã xuất sắc giành 2 HCV...</p>
-                                    <div class="news-meta"><span>30/08/2026</span></div>
-                                </div>
-                            </div>
-
-                            <div class="news-item">
-                                <div class="news-thumb">
-                                    <img src="https://images.unsplash.com/photo-1554068865-24cecd4e34b8?w=200&h=150&fit=crop" alt="News">
-                                </div>
-                                <div class="news-content">
-                                    <strong>Hơn 200 VĐV tham gia Giải Pickleball Đại hội TDTT TP Đà Nẵng</strong>
-                                    <p>Giải đấu diễn ra từ ngày 27 đến 30/6/2026 tại Cụm sân Pickleball Hòa Phát...</p>
-                                    <div class="news-meta"><span>27/06/2026</span></div>
-                                </div>
+                            <div style="text-align:center;padding:30px;color:#6b7280;font-size:12px;">
+                                ⏳ Đang tải...
                             </div>
                         </div>
                     </section>
@@ -329,243 +231,121 @@
     <script src="config.js"></script>
     <script>
         // ==========================================
-        // SPORTSVN ADMIN DASHBOARD - SUPABASE
+        // TRANG CHỦ CÔNG KHAI - KHÔNG CẦN ĐĂNG NHẬP
         // ==========================================
-        
-        window.supabaseClient = null;
-        window.currentSession = null;
         
         document.addEventListener('DOMContentLoaded', async function() {
             'use strict';
 
             const config = window.SPORTSVN_CONFIG || {};
             if (!config.SUPABASE_URL || !config.SUPABASE_ANON_KEY) {
-                console.warn('⚠️ Chưa cấu hình Supabase trong config.js');
+                console.warn('⚠️ Chưa cấu hình Supabase');
                 return;
             }
 
-            window.supabaseClient = window.supabase.createClient(
+            const supabase = window.supabase.createClient(
                 config.SUPABASE_URL,
                 config.SUPABASE_ANON_KEY
             );
-            const supabase = window.supabaseClient;
-
-            const ADMIN_EMAIL = 'nguyenquanghao2505@gmail.com';
-
-            // ================================
-            // 1. KIỂM TRA ĐĂNG NHẬP
-            // ================================
-            async function checkAuth() {
-                const { data: { session } } = await supabase.auth.getSession();
-
-                if (!session) {
-                    window.location.href = 'login.html';
-                    return false;
-                }
-
-                window.currentSession = session;
-
-                // Kiểm tra role admin
-                const { data: roleData } = await supabase
-                    .from('user_roles')
-                    .select('role')
-                    .eq('user_id', session.user.id)
-                    .single();
-
-                if (!roleData || roleData.role !== 'admin') {
-                    alert('Tài khoản không có quyền Admin');
-                    await supabase.auth.signOut();
-                    window.location.href = 'login.html';
-                    return false;
-                }
-
-                // Cập nhật tên + avatar
-                const name = session.user.user_metadata?.full_name ||
-                             session.user.email.split('@')[0];
-                const initials = name.split(' ').map(w => w[0]).join('').slice(0, 2).toUpperCase();
-
-                document.querySelectorAll('.avatar').forEach(el => el.textContent = initials);
-                document.querySelectorAll('.user-info strong, .top-user-info strong').forEach(el => el.textContent = name);
-
-                // Chỉ admin chính mới thấy nút "Đổi ảnh bìa"
-                const userEmail = session.user.email;
-                const changeBannerBtn = document.getElementById('changeBannerBtn');
-
-                if (changeBannerBtn && userEmail === ADMIN_EMAIL) {
-                    changeBannerBtn.classList.add('visible');
-                    console.log('✅ Admin chính đã đăng nhập');
-                }
-
-                return true;
-            }
-
-            const isAuth = await checkAuth();
-            if (!isAuth) return;
-
-            // ================================
-            // 2. ĐĂNG XUẤT
-            // ================================
-            const topUser = document.getElementById('topUser');
-            if (topUser) {
-                topUser.addEventListener('click', async function() {
-                    if (confirm('Bạn có muốn đăng xuất không?')) {
-                        await supabase.auth.signOut();
-                        window.location.href = 'index.html';
-                    }
-                });
-            }
 
             // ==========================================
-            // 3. ĐỔI ẢNH BÌA
+            // 1. LOAD BANNER
             // ==========================================
-            var bannerImage = document.getElementById('bannerImage');
-            var changeBtn = document.getElementById('changeBannerBtn');
-            var fileInput = document.getElementById('bannerInput');
-
-            if (bannerImage && changeBtn && fileInput) {
-
-                async function loadBanner() {
-                    try {
-                        const { data, error } = await supabase
-                            .storage
-                            .from('banners')
-                            .list('', {
-                                limit: 100,
-                                sortBy: { column: 'name', order: 'desc' }
-                            });
-
-                        if (error) return;
-
-                        var imageFiles = (data || []).filter(function(f) {
-                            return f.name &&
-                                   !f.name.startsWith('.') &&
-                                   /\.(jpg|jpeg|png|gif|webp)$/i.test(f.name);
+            async function loadBanner() {
+                try {
+                    const { data, error } = await supabase
+                        .storage
+                        .from('banners')
+                        .list('', {
+                            limit: 100,
+                            sortBy: { column: 'name', order: 'desc' }
                         });
 
-                        if (imageFiles.length === 0) return;
+                    if (error) return;
 
-                        imageFiles.sort(function(a, b) {
-                            var aIsSystem = a.name.startsWith('banner-');
-                            var bIsSystem = b.name.startsWith('banner-');
+                    var imageFiles = (data || []).filter(function(f) {
+                        return f.name &&
+                               !f.name.startsWith('.') &&
+                               /\.(jpg|jpeg|png|gif|webp)$/i.test(f.name);
+                    });
 
-                            if (aIsSystem && !bIsSystem) return -1;
-                            if (!aIsSystem && bIsSystem) return 1;
+                    if (imageFiles.length === 0) return;
 
-                            if (aIsSystem && bIsSystem) {
-                                var aTime = parseInt((a.name.match(/banner-(\d+)/) || [])[1] || 0);
-                                var bTime = parseInt((b.name.match(/banner-(\d+)/) || [])[1] || 0);
-                                return bTime - aTime;
-                            }
+                    imageFiles.sort(function(a, b) {
+                        var aTime = parseInt((a.name.match(/banner-(\d+)/) || [])[1] || 0);
+                        var bTime = parseInt((b.name.match(/banner-(\d+)/) || [])[1] || 0);
+                        return bTime - aTime;
+                    });
 
-                            return new Date(b.created_at) - new Date(a.created_at);
-                        });
+                    const { data: urlData } = supabase
+                        .storage
+                        .from('banners')
+                        .getPublicUrl(imageFiles[0].name);
 
-                        var latestImage = imageFiles[0];
-
-                        const { data: urlData } = supabase
-                            .storage
-                            .from('banners')
-                            .getPublicUrl(latestImage.name);
-
-                        if (urlData && urlData.publicUrl) {
-                            bannerImage.src = urlData.publicUrl + '?t=' + Date.now();
-                            console.log('✅ Đã load banner:', latestImage.name);
-                        }
-                    } catch (err) {
-                        console.error('Lỗi load banner:', err);
+                    if (urlData && urlData.publicUrl) {
+                        document.getElementById('bannerImage').src = 
+                            urlData.publicUrl + '?t=' + Date.now();
                     }
+                } catch (err) {
+                    console.error('Lỗi load banner:', err);
                 }
+            }
 
-                loadBanner();
+            loadBanner();
 
-                changeBtn.addEventListener('click', function(e) {
-                    e.stopPropagation();
-                    fileInput.click();
-                });
+            // ==========================================
+            // 2. LOAD GIẢI ĐẤU CÔNG KHAI
+            // ==========================================
+            async function loadTournaments() {
+                try {
+                    const { data, error } = await supabase
+                        .from('tournaments')
+                        .select('*')
+                        .order('created_at', { ascending: false })
+                        .limit(4);
 
-                fileInput.addEventListener('change', async function(e) {
-                    var file = e.target.files[0];
-                    if (!file) return;
-
-                    if (!file.type.startsWith('image/')) {
-                        alert('Vui lòng chọn file ảnh');
+                    const container = document.getElementById('homeTournamentList');
+                    if (error || !data || data.length === 0) {
+                        container.innerHTML = '<div style="text-align:center;padding:30px;color:#9ca3af;font-size:12px;">📅 Chưa có giải đấu nào</div>';
                         return;
                     }
 
-                    if (file.size > 5 * 1024 * 1024) {
-                        alert('Ảnh quá lớn! Vui lòng chọn ảnh dưới 5MB.');
-                        return;
-                    }
+                    container.innerHTML = data.map(t => {
+                        const statusClass = t.status === 'active' ? 'active' : 
+                                           t.status === 'upcoming' ? 'upcoming' : 'completed';
+                        const statusText = t.status === 'active' ? 'Đang diễn ra' : 
+                                          t.status === 'upcoming' ? 'Sắp diễn ra' : 'Đã kết thúc';
+                        const sportIcon = t.sport === 'football' ? '⚽' :
+                                         t.sport === 'swimming' ? '🏊' :
+                                         t.sport === 'basketball' ? '🏀' :
+                                         t.sport === 'pickleball' ? '◉' : '🏆';
 
-                    var originalText = changeBtn.innerHTML;
-                    changeBtn.innerHTML = '⏳ Đang tải...';
-                    changeBtn.disabled = true;
+                        return `
+                            <div class="tournament">
+                                <div class="sport-logo ${t.sport || 'football'}">${sportIcon}</div>
+                                <div class="tournament-info">
+                                    <strong>${t.name}</strong>
+                                    <span>${t.sport_name || ''} · ${t.team_count || 0} đội</span>
+                                </div>
+                                <div class="tournament-status">
+                                    <span class="status ${statusClass}">${statusText}</span>
+                                    <small>${t.start_date ? new Date(t.start_date).toLocaleDateString('vi-VN') : ''}</small>
+                                </div>
+                            </div>
+                        `;
+                    }).join('');
 
-                    try {
-                        var ext = file.name.split('.').pop().toLowerCase();
-                        var fileName = 'banner-' + Date.now() + '.' + ext;
-
-                        const { error } = await supabase
-                            .storage
-                            .from('banners')
-                            .upload(fileName, file, {
-                                cacheControl: '3600',
-                                upsert: true,
-                                contentType: file.type
-                            });
-
-                        if (error) throw error;
-
-                        const { data: urlData } = supabase
-                            .storage
-                            .from('banners')
-                            .getPublicUrl(fileName);
-
-                        bannerImage.src = urlData.publicUrl;
-
-                        // Xóa ảnh cũ
-                        try {
-                            const { data: oldFiles } = await supabase
-                                .storage
-                                .from('banners')
-                                .list('', { limit: 100 });
-
-                            if (oldFiles && oldFiles.length > 1) {
-                                var filesToDelete = oldFiles
-                                    .filter(function(f) {
-                                        return f.name &&
-                                               f.name !== fileName &&
-                                               !f.name.startsWith('.') &&
-                                               /\.(jpg|jpeg|png|gif|webp)$/i.test(f.name);
-                                    })
-                                    .map(function(f) { return f.name; });
-
-                                if (filesToDelete.length > 0) {
-                                    await supabase.storage.from('banners').remove(filesToDelete);
-                                }
-                            }
-                        } catch (cleanupErr) {
-                            console.warn('Lỗi xóa ảnh cũ:', cleanupErr);
-                        }
-
-                        showToast('✓ Đã đổi ảnh bìa thành công!');
-                        console.log('✅ Upload thành công:', urlData.publicUrl);
-
-                    } catch (err) {
-                        console.error('Lỗi upload:', err);
-                        alert('Lỗi upload ảnh: ' + err.message);
-                    } finally {
-                        changeBtn.innerHTML = originalText;
-                        changeBtn.disabled = false;
-                        fileInput.value = '';
-                    }
-                });
+                } catch (err) {
+                    console.error('Lỗi load giải đấu:', err);
+                }
             }
 
+            loadTournaments();
+
             // ==========================================
-            // 4. LOAD TIN TỨC MỚI NHẤT
+            // 3. LOAD TIN TỨC CÔNG KHAI
             // ==========================================
-            async function loadHomeNews() {
+            async function loadNews() {
                 try {
                     const { data, error } = await supabase
                         .from('news')
@@ -573,12 +353,13 @@
                         .order('created_at', { ascending: false })
                         .limit(3);
 
-                    if (error || !data || data.length === 0) return;
+                    const container = document.getElementById('homeNewsList');
+                    if (error || !data || data.length === 0) {
+                        container.innerHTML = '<div style="text-align:center;padding:30px;color:#9ca3af;font-size:12px;">📰 Chưa có tin tức</div>';
+                        return;
+                    }
 
-                    const newsList = document.getElementById('homeNewsList');
-                    if (!newsList) return;
-
-                    newsList.innerHTML = data.map(news => `
+                    container.innerHTML = data.map(news => `
                         <a href="news-detail.html?id=${news.id}" class="news-item-link">
                             <div class="news-item">
                                 <div class="news-thumb">
@@ -599,16 +380,15 @@
                         </a>
                     `).join('');
 
-                    console.log('✅ Đã load ' + data.length + ' tin tức');
                 } catch (err) {
-                    console.warn('Lỗi load tin tức:', err);
+                    console.error('Lỗi load tin tức:', err);
                 }
             }
 
-            loadHomeNews();
+            loadNews();
 
             // ==========================================
-            // 5. LOAD KẾT QUẢ BÓNG ĐÁ
+            // 4. LOAD KẾT QUẢ BÓNG ĐÁ
             // ==========================================
             let currentLeague = '4328';
             let currentStatus = 'upcoming';
@@ -626,7 +406,6 @@
 
                 try {
                     let matches = [];
-
                     if (currentStatus === 'upcoming') {
                         matches = await window.FootballAPI.getUpcomingMatches(currentLeague);
                     } else {
@@ -645,11 +424,9 @@
                         const homeScore = match.intHomeScore ?? '-';
                         const awayScore = match.intAwayScore ?? '-';
                         const isFinished = match.intHomeScore !== null && match.intHomeScore !== undefined;
-
                         const statusText = isFinished 
                             ? 'KT' 
                             : (match.strTime ? window.FootballAPI.formatMatchTime(match.strTime) : '—');
-
                         const statusColor = isFinished ? '#6b7280' : '#1769ff';
 
                         return `
@@ -661,8 +438,6 @@
                             </div>
                         `;
                     }).join('');
-
-                    console.log(`✅ Đã load ${displayMatches.length} trận ${currentLeague}`);
 
                 } catch (error) {
                     console.error('Lỗi load bóng đá:', error);
@@ -690,34 +465,7 @@
 
             setTimeout(() => loadFootballMatches(), 500);
 
-            // ==========================================
-            // 6. MOBILE MENU TOGGLE
-            // ==========================================
-            const mobileMenu = document.getElementById('mobileMenu');
-            if (mobileMenu) {
-                mobileMenu.addEventListener('click', () => {
-                    const sidebar = document.querySelector('.sidebar');
-                    if (sidebar) sidebar.classList.toggle('open');
-                });
-            }
-
-            // ==========================================
-            // 7. TOAST NOTIFICATION
-            // ==========================================
-            function showToast(message) {
-                var toast = document.createElement('div');
-                toast.className = 'dashboard-toast';
-                toast.textContent = message;
-                document.body.appendChild(toast);
-
-                setTimeout(function() { toast.classList.add('show'); }, 100);
-                setTimeout(function() {
-                    toast.classList.remove('show');
-                    setTimeout(function() { toast.remove(); }, 300);
-                }, 3500);
-            }
-
-            console.log('✅ Admin Dashboard SportsVN đã sẵn sàng');
+            console.log('✅ Trang chủ công khai SportsVN đã load');
         });
     </script>
 
