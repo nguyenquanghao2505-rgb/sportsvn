@@ -52,19 +52,43 @@
                 <!-- DASHBOARD 3 CỘT -->
                 <div class="dashboard-grid">
 
-                    <!-- CỘT 1: GIẢI ĐẤU -->
+                    <!-- CỘT 1: GIẢI ĐẤU (3 NHÓM TRẠNG THÁI) -->
                     <section class="panel">
                         <div class="panel-header">
                             <div>
-                                <h2>🏆 Giải đấu đang diễn ra</h2>
-                                <p>Các giải đấu mới nhất trên hệ thống</p>
+                                <h2>🏆 Giải đấu</h2>
+                                <p>Cập nhật theo trạng thái</p>
                             </div>
                             <a href="tournaments.html">Xem tất cả →</a>
                         </div>
 
-                        <div class="tournament-list" id="homeTournamentList">
-                            <div style="text-align:center;padding:30px;color:#6b7280;font-size:12px;">
-                                ⏳ Đang tải...
+                        <!-- NHÓM 1: ĐANG DIỄN RA -->
+                        <div class="tournament-group">
+                            <div class="tournament-group-title">
+                                <span class="dot active-dot"></span> Đang diễn ra
+                            </div>
+                            <div class="tournament-list" id="tournamentsActive">
+                                <div style="text-align:center;padding:15px;color:#9ca3af;font-size:12px;">⏳ Đang tải...</div>
+                            </div>
+                        </div>
+
+                        <!-- NHÓM 2: SẮP DIỄN RA -->
+                        <div class="tournament-group">
+                            <div class="tournament-group-title">
+                                <span class="dot upcoming-dot"></span> Sắp diễn ra
+                            </div>
+                            <div class="tournament-list" id="tournamentsUpcoming">
+                                <div style="text-align:center;padding:15px;color:#9ca3af;font-size:12px;">⏳ Đang tải...</div>
+                            </div>
+                        </div>
+
+                        <!-- NHÓM 3: ĐÃ KẾT THÚC -->
+                        <div class="tournament-group">
+                            <div class="tournament-group-title">
+                                <span class="dot completed-dot"></span> Đã kết thúc
+                            </div>
+                            <div class="tournament-list" id="tournamentsCompleted">
+                                <div style="text-align:center;padding:15px;color:#9ca3af;font-size:12px;">⏳ Đang tải...</div>
                             </div>
                         </div>
                     </section>
@@ -294,50 +318,98 @@
             loadBanner();
 
             // ==========================================
-            // 2. LOAD GIẢI ĐẤU CÔNG KHAI
+            // 2. LOAD GIẢI ĐẤU THEO 3 TRẠNG THÁI
             // ==========================================
             async function loadTournaments() {
                 try {
+                    // Load TẤT CẢ giải đấu, sắp xếp mới nhất trước
                     const { data, error } = await supabase
                         .from('tournaments')
                         .select('*')
-                        .order('created_at', { ascending: false })
-                        .limit(4);
+                        .order('start_date', { ascending: false });
 
-                    const container = document.getElementById('homeTournamentList');
-                    if (error || !data || data.length === 0) {
-                        container.innerHTML = '<div style="text-align:center;padding:30px;color:#9ca3af;font-size:12px;">📅 Chưa có giải đấu nào</div>';
+                    if (error) {
+                        console.error('Lỗi load tournaments:', error);
                         return;
                     }
 
-                    container.innerHTML = data.map(t => {
-                        const statusClass = t.status === 'active' ? 'active' : 
-                                           t.status === 'upcoming' ? 'upcoming' : 'completed';
-                        const statusText = t.status === 'active' ? 'Đang diễn ra' : 
-                                          t.status === 'upcoming' ? 'Sắp diễn ra' : 'Đã kết thúc';
-                        const sportIcon = t.sport === 'football' ? '⚽' :
-                                         t.sport === 'swimming' ? '🏊' :
-                                         t.sport === 'basketball' ? '🏀' :
-                                         t.sport === 'pickleball' ? '◉' : '🏆';
+                    // Phân loại theo status
+                    const activeList = (data || []).filter(t => t.status === 'active');
+                    const upcomingList = (data || []).filter(t => t.status === 'upcoming');
+                    const completedList = (data || []).filter(t => t.status === 'completed');
 
-                        return `
-                            <div class="tournament">
-                                <div class="sport-logo ${t.sport || 'football'}">${sportIcon}</div>
-                                <div class="tournament-info">
-                                    <strong>${t.name}</strong>
-                                    <span>${t.sport_name || ''} · ${t.team_count || 0} đội</span>
-                                </div>
-                                <div class="tournament-status">
-                                    <span class="status ${statusClass}">${statusText}</span>
-                                    <small>${t.start_date ? new Date(t.start_date).toLocaleDateString('vi-VN') : ''}</small>
-                                </div>
-                            </div>
-                        `;
-                    }).join('');
+                    // Render từng nhóm
+                    renderTournamentGroup('tournamentsActive', activeList, 'active');
+                    renderTournamentGroup('tournamentsUpcoming', upcomingList, 'upcoming');
+                    renderTournamentGroup('tournamentsCompleted', completedList, 'completed');
+
+                    console.log(`✅ Tournaments: ${activeList.length} active, ${upcomingList.length} upcoming, ${completedList.length} completed`);
 
                 } catch (err) {
                     console.error('Lỗi load giải đấu:', err);
                 }
+            }
+
+            // Hàm render 1 nhóm giải đấu
+            function renderTournamentGroup(containerId, tournaments, status) {
+                const container = document.getElementById(containerId);
+                if (!container) return;
+
+                if (!tournaments || tournaments.length === 0) {
+                    const emptyText = status === 'active' ? 'Không có giải nào đang diễn ra' :
+                                      status === 'upcoming' ? 'Không có giải nào sắp diễn ra' :
+                                      'Chưa có giải nào kết thúc';
+                    container.innerHTML = `<div style="text-align:center;padding:15px;color:#9ca3af;font-size:12px;">${emptyText}</div>`;
+                    return;
+                }
+
+                // Chỉ hiển thị tối đa 4 giải mỗi nhóm
+                const displayList = tournaments.slice(0, 4);
+
+                container.innerHTML = displayList.map(t => {
+                    const statusClass = status;
+                    const statusText = status === 'active' ? 'Đang diễn ra' :
+                                      status === 'upcoming' ? 'Sắp diễn ra' :
+                                      'Đã kết thúc';
+                    const sportIcon = getSportIcon(t.sport);
+                    const dateDisplay = t.start_date 
+                        ? new Date(t.start_date).toLocaleDateString('vi-VN') 
+                        : '';
+
+                    return `
+                        <a href="tournament-detail.html?id=${t.id}" class="tournament-link" style="text-decoration:none;color:inherit;">
+                            <div class="tournament">
+                                <div class="sport-logo ${t.sport || 'football'}">${sportIcon}</div>
+                                <div class="tournament-info">
+                                    <strong>${t.name}</strong>
+                                    <span>${t.sport_name || ''}${t.team_count ? ' · ' + t.team_count + ' đội' : ''}</span>
+                                </div>
+                                <div class="tournament-status">
+                                    <span class="status ${statusClass}">${statusText}</span>
+                                    <small>${dateDisplay}</small>
+                                </div>
+                            </div>
+                        </a>
+                    `;
+                }).join('');
+            }
+
+            // Helper: lấy icon theo môn thể thao
+            function getSportIcon(sport) {
+                const icons = {
+                    football: '⚽',
+                    swimming: '🏊',
+                    basketball: '🏀',
+                    pickleball: '◉',
+                    volleyball: '🏐',
+                    tennis: '🎾',
+                    badminton: '🏸',
+                    chess: '♟️',
+                    athletics: '🏃',
+                    martial_arts: '🥋',
+                    default: '🏆'
+                };
+                return icons[sport] || icons.default;
             }
 
             loadTournaments();
