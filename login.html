@@ -88,6 +88,24 @@
                 config.SUPABASE_ANON_KEY
             );
 
+            // ==========================================
+            // 1. NẾU ĐÃ ĐĂNG NHẬP → CHUYỂN THẲNG VÀO ADMIN
+            // ==========================================
+            (async function autoRedirect() {
+                try {
+                    const { data: { session } } = await supabaseClient.auth.getSession();
+                    if (session) {
+                        console.log('✅ Đã có session → chuyển vào admin.html');
+                        window.location.href = 'admin.html';
+                    }
+                } catch (err) {
+                    console.warn('Lỗi kiểm tra session:', err);
+                }
+            })();
+
+            // ==========================================
+            // 2. KIỂM TRA QUYỀN ADMIN
+            // ==========================================
             async function checkAdminRole(userId) {
                 try {
                     const { data, error } = await supabaseClient
@@ -103,6 +121,9 @@
                 }
             }
 
+            // ==========================================
+            // 3. XỬ LÝ ĐĂNG NHẬP
+            // ==========================================
             window.handleLogin = async function(event) {
                 event.preventDefault();
                 const email = document.getElementById('email').value.trim();
@@ -156,8 +177,11 @@
 
                     showAlert('✅ Đăng nhập thành công! Đang chuyển hướng...', 'success');
 
+                    // ==========================================
+                    // ✅ SỬA Ở ĐÂY: chuyển đến admin.html
+                    // ==========================================
                     setTimeout(() => {
-                        window.location.href = 'index.html';
+                        window.location.href = 'admin.html';
                     }, 1000);
 
                 } catch (error) {
