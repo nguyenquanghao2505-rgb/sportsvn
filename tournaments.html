@@ -3,599 +3,512 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta name="description" content="Quản lý giải đấu - SportsVN">
     <title>Quản lý giải đấu - SportsVN</title>
-    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
-    <style>
-        * { margin: 0; padding: 0; box-sizing: border-box; font-family: 'Segoe UI', system-ui, sans-serif; }
-        body { background: #f0f2f8; min-height: 100vh; padding: 24px; }
-        .container { max-width: 1200px; margin: 0 auto; }
-
-        .header {
-            background: linear-gradient(135deg, #0d1b3e, #1a3a7a);
-            border-radius: 20px; padding: 32px; color: #fff;
-            margin-bottom: 24px; display: flex; justify-content: space-between;
-            align-items: center; flex-wrap: wrap; gap: 16px;
-        }
-        .header h1 { font-size: 28px; margin-bottom: 8px; }
-        .header p { opacity: 0.85; }
-
-        .btn {
-            padding: 12px 24px; border-radius: 10px; font-size: 15px; font-weight: 700;
-            cursor: pointer; border: none; transition: all 0.3s ease; text-decoration: none;
-            display: inline-flex; align-items: center; gap: 8px;
-        }
-        .btn-primary { background: #e94560; color: #fff; }
-        .btn-primary:hover { transform: translateY(-2px); box-shadow: 0 8px 20px rgba(233,69,96,0.4); }
-        .btn-outline { background: transparent; color: #fff; border: 2px solid #fff; }
-        .btn-outline:hover { background: #fff; color: #0d1b3e; }
-
-        .panel { background: #fff; border-radius: 16px; padding: 24px;
-                 margin-bottom: 24px; box-shadow: 0 4px 20px rgba(0,0,0,0.08); }
-        .panel-title { font-size: 20px; font-weight: 700; color: #1a1a2e; margin-bottom: 16px; }
-
-        /* MODAL */
-        .modal-overlay {
-            display: none; position: fixed; top: 0; left: 0; right: 0; bottom: 0;
-            background: rgba(0,0,0,0.5); z-index: 1000; align-items: center;
-            justify-content: center; padding: 20px;
-        }
-        .modal-overlay.show { display: flex; }
-        .modal-content {
-            background: #fff; border-radius: 20px; max-width: 800px; width: 100%;
-            max-height: 90vh; overflow-y: auto; animation: slideIn 0.3s ease;
-        }
-        @keyframes slideIn { from { opacity: 0; transform: translateY(-30px); } to { opacity: 1; transform: translateY(0); } }
-        .modal-header {
-            background: linear-gradient(135deg, #0d1b3e, #1a3a7a); color: #fff;
-            padding: 24px 28px; border-radius: 20px 20px 0 0;
-            display: flex; justify-content: space-between; align-items: center;
-            position: sticky; top: 0; z-index: 10;
-        }
-        .modal-header h2 { font-size: 20px; }
-        .modal-close { background: none; border: none; color: #fff; font-size: 28px; cursor: pointer; padding: 0 8px; }
-        .modal-body { padding: 28px; }
-
-        .section-label {
-            font-size: 13px; font-weight: 800; color: #1a3a7a;
-            text-transform: uppercase; letter-spacing: 1px;
-            margin-bottom: 14px; padding-bottom: 8px;
-            border-bottom: 2px solid #e9ecef;
-            display: flex; align-items: center; gap: 8px;
-        }
-        .section-label i { font-size: 16px; }
-
-        .form-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 18px; margin-bottom: 24px; }
-        .form-group { display: flex; flex-direction: column; }
-        .form-group.full { grid-column: 1 / -1; }
-        .form-group label { font-weight: 700; font-size: 14px; margin-bottom: 8px; color: #1a1a2e; }
-        .form-group label span { color: #e94560; }
-        .form-group input, .form-group select, .form-group textarea {
-            padding: 12px 16px; border: 2px solid #e9ecef; border-radius: 10px;
-            font-size: 15px; font-family: inherit;
-        }
-        .form-group input:focus, .form-group select:focus, .form-group textarea:focus {
-            border-color: #1a3a7a; outline: none;
-        }
-        .form-group textarea { resize: vertical; min-height: 80px; }
-        .form-hint { font-size: 12px; color: #6c757d; margin-top: 4px; }
-
-        .time-grid { display: grid; grid-template-columns: 1fr 1fr 1fr; gap: 12px; }
-
-        .modal-actions { display: flex; gap: 12px; justify-content: flex-end; margin-top: 24px;
-                         padding-top: 20px; border-top: 1px solid #e9ecef; }
-
-        .alert { padding: 14px 18px; border-radius: 10px; margin-bottom: 16px; display: none; }
-        .alert.show { display: block; }
-        .alert.error { background: #f8d7da; color: #721c24; }
-        .alert.success { background: #d4edda; color: #155724; }
-
-        /* TOURNAMENT CARD */
-        .tournament-grid {
-            display: grid; grid-template-columns: repeat(auto-fill, minmax(380px, 1fr)); gap: 20px;
-        }
-        .tournament-card {
-            background: #fff; border-radius: 16px; padding: 22px;
-            box-shadow: 0 2px 12px rgba(0,0,0,0.06);
-            border-left: 5px solid #1a3a7a; transition: all 0.3s ease;
-        }
-        .tournament-card:hover { transform: translateY(-4px); box-shadow: 0 8px 25px rgba(0,0,0,0.12); }
-        .tournament-card h3 { font-size: 17px; color: #1a1a2e; margin-bottom: 14px; line-height: 1.4; }
-
-        .tournament-meta { display: flex; flex-direction: column; gap: 8px;
-                           font-size: 14px; color: #6c757d; margin-bottom: 14px; }
-        .tournament-meta span { display: flex; align-items: center; gap: 8px; }
-
-        .tournament-stats {
-            display: grid; grid-template-columns: repeat(3, 1fr); gap: 8px;
-            margin-bottom: 14px; padding: 12px; background: #f8f9fa; border-radius: 10px;
-        }
-        .stat-item { text-align: center; }
-        .stat-item .value { font-size: 20px; font-weight: 800; color: #1a3a7a; display: block; }
-        .stat-item .label { font-size: 11px; color: #6c757d; text-transform: uppercase; letter-spacing: 0.5px; }
-
-        .badge {
-            display: inline-block; padding: 4px 12px; border-radius: 20px;
-            font-size: 12px; font-weight: 700; text-transform: uppercase;
-        }
-        .badge.draft { background: #e9ecef; color: #6c757d; }
-        .badge.registration { background: #cfe2ff; color: #084298; }
-        .badge.ongoing { background: #d4edda; color: #155724; }
-        .badge.completed { background: #f8d7da; color: #721c24; }
-        .badge.cancelled { background: #e2e3e5; color: #41464b; }
-
-        .card-actions {
-            display: grid; grid-template-columns: 1fr 1fr;
-            gap: 8px; margin-top: 14px; padding-top: 14px; border-top: 1px solid #e9ecef;
-        }
-        .btn-small {
-            padding: 10px 14px; font-size: 13px; border-radius: 8px; border: none;
-            cursor: pointer; font-weight: 700; display: inline-flex;
-            align-items: center; justify-content: center; gap: 6px; transition: all 0.2s ease;
-        }
-        .btn-small:hover { transform: translateY(-1px); }
-        .btn-draw { background: #00b894; color: #fff; }
-        .btn-categories { background: #6c5ce7; color: #fff; }
-        .btn-athletes { background: #0984e3; color: #fff; }
-        .btn-schedule { background: #fdcb6e; color: #1a1a2e; }
-        .btn-edit { background: #fdcb6e; color: #1a1a2e; }
-        .btn-delete { background: #e94560; color: #fff; }
-
-        .empty-state { text-align: center; padding: 60px 20px; color: #6c757d; }
-        .empty-state i { font-size: 60px; color: #dee2e6; margin-bottom: 16px; display: block; }
-
-        @media (max-width: 768px) {
-            .form-grid { grid-template-columns: 1fr; }
-            .time-grid { grid-template-columns: 1fr; }
-            .header h1 { font-size: 22px; }
-        }
-    </style>
+    <link rel="stylesheet" href="styles.css">
+    <script src="football.js" defer></script>
+    <script src="provinces.js" defer></script>
+    <script src="sidebar.js" defer></script>
 </head>
+
 <body>
 
-<div class="container">
+    <div class="app">
 
-    <div class="header">
-        <div>
-            <h1>🏆 Quản lý giải đấu</h1>
-            <p>Danh sách tất cả giải đấu của bạn · SportsVN</p>
-        </div>
-        <div style="display: flex; gap: 12px; flex-wrap: wrap;">
-            <a href="index.html" class="btn btn-outline">
-                <i class="fas fa-home"></i> Dashboard
-            </a>
-            <button class="btn btn-primary" onclick="openCreateModal()">
-                <i class="fas fa-plus"></i> Tạo giải đấu
-            </button>
-        </div>
-    </div>
+        <main class="main">
 
-    <div id="alert" class="alert"></div>
-
-    <div class="panel">
-        <div class="panel-title">📋 Danh sách giải đấu (<span id="count">0</span>)</div>
-        <div id="tournament-list" class="tournament-grid">
-            <div class="empty-state">
-                <i class="fas fa-spinner fa-spin"></i>
-                <p>Đang tải...</p>
-            </div>
-        </div>
-    </div>
-
-</div>
-
-<!-- MODAL TẠO/SỬA GIẢI ĐẤU -->
-<div class="modal-overlay" id="tournament-modal">
-    <div class="modal-content">
-        <div class="modal-header">
-            <h2 id="modal-title">Tạo giải đấu mới</h2>
-            <button class="modal-close" onclick="closeModal()">×</button>
-        </div>
-        <div class="modal-body">
-            <form id="tournament-form" onsubmit="handleSubmit(event)">
-                <input type="hidden" id="tournament-id">
-
-                <!-- THÔNG TIN CƠ BẢN -->
-                <div class="section-label"><i class="fas fa-info-circle"></i> Thông tin cơ bản</div>
-                <div class="form-grid">
-                    <div class="form-group full">
-                        <label>Tên giải đấu <span>*</span></label>
-                        <input type="text" id="name" required placeholder="VD: Giải Cầu lông Đà Nẵng 2026">
-                    </div>
-
-                    <div class="form-group">
-                        <label>Môn thể thao <span>*</span></label>
-                        <select id="sport" required>
-                            <option value="">-- Chọn môn --</option>
-                            <option>Bóng đá</option>
-                            <option>Bóng rổ</option>
-                            <option>Bóng chuyền</option>
-                            <option>Cầu lông</option>
-                            <option>Pickleball</option>
-                            <option>Tennis</option>
-                            <option>Bóng bàn</option>
-                            <option>Taekwondo</option>
-                            <option>Bơi</option>
-                            <option>Cờ tướng</option>
-                            <option>Đua thuyền</option>
-                            <option>Võ thuật khác</option>
-                        </select>
-                    </div>
-
-                    <div class="form-group">
-                        <label>Trạng thái</label>
-                        <select id="status">
-                            <option value="draft">Bản nháp</option>
-                            <option value="registration" selected>Đăng ký</option>
-                            <option value="ongoing">Đang diễn ra</option>
-                            <option value="completed">Đã kết thúc</option>
-                            <option value="cancelled">Đã hủy</option>
-                        </select>
-                    </div>
-
-                    <div class="form-group">
-                        <label>Ngày bắt đầu <span>*</span></label>
-                        <input type="date" id="start_date" required>
-                    </div>
-
-                    <div class="form-group">
-                        <label>Ngày kết thúc</label>
-                        <input type="date" id="end_date">
-                    </div>
-
-                    <div class="form-group full">
-                        <label>Địa điểm <span>*</span></label>
-                        <input type="text" id="location" required placeholder="VD: Nhà thi đấu Tiên Sơn, Đà Nẵng">
+            <!-- TOPBAR -->
+            <header class="topbar">
+                <div class="topbar-left">
+                    <button class="mobile-menu" id="mobileMenu" aria-label="Mở menu">☰</button>
+                    <div class="topbar-brand">
+                        <span class="topbar-label">SPORTS MANAGEMENT PLATFORM</span>
+                        <h1 class="topbar-title-main">SPORTS<span>VN</span></h1>
+                        <p class="topbar-subtitle">Quản lý giải đấu — Tạo mới, theo dõi và cập nhật</p>
                     </div>
                 </div>
 
-                <!-- CẤU HÌNH THI ĐẤU -->
-                <div class="section-label"><i class="fas fa-cog"></i> Cấu hình thi đấu</div>
-                <div class="form-grid">
-                    <div class="form-group">
-                        <label>Số sân <span>*</span></label>
-                        <input type="number" id="num_venues" min="1" max="15" value="4" required>
-                        <div class="form-hint">Từ 1 đến 15 sân</div>
+                <div class="topbar-right">
+                    <a href="index.html" class="topbar-cta" style="background:linear-gradient(135deg,#6b7280,#9ca3af);box-shadow:none;">
+                        ← Về trang chủ
+                    </a>
+                    <div class="top-user" id="topUser">
+                        <div class="avatar">A</div>
+                        <div class="top-user-info">
+                            <strong>Quản trị viên</strong>
+                            <span>SportsVN</span>
+                        </div>
+                        <span class="arrow">▾</span>
+                    </div>
+                </div>
+            </header>
+
+
+            <!-- CONTENT -->
+            <section class="content">
+
+                <!-- HEADER + NÚT TẠO GIẢI -->
+                <div class="panel" style="margin-bottom:20px;">
+                    <div class="panel-header" style="justify-content:space-between;">
+                        <div>
+                            <h2>🏆 Danh sách giải đấu</h2>
+                            <p>Quản lý tất cả các giải đấu trên hệ thống</p>
+                        </div>
+                        <button class="topbar-cta" id="openCreateModal">
+                            <span>＋</span> Tạo giải đấu
+                        </button>
                     </div>
 
-                    <div class="form-group">
-                        <label>Số ngày thi đấu <span>*</span></label>
-                        <input type="number" id="num_days" min="1" max="30" value="3" required>
-                        <div class="form-hint">Số ngày tổ chức giải</div>
-                    </div>
-
-                    <div class="form-group">
-                        <label>Số buổi/ngày <span>*</span></label>
-                        <select id="sessions_per_day" required>
-                            <option value="1">1 buổi (Sáng)</option>
-                            <option value="2" selected>2 buổi (Sáng + Chiều)</option>
-                            <option value="3">3 buổi (Sáng + Chiều + Tối)</option>
-                        </select>
-                    </div>
-
-                    <div class="form-group">
-                        <label>Thời lượng 1 trận (phút) <span>*</span></label>
-                        <input type="number" id="match_duration" min="15" max="120" value="45" required>
-                        <div class="form-hint">Thời gian dự kiến mỗi trận</div>
-                    </div>
-
-                    <div class="form-group full">
-                        <label>Giờ bắt đầu các buổi</label>
-                        <div class="time-grid">
-                            <div>
-                                <label style="font-size:12px; color:#6c757d; margin-bottom:4px; display:block;">Sáng</label>
-                                <input type="time" id="start_time_morning" value="08:00">
-                            </div>
-                            <div>
-                                <label style="font-size:12px; color:#6c757d; margin-bottom:4px; display:block;">Chiều</label>
-                                <input type="time" id="start_time_afternoon" value="14:00">
-                            </div>
-                            <div>
-                                <label style="font-size:12px; color:#6c757d; margin-bottom:4px; display:block;">Tối</label>
-                                <input type="time" id="start_time_evening" value="19:00">
-                            </div>
+                    <!-- BỘ LỌC TRẠNG THÁI -->
+                    <div style="padding:16px 20px;">
+                        <div class="result-tabs" id="filterTabs" style="max-width:500px;">
+                            <div class="result-tab active" data-filter="all">Tất cả</div>
+                            <div class="result-tab" data-filter="active">Đang diễn ra</div>
+                            <div class="result-tab" data-filter="upcoming">Sắp diễn ra</div>
+                            <div class="result-tab" data-filter="completed">Đã kết thúc</div>
                         </div>
                     </div>
                 </div>
 
-                <!-- MÔ TẢ -->
-                <div class="section-label"><i class="fas fa-file-alt"></i> Mô tả</div>
-                <div class="form-group full">
-                    <textarea id="description" placeholder="Thông tin giới thiệu, thể lệ, đối tượng tham dự..." rows="4"></textarea>
+
+                <!-- DANH SÁCH GIẢI ĐẤU -->
+                <div class="panel">
+                    <div class="tournament-list" id="tournamentListAdmin">
+                        <div style="text-align:center;padding:40px;color:#9ca3af;font-size:13px;">
+                            ⏳ Đang tải danh sách giải đấu...
+                        </div>
+                    </div>
                 </div>
 
-                <div id="form-message" class="alert"></div>
+            </section>
 
-                <div class="modal-actions">
-                    <button type="button" class="btn btn-outline" style="color: #1a1a2e; border-color: #e9ecef;" onclick="closeModal()">Hủy</button>
-                    <button type="submit" class="btn btn-primary" id="submit-btn">
-                        <i class="fas fa-save"></i> Lưu giải đấu
+
+            <!-- FOOTER -->
+            <footer class="footer">
+                <span>© 2026 SportsVN</span>
+                <span>Nền tảng công nghệ thể thao Việt Nam</span>
+            </footer>
+
+        </main>
+
+    </div>
+
+
+    <!-- ============================================================== -->
+    <!-- MODAL: TẠO GIẢI ĐẤU MỚI -->
+    <!-- ============================================================== -->
+    <div class="tournament-modal" id="createTournamentModal" hidden>
+        <div class="tournament-modal-card">
+            <div class="tournament-modal-head">
+                <div>
+                    <h2>🏆 Tạo giải đấu mới</h2>
+                    <p>Điền đầy đủ thông tin để tạo giải đấu trên hệ thống</p>
+                </div>
+                <button class="tournament-modal-close" id="closeCreateModal">×</button>
+            </div>
+
+            <form class="tournament-form" id="createTournamentForm">
+                <div class="tournament-form-grid">
+
+                    <!-- Tên giải đấu -->
+                    <div class="tournament-field full">
+                        <label>Tên giải đấu <span>*</span></label>
+                        <input type="text" id="tName" placeholder="VD: Giải Bóng đá Đại hội TDTT TP Đà Nẵng" required>
+                    </div>
+
+                    <!-- Môn thể thao -->
+                    <div class="tournament-field">
+                        <label>Môn thể thao <span>*</span></label>
+                        <select id="tSport" required>
+                            <option value="">-- Chọn môn --</option>
+                            <option value="football">⚽ Bóng đá</option>
+                            <option value="swimming">🏊 Bơi</option>
+                            <option value="basketball">🏀 Bóng rổ</option>
+                            <option value="pickleball">◉ Pickleball</option>
+                            <option value="volleyball">🏐 Bóng chuyền</option>
+                            <option value="tennis">🎾 Quần vợt</option>
+                            <option value="badminton">🏸 Cầu lông</option>
+                            <option value="chess">♟️ Cờ tướng</option>
+                            <option value="athletics">🏃 Điền kinh</option>
+                            <option value="martial_arts">🥋 Võ thuật</option>
+                        </select>
+                    </div>
+
+                    <!-- Tên hiển thị môn -->
+                    <div class="tournament-field">
+                        <label>Tên hiển thị môn <span>*</span></label>
+                        <input type="text" id="tSportName" placeholder="VD: Bóng đá nam" required>
+                    </div>
+
+                    <!-- Số đội -->
+                    <div class="tournament-field">
+                        <label>Số đội tham gia</label>
+                        <input type="number" id="tTeamCount" placeholder="VD: 16" min="1" value="16">
+                    </div>
+
+                    <!-- Trạng thái -->
+                    <div class="tournament-field">
+                        <label>Trạng thái <span>*</span></label>
+                        <select id="tStatus" required>
+                            <option value="upcoming">🟠 Sắp diễn ra</option>
+                            <option value="active">🟢 Đang diễn ra</option>
+                            <option value="completed">⚫ Đã kết thúc</option>
+                        </select>
+                    </div>
+
+                    <!-- Ngày bắt đầu -->
+                    <div class="tournament-field">
+                        <label>Ngày bắt đầu <span>*</span></label>
+                        <input type="date" id="tStartDate" required>
+                    </div>
+
+                    <!-- Ngày kết thúc -->
+                    <div class="tournament-field">
+                        <label>Ngày kết thúc</label>
+                        <input type="date" id="tEndDate">
+                    </div>
+
+                </div>
+
+                <div class="tournament-form-message" id="formMessage"></div>
+
+                <div class="tournament-form-actions">
+                    <button type="button" class="tournament-cancel" id="cancelCreate">Hủy</button>
+                    <button type="submit" class="tournament-submit" id="submitCreate">
+                        Tạo giải đấu
                     </button>
                 </div>
             </form>
         </div>
     </div>
-</div>
 
-<script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
-<script src="config.js"></script>
-<script>
-(function() {
-    'use strict';
 
-    const config = window.SPORTSVN_CONFIG || {};
-    const supabaseClient = window.supabase.createClient(config.SUPABASE_URL, config.SUPABASE_ANON_KEY);
+    <!-- ============================================================== -->
+    <!-- SCRIPTS -->
+    <!-- ============================================================== -->
+    <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+    <script src="config.js"></script>
+    <script>
+        // ==========================================
+        // QUẢN LÝ GIẢI ĐẤU - SPORTSVN ADMIN
+        // ==========================================
 
-    let currentUser = null;
-    let tournaments = [];
+        window.supabaseClient = null;
 
-    async function init() {
-        const { data: { session } } = await supabaseClient.auth.getSession();
-        if (!session) { window.location.href = 'login.html'; return; }
-        currentUser = session.user;
-        await loadTournaments();
-    }
+        document.addEventListener('DOMContentLoaded', async function() {
+            'use strict';
 
-    async function loadTournaments() {
-        try {
-            const { data, error } = await supabaseClient
-                .from('tournaments').select('*')
-                .order('created_at', { ascending: false });
-            if (error) throw error;
-            tournaments = data || [];
-            renderTournaments();
-        } catch (error) {
-            console.error(error);
-            showAlert('Không tải được danh sách: ' + error.message, 'error');
-        }
-    }
-
-    function renderTournaments() {
-        const container = document.getElementById('tournament-list');
-        document.getElementById('count').textContent = tournaments.length;
-
-        if (tournaments.length === 0) {
-            container.innerHTML = `
-                <div class="empty-state" style="grid-column: 1/-1;">
-                    <i class="fas fa-trophy"></i>
-                    <p style="margin-bottom: 16px;">Chưa có giải đấu nào</p>
-                    <button class="btn btn-primary" onclick="openCreateModal()">
-                        <i class="fas fa-plus"></i> Tạo giải đấu đầu tiên
-                    </button>
-                </div>`;
-            return;
-        }
-
-        container.innerHTML = tournaments.map(t => `
-            <div class="tournament-card">
-                <h3>${escapeHtml(t.name)}</h3>
-                <div class="tournament-meta">
-                    <span><i class="fas fa-tag"></i> ${escapeHtml(t.sport || '—')}</span>
-                    <span><i class="fas fa-map-marker-alt"></i> ${escapeHtml(t.location || '—')}</span>
-                    <span><i class="fas fa-calendar"></i> ${formatDate(t.start_date)} ${t.end_date ? '→ ' + formatDate(t.end_date) : ''}</span>
-                    <span><span class="badge ${t.status || 'draft'}">${statusLabel(t.status)}</span></span>
-                </div>
-
-                <div class="tournament-stats">
-                    <div class="stat-item">
-                        <span class="value">${t.num_venues || 0}</span>
-                        <span class="label">Sân</span>
-                    </div>
-                    <div class="stat-item">
-                        <span class="value">${t.num_days || 0}</span>
-                        <span class="label">Ngày</span>
-                    </div>
-                    <div class="stat-item">
-                        <span class="value">${t.sessions_per_day || 0}</span>
-                        <span class="label">Buổi/ngày</span>
-                    </div>
-                </div>
-
-                <div class="card-actions">
-                    <button class="btn-small btn-categories" onclick="goToCategories('${t.id}')">
-                        <i class="fas fa-list"></i> Nội dung
-                    </button>
-                    <button class="btn-small btn-athletes" onclick="goToAthletes('${t.id}')">
-                        <i class="fas fa-users"></i> VĐV
-                    </button>
-                    <button class="btn-small btn-draw" onclick="goToDraw('${t.id}')">
-                        <i class="fas fa-dice"></i> Bốc thăm
-                    </button>
-                    <button class="btn-small btn-schedule" onclick="goToSchedule('${t.id}')">
-                        <i class="fas fa-calendar-alt"></i> Lịch thi
-                    </button>
-                    <button class="btn-small btn-edit" onclick="openEditModal('${t.id}')">
-                        <i class="fas fa-edit"></i> Sửa
-                    </button>
-                    <button class="btn-small btn-delete" onclick="deleteTournament('${t.id}')">
-                        <i class="fas fa-trash"></i> Xóa
-                    </button>
-                </div>
-            </div>
-        `).join('');
-    }
-
-    window.openCreateModal = function() {
-        document.getElementById('modal-title').textContent = 'Tạo giải đấu mới';
-        document.getElementById('tournament-form').reset();
-        document.getElementById('tournament-id').value = '';
-        document.getElementById('num_venues').value = 4;
-        document.getElementById('num_days').value = 3;
-        document.getElementById('sessions_per_day').value = 2;
-        document.getElementById('match_duration').value = 45;
-        document.getElementById('start_time_morning').value = '08:00';
-        document.getElementById('start_time_afternoon').value = '14:00';
-        document.getElementById('start_time_evening').value = '19:00';
-        document.getElementById('status').value = 'registration';
-        document.getElementById('form-message').className = 'alert';
-        document.getElementById('tournament-modal').classList.add('show');
-    };
-
-    window.openEditModal = function(id) {
-        const t = tournaments.find(x => x.id === id);
-        if (!t) { alert('Không tìm thấy giải đấu!'); return; }
-        document.getElementById('modal-title').textContent = 'Sửa giải đấu';
-        document.getElementById('tournament-id').value = t.id;
-        document.getElementById('name').value = t.name || '';
-        document.getElementById('sport').value = t.sport || '';
-        document.getElementById('status').value = t.status || 'draft';
-        document.getElementById('start_date').value = t.start_date || '';
-        document.getElementById('end_date').value = t.end_date || '';
-        document.getElementById('location').value = t.location || '';
-        document.getElementById('description').value = t.description || '';
-        document.getElementById('num_venues').value = t.num_venues || 4;
-        document.getElementById('num_days').value = t.num_days || 3;
-        document.getElementById('sessions_per_day').value = t.sessions_per_day || 2;
-        document.getElementById('match_duration').value = t.match_duration || 45;
-        document.getElementById('start_time_morning').value = t.start_time_morning || '08:00';
-        document.getElementById('start_time_afternoon').value = t.start_time_afternoon || '14:00';
-        document.getElementById('start_time_evening').value = t.start_time_evening || '19:00';
-        document.getElementById('form-message').className = 'alert';
-        document.getElementById('tournament-modal').classList.add('show');
-    };
-
-    window.closeModal = function() {
-        document.getElementById('tournament-modal').classList.remove('show');
-    };
-
-    function generateSlug(text) {
-        const base = String(text || '').toLowerCase().normalize('NFD')
-            .replace(/[\u0300-\u036f]/g, '').replace(/đ/g, 'd')
-            .replace(/[^a-z0-9\s-]/g, '').trim()
-            .replace(/\s+/g, '-').replace(/-+/g, '-').slice(0, 80);
-        return (base || 'giai-dau') + '-' + Date.now();
-    }
-
-    window.handleSubmit = async function(event) {
-        event.preventDefault();
-        const id = document.getElementById('tournament-id').value;
-        const nameValue = document.getElementById('name').value.trim();
-        const numVenues = parseInt(document.getElementById('num_venues').value);
-
-        const payload = {
-            name: nameValue,
-            slug: generateSlug(nameValue),
-            sport: document.getElementById('sport').value,
-            status: document.getElementById('status').value,
-            start_date: document.getElementById('start_date').value,
-            end_date: document.getElementById('end_date').value || null,
-            location: document.getElementById('location').value.trim(),
-            description: document.getElementById('description').value.trim() || null,
-            num_venues: numVenues,
-            num_days: parseInt(document.getElementById('num_days').value),
-            sessions_per_day: parseInt(document.getElementById('sessions_per_day').value),
-            match_duration: parseInt(document.getElementById('match_duration').value),
-            start_time_morning: document.getElementById('start_time_morning').value,
-            start_time_afternoon: document.getElementById('start_time_afternoon').value,
-            start_time_evening: document.getElementById('start_time_evening').value,
-            organizer_id: currentUser.id
-        };
-
-        if (!payload.name || !payload.sport || !payload.start_date || !payload.location) {
-            showFormMessage('Vui lòng nhập đầy đủ các trường bắt buộc.', 'error');
-            return;
-        }
-
-        const btn = document.getElementById('submit-btn');
-        btn.disabled = true;
-        btn.innerHTML = '<i class="fas fa-spinner fa-spin"></i> Đang lưu...';
-
-        try {
-            if (id) {
-                delete payload.slug;
-                const { error } = await supabaseClient.from('tournaments').update(payload).eq('id', id);
-                if (error) throw error;
-                showAlert('✅ Cập nhật giải đấu thành công!', 'success');
-            } else {
-                const { data: newTournament, error } = await supabaseClient
-                    .from('tournaments').insert(payload).select().single();
-                if (error) throw error;
-                await createVenues(newTournament.id, numVenues, payload.location);
-                showAlert(`✅ Tạo giải đấu thành công! Đã tạo ${numVenues} sân.`, 'success');
+            const config = window.SPORTSVN_CONFIG || {};
+            if (!config.SUPABASE_URL || !config.SUPABASE_ANON_KEY) {
+                console.warn('⚠️ Chưa cấu hình Supabase');
+                return;
             }
-            closeModal();
-            await loadTournaments();
-        } catch (error) {
-            console.error(error);
-            showFormMessage('Lỗi: ' + error.message, 'error');
-        } finally {
-            btn.disabled = false;
-            btn.innerHTML = '<i class="fas fa-save"></i> Lưu giải đấu';
-        }
-    };
 
-    async function createVenues(tournamentId, numVenues, venueName) {
-        const venues = [];
-        for (let i = 1; i <= numVenues; i++) {
-            venues.push({
-                tournament_id: tournamentId,
-                venue_name: venueName,
-                court_number: i,
-                court_name: `Sân ${i}`
+            const supabase = window.supabase.createClient(
+                config.SUPABASE_URL,
+                config.SUPABASE_ANON_KEY
+            );
+            window.supabaseClient = supabase;
+
+            // ================================
+            // 1. KIỂM TRA ĐĂNG NHẬP + QUYỀN ADMIN
+            // ================================
+            async function checkAuth() {
+                const { data: { session } } = await supabase.auth.getSession();
+                if (!session) {
+                    window.location.href = 'login.html';
+                    return false;
+                }
+
+                const { data: roleData } = await supabase
+                    .from('user_roles')
+                    .select('role')
+                    .eq('user_id', session.user.id)
+                    .single();
+
+                if (!roleData || roleData.role !== 'admin') {
+                    alert('Tài khoản không có quyền Admin');
+                    await supabase.auth.signOut();
+                    window.location.href = 'login.html';
+                    return false;
+                }
+
+                // Cập nhật tên user
+                const name = session.user.user_metadata?.full_name ||
+                             session.user.email.split('@')[0];
+                const initials = name.split(' ').map(w => w[0]).join('').slice(0, 2).toUpperCase();
+
+                document.querySelectorAll('.avatar').forEach(el => el.textContent = initials);
+                document.querySelectorAll('.top-user-info strong').forEach(el => el.textContent = name);
+
+                return true;
+            }
+
+            const isAuth = await checkAuth();
+            if (!isAuth) return;
+
+            // ================================
+            // 2. ĐĂNG XUẤT
+            // ================================
+            document.getElementById('topUser')?.addEventListener('click', async function() {
+                if (confirm('Bạn có muốn đăng xuất không?')) {
+                    await supabase.auth.signOut();
+                    window.location.href = 'index.html';
+                }
             });
-        }
-        const { error } = await supabaseClient.from('venues').insert(venues);
-        if (error) throw new Error('Không tạo được sân: ' + error.message);
-    }
 
-    window.deleteTournament = async function(id) {
-        const t = tournaments.find(x => x.id === id);
-        if (!t) return;
-        if (!confirm(`Xóa giải đấu "${t.name}"?\n\nTất cả sân, nội dung, VĐV, lịch thi đấu cũng bị xóa!\n\nKHÔNG THỂ HOÀN TÁC!`)) return;
-        try {
-            const { error } = await supabaseClient.from('tournaments').delete().eq('id', id);
-            if (error) throw error;
-            showAlert('✅ Đã xóa giải đấu!', 'success');
-            await loadTournaments();
-        } catch (error) {
-            showAlert('Lỗi xóa: ' + error.message, 'error');
-        }
-    };
+            // ================================
+            // 3. STATE
+            // ================================
+            let allTournaments = [];
+            let currentFilter = 'all';
 
-    // ============================
-    // CHUYỂN TRANG
-    // ============================
-    window.goToDraw = function(id) { window.location.href = 'draw.html?tournament_id=' + id; };
-    window.goToCategories = function(id) { window.location.href = 'categories.html?tournament_id=' + id; };
-    window.goToAthletes = function(id) { window.location.href = 'athletes.html?tournament_id=' + id; };
-    window.goToSchedule = function(id) { window.location.href = 'schedule.html?tournament_id=' + id; };
+            // ================================
+            // 4. LOAD DANH SÁCH GIẢI ĐẤU
+            // ================================
+            async function loadTournaments() {
+                const container = document.getElementById('tournamentListAdmin');
+                container.innerHTML = '<div style="text-align:center;padding:40px;color:#9ca3af;font-size:13px;">⏳ Đang tải...</div>';
 
-    // ============================
-    // HELPERS
-    // ============================
-    function showAlert(message, type) {
-        const el = document.getElementById('alert');
-        el.textContent = message;
-        el.className = 'alert show ' + type;
-        setTimeout(() => { el.className = 'alert'; }, 5000);
-    }
+                try {
+                    const { data, error } = await supabase
+                        .from('tournaments')
+                        .select('*')
+                        .order('created_at', { ascending: false });
 
-    function showFormMessage(message, type) {
-        const el = document.getElementById('form-message');
-        el.textContent = message;
-        el.className = 'alert show ' + type;
-    }
+                    if (error) throw error;
 
-    function formatDate(dateStr) {
-        if (!dateStr) return '—';
-        const d = new Date(dateStr);
-        return d.toLocaleDateString('vi-VN');
-    }
+                    allTournaments = data || [];
+                    renderTournaments();
 
-    function statusLabel(status) {
-        return {
-            draft: 'Bản nháp', registration: 'Đăng ký', ongoing: 'Đang diễn ra',
-            completed: 'Đã kết thúc', cancelled: 'Đã hủy'
-        }[status] || 'Bản nháp';
-    }
+                } catch (err) {
+                    console.error('Lỗi load tournaments:', err);
+                    container.innerHTML = '<div style="text-align:center;padding:40px;color:#dc2626;font-size:13px;">❌ Không thể tải danh sách</div>';
+                }
+            }
 
-    function escapeHtml(text) {
-        return String(text || '').replace(/&/g, '&amp;').replace(/</g, '&lt;')
-            .replace(/>/g, '&gt;').replace(/"/g, '&quot;');
-    }
+            // ================================
+            // 5. RENDER DANH SÁCH
+            // ================================
+            function renderTournaments() {
+                const container = document.getElementById('tournamentListAdmin');
 
-    init();
-})();
-</script>
+                let list = allTournaments;
+                if (currentFilter !== 'all') {
+                    list = allTournaments.filter(t => t.status === currentFilter);
+                }
+
+                if (list.length === 0) {
+                    container.innerHTML = '<div style="text-align:center;padding:40px;color:#9ca3af;font-size:13px;">📅 Chưa có giải đấu nào. Bấm "Tạo giải đấu" để bắt đầu.</div>';
+                    return;
+                }
+
+                container.innerHTML = list.map(t => {
+                    const statusClass = t.status === 'active' ? 'active' :
+                                       t.status === 'upcoming' ? 'upcoming' : 'completed';
+                    const statusText = t.status === 'active' ? 'Đang diễn ra' :
+                                      t.status === 'upcoming' ? 'Sắp diễn ra' : 'Đã kết thúc';
+                    const sportIcon = getSportIcon(t.sport);
+                    const dateDisplay = t.start_date
+                        ? new Date(t.start_date).toLocaleDateString('vi-VN')
+                        : '';
+
+                    return `
+                        <div class="tournament" style="position:relative;">
+                            <div class="sport-logo ${t.sport || 'football'}">${sportIcon}</div>
+                            <div class="tournament-info">
+                                <strong>${t.name}</strong>
+                                <span>${t.sport_name || ''}${t.team_count ? ' · ' + t.team_count + ' đội' : ''}${dateDisplay ? ' · ' + dateDisplay : ''}</span>
+                            </div>
+                            <div class="tournament-status">
+                                <span class="status ${statusClass}">${statusText}</span>
+                            </div>
+                            <div style="display:flex;gap:6px;margin-left:8px;">
+                                <button onclick="deleteTournament('${t.id}')"
+                                    title="Xóa giải đấu"
+                                    style="width:32px;height:32px;border-radius:8px;background:#fee2e2;color:#dc2626;font-size:14px;display:flex;align-items:center;justify-content:center;">
+                                    🗑
+                                </button>
+                            </div>
+                        </div>
+                    `;
+                }).join('');
+            }
+
+            // Helper: icon theo môn thể thao
+            function getSportIcon(sport) {
+                const icons = {
+                    football: '⚽', swimming: '🏊', basketball: '🏀',
+                    pickleball: '◉', volleyball: '🏐', tennis: '🎾',
+                    badminton: '🏸', chess: '♟️', athletics: '🏃',
+                    martial_arts: '🥋', default: '🏆'
+                };
+                return icons[sport] || icons.default;
+            }
+
+            // ================================
+            // 6. BỘ LỌC TRẠNG THÁI
+            // ================================
+            document.querySelectorAll('#filterTabs .result-tab').forEach(tab => {
+                tab.addEventListener('click', () => {
+                    document.querySelectorAll('#filterTabs .result-tab').forEach(t => t.classList.remove('active'));
+                    tab.classList.add('active');
+                    currentFilter = tab.dataset.filter;
+                    renderTournaments();
+                });
+            });
+
+            // ================================
+            // 7. MỞ / ĐÓNG MODAL TẠO GIẢI
+            // ================================
+            const modal = document.getElementById('createTournamentModal');
+            const openBtn = document.getElementById('openCreateModal');
+            const closeBtn = document.getElementById('closeCreateModal');
+            const cancelBtn = document.getElementById('cancelCreate');
+            const form = document.getElementById('createTournamentForm');
+            const formMessage = document.getElementById('formMessage');
+
+            function openModal() {
+                modal.hidden = false;
+                form.reset();
+                formMessage.textContent = '';
+                formMessage.className = 'tournament-form-message';
+                // Set ngày mặc định = hôm nay
+                const today = new Date().toISOString().split('T')[0];
+                document.getElementById('tStartDate').value = today;
+            }
+
+            function closeModal() {
+                modal.hidden = true;
+            }
+
+            openBtn?.addEventListener('click', openModal);
+            closeBtn?.addEventListener('click', closeModal);
+            cancelBtn?.addEventListener('click', closeModal);
+
+            // Đóng modal khi click ra ngoài
+            modal?.addEventListener('click', (e) => {
+                if (e.target === modal) closeModal();
+            });
+
+            // Đóng bằng ESC
+            document.addEventListener('keydown', (e) => {
+                if (e.key === 'Escape' && !modal.hidden) closeModal();
+            });
+
+            // ================================
+            // 8. XỬ LÝ SUBMIT FORM TẠO GIẢI
+            // ================================
+            form?.addEventListener('submit', async function(e) {
+                e.preventDefault();
+
+                const submitBtn = document.getElementById('submitCreate');
+                const name = document.getElementById('tName').value.trim();
+                const sport = document.getElementById('tSport').value;
+                const sportName = document.getElementById('tSportName').value.trim();
+                const teamCount = parseInt(document.getElementById('tTeamCount').value) || 0;
+                const status = document.getElementById('tStatus').value;
+                const startDate = document.getElementById('tStartDate').value;
+                const endDate = document.getElementById('tEndDate').value || null;
+
+                // Validate
+                if (!name || !sport || !sportName || !status || !startDate) {
+                    formMessage.textContent = '⚠️ Vui lòng điền đầy đủ các trường bắt buộc (*)';
+                    formMessage.className = 'tournament-form-message error';
+                    return;
+                }
+
+                submitBtn.disabled = true;
+                submitBtn.textContent = 'Đang tạo...';
+                formMessage.textContent = '';
+
+                try {
+                    const { data, error } = await supabase
+                        .from('tournaments')
+                        .insert([{
+                            name: name,
+                            sport: sport,
+                            sport_name: sportName,
+                            team_count: teamCount,
+                            status: status,
+                            start_date: startDate,
+                            end_date: endDate
+                        }])
+                        .select();
+
+                    if (error) throw error;
+
+                    formMessage.textContent = '✅ Tạo giải đấu thành công! Đang cập nhật danh sách...';
+                    formMessage.className = 'tournament-form-message success';
+
+                    setTimeout(() => {
+                        closeModal();
+                        loadTournaments();
+                    }, 1000);
+
+                } catch (err) {
+                    console.error('Lỗi tạo giải đấu:', err);
+                    formMessage.textContent = '❌ Lỗi: ' + err.message;
+                    formMessage.className = 'tournament-form-message error';
+                } finally {
+                    submitBtn.disabled = false;
+                    submitBtn.textContent = 'Tạo giải đấu';
+                }
+            });
+
+            // ================================
+            // 9. XÓA GIẢI ĐẤU
+            // ================================
+            window.deleteTournament = async function(id) {
+                if (!confirm('Bạn có chắc muốn xóa giải đấu này? Hành động không thể hoàn tác.')) return;
+
+                try {
+                    const { error } = await supabase
+                        .from('tournaments')
+                        .delete()
+                        .eq('id', id);
+
+                    if (error) throw error;
+
+                    showToast('✓ Đã xóa giải đấu');
+                    loadTournaments();
+
+                } catch (err) {
+                    console.error('Lỗi xóa giải đấu:', err);
+                    alert('Lỗi xóa: ' + err.message);
+                }
+            };
+
+            // ================================
+            // 10. TOAST
+            // ================================
+            function showToast(message) {
+                const toast = document.createElement('div');
+                toast.className = 'dashboard-toast';
+                toast.textContent = message;
+                document.body.appendChild(toast);
+                setTimeout(() => toast.classList.add('show'), 100);
+                setTimeout(() => {
+                    toast.classList.remove('show');
+                    setTimeout(() => toast.remove(), 300);
+                }, 3500);
+            }
+
+            // ================================
+            // 11. MOBILE MENU
+            // ================================
+            document.getElementById('mobileMenu')?.addEventListener('click', () => {
+                document.querySelector('.sidebar')?.classList.toggle('open');
+            });
+
+            // ================================
+            // KHỞI CHẠY
+            // ================================
+            loadTournaments();
+
+            console.log('✅ Trang quản lý giải đấu SportsVN đã sẵn sàng');
+        });
+    </script>
 
 </body>
 </html>
