@@ -1,0 +1,1049 @@
+<!DOCTYPE html>
+<html lang="vi">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Nhập kết quả - SportsVN</title>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <style>
+        * { margin: 0; padding: 0; box-sizing: border-box; font-family: 'Segoe UI', system-ui, sans-serif; }
+        body { background: #f0f2f8; min-height: 100vh; padding: 24px; }
+        .container { max-width: 1400px; margin: 0 auto; }
+
+        .header {
+            background: linear-gradient(135deg, #0d1b3e, #1a3a7a);
+            border-radius: 20px; padding: 28px 32px; color: #fff;
+            margin-bottom: 24px; display: flex; justify-content: space-between;
+            align-items: center; flex-wrap: wrap; gap: 16px;
+        }
+        .header h1 { font-size: 26px; margin-bottom: 6px; }
+        .header p { opacity: 0.85; font-size: 14px; }
+        .header-actions { display: flex; gap: 10px; flex-wrap: wrap; }
+        .btn {
+            padding: 11px 22px; border-radius: 10px; font-size: 14px;
+            font-weight: 700; cursor: pointer; border: none;
+            transition: all 0.3s ease; text-decoration: none;
+            display: inline-flex; align-items: center; gap: 8px;
+        }
+        .btn:hover { transform: translateY(-2px); }
+        .btn-primary { background: #e94560; color: #fff; }
+        .btn-outline { background: transparent; color: #fff; border: 2px solid #fff; }
+        .btn-outline:hover { background: #fff; color: #0d1b3e; }
+        .btn-success { background: #00b894; color: #fff; }
+        .btn-warning { background: #f39c12; color: #fff; }
+
+        .stats-bar {
+            display: grid; grid-template-columns: repeat(auto-fit, minmax(180px, 1fr));
+            gap: 16px; margin-bottom: 24px;
+        }
+        .stat-card {
+            background: #fff; border-radius: 14px; padding: 18px 20px;
+            box-shadow: 0 4px 15px rgba(0,0,0,0.06);
+        }
+        .stat-card .label { font-size: 12px; color: #6c757d; text-transform: uppercase; letter-spacing: 0.5px; margin-bottom: 6px; }
+        .stat-card .value { font-size: 26px; font-weight: 800; color: #1a3a7a; }
+        .stat-card .sub { font-size: 12px; color: #6c757d; margin-top: 4px; }
+
+        .panel {
+            background: #fff; border-radius: 16px; padding: 24px;
+            box-shadow: 0 4px 20px rgba(0,0,0,0.08); margin-bottom: 20px;
+        }
+        .panel-header {
+            display: flex; justify-content: space-between; align-items: center;
+            margin-bottom: 20px; padding-bottom: 14px;
+            border-bottom: 2px solid #f0f2f8;
+            flex-wrap: wrap; gap: 12px;
+        }
+        .panel-header h2 { font-size: 20px; color: #1a1a2e; }
+        .panel-header p { font-size: 13px; color: #6c757d; margin-top: 4px; }
+
+        .category-tabs {
+            display: flex; gap: 8px; margin-bottom: 20px;
+            overflow-x: auto; padding-bottom: 8px;
+        }
+        .category-tab {
+            padding: 10px 18px; border-radius: 10px; cursor: pointer;
+            font-weight: 700; font-size: 13px; color: #6c757d;
+            background: #f8f9fa; border: 2px solid transparent;
+            white-space: nowrap; transition: all 0.2s;
+        }
+        .category-tab.active { background: #0d1b3e; color: #fff; }
+        .category-tab:hover:not(.active) { border-color: #1a3a7a; color: #1a3a7a; }
+
+        .match-list { display: flex; flex-direction: column; gap: 12px; }
+
+        .match-item {
+            background: #f8f9fa; border: 2px solid #e9ecef;
+            border-radius: 12px; padding: 16px;
+            transition: all 0.2s;
+        }
+        .match-item:hover { border-color: #1a3a7a; background: #fff; }
+        .match-item.completed { background: #f0fdf4; border-color: #00b894; }
+        .match-item.placeholder { background: #e3f2fd; border-color: #64b5f6; border-style: dashed; }
+
+        .match-header {
+            display: flex; justify-content: space-between; align-items: center;
+            margin-bottom: 12px; flex-wrap: wrap; gap: 8px;
+        }
+        .match-meta {
+            display: flex; gap: 12px; font-size: 12px; color: #6c757d;
+            flex-wrap: wrap;
+        }
+        .match-meta span {
+            display: inline-flex; align-items: center; gap: 4px;
+        }
+        .match-badge {
+            display: inline-block; padding: 3px 10px;
+            border-radius: 12px; font-size: 11px; font-weight: 700;
+        }
+        .badge-pending { background: #fff3cd; color: #856404; }
+        .badge-completed { background: #d4edda; color: #155724; }
+        .badge-placeholder { background: #cce5ff; color: #004085; }
+
+        .match-body {
+            display: grid; grid-template-columns: 1fr auto 1fr;
+            gap: 12px; align-items: center;
+        }
+        .team-input {
+            display: flex; flex-direction: column; gap: 6px;
+        }
+        .team-input label {
+            font-size: 11px; color: #6c757d; font-weight: 700;
+            text-transform: uppercase;
+        }
+        .team-input .team-name {
+            font-size: 14px; font-weight: 700; color: #1a1a2e;
+            padding: 8px 12px; background: #fff;
+            border-radius: 8px; border: 1px solid #e9ecef;
+            min-height: 38px; display: flex; align-items: center;
+        }
+        .team-input .team-name.winner {
+            background: #d4edda; color: #155724;
+            border-color: #00b894; font-weight: 800;
+        }
+        .team-input input {
+            width: 80px; padding: 10px 12px; border: 2px solid #e9ecef;
+            border-radius: 8px; font-size: 18px; font-weight: 800;
+            text-align: center; font-family: inherit;
+            transition: all 0.2s;
+        }
+        .team-input input:focus {
+            border-color: #1a3a7a; outline: none;
+            box-shadow: 0 0 0 3px rgba(26,58,122,0.1);
+        }
+        .team-input input:disabled {
+            background: #f8f9fa; color: #adb5bd;
+        }
+
+        .vs-separator {
+            font-size: 18px; font-weight: 800; color: #adb5bd;
+        }
+
+        .match-actions {
+            display: flex; gap: 8px; margin-top: 12px;
+            justify-content: flex-end; flex-wrap: wrap;
+        }
+        .btn-sm {
+            padding: 8px 16px; border-radius: 8px;
+            font-size: 12px; font-weight: 700;
+            cursor: pointer; border: none;
+            display: inline-flex; align-items: center; gap: 6px;
+            transition: all 0.2s;
+        }
+        .btn-sm:hover { transform: translateY(-1px); }
+        .btn-save { background: #00b894; color: #fff; }
+        .btn-reset { background: #f39c12; color: #fff; }
+        .btn-delete { background: #e94560; color: #fff; }
+
+        .empty-state {
+            text-align: center; padding: 60px 20px; color: #6c757d;
+        }
+        .empty-state i {
+            font-size: 56px; color: #dee2e6;
+            margin-bottom: 16px; display: block;
+        }
+        .empty-state h3 { font-size: 18px; color: #1a1a2e; margin-bottom: 8px; }
+
+        .alert {
+            padding: 14px 18px; border-radius: 10px; margin-bottom: 16px;
+            font-size: 14px; display: none;
+        }
+        .alert.show { display: block; }
+        .alert.error { background: #f8d7da; color: #721c24; }
+        .alert.success { background: #d4edda; color: #155724; }
+        .alert.info { background: #cce5ff; color: #004085; }
+
+        .loading {
+            text-align: center; padding: 60px 20px; color: #6c757d;
+        }
+        .loading i {
+            font-size: 40px; color: #dee2e6;
+            animation: spin 1s linear infinite; display: block;
+            margin-bottom: 16px;
+        }
+        @keyframes spin { from { transform: rotate(0deg); } to { transform: rotate(360deg); } }
+
+        /* Final results section */
+        .final-results-section {
+            background: linear-gradient(135deg, #fff8e6, #fff3cd);
+            border: 2px solid #fdcb6e; border-radius: 16px;
+            padding: 24px; margin-top: 24px;
+        }
+        .final-results-section h3 {
+            font-size: 18px; color: #856404; margin-bottom: 20px;
+            display: flex; align-items: center; gap: 10px;
+        }
+        .final-form {
+            display: grid; grid-template-columns: repeat(auto-fit, minmax(250px, 1fr));
+            gap: 16px;
+        }
+        .form-group { display: flex; flex-direction: column; gap: 6px; }
+        .form-group label {
+            font-size: 12px; font-weight: 800; color: #856404;
+            text-transform: uppercase; letter-spacing: 0.5px;
+        }
+        .form-group input {
+            padding: 10px 14px; border: 2px solid #fdcb6e;
+            border-radius: 8px; font-size: 14px; font-family: inherit;
+            background: #fff; transition: all 0.2s;
+        }
+        .form-group input:focus {
+            border-color: #f39c12; outline: none;
+            box-shadow: 0 0 0 3px rgba(243,156,18,0.2);
+        }
+        .form-group textarea {
+            padding: 10px 14px; border: 2px solid #fdcb6e;
+            border-radius: 8px; font-size: 14px; font-family: inherit;
+            background: #fff; resize: vertical; min-height: 70px;
+        }
+
+        @media (max-width: 768px) {
+            .match-body { grid-template-columns: 1fr; }
+            .vs-separator { text-align: center; }
+            .team-input input { width: 100%; }
+        }
+    </style>
+</head>
+<body>
+
+<div class="container">
+    <!-- HEADER -->
+    <div class="header">
+        <div>
+            <h1>📊 Nhập kết quả thi đấu</h1>
+            <p id="tournament-name">Đang tải...</p>
+        </div>
+        <div class="header-actions">
+            <a href="tournaments.html" class="btn btn-outline">
+                <i class="fas fa-arrow-left"></i> Quay lại
+            </a>
+            <a href="#" id="btn-view-schedule" class="btn btn-outline">
+                <i class="fas fa-calendar"></i> Xem lịch
+            </a>
+            <button class="btn btn-warning" onclick="updateAllWinners()">
+                <i class="fas fa-sync"></i> Cập nhật vòng sau
+            </button>
+        </div>
+    </div>
+
+    <div id="alert" class="alert"></div>
+
+    <!-- STATS -->
+    <div class="stats-bar" id="stats-bar"></div>
+
+    <!-- FILTER CATEGORY -->
+    <div class="panel">
+        <div class="panel-header">
+            <div>
+                <h2>📋 Chọn nội dung thi đấu</h2>
+                <p>Chọn nội dung để nhập kết quả</p>
+            </div>
+        </div>
+        <div class="category-tabs" id="category-tabs"></div>
+    </div>
+
+    <!-- MATCH LIST -->
+    <div class="panel">
+        <div class="panel-header">
+            <div>
+                <h2 id="category-title">Danh sách trận đấu</h2>
+                <p id="match-count">Đang tải...</p>
+            </div>
+            <button class="btn btn-success" onclick="saveAllChanges()">
+                <i class="fas fa-save"></i> Lưu tất cả
+            </button>
+        </div>
+        <div id="match-list" class="match-list">
+            <div class="loading">
+                <i class="fas fa-spinner"></i>
+                <p>Đang tải trận đấu...</p>
+            </div>
+        </div>
+    </div>
+
+    <!-- FINAL RESULTS -->
+    <div class="final-results-section" id="final-results-section" style="display: none;">
+        <h3>
+            <i class="fas fa-trophy"></i>
+            Kết quả chung cuộc - <span id="final-category-name"></span>
+        </h3>
+        <div class="final-form">
+            <div class="form-group">
+                <label>🥇 Giải Nhất</label>
+                <input type="text" id="final-first" placeholder="Tên VĐV/Đội">
+            </div>
+            <div class="form-group">
+                <label>🥈 Giải Nhì</label>
+                <input type="text" id="final-second" placeholder="Tên VĐV/Đội">
+            </div>
+            <div class="form-group">
+                <label>🥉 Giải Ba (nhiều VĐV, cách nhau dấu phẩy)</label>
+                <textarea id="final-third" placeholder="VD: Nguyễn Văn A, Trần Văn B"></textarea>
+            </div>
+            <div class="form-group">
+                <label>🏅 Đồng hạng 5 (nếu có)</label>
+                <textarea id="final-fifth" placeholder="VD: Lê Văn C, Phạm Văn D"></textarea>
+            </div>
+        </div>
+        <div style="margin-top: 16px; display: flex; gap: 10px;">
+            <button class="btn btn-success" onclick="saveFinalResults()">
+                <i class="fas fa-save"></i> Lưu kết quả chung cuộc
+            </button>
+            <button class="btn btn-warning" onclick="autoFillFinalResults()">
+                <i class="fas fa-magic"></i> Tự động điền từ bracket
+            </button>
+        </div>
+    </div>
+</div>
+
+<script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+<script src="config.js"></script>
+<script>
+(function() {
+    'use strict';
+
+    console.log('🚀 results.html v1 - Nhập kết quả + Tự động điền winner');
+
+    const config = window.SPORTSVN_CONFIG || {};
+    if (!config.SUPABASE_URL || !config.SUPABASE_ANON_KEY) {
+        document.body.innerHTML = '<p style="color:red;padding:40px;">Lỗi cấu hình</p>';
+        return;
+    }
+
+    const supabaseClient = window.supabase.createClient(config.SUPABASE_URL, config.SUPABASE_ANON_KEY);
+
+    let tournamentId = null;
+    let tournament = null;
+    let schedules = [];
+    let draws = [];
+    let categories = [];
+    let venues = [];
+    let selectedCategory = null;
+    let currentUser = null;
+
+    // ==========================================
+    // INIT
+    // ==========================================
+    async function init() {
+        const params = new URLSearchParams(window.location.search);
+        tournamentId = params.get('id') || params.get('tournament_id');
+
+        if (!tournamentId) {
+            showAlert('Thiếu ID giải đấu', 'error');
+            return;
+        }
+
+        document.getElementById('btn-view-schedule').href = `schedule.html?id=${tournamentId}`;
+
+        // Kiểm tra đăng nhập
+        const { data: { session } } = await supabaseClient.auth.getSession();
+        if (!session) {
+            window.location.href = 'login.html';
+            return;
+        }
+        currentUser = session.user;
+
+        await loadData();
+    }
+
+    // ==========================================
+    // LOAD DATA
+    // ==========================================
+    async function loadData() {
+        try {
+            // Tournament
+            const { data: tour } = await supabaseClient
+                .from('tournaments')
+                .select('*')
+                .eq('id', tournamentId)
+                .single();
+            tournament = tour;
+
+            document.getElementById('tournament-name').textContent =
+                `${tournament.name} · ${tournament.sport || ''}`;
+
+            // Categories
+            const { data: cats } = await supabaseClient
+                .from('categories')
+                .select('*')
+                .eq('tournament_id', tournamentId);
+            categories = cats || [];
+
+            // Venues
+            const { data: vens } = await supabaseClient
+                .from('venues')
+                .select('*')
+                .eq('tournament_id', tournamentId)
+                .order('court_number');
+            venues = vens || [];
+
+            // Draws
+            const { data: drawsData } = await supabaseClient
+                .from('draws')
+                .select('*')
+                .eq('tournament_id', tournamentId);
+            draws = drawsData || [];
+
+            // Schedules
+            const { data: scheds } = await supabaseClient
+                .from('schedules')
+                .select('*')
+                .eq('tournament_id', tournamentId)
+                .order('match_date')
+                .order('start_time');
+            schedules = scheds || [];
+
+            console.log('📊 Data loaded:', {
+                categories: categories.length,
+                schedules: schedules.length,
+                draws: draws.length
+            });
+
+            renderStats();
+            renderCategoryTabs();
+
+            // Chọn category đầu tiên
+            if (categories.length > 0) {
+                const firstCat = categories[0].name;
+                selectCategory(firstCat);
+            }
+
+        } catch (error) {
+            console.error('❌', error);
+            showAlert('Lỗi: ' + error.message, 'error');
+        }
+    }
+
+    // ==========================================
+    // STATS
+    // ==========================================
+    function renderStats() {
+        const completed = schedules.filter(s => s.status === 'completed').length;
+        const pending = schedules.filter(s => s.status !== 'completed' && !s.is_placeholder).length;
+        const placeholder = schedules.filter(s => s.is_placeholder).length;
+
+        document.getElementById('stats-bar').innerHTML = `
+            <div class="stat-card">
+                <div class="label">Tổng trận</div>
+                <div class="value">${schedules.length}</div>
+                <div class="sub">Thực: ${schedules.filter(s => !s.is_placeholder).length} · Chờ: ${placeholder}</div>
+            </div>
+            <div class="stat-card">
+                <div class="label">Đã hoàn thành</div>
+                <div class="value" style="color:#00b894;">${completed}</div>
+                <div class="sub">Có tỷ số</div>
+            </div>
+            <div class="stat-card">
+                <div class="label">Chưa nhập</div>
+                <div class="value" style="color:#f39c12;">${pending}</div>
+                <div class="sub">Cần nhập kết quả</div>
+            </div>
+            <div class="stat-card">
+                <div class="label">Chờ KQ vòng sau</div>
+                <div class="value" style="color:#0984e3;">${placeholder}</div>
+                <div class="sub">Placeholder</div>
+            </div>
+        `;
+    }
+
+    // ==========================================
+    // CATEGORY TABS
+    // ==========================================
+    function renderCategoryTabs() {
+        const tabsEl = document.getElementById('category-tabs');
+
+        if (categories.length === 0) {
+            tabsEl.innerHTML = '<p style="color:#6c757d;padding:10px;">Chưa có nội dung nào</p>';
+            return;
+        }
+
+        tabsEl.innerHTML = categories.map(cat => {
+            const count = schedules.filter(s => s.notes && s.notes.includes(cat.name)).length;
+            return `
+                <button class="category-tab ${selectedCategory === cat.name ? 'active' : ''}"
+                        onclick="selectCategory('${escapeHtml(cat.name)}')">
+                    ${escapeHtml(cat.name)} (${count})
+                </button>
+            `;
+        }).join('');
+    }
+
+    window.selectCategory = function(catName) {
+        selectedCategory = catName;
+        renderCategoryTabs();
+        renderMatches();
+        renderFinalResults();
+    };
+
+    // ==========================================
+    // MATCHES
+    // ==========================================
+    function renderMatches() {
+        const listEl = document.getElementById('match-list');
+        const titleEl = document.getElementById('category-title');
+        const countEl = document.getElementById('match-count');
+
+        if (!selectedCategory) {
+            listEl.innerHTML = `
+                <div class="empty-state">
+                    <i class="fas fa-tasks"></i>
+                    <h3>Chọn nội dung để xem trận đấu</h3>
+                </div>
+            `;
+            return;
+        }
+
+        titleEl.textContent = `Trận đấu - ${selectedCategory}`;
+
+        const catSchedules = schedules.filter(s => 
+            s.notes && s.notes.includes(selectedCategory)
+        );
+
+        if (catSchedules.length === 0) {
+            countEl.textContent = '0 trận';
+            listEl.innerHTML = `
+                <div class="empty-state">
+                    <i class="fas fa-calendar-times"></i>
+                    <h3>Chưa có trận đấu</h3>
+                    <p>Nội dung này chưa được xếp lịch</p>
+                </div>
+            `;
+            return;
+        }
+
+        // Sắp xếp: trận thực trước, placeholder sau, theo vòng
+        const sorted = [...catSchedules].sort((a, b) => {
+            if (a.is_placeholder !== b.is_placeholder) {
+                return a.is_placeholder ? 1 : -1;
+            }
+            if (a.round_number !== b.round_number) {
+                return (a.round_number || 0) - (b.round_number || 0);
+            }
+            return (a.match_number || 0) - (b.match_number || 0);
+        });
+
+        const completed = sorted.filter(s => s.status === 'completed').length;
+        countEl.textContent = `${sorted.length} trận · Đã nhập: ${completed}/${sorted.length}`;
+
+        listEl.innerHTML = sorted.map(m => renderMatchItem(m)).join('');
+    }
+
+    function renderMatchItem(m) {
+        const venue = venues.find(v => v.id === m.venue_id);
+        const isCompleted = m.status === 'completed';
+        const isPlaceholder = m.is_placeholder;
+        const winnerA = m.winner_name && m.winner_name === m.team_a_name;
+        const winnerB = m.winner_name && m.winner_name === m.team_b_name;
+
+        let badgeClass, badgeText;
+        if (isPlaceholder) {
+            badgeClass = 'badge-placeholder';
+            badgeText = 'Chờ KQ';
+        } else if (isCompleted) {
+            badgeClass = 'badge-completed';
+            badgeText = '✓ Đã xong';
+        } else {
+            badgeClass = 'badge-pending';
+            badgeText = 'Chưa nhập';
+        }
+
+        return `
+            <div class="match-item ${isCompleted ? 'completed' : ''} ${isPlaceholder ? 'placeholder' : ''}"
+                 data-match-id="${m.id}">
+                <div class="match-header">
+                    <div class="match-meta">
+                        <span><i class="fas fa-calendar"></i> ${formatDate(m.match_date)}</span>
+                        <span><i class="fas fa-clock"></i> ${formatTime(m.start_time)}</span>
+                        <span><i class="fas fa-map-marker-alt"></i> ${escapeHtml(venue?.court_name || '—')}</span>
+                        <span><i class="fas fa-flag"></i> Vòng ${m.round_number || 1} · Trận ${m.match_number || 1}</span>
+                    </div>
+                    <span class="match-badge ${badgeClass}">${badgeText}</span>
+                </div>
+
+                <div style="font-size:11px;color:#6c757d;margin-bottom:10px;text-transform:uppercase;font-weight:700;">
+                    ${escapeHtml(m.notes || '')}
+                </div>
+
+                <div class="match-body">
+                    <div class="team-input">
+                        <label>VĐV/Đội A</label>
+                        <div class="team-name ${winnerA ? 'winner' : ''}">
+                            ${escapeHtml(m.team_a_name || '—')}
+                        </div>
+                        <input type="number" min="0" max="99"
+                               value="${m.score_a ?? ''}"
+                               placeholder="0"
+                               data-match-id="${m.id}"
+                               data-side="a"
+                               ${isPlaceholder ? 'disabled' : ''}
+                               onchange="onScoreChange(this)">
+                    </div>
+
+                    <div class="vs-separator">VS</div>
+
+                    <div class="team-input">
+                        <label>VĐV/Đội B</label>
+                        <div class="team-name ${winnerB ? 'winner' : ''}">
+                            ${escapeHtml(m.team_b_name || '—')}
+                        </div>
+                        <input type="number" min="0" max="99"
+                               value="${m.score_b ?? ''}"
+                               placeholder="0"
+                               data-match-id="${m.id}"
+                               data-side="b"
+                               ${isPlaceholder ? 'disabled' : ''}
+                               onchange="onScoreChange(this)">
+                    </div>
+                </div>
+
+                ${!isPlaceholder ? `
+                    <div class="match-actions">
+                        <button class="btn-sm btn-save"
+                                onclick="saveMatch('${m.id}')">
+                            <i class="fas fa-save"></i> Lưu
+                        </button>
+                        ${isCompleted ? `
+                            <button class="btn-sm btn-reset"
+                                    onclick="resetMatch('${m.id}')">
+                                <i class="fas fa-undo"></i> Hủy KQ
+                            </button>
+                        ` : ''}
+                    </div>
+                ` : `
+                    <div style="margin-top:10px;font-size:12px;color:#1565c0;font-style:italic;">
+                        ⏳ Trận này sẽ tự động cập nhật khi có kết quả vòng trước
+                    </div>
+                `}
+            </div>
+        `;
+    }
+
+    // ==========================================
+    // SCORE CHANGE
+    // ==========================================
+    window.onScoreChange = function(input) {
+        // Chỉ validate nhẹ
+        const val = parseInt(input.value);
+        if (isNaN(val) || val < 0) {
+            input.value = '';
+        }
+    };
+
+    // ==========================================
+    // SAVE MATCH
+    // ==========================================
+    window.saveMatch = async function(matchId) {
+        const match = schedules.find(s => s.id === matchId);
+        if (!match) return;
+
+        const inputA = document.querySelector(`input[data-match-id="${matchId}"][data-side="a"]`);
+        const inputB = document.querySelector(`input[data-match-id="${matchId}"][data-side="b"]`);
+
+        const scoreA = parseInt(inputA.value);
+        const scoreB = parseInt(inputB.value);
+
+        if (isNaN(scoreA) || isNaN(scoreB)) {
+            showAlert('Vui lòng nhập đầy đủ tỷ số 2 bên', 'error');
+            return;
+        }
+
+        if (scoreA === scoreB) {
+            showAlert('Tỷ số không được hòa (cần có người thắng)', 'error');
+            return;
+        }
+
+        const winner = scoreA > scoreB ? match.team_a_name : match.team_b_name;
+
+        try {
+            const { error } = await supabaseClient
+                .from('schedules')
+                .update({
+                    score_a: scoreA,
+                    score_b: scoreB,
+                    winner_name: winner,
+                    status: 'completed',
+                    result_note: `${scoreA}-${scoreB}`
+                })
+                .eq('id', matchId);
+
+            if (error) throw error;
+
+            // Cập nhật local
+            match.score_a = scoreA;
+            match.score_b = scoreB;
+            match.winner_name = winner;
+            match.status = 'completed';
+
+            showAlert(`✅ Đã lưu: ${winner} thắng ${Math.max(scoreA, scoreB)}-${Math.min(scoreA, scoreB)}`, 'success');
+
+            // Cập nhật winner vào vòng sau
+            await propagateWinner(match);
+
+            renderStats();
+            renderMatches();
+
+        } catch (error) {
+            console.error('❌', error);
+            showAlert('Lỗi lưu: ' + error.message, 'error');
+        }
+    };
+
+    // ==========================================
+    // RESET MATCH
+    // ==========================================
+    window.resetMatch = async function(matchId) {
+        if (!confirm('Hủy kết quả trận này?')) return;
+
+        const match = schedules.find(s => s.id === matchId);
+        if (!match) return;
+
+        try {
+            const { error } = await supabaseClient
+                .from('schedules')
+                .update({
+                    score_a: null,
+                    score_b: null,
+                    winner_name: null,
+                    status: 'scheduled',
+                    result_note: null
+                })
+                .eq('id', matchId);
+
+            if (error) throw error;
+
+            match.score_a = null;
+            match.score_b = null;
+            match.winner_name = null;
+            match.status = 'scheduled';
+            match.result_note = null;
+
+            showAlert('✅ Đã hủy kết quả', 'success');
+            renderStats();
+            renderMatches();
+
+        } catch (error) {
+            console.error('❌', error);
+            showAlert('Lỗi: ' + error.message, 'error');
+        }
+    };
+
+    // ==========================================
+    // PROPAGATE WINNER (tự động điền vào vòng sau)
+    // ==========================================
+    async function propagateWinner(match) {
+        if (!match.winner_name) return;
+
+        console.log('🔄 Propagate winner:', match.winner_name, 'from match', match.match_number);
+
+        // Tìm trận placeholder ở vòng sau cùng category + cùng bảng
+        const catName = extractCategoryName(match.notes);
+        const groupName = extractGroupName(match.notes);
+
+        if (!catName || !groupName) return;
+
+        // Trận hiện tại ở vòng R → trận vòng R+1 sẽ nhận winner
+        const currentRound = match.round_number || 1;
+        const nextRound = currentRound + 1;
+
+        // Tính chỉ số trận ở vòng sau
+        // VD: Vòng 1 có 12 trận → Vòng 2 có 6 trận
+        // Trận 1,2 vòng 1 → Trận 1 vòng 2
+        // Trận 3,4 vòng 1 → Trận 2 vòng 2
+        const matchNum = match.match_number || 1;
+        const nextMatchNum = Math.ceil(matchNum / 2);
+        const isSlotA = matchNum % 2 === 1; // Trận lẻ → slot A, trận chẵn → slot B
+
+        // Tìm trận placeholder vòng sau
+        const nextMatch = schedules.find(s =>
+            s.is_placeholder &&
+            s.round_number === nextRound &&
+            s.match_number === nextMatchNum &&
+            s.notes && s.notes.includes(catName) && s.notes.includes(`Bảng ${groupName}`)
+        );
+
+        if (!nextMatch) {
+            console.log('⚠️ Không tìm thấy trận vòng sau');
+            return;
+        }
+
+        // Cập nhật slot A hoặc B
+        const updateData = {};
+        if (isSlotA) {
+            updateData.team_a_name = match.winner_name;
+        } else {
+            updateData.team_b_name = match.winner_name;
+        }
+
+        // Nếu cả 2 slot đã có tên thực → bỏ is_placeholder
+        const newTeamA = isSlotA ? match.winner_name : nextMatch.team_a_name;
+        const newTeamB = isSlotA ? nextMatch.team_b_name : match.winner_name;
+        if (newTeamA && newTeamB && 
+            !newTeamA.includes('Chờ') && !newTeamB.includes('Chờ') &&
+            !newTeamA.includes('Thua') && !newTeamB.includes('Thua')) {
+            updateData.is_placeholder = false;
+        }
+
+        try {
+            const { error } = await supabaseClient
+                .from('schedules')
+                .update(updateData)
+                .eq('id', nextMatch.id);
+
+            if (error) throw error;
+
+            // Cập nhật local
+            Object.assign(nextMatch, updateData);
+            console.log('✅ Đã điền winner vào trận vòng sau');
+        } catch (error) {
+            console.error('❌ Lỗi propagate:', error);
+        }
+    }
+
+    // ==========================================
+    // UPDATE ALL WINNERS (bulk)
+    // ==========================================
+    window.updateAllWinners = async function() {
+        if (!confirm('Cập nhật tất cả winner từ các trận đã hoàn thành vào vòng sau?')) return;
+
+        const completed = schedules.filter(s => s.status === 'completed' && s.winner_name);
+        let count = 0;
+
+        for (const match of completed) {
+            await propagateWinner(match);
+            count++;
+        }
+
+        showAlert(`✅ Đã cập nhật ${count} trận vào vòng sau`, 'success');
+        await loadData();
+    };
+
+    // ==========================================
+    // SAVE ALL CHANGES
+    // ==========================================
+    window.saveAllChanges = async function() {
+        if (!selectedCategory) return;
+        if (!confirm('Lưu tất cả thay đổi tỷ số?')) return;
+
+        const catSchedules = schedules.filter(s =>
+            s.notes && s.notes.includes(selectedCategory) && !s.is_placeholder
+        );
+
+        let saved = 0;
+        for (const match of catSchedules) {
+            const inputA = document.querySelector(`input[data-match-id="${match.id}"][data-side="a"]`);
+            const inputB = document.querySelector(`input[data-match-id="${match.id}"][data-side="b"]`);
+            if (!inputA || !inputB) continue;
+
+            const scoreA = parseInt(inputA.value);
+            const scoreB = parseInt(inputB.value);
+            if (isNaN(scoreA) || isNaN(scoreB) || scoreA === scoreB) continue;
+
+            const winner = scoreA > scoreB ? match.team_a_name : match.team_b_name;
+
+            const { error } = await supabaseClient
+                .from('schedules')
+                .update({
+                    score_a: scoreA,
+                    score_b: scoreB,
+                    winner_name: winner,
+                    status: 'completed',
+                    result_note: `${scoreA}-${scoreB}`
+                })
+                .eq('id', match.id);
+
+            if (!error) {
+                match.score_a = scoreA;
+                match.score_b = scoreB;
+                match.winner_name = winner;
+                match.status = 'completed';
+                saved++;
+            }
+        }
+
+        showAlert(`✅ Đã lưu ${saved} trận`, 'success');
+        renderStats();
+        renderMatches();
+    };
+
+    // ==========================================
+    // FINAL RESULTS
+    // ==========================================
+    function renderFinalResults() {
+        const section = document.getElementById('final-results-section');
+        const nameEl = document.getElementById('final-category-name');
+
+        if (!selectedCategory) {
+            section.style.display = 'none';
+            return;
+        }
+
+        section.style.display = 'block';
+        nameEl.textContent = selectedCategory;
+
+        const finalResults = tournament.final_results || {};
+        const catResults = finalResults[selectedCategory] || {};
+
+        document.getElementById('final-first').value = catResults.first || '';
+        document.getElementById('final-second').value = catResults.second || '';
+        document.getElementById('final-third').value = 
+            Array.isArray(catResults.third) ? catResults.third.join(', ') : (catResults.third || '');
+        document.getElementById('final-fifth').value = 
+            Array.isArray(catResults.fifth) ? catResults.fifth.join(', ') : (catResults.fifth || '');
+    }
+
+    window.saveFinalResults = async function() {
+        if (!selectedCategory) return;
+
+        const first = document.getElementById('final-first').value.trim();
+        const second = document.getElementById('final-second').value.trim();
+        const thirdText = document.getElementById('final-third').value.trim();
+        const fifthText = document.getElementById('final-fifth').value.trim();
+
+        const third = thirdText ? thirdText.split(',').map(s => s.trim()).filter(s => s) : [];
+        const fifth = fifthText ? fifthText.split(',').map(s => s.trim()).filter(s => s) : [];
+
+        const finalResults = tournament.final_results || {};
+        finalResults[selectedCategory] = {
+            first, second, third, fifth
+        };
+
+        try {
+            const { error } = await supabaseClient
+                .from('tournaments')
+                .update({ final_results: finalResults })
+                .eq('id', tournamentId);
+
+            if (error) throw error;
+
+            tournament.final_results = finalResults;
+            showAlert('✅ Đã lưu kết quả chung cuộc', 'success');
+
+        } catch (error) {
+            console.error('❌', error);
+            showAlert('Lỗi: ' + error.message, 'error');
+        }
+    };
+
+    // Tự động điền kết quả chung cuộc từ bracket
+    window.autoFillFinalResults = function() {
+        if (!selectedCategory) return;
+
+        const catSchedules = schedules.filter(s =>
+            s.notes && s.notes.includes(selectedCategory)
+        );
+
+        // Tìm trận chung kết (round cao nhất)
+        const maxRound = Math.max(...catSchedules.map(s => s.round_number || 0));
+        const finalMatch = catSchedules.find(s => 
+            s.round_number === maxRound && 
+            s.notes && s.notes.includes('Chung kết')
+        );
+
+        // Tìm trận tranh hạng 3
+        const thirdMatch = catSchedules.find(s =>
+            s.notes && s.notes.includes('Tranh hạng 3')
+        );
+
+        // Tìm các trận tứ kết (thua → hạng 5)
+        const quarterFinals = catSchedules.filter(s =>
+            s.notes && s.notes.includes('Tứ kết') && s.status === 'completed'
+        );
+
+        let filled = false;
+
+        if (finalMatch && finalMatch.winner_name) {
+            document.getElementById('final-first').value = finalMatch.winner_name;
+            const loser = finalMatch.team_a_name === finalMatch.winner_name 
+                ? finalMatch.team_b_name : finalMatch.team_a_name;
+            document.getElementById('final-second').value = loser;
+            filled = true;
+        }
+
+        if (thirdMatch && thirdMatch.winner_name) {
+            document.getElementById('final-third').value = thirdMatch.winner_name;
+            filled = true;
+        }
+
+        // Hạng 5: 4 đội thua tứ kết
+        if (quarterFinals.length === 4) {
+            const losers = quarterFinals.map(q => {
+                if (!q.winner_name) return null;
+                return q.team_a_name === q.winner_name ? q.team_b_name : q.team_a_name;
+            }).filter(Boolean);
+            if (losers.length === 4) {
+                document.getElementById('final-fifth').value = losers.join(', ');
+                filled = true;
+            }
+        }
+
+        if (filled) {
+            showAlert('✅ Đã tự động điền từ bracket. Kiểm tra và bấm "Lưu" để hoàn tất.', 'info');
+        } else {
+            showAlert('⚠️ Chưa đủ dữ liệu để tự động điền (cần có kết quả chung kết)', 'error');
+        }
+    };
+
+    // ==========================================
+    // HELPERS
+    // ==========================================
+    function extractCategoryName(notes) {
+        if (!notes) return null;
+        const parts = notes.split(' - ');
+        return parts[0] || null;
+    }
+
+    function extractGroupName(notes) {
+        if (!notes) return null;
+        const match = notes.match(/Bảng\s+([A-Z])/);
+        return match ? match[1] : null;
+    }
+
+    function formatDate(dateStr) {
+        if (!dateStr) return '—';
+        const [y, m, d] = dateStr.split('-').map(Number);
+        return new Date(y, m - 1, d).toLocaleDateString('vi-VN');
+    }
+
+    function formatTime(timeStr) {
+        if (!timeStr) return '';
+        return timeStr.slice(0, 5);
+    }
+
+    function escapeHtml(text) {
+        return String(text || '').replace(/&/g, '&amp;').replace(/</g, '&lt;')
+            .replace(/>/g, '&gt;').replace(/"/g, '&quot;');
+    }
+
+    function showAlert(message, type) {
+        const el = document.getElementById('alert');
+        el.textContent = message;
+        el.className = 'alert show ' + type;
+        if (type !== 'info') setTimeout(() => { el.className = 'alert'; }, 6000);
+    }
+
+    init();
+})();
+</script>
+
+</body>
+</html>
