@@ -367,9 +367,43 @@
         </div>
 
         <div id="config-bye" class="config-box" style="display:block;border-left-color:#fdcb6e;">
-            <h4><i class="fas fa-ban" style="color:#fdcb6e;"></i> Slot BYE tùy chỉnh (chỉ Knockout)</h4>
-            <div class="form-group"><label>Nhập vị trí BYE (cách nhau dấu phẩy, để trống = tự động)</label><input type="text" id="custom-bye-slots" placeholder="VD: 2,15,18,34,47,50" oninput="updateByeInfo()"></div>
-            <div id="bye-info" style="font-size:13px;color:#1a3a7a;font-weight:600;"></div>
+            <h4><i class="fas fa-ban" style="color:#fdcb6e;"></i> Vị trí BYE (chỉ Knockout)</h4>
+            <p style="font-size:13px;color:#6c757d;margin-bottom:12px;">
+                Nhập vị trí BYE giống Excel (VD: <code>2, 15, 18, 34, 47, 50</code>)
+                <br>Để trống → hệ thống tự động sinh
+            </p>
+
+            <div class="form-group">
+                <label>Danh sách vị trí BYE</label>
+                <input type="text" 
+                       id="custom-bye-slots" 
+                       placeholder="VD: 2,15,18,34,47,50"
+                       style="width:100%; padding:12px; border:2px solid #fdcb6e; border-radius:10px; font-family:monospace;"
+                       oninput="updateByeInfo()">
+                <div id="bye-info" style="font-size:13px;color:#1a3a7a;font-weight:600;margin-top:8px;"></div>
+            </div>
+
+            <div style="display:flex;gap:8px;flex-wrap:wrap;margin-top:12px;">
+                <button type="button" class="btn-info-sm" onclick="autoGenerateByes()">
+                    🎲 Tự động sinh BYE
+                </button>
+                <button type="button" class="btn-success-sm" onclick="loadByeTemplate()">
+                    📋 Load mẫu có sẵn
+                </button>
+                <button type="button" class="btn-warning-sm" onclick="previewByes()">
+                    👁 Xem trước
+                </button>
+                <button type="button" class="btn-danger-sm" onclick="clearByes()">
+                    🗑 Xóa hết
+                </button>
+            </div>
+
+            <div id="bye-preview" style="margin-top:16px; display:none;">
+                <div style="font-size:12px;font-weight:700;color:#1a3a7a;margin-bottom:8px;">
+                    📊 Xem trước bracket:
+                </div>
+                <div id="bye-preview-content" style="font-family:monospace; font-size:11px;"></div>
+            </div>
         </div>
     </div>
 
@@ -510,11 +544,13 @@
 <script src="config.js"></script>
 <!-- ✅ LOAD CẤU HÌNH MÔN THỂ THAO -->
 <script src="sports-config.js"></script>
+<!-- ✅ LOAD BẢNG BYE TEMPLATES -->
+<script src="bye-templates.js"></script>
 <script>
 (function() {
     'use strict';
 
-    console.log('🚀 draw.html v22 - Đọc cấu hình môn thể thao');
+    console.log('🚀 draw.html v23 - BYE templates + Input BYE');
 
     const config = window.SPORTSVN_CONFIG || {};
     const supabaseClient = window.supabase.createClient(config.SUPABASE_URL, config.SUPABASE_ANON_KEY);
@@ -529,7 +565,6 @@
     let categoriesList = [];
     let editingContext = null;
 
-    // ✅ BIẾN LƯU MÔN THỂ THAO
     let currentSport = null;
     let currentSportConfig = null;
 
@@ -622,6 +657,110 @@
     }
 
     // ==========================================
+    // ✅ XỬ LÝ BYE
+    // ==========================================
+    window.autoGenerateByes = function() {
+        const numPlayers = teams.length;
+        if (numPlayers < 2) {
+            showAlert('⚠️ Cần ít nhất 2 VĐV', 'error');
+            return;
+        }
+
+        let byes;
+        if (window.BYE_TEMPLATES && window.BYE_TEMPLATES[numPlayers]) {
+            byes = window.BYE_TEMPLATES[numPlayers];
+            showAlert(`✅ Đã load mẫu BYE cho ${numPlayers} VĐV`, 'success');
+        } else if (window.generateAutoByes) {
+            byes = window.generateAutoByes(numPlayers);
+            showAlert(`✅ Đã tự động sinh ${byes.length} BYE`, 'success');
+        } else {
+            showAlert('⚠️ Không có module sinh BYE', 'error');
+            return;
+        }
+
+        document.getElementById('custom-bye-slots').value = byes.join(',');
+        updateByeInfo();
+        previewByes();
+    };
+
+    window.loadByeTemplate = function() {
+        const numPlayers = teams.length;
+        if (window.BYE_TEMPLATES && window.BYE_TEMPLATES[numPlayers]) {
+            document.getElementById('custom-bye-slots').value = 
+                window.BYE_TEMPLATES[numPlayers].join(',');
+            updateByeInfo();
+            previewByes();
+            showAlert(`✅ Đã load mẫu BYE cho ${numPlayers} VĐV`, 'success');
+        } else {
+            showAlert(`⚠️ Chưa có mẫu BYE cho ${numPlayers} VĐV. Bấm "🎲 Tự động sinh BYE"`, 'error');
+        }
+    };
+
+    window.clearByes = function() {
+        document.getElementById('custom-bye-slots').value = '';
+        updateByeInfo();
+        document.getElementById('bye-preview').style.display = 'none';
+    };
+
+    window.updateByeInfo = function() {
+        const n = teams.length;
+        const info = document.getElementById('bye-info');
+        if (!info) return;
+        if (n < 2) { info.textContent = '⚠️ Cần ít nhất 2 VĐV'; info.style.color = '#e94560'; return; }
+        let bracketSize = 2;
+        while (bracketSize < n) bracketSize *= 2;
+        const numByes = bracketSize - n;
+        const input = document.getElementById('custom-bye-slots');
+        if (input && input.value.trim()) {
+            const custom = input.value.split(',').map(s => parseInt(s.trim())).filter(s => !isNaN(s));
+            const unique = [...new Set(custom)];
+            if (unique.length !== numByes) {
+                info.innerHTML = `⚠️ Nhập ${unique.length} BYE, cần đúng <strong>${numByes}</strong>`;
+                info.style.color = '#e94560';
+            } else {
+                info.innerHTML = `✅ ${n} VĐV → Bracket ${bracketSize} → ${numByes} BYE`;
+                info.style.color = '#00b894';
+            }
+        } else {
+            info.innerHTML = `📊 ${n} VĐV → Bracket ${bracketSize} → cần ${numByes} BYE (tự động)`;
+            info.style.color = '#1a3a7a';
+        }
+    };
+
+    window.previewByes = function() {
+        const numPlayers = teams.length;
+        const input = document.getElementById('custom-bye-slots').value.trim();
+        if (!input) return;
+
+        let bracketSize = 2;
+        while (bracketSize < numPlayers) bracketSize *= 2;
+
+        const byes = input.split(',').map(s => parseInt(s.trim())).filter(s => !isNaN(s));
+        const byeSet = new Set(byes);
+
+        const numSections = bracketSize / 8;
+        let html = '';
+
+        for (let s = 0; s < numSections; s++) {
+            const sectionStart = s * 8;
+            html += `<div style="margin-bottom:6px;">`;
+            html += `<strong style="display:inline-block;width:80px;">Nhánh ${s + 1}:</strong> `;
+            for (let i = 1; i <= 8; i++) {
+                const slot = sectionStart + i;
+                if (byeSet.has(slot)) {
+                    html += `<span style="background:#fdcb6e;color:#856404;padding:2px 6px;border-radius:4px;margin-right:4px;">${slot} (BYE)</span>`;
+                } else {
+                    html += `<span style="background:#e7f3ff;color:#1a3a7a;padding:2px 6px;border-radius:4px;margin-right:4px;">${slot}</span>`;
+                }
+            }
+            html += `</div>`;
+        }
+
+        document.getElementById('bye-preview-content').innerHTML = html;
+        document.getElementById('bye-preview').style.display = 'block';
+    };
+
+    // ==========================================
     // ✅ ÁP DỤNG CẤU HÌNH MÔN THỂ THAO
     // ==========================================
     function applySportConfig() {
@@ -630,7 +769,6 @@
         const cfg = currentSportConfig;
         console.log('✅ Áp dụng cấu hình môn:', cfg.name);
 
-        // 1. Hiển thị banner môn
         const banner = document.getElementById('sportInfoBanner');
         const iconEl = document.getElementById('sportInfoIcon');
         const nameEl = document.getElementById('sportInfoName');
@@ -655,18 +793,15 @@
         metaEl.innerHTML = metaHtml;
         banner.classList.add('visible');
 
-        // 2. Cập nhật subtitle header
         const subtitle = document.getElementById('drawHeaderSubtitle');
         if (subtitle) {
             subtitle.innerHTML = `${cfg.icon} <strong>${cfg.name}</strong>${cfg.matchDuration ? ' · ' + cfg.matchDuration + ' phút/trận' : ''}${cfg.bestOf ? ' · Best of ' + cfg.bestOf : ''}`;
         }
 
-        // 3. Ẩn/hiện các thể thức theo allowedDrawTypes
         const drawTypeCards = document.querySelectorAll('.draw-type-card');
         drawTypeCards.forEach(card => {
             const type = card.dataset.drawType;
             if (!type) return;
-
             if (cfg.allowedDrawTypes && cfg.allowedDrawTypes.length > 0) {
                 if (!cfg.allowedDrawTypes.includes(type)) {
                     card.style.display = 'none';
@@ -676,7 +811,6 @@
             }
         });
 
-        // 4. Tự chọn thể thức mặc định
         if (cfg.drawType) {
             const defaultCard = document.querySelector(`.draw-type-card[data-draw-type="${cfg.drawType}"]`);
             if (defaultCard && defaultCard.style.display !== 'none') {
@@ -685,7 +819,6 @@
             }
         }
 
-        // 5. Cập nhật thời gian trận mặc định (nếu có)
         if (cfg.matchDuration) {
             window._sportMatchDuration = cfg.matchDuration;
         }
@@ -742,7 +875,6 @@
         if (btnManage) btnManage.href = `categories.html?tournament_id=${tournamentId}`;
         if (btnAdd) btnAdd.href = `categories.html?tournament_id=${tournamentId}&action=add`;
 
-        // ✅ LOAD THÔNG TIN GIẢI ĐẤU ĐỂ BIẾT MÔN
         try {
             const { data: tour } = await supabaseClient
                 .from('tournaments')
@@ -753,7 +885,6 @@
             if (tour && tour.sport) {
                 currentSport = tour.sport;
                 currentSportConfig = window.getSportConfig ? window.getSportConfig(tour.sport) : null;
-
                 if (currentSportConfig) {
                     applySportConfig();
                 } else {
@@ -764,7 +895,6 @@
             console.warn('Không load được thông tin giải:', err);
         }
 
-        // LOAD DANH SÁCH NỘI DUNG
         const { data, error } = await supabaseClient.from('categories')
             .select('id, name, category_type, scoring_type')
             .eq('tournament_id', tournamentId).order('priority');
@@ -943,31 +1073,6 @@
         if (type === 'round-robin-custom') renderCustomGroupsInputs();
         if (type.startsWith('round-robin')) onKOQualifyPreChange();
         if (type === 'knockout') updateByeInfo();
-    };
-
-    window.updateByeInfo = function() {
-        const n = teams.length;
-        const info = document.getElementById('bye-info');
-        if (!info) return;
-        if (n < 2) { info.textContent = '⚠️ Cần ít nhất 2 VĐV'; info.style.color = '#e94560'; return; }
-        let bracketSize = 2;
-        while (bracketSize < n) bracketSize *= 2;
-        const numByes = bracketSize - n;
-        const input = document.getElementById('custom-bye-slots');
-        if (input && input.value.trim()) {
-            const custom = input.value.split(',').map(s => parseInt(s.trim())).filter(s => !isNaN(s));
-            const unique = [...new Set(custom)];
-            if (unique.length !== numByes) {
-                info.innerHTML = `⚠️ Nhập ${unique.length} BYE, cần đúng <strong>${numByes}</strong>`;
-                info.style.color = '#e94560';
-            } else {
-                info.innerHTML = `✅ ${n} VĐV → Bracket ${bracketSize} → ${numByes} BYE: ${unique.sort((a,b)=>a-b).join(', ')}`;
-                info.style.color = '#00b894';
-            }
-        } else {
-            info.innerHTML = `📊 ${n} VĐV → Bracket ${bracketSize} → cần ${numByes} BYE (tự động)`;
-            info.style.color = '#1a3a7a';
-        }
     };
 
     window.renderCustomGroupsInputs = function() {
@@ -2511,7 +2616,6 @@
             const { error } = await supabaseClient.from('draws').insert(records);
             if (error) throw error;
 
-            // ✅ LƯU CẤU HÌNH VÀO LOCALSTORAGE
             const scheduleConfigToSave = {
                 startDate: document.getElementById('start-date')?.value || new Date().toISOString().slice(0, 10),
                 numDays: parseInt(document.getElementById('num-days')?.value) || 3,
@@ -2526,7 +2630,6 @@
             localStorage.setItem(`sportsvn_config_${tournamentId}`, JSON.stringify(scheduleConfigToSave));
             localStorage.setItem('sportsvn_config', JSON.stringify(scheduleConfigToSave));
 
-            // Lưu môn vào localStorage
             if (currentSport) {
                 localStorage.setItem(`sportsvn_sport_${tournamentId}`, currentSport);
             }
@@ -2573,7 +2676,7 @@
         }
     });
 
-    console.log('✅ draw.html v22 loaded - Có cấu hình môn thể thao');
+    console.log('✅ draw.html v23 loaded - BYE templates + Input BYE');
 
 })();
 </script>
