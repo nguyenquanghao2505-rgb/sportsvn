@@ -4,7 +4,7 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <meta name="description" content="SportsVN - Nền tảng công nghệ thể thao Việt Nam">
-    <title>SportsVN - Nền tảng thể thao Việt Nam</title>
+    <title>Admin Dashboard - SportsVN</title>
     <link rel="stylesheet" href="styles.css">
     <script src="football.js" defer></script>
     <script src="provinces.js" defer></script>
@@ -17,7 +17,9 @@
 
         <main class="main">
 
+            <!-- ============================== -->
             <!-- TOPBAR -->
+            <!-- ============================== -->
             <header class="topbar">
                 <div class="topbar-left">
                     <button class="mobile-menu" id="mobileMenu" aria-label="Mở menu">☰</button>
@@ -40,7 +42,7 @@
 
                     <button class="icon-button" title="Tìm kiếm">⌕</button>
 
-                    <div class="top-user">
+                    <div class="top-user" id="topUser">
                         <div class="avatar">H</div>
                         <div class="top-user-info">
                             <strong>Quản trị viên</strong>
@@ -52,7 +54,9 @@
             </header>
 
 
+            <!-- ============================== -->
             <!-- CONTENT -->
+            <!-- ============================== -->
             <section class="content">
 
                 <!-- HERO BANNER -->
@@ -305,7 +309,9 @@
             </section>
 
 
+            <!-- ============================== -->
             <!-- FOOTER -->
+            <!-- ============================== -->
             <footer class="footer">
                 <span>© 2026 SportsVN</span>
                 <span>Nền tảng công nghệ thể thao Việt Nam</span>
@@ -316,11 +322,14 @@
     </div>
 
 
+    <!-- ============================== -->
+    <!-- SCRIPTS -->
+    <!-- ============================== -->
     <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
     <script src="config.js"></script>
     <script>
         // ==========================================
-        // SPORTSVN DASHBOARD - KẾT NỐI SUPABASE
+        // SPORTSVN ADMIN DASHBOARD - SUPABASE
         // ==========================================
         
         window.supabaseClient = null;
@@ -331,7 +340,7 @@
 
             const config = window.SPORTSVN_CONFIG || {};
             if (!config.SUPABASE_URL || !config.SUPABASE_ANON_KEY) {
-                console.warn('Chưa cấu hình Supabase trong config.js');
+                console.warn('⚠️ Chưa cấu hình Supabase trong config.js');
                 return;
             }
 
@@ -348,12 +357,15 @@
             // ================================
             async function checkAuth() {
                 const { data: { session } } = await supabase.auth.getSession();
+
                 if (!session) {
                     window.location.href = 'login.html';
-                    return;
+                    return false;
                 }
+
                 window.currentSession = session;
 
+                // Kiểm tra role admin
                 const { data: roleData } = await supabase
                     .from('user_roles')
                     .select('role')
@@ -364,9 +376,10 @@
                     alert('Tài khoản không có quyền Admin');
                     await supabase.auth.signOut();
                     window.location.href = 'login.html';
-                    return;
+                    return false;
                 }
 
+                // Cập nhật tên + avatar
                 const name = session.user.user_metadata?.full_name ||
                              session.user.email.split('@')[0];
                 const initials = name.split(' ').map(w => w[0]).join('').slice(0, 2).toUpperCase();
@@ -374,26 +387,33 @@
                 document.querySelectorAll('.avatar').forEach(el => el.textContent = initials);
                 document.querySelectorAll('.user-info strong, .top-user-info strong').forEach(el => el.textContent = name);
 
+                // Chỉ admin chính mới thấy nút "Đổi ảnh bìa"
                 const userEmail = session.user.email;
                 const changeBannerBtn = document.getElementById('changeBannerBtn');
 
                 if (changeBannerBtn && userEmail === ADMIN_EMAIL) {
                     changeBannerBtn.classList.add('visible');
-                    console.log('✅ Admin đã đăng nhập');
+                    console.log('✅ Admin chính đã đăng nhập');
                 }
+
+                return true;
             }
 
-            await checkAuth();
+            const isAuth = await checkAuth();
+            if (!isAuth) return;
 
             // ================================
             // 2. ĐĂNG XUẤT
             // ================================
-            document.querySelector('.top-user')?.addEventListener('click', async function() {
-                if (confirm('Bạn có muốn đăng xuất không?')) {
-                    await supabase.auth.signOut();
-                    window.location.href = 'login.html';
-                }
-            });
+            const topUser = document.getElementById('topUser');
+            if (topUser) {
+                topUser.addEventListener('click', async function() {
+                    if (confirm('Bạn có muốn đăng xuất không?')) {
+                        await supabase.auth.signOut();
+                        window.location.href = 'index.html';
+                    }
+                });
+            }
 
             // ==========================================
             // 3. ĐỔI ẢNH BÌA
@@ -402,158 +422,144 @@
             var changeBtn = document.getElementById('changeBannerBtn');
             var fileInput = document.getElementById('bannerInput');
 
-            if (!bannerImage || !changeBtn || !fileInput) {
-                console.warn('Không tìm thấy element banner');
-                return;
-            }
+            if (bannerImage && changeBtn && fileInput) {
 
-            async function loadBanner() {
-                try {
-                    const { data, error } = await supabase
-                        .storage
-                        .from('banners')
-                        .list('', {
-                            limit: 100,
-                            sortBy: { column: 'name', order: 'desc' }
-                        });
-
-                    if (error) return;
-
-                    var imageFiles = (data || []).filter(function(f) {
-                        return f.name &&
-                               !f.name.startsWith('.') &&
-                               /\.(jpg|jpeg|png|gif|webp)$/i.test(f.name);
-                    });
-
-                    if (imageFiles.length === 0) return;
-
-                    imageFiles.sort(function(a, b) {
-                        var aIsSystem = a.name.startsWith('banner-');
-                        var bIsSystem = b.name.startsWith('banner-');
-
-                        if (aIsSystem && !bIsSystem) return -1;
-                        if (!aIsSystem && bIsSystem) return 1;
-
-                        if (aIsSystem && bIsSystem) {
-                            var aTime = parseInt((a.name.match(/banner-(\d+)/) || [])[1] || 0);
-                            var bTime = parseInt((b.name.match(/banner-(\d+)/) || [])[1] || 0);
-                            return bTime - aTime;
-                        }
-
-                        return new Date(b.created_at) - new Date(a.created_at);
-                    });
-
-                    var latestImage = imageFiles[0];
-
-                    const { data: urlData } = supabase
-                        .storage
-                        .from('banners')
-                        .getPublicUrl(latestImage.name);
-
-                    if (urlData && urlData.publicUrl) {
-                        bannerImage.src = urlData.publicUrl + '?t=' + Date.now();
-                        console.log('✅ Đã load banner:', latestImage.name);
-                    }
-                } catch (err) {
-                    console.error('Lỗi load banner:', err);
-                }
-            }
-
-            loadBanner();
-
-            changeBtn.addEventListener('click', function(e) {
-                e.stopPropagation();
-                fileInput.click();
-            });
-
-            fileInput.addEventListener('change', async function(e) {
-                var file = e.target.files[0];
-                if (!file) return;
-
-                if (!file.type.startsWith('image/')) {
-                    alert('Vui lòng chọn file ảnh');
-                    return;
-                }
-
-                if (file.size > 5 * 1024 * 1024) {
-                    alert('Ảnh quá lớn! Vui lòng chọn ảnh dưới 5MB.');
-                    return;
-                }
-
-                var originalText = changeBtn.innerHTML;
-                changeBtn.innerHTML = '⏳ Đang tải...';
-                changeBtn.disabled = true;
-
-                try {
-                    var ext = file.name.split('.').pop().toLowerCase();
-                    var fileName = 'banner-' + Date.now() + '.' + ext;
-
-                    const { data, error } = await supabase
-                        .storage
-                        .from('banners')
-                        .upload(fileName, file, {
-                            cacheControl: '3600',
-                            upsert: true,
-                            contentType: file.type
-                        });
-
-                    if (error) throw error;
-
-                    const { data: urlData } = supabase
-                        .storage
-                        .from('banners')
-                        .getPublicUrl(fileName);
-
-                    bannerImage.src = urlData.publicUrl;
-
+                async function loadBanner() {
                     try {
-                        const { data: oldFiles } = await supabase
+                        const { data, error } = await supabase
                             .storage
                             .from('banners')
-                            .list('', { limit: 100 });
+                            .list('', {
+                                limit: 100,
+                                sortBy: { column: 'name', order: 'desc' }
+                            });
 
-                        if (oldFiles && oldFiles.length > 1) {
-                            var filesToDelete = oldFiles
-                                .filter(function(f) {
-                                    return f.name &&
-                                           f.name !== fileName &&
-                                           !f.name.startsWith('.') &&
-                                           /\.(jpg|jpeg|png|gif|webp)$/i.test(f.name);
-                                })
-                                .map(function(f) { return f.name; });
+                        if (error) return;
 
-                            if (filesToDelete.length > 0) {
-                                await supabase.storage.from('banners').remove(filesToDelete);
+                        var imageFiles = (data || []).filter(function(f) {
+                            return f.name &&
+                                   !f.name.startsWith('.') &&
+                                   /\.(jpg|jpeg|png|gif|webp)$/i.test(f.name);
+                        });
+
+                        if (imageFiles.length === 0) return;
+
+                        imageFiles.sort(function(a, b) {
+                            var aIsSystem = a.name.startsWith('banner-');
+                            var bIsSystem = b.name.startsWith('banner-');
+
+                            if (aIsSystem && !bIsSystem) return -1;
+                            if (!aIsSystem && bIsSystem) return 1;
+
+                            if (aIsSystem && bIsSystem) {
+                                var aTime = parseInt((a.name.match(/banner-(\d+)/) || [])[1] || 0);
+                                var bTime = parseInt((b.name.match(/banner-(\d+)/) || [])[1] || 0);
+                                return bTime - aTime;
                             }
+
+                            return new Date(b.created_at) - new Date(a.created_at);
+                        });
+
+                        var latestImage = imageFiles[0];
+
+                        const { data: urlData } = supabase
+                            .storage
+                            .from('banners')
+                            .getPublicUrl(latestImage.name);
+
+                        if (urlData && urlData.publicUrl) {
+                            bannerImage.src = urlData.publicUrl + '?t=' + Date.now();
+                            console.log('✅ Đã load banner:', latestImage.name);
                         }
-                    } catch (cleanupErr) {
-                        console.warn('Lỗi xóa ảnh cũ:', cleanupErr);
+                    } catch (err) {
+                        console.error('Lỗi load banner:', err);
+                    }
+                }
+
+                loadBanner();
+
+                changeBtn.addEventListener('click', function(e) {
+                    e.stopPropagation();
+                    fileInput.click();
+                });
+
+                fileInput.addEventListener('change', async function(e) {
+                    var file = e.target.files[0];
+                    if (!file) return;
+
+                    if (!file.type.startsWith('image/')) {
+                        alert('Vui lòng chọn file ảnh');
+                        return;
                     }
 
-                    showToast('✓ Đã đổi ảnh bìa thành công!');
-                    console.log('✅ Upload thành công:', urlData.publicUrl);
+                    if (file.size > 5 * 1024 * 1024) {
+                        alert('Ảnh quá lớn! Vui lòng chọn ảnh dưới 5MB.');
+                        return;
+                    }
 
-                } catch (err) {
-                    console.error('Lỗi upload:', err);
-                    alert('Lỗi upload ảnh: ' + err.message);
-                } finally {
-                    changeBtn.innerHTML = originalText;
-                    changeBtn.disabled = false;
-                    fileInput.value = '';
-                }
-            });
+                    var originalText = changeBtn.innerHTML;
+                    changeBtn.innerHTML = '⏳ Đang tải...';
+                    changeBtn.disabled = true;
 
-            function showToast(message) {
-                var toast = document.createElement('div');
-                toast.className = 'dashboard-toast';
-                toast.textContent = message;
-                document.body.appendChild(toast);
+                    try {
+                        var ext = file.name.split('.').pop().toLowerCase();
+                        var fileName = 'banner-' + Date.now() + '.' + ext;
 
-                setTimeout(function() { toast.classList.add('show'); }, 100);
-                setTimeout(function() {
-                    toast.classList.remove('show');
-                    setTimeout(function() { toast.remove(); }, 300);
-                }, 3500);
+                        const { error } = await supabase
+                            .storage
+                            .from('banners')
+                            .upload(fileName, file, {
+                                cacheControl: '3600',
+                                upsert: true,
+                                contentType: file.type
+                            });
+
+                        if (error) throw error;
+
+                        const { data: urlData } = supabase
+                            .storage
+                            .from('banners')
+                            .getPublicUrl(fileName);
+
+                        bannerImage.src = urlData.publicUrl;
+
+                        // Xóa ảnh cũ
+                        try {
+                            const { data: oldFiles } = await supabase
+                                .storage
+                                .from('banners')
+                                .list('', { limit: 100 });
+
+                            if (oldFiles && oldFiles.length > 1) {
+                                var filesToDelete = oldFiles
+                                    .filter(function(f) {
+                                        return f.name &&
+                                               f.name !== fileName &&
+                                               !f.name.startsWith('.') &&
+                                               /\.(jpg|jpeg|png|gif|webp)$/i.test(f.name);
+                                    })
+                                    .map(function(f) { return f.name; });
+
+                                if (filesToDelete.length > 0) {
+                                    await supabase.storage.from('banners').remove(filesToDelete);
+                                }
+                            }
+                        } catch (cleanupErr) {
+                            console.warn('Lỗi xóa ảnh cũ:', cleanupErr);
+                        }
+
+                        showToast('✓ Đã đổi ảnh bìa thành công!');
+                        console.log('✅ Upload thành công:', urlData.publicUrl);
+
+                    } catch (err) {
+                        console.error('Lỗi upload:', err);
+                        alert('Lỗi upload ảnh: ' + err.message);
+                    } finally {
+                        changeBtn.innerHTML = originalText;
+                        changeBtn.disabled = false;
+                        fileInput.value = '';
+                    }
+                });
             }
 
             // ==========================================
@@ -620,7 +626,7 @@
 
                 try {
                     let matches = [];
-                    
+
                     if (currentStatus === 'upcoming') {
                         matches = await window.FootballAPI.getUpcomingMatches(currentLeague);
                     } else {
@@ -639,11 +645,11 @@
                         const homeScore = match.intHomeScore ?? '-';
                         const awayScore = match.intAwayScore ?? '-';
                         const isFinished = match.intHomeScore !== null && match.intHomeScore !== undefined;
-                        
+
                         const statusText = isFinished 
                             ? 'KT' 
                             : (match.strTime ? window.FootballAPI.formatMatchTime(match.strTime) : '—');
-                        
+
                         const statusColor = isFinished ? '#6b7280' : '#1769ff';
 
                         return `
@@ -688,7 +694,6 @@
             // 6. MOBILE MENU TOGGLE
             // ==========================================
             const mobileMenu = document.getElementById('mobileMenu');
-            
             if (mobileMenu) {
                 mobileMenu.addEventListener('click', () => {
                     const sidebar = document.querySelector('.sidebar');
@@ -696,7 +701,23 @@
                 });
             }
 
-            console.log('✅ Dashboard SportsVN đã kết nối Supabase');
+            // ==========================================
+            // 7. TOAST NOTIFICATION
+            // ==========================================
+            function showToast(message) {
+                var toast = document.createElement('div');
+                toast.className = 'dashboard-toast';
+                toast.textContent = message;
+                document.body.appendChild(toast);
+
+                setTimeout(function() { toast.classList.add('show'); }, 100);
+                setTimeout(function() {
+                    toast.classList.remove('show');
+                    setTimeout(function() { toast.remove(); }, 300);
+                }, 3500);
+            }
+
+            console.log('✅ Admin Dashboard SportsVN đã sẵn sàng');
         });
     </script>
 
