@@ -197,6 +197,41 @@
             gap: 10px;
             flex-wrap: wrap;
         }
+
+        /* ✅ SPORT INFO BANNER */
+        .sport-info-banner {
+            background: linear-gradient(135deg, #fff8e6, #fff3cd);
+            border-left: 5px solid #fdcb6e;
+            padding: 14px 20px;
+            border-radius: 12px;
+            margin-bottom: 20px;
+            display: none;
+            align-items: center;
+            gap: 16px;
+            flex-wrap: wrap;
+        }
+        .sport-info-banner.visible { display: flex; }
+        .sport-info-banner .sport-icon {
+            width: 52px; height: 52px;
+            display: flex; align-items: center; justify-content: center;
+            background: #fff;
+            border-radius: 14px;
+            font-size: 28px;
+            box-shadow: 0 4px 10px rgba(0,0,0,0.08);
+            flex-shrink: 0;
+        }
+        .sport-info-banner .sport-details { flex: 1; min-width: 200px; }
+        .sport-info-banner .sport-name {
+            font-size: 17px; font-weight: 800; color: #856404;
+            margin-bottom: 4px;
+        }
+        .sport-info-banner .sport-meta {
+            font-size: 13px; color: #6c757d;
+            display: flex; flex-wrap: wrap; gap: 12px;
+        }
+        .sport-info-banner .sport-meta span {
+            display: inline-flex; align-items: center; gap: 4px;
+        }
     </style>
 </head>
 <body>
@@ -205,9 +240,18 @@
     <div class="draw-header">
         <div>
             <h1>🎲 Bốc thăm tự động</h1>
-            <p>Vòng tròn + Knockout · Chia nhánh trên/dưới · Xuất Excel 1 sheet</p>
+            <p id="drawHeaderSubtitle">Vòng tròn + Knockout · Chia nhánh trên/dưới · Xuất Excel 1 sheet</p>
         </div>
         <a href="tournaments.html" class="btn-outline"><i class="fas fa-arrow-left"></i> Quay lại</a>
+    </div>
+
+    <!-- ✅ SPORT INFO BANNER - Hiển thị cấu hình môn -->
+    <div class="sport-info-banner" id="sportInfoBanner">
+        <div class="sport-icon" id="sportInfoIcon">🏆</div>
+        <div class="sport-details">
+            <div class="sport-name" id="sportInfoName">Môn thể thao</div>
+            <div class="sport-meta" id="sportInfoMeta"></div>
+        </div>
     </div>
 
     <div class="draw-panel">
@@ -251,19 +295,19 @@
     <div class="draw-panel">
         <div class="panel-title"><span class="step-num">3</span> Chọn thể thức bốc thăm</div>
         <div class="draw-types">
-            <label class="draw-type-card selected" onclick="selectDrawType('knockout')">
+            <label class="draw-type-card selected" data-draw-type="knockout" onclick="selectDrawType('knockout')">
                 <input type="radio" name="draw-type" value="knockout" checked>
                 <div class="info"><strong>🏆 Loại trực tiếp (Knock-out)</strong><small>Tự động chọn bracket 4, 8, 16, 32, 64...<br>VD: 26 VĐV → Bracket 32 (6 BYE)</small></div>
             </label>
-            <label class="draw-type-card" onclick="selectDrawType('round-robin-even')">
+            <label class="draw-type-card" data-draw-type="round-robin-even" onclick="selectDrawType('round-robin-even')">
                 <input type="radio" name="draw-type" value="round-robin-even">
                 <div class="info"><strong>🔄 Vòng tròn - Chia đều</strong><small>Chia đều vào các bảng.<br>Sau đó tự động tạo nhánh Knockout</small></div>
             </label>
-            <label class="draw-type-card" onclick="selectDrawType('round-robin-custom')">
+            <label class="draw-type-card" data-draw-type="round-robin-custom" onclick="selectDrawType('round-robin-custom')">
                 <input type="radio" name="draw-type" value="round-robin-custom">
                 <div class="info"><strong>⚙️ Vòng tròn - Chia tùy chỉnh</strong><small>Tự chọn số bảng, hệ thống chia đều.<br>Sau đó tự động tạo nhánh Knockout</small></div>
             </label>
-            <label class="draw-type-card" onclick="selectDrawType('round-robin-single')">
+            <label class="draw-type-card" data-draw-type="round-robin-single" onclick="selectDrawType('round-robin-single')">
                 <input type="radio" name="draw-type" value="round-robin-single">
                 <div class="info"><strong>🎯 Vòng tròn 1 bảng</strong><small>Tất cả các đội đấu vòng tròn trong 1 bảng duy nhất</small></div>
             </label>
@@ -464,11 +508,13 @@
 <script src="https://cdnjs.cloudflare.com/ajax/libs/exceljs/4.4.0/exceljs.min.js"></script>
 <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
 <script src="config.js"></script>
+<!-- ✅ LOAD CẤU HÌNH MÔN THỂ THAO -->
+<script src="sports-config.js"></script>
 <script>
 (function() {
     'use strict';
 
-    console.log('🚀 draw.html v21 - Lưu config localStorage');
+    console.log('🚀 draw.html v22 - Đọc cấu hình môn thể thao');
 
     const config = window.SPORTSVN_CONFIG || {};
     const supabaseClient = window.supabase.createClient(config.SUPABASE_URL, config.SUPABASE_ANON_KEY);
@@ -482,6 +528,10 @@
     let importData = [];
     let categoriesList = [];
     let editingContext = null;
+
+    // ✅ BIẾN LƯU MÔN THỂ THAO
+    let currentSport = null;
+    let currentSportConfig = null;
 
     let koState = {
         mode: 'custom',
@@ -572,6 +622,76 @@
     }
 
     // ==========================================
+    // ✅ ÁP DỤNG CẤU HÌNH MÔN THỂ THAO
+    // ==========================================
+    function applySportConfig() {
+        if (!currentSportConfig) return;
+
+        const cfg = currentSportConfig;
+        console.log('✅ Áp dụng cấu hình môn:', cfg.name);
+
+        // 1. Hiển thị banner môn
+        const banner = document.getElementById('sportInfoBanner');
+        const iconEl = document.getElementById('sportInfoIcon');
+        const nameEl = document.getElementById('sportInfoName');
+        const metaEl = document.getElementById('sportInfoMeta');
+
+        iconEl.textContent = cfg.icon || '🏆';
+        nameEl.textContent = cfg.name || 'Môn thể thao';
+
+        let metaHtml = '';
+        if (cfg.bestOf) metaHtml += `<span>🎯 Best of ${cfg.bestOf}</span>`;
+        if (cfg.pointsPerSet) metaHtml += `<span>📍 ${cfg.pointsPerSet} điểm/set</span>`;
+        if (cfg.gamesPerSet) metaHtml += `<span>📍 ${cfg.gamesPerSet} game/set</span>`;
+        if (cfg.matchDuration) metaHtml += `<span>⏱️ ${cfg.matchDuration} phút/trận</span>`;
+        if (cfg.periods) metaHtml += `<span>🔢 ${cfg.periods} hiệp</span>`;
+        if (cfg.hasDraw) metaHtml += `<span>🤝 Có hòa</span>`;
+        if (cfg.hasExtraTime) metaHtml += `<span>⏰ Hiệp phụ</span>`;
+        if (cfg.hasPenalty) metaHtml += `<span>⚽ Luân lưu</span>`;
+        if (cfg.hasOvertime) metaHtml += `<span>⏰ Hiệp phụ</span>`;
+        if (cfg.tieBreak) metaHtml += `<span>🎾 Tie-break</span>`;
+        if (cfg.hasWeightClasses) metaHtml += `<span>⚖️ Chia hạng cân</span>`;
+
+        metaEl.innerHTML = metaHtml;
+        banner.classList.add('visible');
+
+        // 2. Cập nhật subtitle header
+        const subtitle = document.getElementById('drawHeaderSubtitle');
+        if (subtitle) {
+            subtitle.innerHTML = `${cfg.icon} <strong>${cfg.name}</strong>${cfg.matchDuration ? ' · ' + cfg.matchDuration + ' phút/trận' : ''}${cfg.bestOf ? ' · Best of ' + cfg.bestOf : ''}`;
+        }
+
+        // 3. Ẩn/hiện các thể thức theo allowedDrawTypes
+        const drawTypeCards = document.querySelectorAll('.draw-type-card');
+        drawTypeCards.forEach(card => {
+            const type = card.dataset.drawType;
+            if (!type) return;
+
+            if (cfg.allowedDrawTypes && cfg.allowedDrawTypes.length > 0) {
+                if (!cfg.allowedDrawTypes.includes(type)) {
+                    card.style.display = 'none';
+                } else {
+                    card.style.display = 'flex';
+                }
+            }
+        });
+
+        // 4. Tự chọn thể thức mặc định
+        if (cfg.drawType) {
+            const defaultCard = document.querySelector(`.draw-type-card[data-draw-type="${cfg.drawType}"]`);
+            if (defaultCard && defaultCard.style.display !== 'none') {
+                selectDrawType(cfg.drawType);
+                console.log('✅ Thể thức mặc định:', cfg.drawType);
+            }
+        }
+
+        // 5. Cập nhật thời gian trận mặc định (nếu có)
+        if (cfg.matchDuration) {
+            window._sportMatchDuration = cfg.matchDuration;
+        }
+    }
+
+    // ==========================================
     // SINH LỊCH VÒNG TRÒN CHUẨN BERGER
     // ==========================================
     function generateRoundRobinSchedule(n) {
@@ -602,7 +722,7 @@
     }
 
     // ==========================================
-    // LOAD CATEGORIES
+    // LOAD CATEGORIES + LOAD SPORT CONFIG
     // ==========================================
     async function loadCategories() {
         const urlParams = new URLSearchParams(window.location.search);
@@ -622,6 +742,29 @@
         if (btnManage) btnManage.href = `categories.html?tournament_id=${tournamentId}`;
         if (btnAdd) btnAdd.href = `categories.html?tournament_id=${tournamentId}&action=add`;
 
+        // ✅ LOAD THÔNG TIN GIẢI ĐẤU ĐỂ BIẾT MÔN
+        try {
+            const { data: tour } = await supabaseClient
+                .from('tournaments')
+                .select('sport, sport_name, name')
+                .eq('id', tournamentId)
+                .single();
+
+            if (tour && tour.sport) {
+                currentSport = tour.sport;
+                currentSportConfig = window.getSportConfig ? window.getSportConfig(tour.sport) : null;
+
+                if (currentSportConfig) {
+                    applySportConfig();
+                } else {
+                    console.warn('⚠️ Không tìm thấy config cho môn:', tour.sport);
+                }
+            }
+        } catch (err) {
+            console.warn('Không load được thông tin giải:', err);
+        }
+
+        // LOAD DANH SÁCH NỘI DUNG
         const { data, error } = await supabaseClient.from('categories')
             .select('id, name, category_type, scoring_type')
             .eq('tournament_id', tournamentId).order('priority');
@@ -2298,7 +2441,6 @@
 
     // ==========================================
     // SAVE TO DATABASE
-    // ✅ ĐÃ THÊM: Lưu config vào localStorage
     // ==========================================
     window.saveToDatabase = async function() {
         const result = lastResult;
@@ -2369,7 +2511,7 @@
             const { error } = await supabaseClient.from('draws').insert(records);
             if (error) throw error;
 
-            // ✅ LƯU CẤU HÌNH VÀO LOCALSTORAGE ĐỂ SCHEDULE.HTML ĐỌC
+            // ✅ LƯU CẤU HÌNH VÀO LOCALSTORAGE
             const scheduleConfigToSave = {
                 startDate: document.getElementById('start-date')?.value || new Date().toISOString().slice(0, 10),
                 numDays: parseInt(document.getElementById('num-days')?.value) || 3,
@@ -2378,12 +2520,18 @@
                 timeMorning: document.getElementById('time-morning')?.value || '07:30',
                 timeAfternoon: document.getElementById('time-afternoon')?.value || '13:30',
                 timeEvening: document.getElementById('time-evening')?.value || '18:00',
-                matchDuration: 45
+                matchDuration: window._sportMatchDuration || 45
             };
 
             localStorage.setItem(`sportsvn_config_${tournamentId}`, JSON.stringify(scheduleConfigToSave));
             localStorage.setItem('sportsvn_config', JSON.stringify(scheduleConfigToSave));
-            console.log('✅ Đã lưu config vào localStorage:', scheduleConfigToSave);
+
+            // Lưu môn vào localStorage
+            if (currentSport) {
+                localStorage.setItem(`sportsvn_sport_${tournamentId}`, currentSport);
+            }
+
+            console.log('✅ Đã lưu config:', scheduleConfigToSave);
 
             showAlert(`✅ Đã lưu ${records.length} VĐV cho "${category}"! Đang chuyển trang...`, 'success');
             setTimeout(() => { window.location.href = 'categories.html?tournament_id=' + tournamentId; }, 1500);
@@ -2425,7 +2573,7 @@
         }
     });
 
-    console.log('✅ draw.html v21 loaded - Lưu config localStorage');
+    console.log('✅ draw.html v22 loaded - Có cấu hình môn thể thao');
 
 })();
 </script>
