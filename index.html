@@ -1,0 +1,725 @@
+<!DOCTYPE html>
+<html lang="vi">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta name="description" content="SportsVN - Nền tảng công nghệ thể thao Việt Nam">
+    <title>Admin Dashboard - SportsVN</title>
+    <link rel="stylesheet" href="styles.css">
+    <script src="football.js" defer></script>
+    <script src="provinces.js" defer></script>
+    <script src="sidebar.js" defer></script>
+</head>
+
+<body>
+
+    <div class="app">
+
+        <main class="main">
+
+            <!-- ============================== -->
+            <!-- TOPBAR -->
+            <!-- ============================== -->
+            <header class="topbar">
+                <div class="topbar-left">
+                    <button class="mobile-menu" id="mobileMenu" aria-label="Mở menu">☰</button>
+                    <div class="topbar-brand">
+                        <span class="topbar-label">SPORTS MANAGEMENT PLATFORM</span>
+                        <h1 class="topbar-title-main">SPORTS<span>VN</span></h1>
+                        <p class="topbar-subtitle">Kết nối đam mê thể thao — Cập nhật nhanh chóng — Chính xác — Toàn diện</p>
+                    </div>
+                </div>
+
+                <div class="topbar-right">
+                    <a href="tournaments.html" class="topbar-cta">
+                        <span>＋</span> Tạo giải đấu
+                    </a>
+
+                    <button class="icon-button" title="Thông báo">
+                        ♢
+                        <span class="notification-dot"></span>
+                    </button>
+
+                    <button class="icon-button" title="Tìm kiếm">⌕</button>
+
+                    <div class="top-user" id="topUser">
+                        <div class="avatar">H</div>
+                        <div class="top-user-info">
+                            <strong>Quản trị viên</strong>
+                            <span>SportsVN</span>
+                        </div>
+                        <span class="arrow">▾</span>
+                    </div>
+                </div>
+            </header>
+
+
+            <!-- ============================== -->
+            <!-- CONTENT -->
+            <!-- ============================== -->
+            <section class="content">
+
+                <!-- HERO BANNER -->
+                <section class="welcome-banner" id="bannerSection">
+                    <img src="banner.jpg" alt="SportsVN Banner" class="banner-image" id="bannerImage">
+                    
+                    <button class="change-banner-btn" id="changeBannerBtn" title="Đổi ảnh bìa">
+                        📷 Đổi ảnh bìa
+                    </button>
+                    
+                    <input type="file" id="bannerInput" accept="image/*" style="display: none;">
+                </section>
+
+
+                <!-- DASHBOARD 3 CỘT -->
+                <div class="dashboard-grid">
+
+                    <!-- CỘT 1: GIẢI ĐẤU -->
+                    <section class="panel">
+                        <div class="panel-header">
+                            <div>
+                                <h2>🏆 Giải đấu đang diễn ra</h2>
+                                <p>Các giải đấu mới nhất trên hệ thống</p>
+                            </div>
+                            <a href="tournaments.html">Xem tất cả →</a>
+                        </div>
+
+                        <div class="tournament-list" id="homeTournamentList">
+                            <div class="tournament">
+                                <div class="sport-logo football">⚽</div>
+                                <div class="tournament-info">
+                                    <strong>Giải Bóng đá Đại hội TDTT thành phố Đà Nẵng</strong>
+                                    <span>Bóng đá nam · 16 đội</span>
+                                </div>
+                                <div class="tournament-status">
+                                    <span class="status active">Đang diễn ra</span>
+                                    <small>24/08/2026</small>
+                                </div>
+                            </div>
+
+                            <div class="tournament">
+                                <div class="sport-logo swimming">🏊</div>
+                                <div class="tournament-info">
+                                    <strong>Giải Bơi Đại hội TDTT thành phố Đà Nẵng</strong>
+                                    <span>Bơi · 25 đơn vị</span>
+                                </div>
+                                <div class="tournament-status">
+                                    <span class="status upcoming">Sắp diễn ra</span>
+                                    <small>27/08/2026</small>
+                                </div>
+                            </div>
+
+                            <div class="tournament">
+                                <div class="sport-logo basketball">🏀</div>
+                                <div class="tournament-info">
+                                    <strong>Giải Bóng rổ trẻ 5x5 Quốc gia</strong>
+                                    <span>Bóng rổ · U16</span>
+                                </div>
+                                <div class="tournament-status">
+                                    <span class="status active">Đang diễn ra</span>
+                                    <small>24/08/2026</small>
+                                </div>
+                            </div>
+
+                            <div class="tournament">
+                                <div class="sport-logo pickleball">◉</div>
+                                <div class="tournament-info">
+                                    <strong>Giải Pickleball Đại hội TDTT thành phố Đà Nẵng</strong>
+                                    <span>Pickleball · 25 đơn vị</span>
+                                </div>
+                                <div class="tournament-status">
+                                    <span class="status completed">Đã kết thúc</span>
+                                    <small>30/06/2026</small>
+                                </div>
+                            </div>
+                        </div>
+                    </section>
+
+
+                    <!-- CỘT 2: TIN TỨC -->
+                    <section class="panel">
+                        <div class="panel-header">
+                            <div>
+                                <h2>📰 Tin tức mới nhất</h2>
+                                <p>Cập nhật tin tức thể thao</p>
+                            </div>
+                            <a href="news-list.html">Xem tất cả →</a>
+                        </div>
+
+                        <div class="news-list" id="homeNewsList">
+                            <div class="news-item">
+                                <div class="news-thumb">
+                                    <img src="https://images.unsplash.com/photo-1579952363873-27f3bade9f55?w=200&h=150&fit=crop" alt="News">
+                                </div>
+                                <div class="news-content">
+                                    <strong>Khai mạc Giải Bóng đá Đại hội TDTT TP Đà Nẵng lần thứ X</strong>
+                                    <p>Sáng 24/8, tại Nhà thi đấu Trung tâm Cung ứng dịch vụ sự nghiệp công phường An Hải...</p>
+                                    <div class="news-meta">
+                                        <span>24/08/2026</span>
+                                        <span class="news-tag">HOT</span>
+                                    </div>
+                                </div>
+                            </div>
+
+                            <div class="news-item">
+                                <div class="news-thumb">
+                                    <img src="https://images.unsplash.com/photo-1530549387789-4c1017266635?w=200&h=150&fit=crop" alt="News">
+                                </div>
+                                <div class="news-content">
+                                    <strong>Đoàn Đà Nẵng giành 2 HCV tại Giải Đua thuyền truyền thống</strong>
+                                    <p>Với tinh thần thi đấu đoàn kết, các vận động viên Đà Nẵng đã xuất sắc giành 2 HCV...</p>
+                                    <div class="news-meta"><span>30/08/2026</span></div>
+                                </div>
+                            </div>
+
+                            <div class="news-item">
+                                <div class="news-thumb">
+                                    <img src="https://images.unsplash.com/photo-1554068865-24cecd4e34b8?w=200&h=150&fit=crop" alt="News">
+                                </div>
+                                <div class="news-content">
+                                    <strong>Hơn 200 VĐV tham gia Giải Pickleball Đại hội TDTT TP Đà Nẵng</strong>
+                                    <p>Giải đấu diễn ra từ ngày 27 đến 30/6/2026 tại Cụm sân Pickleball Hòa Phát...</p>
+                                    <div class="news-meta"><span>27/06/2026</span></div>
+                                </div>
+                            </div>
+                        </div>
+                    </section>
+
+
+                    <!-- CỘT 3: KẾT QUẢ BÓNG ĐÁ -->
+                    <section class="panel">
+                        <div class="panel-header">
+                            <div>
+                                <h2>⚽ Kết quả Bóng đá</h2>
+                            </div>
+                            <a href="#">Xem tất cả →</a>
+                        </div>
+
+                        <div class="results-list">
+                            <div class="result-tabs" id="footballLeagueTabs">
+                                <div class="result-tab active" data-league="4328">NHA</div>
+                                <div class="result-tab" data-league="4335">La Liga</div>
+                                <div class="result-tab" data-league="4480">C1</div>
+                                <div class="result-tab" data-league="4564">V.League</div>
+                            </div>
+
+                            <div class="result-tabs" id="footballStatusTabs" style="margin-top:8px;">
+                                <div class="result-tab active" data-status="upcoming">Sắp tới</div>
+                                <div class="result-tab" data-status="recent">Gần đây</div>
+                            </div>
+
+                            <div id="footballMatches">
+                                <div style="text-align:center;padding:30px;color:#6b7280;font-size:12px;">
+                                    ⏳ Đang tải...
+                                </div>
+                            </div>
+                        </div>
+
+                        <div class="panel-header" style="border-top: 1px solid var(--border-light); margin-top: 8px;">
+                            <div>
+                                <h2>🔗 Liên kết nhanh</h2>
+                            </div>
+                        </div>
+
+                        <div class="quick-links">
+                            <a href="draw.html" class="quick-link-item" style="text-decoration: none;">
+                                <div class="quick-link-icon blue">◇</div>
+                                <div class="quick-link-text">
+                                    <strong>Bốc thăm</strong>
+                                    <span>Trực tuyến</span>
+                                </div>
+                            </a>
+
+                            <a href="booking.html" class="quick-link-item" style="text-decoration: none;">
+                                <div class="quick-link-icon green">🏟️</div>
+                                <div class="quick-link-text">
+                                    <strong>Đặt sân</strong>
+                                    <span>Online</span>
+                                </div>
+                            </a>
+
+                            <a href="shop.html" class="quick-link-item" style="text-decoration: none;">
+                                <div class="quick-link-icon orange">🛍️</div>
+                                <div class="quick-link-text">
+                                    <strong>Mua sắm</strong>
+                                    <span>Sản phẩm</span>
+                                </div>
+                            </a>
+
+                            <a href="lucky-wheel.html" class="quick-link-item" style="text-decoration: none;">
+                                <div class="quick-link-icon purple">🎰</div>
+                                <div class="quick-link-text">
+                                    <strong>Vòng quay</strong>
+                                    <span>May mắn</span>
+                                </div>
+                            </a>
+                        </div>
+                    </section>
+
+                </div>
+
+
+                <!-- UPCOMING BAR -->
+                <div class="upcoming-bar">
+                    <div class="upcoming-title">
+                        <span>📅</span> Giải đấu sắp tới
+                    </div>
+
+                    <div class="upcoming-item">
+                        <div class="upcoming-icon" style="background:#fff3e0; color:#f57c00;">🏀</div>
+                        <div class="upcoming-info">
+                            <strong>Bóng rổ U16</strong>
+                            <span>24/08 - 28/08/2026</span>
+                        </div>
+                    </div>
+
+                    <div class="upcoming-item">
+                        <div class="upcoming-icon" style="background:#e0f7fa; color:#00acc1;">🏊</div>
+                        <div class="upcoming-info">
+                            <strong>Bơi</strong>
+                            <span>27/08 - 29/08/2026</span>
+                        </div>
+                    </div>
+
+                    <div class="upcoming-item">
+                        <div class="upcoming-icon" style="background:#fff8e1; color:#fbc02d;">♟️</div>
+                        <div class="upcoming-info">
+                            <strong>Cờ tướng trẻ</strong>
+                            <span>23/06 - 02/07/2026</span>
+                        </div>
+                    </div>
+
+                    <div class="upcoming-item">
+                        <div class="upcoming-icon" style="background:#fce4ec; color:#e91e63;">🎱</div>
+                        <div class="upcoming-info">
+                            <strong>Bi sắt</strong>
+                            <span>12/09 - 15/09/2026</span>
+                        </div>
+                    </div>
+
+                    <div class="upcoming-item">
+                        <div class="upcoming-icon" style="background:#e3f2fd; color:#1976d2;">🥋</div>
+                        <div class="upcoming-info">
+                            <strong>Vovinam</strong>
+                            <span>20/09 - 24/09/2026</span>
+                        </div>
+                    </div>
+                </div>
+
+            </section>
+
+
+            <!-- ============================== -->
+            <!-- FOOTER -->
+            <!-- ============================== -->
+            <footer class="footer">
+                <span>© 2026 SportsVN</span>
+                <span>Nền tảng công nghệ thể thao Việt Nam</span>
+            </footer>
+
+        </main>
+
+    </div>
+
+
+    <!-- ============================== -->
+    <!-- SCRIPTS -->
+    <!-- ============================== -->
+    <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+    <script src="config.js"></script>
+    <script>
+        // ==========================================
+        // SPORTSVN ADMIN DASHBOARD - SUPABASE
+        // ==========================================
+        
+        window.supabaseClient = null;
+        window.currentSession = null;
+        
+        document.addEventListener('DOMContentLoaded', async function() {
+            'use strict';
+
+            const config = window.SPORTSVN_CONFIG || {};
+            if (!config.SUPABASE_URL || !config.SUPABASE_ANON_KEY) {
+                console.warn('⚠️ Chưa cấu hình Supabase trong config.js');
+                return;
+            }
+
+            window.supabaseClient = window.supabase.createClient(
+                config.SUPABASE_URL,
+                config.SUPABASE_ANON_KEY
+            );
+            const supabase = window.supabaseClient;
+
+            const ADMIN_EMAIL = 'nguyenquanghao2505@gmail.com';
+
+            // ================================
+            // 1. KIỂM TRA ĐĂNG NHẬP
+            // ================================
+            async function checkAuth() {
+                const { data: { session } } = await supabase.auth.getSession();
+
+                if (!session) {
+                    window.location.href = 'login.html';
+                    return false;
+                }
+
+                window.currentSession = session;
+
+                // Kiểm tra role admin
+                const { data: roleData } = await supabase
+                    .from('user_roles')
+                    .select('role')
+                    .eq('user_id', session.user.id)
+                    .single();
+
+                if (!roleData || roleData.role !== 'admin') {
+                    alert('Tài khoản không có quyền Admin');
+                    await supabase.auth.signOut();
+                    window.location.href = 'login.html';
+                    return false;
+                }
+
+                // Cập nhật tên + avatar
+                const name = session.user.user_metadata?.full_name ||
+                             session.user.email.split('@')[0];
+                const initials = name.split(' ').map(w => w[0]).join('').slice(0, 2).toUpperCase();
+
+                document.querySelectorAll('.avatar').forEach(el => el.textContent = initials);
+                document.querySelectorAll('.user-info strong, .top-user-info strong').forEach(el => el.textContent = name);
+
+                // Chỉ admin chính mới thấy nút "Đổi ảnh bìa"
+                const userEmail = session.user.email;
+                const changeBannerBtn = document.getElementById('changeBannerBtn');
+
+                if (changeBannerBtn && userEmail === ADMIN_EMAIL) {
+                    changeBannerBtn.classList.add('visible');
+                    console.log('✅ Admin chính đã đăng nhập');
+                }
+
+                return true;
+            }
+
+            const isAuth = await checkAuth();
+            if (!isAuth) return;
+
+            // ================================
+            // 2. ĐĂNG XUẤT
+            // ================================
+            const topUser = document.getElementById('topUser');
+            if (topUser) {
+                topUser.addEventListener('click', async function() {
+                    if (confirm('Bạn có muốn đăng xuất không?')) {
+                        await supabase.auth.signOut();
+                        window.location.href = 'index.html';
+                    }
+                });
+            }
+
+            // ==========================================
+            // 3. ĐỔI ẢNH BÌA
+            // ==========================================
+            var bannerImage = document.getElementById('bannerImage');
+            var changeBtn = document.getElementById('changeBannerBtn');
+            var fileInput = document.getElementById('bannerInput');
+
+            if (bannerImage && changeBtn && fileInput) {
+
+                async function loadBanner() {
+                    try {
+                        const { data, error } = await supabase
+                            .storage
+                            .from('banners')
+                            .list('', {
+                                limit: 100,
+                                sortBy: { column: 'name', order: 'desc' }
+                            });
+
+                        if (error) return;
+
+                        var imageFiles = (data || []).filter(function(f) {
+                            return f.name &&
+                                   !f.name.startsWith('.') &&
+                                   /\.(jpg|jpeg|png|gif|webp)$/i.test(f.name);
+                        });
+
+                        if (imageFiles.length === 0) return;
+
+                        imageFiles.sort(function(a, b) {
+                            var aIsSystem = a.name.startsWith('banner-');
+                            var bIsSystem = b.name.startsWith('banner-');
+
+                            if (aIsSystem && !bIsSystem) return -1;
+                            if (!aIsSystem && bIsSystem) return 1;
+
+                            if (aIsSystem && bIsSystem) {
+                                var aTime = parseInt((a.name.match(/banner-(\d+)/) || [])[1] || 0);
+                                var bTime = parseInt((b.name.match(/banner-(\d+)/) || [])[1] || 0);
+                                return bTime - aTime;
+                            }
+
+                            return new Date(b.created_at) - new Date(a.created_at);
+                        });
+
+                        var latestImage = imageFiles[0];
+
+                        const { data: urlData } = supabase
+                            .storage
+                            .from('banners')
+                            .getPublicUrl(latestImage.name);
+
+                        if (urlData && urlData.publicUrl) {
+                            bannerImage.src = urlData.publicUrl + '?t=' + Date.now();
+                            console.log('✅ Đã load banner:', latestImage.name);
+                        }
+                    } catch (err) {
+                        console.error('Lỗi load banner:', err);
+                    }
+                }
+
+                loadBanner();
+
+                changeBtn.addEventListener('click', function(e) {
+                    e.stopPropagation();
+                    fileInput.click();
+                });
+
+                fileInput.addEventListener('change', async function(e) {
+                    var file = e.target.files[0];
+                    if (!file) return;
+
+                    if (!file.type.startsWith('image/')) {
+                        alert('Vui lòng chọn file ảnh');
+                        return;
+                    }
+
+                    if (file.size > 5 * 1024 * 1024) {
+                        alert('Ảnh quá lớn! Vui lòng chọn ảnh dưới 5MB.');
+                        return;
+                    }
+
+                    var originalText = changeBtn.innerHTML;
+                    changeBtn.innerHTML = '⏳ Đang tải...';
+                    changeBtn.disabled = true;
+
+                    try {
+                        var ext = file.name.split('.').pop().toLowerCase();
+                        var fileName = 'banner-' + Date.now() + '.' + ext;
+
+                        const { error } = await supabase
+                            .storage
+                            .from('banners')
+                            .upload(fileName, file, {
+                                cacheControl: '3600',
+                                upsert: true,
+                                contentType: file.type
+                            });
+
+                        if (error) throw error;
+
+                        const { data: urlData } = supabase
+                            .storage
+                            .from('banners')
+                            .getPublicUrl(fileName);
+
+                        bannerImage.src = urlData.publicUrl;
+
+                        // Xóa ảnh cũ
+                        try {
+                            const { data: oldFiles } = await supabase
+                                .storage
+                                .from('banners')
+                                .list('', { limit: 100 });
+
+                            if (oldFiles && oldFiles.length > 1) {
+                                var filesToDelete = oldFiles
+                                    .filter(function(f) {
+                                        return f.name &&
+                                               f.name !== fileName &&
+                                               !f.name.startsWith('.') &&
+                                               /\.(jpg|jpeg|png|gif|webp)$/i.test(f.name);
+                                    })
+                                    .map(function(f) { return f.name; });
+
+                                if (filesToDelete.length > 0) {
+                                    await supabase.storage.from('banners').remove(filesToDelete);
+                                }
+                            }
+                        } catch (cleanupErr) {
+                            console.warn('Lỗi xóa ảnh cũ:', cleanupErr);
+                        }
+
+                        showToast('✓ Đã đổi ảnh bìa thành công!');
+                        console.log('✅ Upload thành công:', urlData.publicUrl);
+
+                    } catch (err) {
+                        console.error('Lỗi upload:', err);
+                        alert('Lỗi upload ảnh: ' + err.message);
+                    } finally {
+                        changeBtn.innerHTML = originalText;
+                        changeBtn.disabled = false;
+                        fileInput.value = '';
+                    }
+                });
+            }
+
+            // ==========================================
+            // 4. LOAD TIN TỨC MỚI NHẤT
+            // ==========================================
+            async function loadHomeNews() {
+                try {
+                    const { data, error } = await supabase
+                        .from('news')
+                        .select('*')
+                        .order('created_at', { ascending: false })
+                        .limit(3);
+
+                    if (error || !data || data.length === 0) return;
+
+                    const newsList = document.getElementById('homeNewsList');
+                    if (!newsList) return;
+
+                    newsList.innerHTML = data.map(news => `
+                        <a href="news-detail.html?id=${news.id}" class="news-item-link">
+                            <div class="news-item">
+                                <div class="news-thumb">
+                                    ${news.image_url ? 
+                                        `<img src="${news.image_url}" alt="${news.title}">` :
+                                        `<div style="width:100%;height:100%;display:flex;align-items:center;justify-content:center;font-size:32px;background:#f3f4f6;">📰</div>`
+                                    }
+                                </div>
+                                <div class="news-content">
+                                    <strong>${news.title}</strong>
+                                    <p>${news.summary || ''}</p>
+                                    <div class="news-meta">
+                                        <span>${new Date(news.created_at).toLocaleDateString('vi-VN')}</span>
+                                        ${news.is_hot ? '<span class="news-tag">HOT</span>' : ''}
+                                    </div>
+                                </div>
+                            </div>
+                        </a>
+                    `).join('');
+
+                    console.log('✅ Đã load ' + data.length + ' tin tức');
+                } catch (err) {
+                    console.warn('Lỗi load tin tức:', err);
+                }
+            }
+
+            loadHomeNews();
+
+            // ==========================================
+            // 5. LOAD KẾT QUẢ BÓNG ĐÁ
+            // ==========================================
+            let currentLeague = '4328';
+            let currentStatus = 'upcoming';
+
+            async function loadFootballMatches() {
+                const container = document.getElementById('footballMatches');
+                if (!container) return;
+
+                if (!window.FootballAPI) {
+                    container.innerHTML = '<div style="text-align:center;padding:30px;color:#dc2626;font-size:12px;">❌ Football API chưa load</div>';
+                    return;
+                }
+
+                container.innerHTML = '<div style="text-align:center;padding:30px;color:#6b7280;font-size:12px;">⏳ Đang tải...</div>';
+
+                try {
+                    let matches = [];
+
+                    if (currentStatus === 'upcoming') {
+                        matches = await window.FootballAPI.getUpcomingMatches(currentLeague);
+                    } else {
+                        matches = await window.FootballAPI.getRecentMatches(currentLeague);
+                    }
+
+                    if (!matches || matches.length === 0) {
+                        container.innerHTML = '<div style="text-align:center;padding:30px;color:#9ca3af;font-size:12px;">📅 Không có trận đấu nào</div>';
+                        return;
+                    }
+
+                    matches.sort((a, b) => new Date(a.dateEvent) - new Date(b.dateEvent));
+                    const displayMatches = matches.slice(0, 5);
+
+                    container.innerHTML = displayMatches.map(match => {
+                        const homeScore = match.intHomeScore ?? '-';
+                        const awayScore = match.intAwayScore ?? '-';
+                        const isFinished = match.intHomeScore !== null && match.intHomeScore !== undefined;
+
+                        const statusText = isFinished 
+                            ? 'KT' 
+                            : (match.strTime ? window.FootballAPI.formatMatchTime(match.strTime) : '—');
+
+                        const statusColor = isFinished ? '#6b7280' : '#1769ff';
+
+                        return `
+                            <div class="result-item">
+                                <div class="result-team">${match.strHomeTeam}</div>
+                                <div class="result-score">${homeScore} - ${awayScore}</div>
+                                <div class="result-team" style="text-align:right;">${match.strAwayTeam}</div>
+                                <div class="result-status" style="color:${statusColor};font-weight:700;">${statusText}</div>
+                            </div>
+                        `;
+                    }).join('');
+
+                    console.log(`✅ Đã load ${displayMatches.length} trận ${currentLeague}`);
+
+                } catch (error) {
+                    console.error('Lỗi load bóng đá:', error);
+                    container.innerHTML = '<div style="text-align:center;padding:30px;color:#dc2626;font-size:12px;">❌ Không thể tải dữ liệu</div>';
+                }
+            }
+
+            document.querySelectorAll('#footballLeagueTabs .result-tab').forEach(tab => {
+                tab.addEventListener('click', () => {
+                    document.querySelectorAll('#footballLeagueTabs .result-tab').forEach(t => t.classList.remove('active'));
+                    tab.classList.add('active');
+                    currentLeague = tab.dataset.league;
+                    loadFootballMatches();
+                });
+            });
+
+            document.querySelectorAll('#footballStatusTabs .result-tab').forEach(tab => {
+                tab.addEventListener('click', () => {
+                    document.querySelectorAll('#footballStatusTabs .result-tab').forEach(t => t.classList.remove('active'));
+                    tab.classList.add('active');
+                    currentStatus = tab.dataset.status;
+                    loadFootballMatches();
+                });
+            });
+
+            setTimeout(() => loadFootballMatches(), 500);
+
+            // ==========================================
+            // 6. MOBILE MENU TOGGLE
+            // ==========================================
+            const mobileMenu = document.getElementById('mobileMenu');
+            if (mobileMenu) {
+                mobileMenu.addEventListener('click', () => {
+                    const sidebar = document.querySelector('.sidebar');
+                    if (sidebar) sidebar.classList.toggle('open');
+                });
+            }
+
+            // ==========================================
+            // 7. TOAST NOTIFICATION
+            // ==========================================
+            function showToast(message) {
+                var toast = document.createElement('div');
+                toast.className = 'dashboard-toast';
+                toast.textContent = message;
+                document.body.appendChild(toast);
+
+                setTimeout(function() { toast.classList.add('show'); }, 100);
+                setTimeout(function() {
+                    toast.classList.remove('show');
+                    setTimeout(function() { toast.remove(); }, 300);
+                }, 3500);
+            }
+
+            console.log('✅ Admin Dashboard SportsVN đã sẵn sàng');
+        });
+    </script>
+
+</body>
+</html>
