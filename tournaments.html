@@ -9,6 +9,8 @@
     <script src="football.js" defer></script>
     <script src="provinces.js" defer></script>
     <script src="sidebar.js" defer></script>
+    <!-- ✅ LOAD CẤU HÌNH MÔN THỂ THAO -->
+    <script src="sports-config.js" defer></script>
 </head>
 
 <body>
@@ -110,7 +112,7 @@
             <form class="tournament-form" id="createTournamentForm" autocomplete="off">
                 <div class="tournament-form-grid">
 
-                    <!-- ✅ BỎ AUTOCOMPLETE + ĐỔI NAME FIELD ĐỂ TRÁNH TRÌNH DUYỆT GỢI Ý -->
+                    <!-- TÊN GIẢI ĐẤU -->
                     <div class="tournament-field full">
                         <label>Tên giải đấu <span>*</span></label>
                         <input type="text" 
@@ -124,31 +126,31 @@
                                required>
                     </div>
 
-                    <!-- ✅ MÔN THỂ THAO - TỰ SINH sport_name -->
+                    <!-- ✅ MÔN THỂ THAO - TỰ SINH TỪ sports-config.js -->
                     <div class="tournament-field full">
                         <label>Môn thể thao <span>*</span></label>
-                        <select id="tSport" required onchange="autoFillSportName()" autocomplete="off">
-                            <option value="">-- Chọn môn --</option>
-                            <option value="football" data-name="Bóng đá">⚽ Bóng đá</option>
-                            <option value="swimming" data-name="Bơi">🏊 Bơi</option>
-                            <option value="basketball" data-name="Bóng rổ">🏀 Bóng rổ</option>
-                            <option value="pickleball" data-name="Pickleball">◉ Pickleball</option>
-                            <option value="volleyball" data-name="Bóng chuyền">🏐 Bóng chuyền</option>
-                            <option value="tennis" data-name="Quần vợt">🎾 Quần vợt</option>
-                            <option value="badminton" data-name="Cầu lông">🏸 Cầu lông</option>
-                            <option value="chess" data-name="Cờ tướng">♟️ Cờ tướng</option>
-                            <option value="athletics" data-name="Điền kinh">🏃 Điền kinh</option>
-                            <option value="martial_arts" data-name="Võ thuật">🥋 Võ thuật</option>
+                        <select id="tSport" required onchange="onSportChange()" autocomplete="off">
+                            <option value="">-- Đang tải danh sách môn... --</option>
                         </select>
                     </div>
 
-                    <!-- ✅ ĐÃ XÓA DÒNG "Hiển thị tên môn" -->
+                    <!-- ✅ HIỂN THỊ CẤU HÌNH MÔN THỂ THAO -->
+                    <div class="tournament-field full" id="sportConfigBox" style="display:none;">
+                        <div style="background:#e7f3ff;border-left:4px solid #1a3a7a;padding:14px 18px;border-radius:12px;">
+                            <div style="font-size:13px;font-weight:700;color:#1a3a7a;margin-bottom:8px;">
+                                📋 Cấu hình môn thể thao
+                            </div>
+                            <div id="sportConfigContent" style="font-size:13px;color:#495057;line-height:1.7;"></div>
+                        </div>
+                    </div>
 
+                    <!-- SỐ ĐỘI -->
                     <div class="tournament-field">
                         <label>Số đội tham gia</label>
                         <input type="number" id="tTeamCount" name="team_count_field" placeholder="VD: 16" min="1" value="16" autocomplete="off">
                     </div>
 
+                    <!-- TRẠNG THÁI -->
                     <div class="tournament-field">
                         <label>Trạng thái <span>*</span></label>
                         <select id="tStatus" required autocomplete="off">
@@ -158,11 +160,13 @@
                         </select>
                     </div>
 
+                    <!-- NGÀY BẮT ĐẦU -->
                     <div class="tournament-field">
                         <label>Ngày bắt đầu <span>*</span></label>
                         <input type="date" id="tStartDate" required autocomplete="off">
                     </div>
 
+                    <!-- NGÀY KẾT THÚC -->
                     <div class="tournament-field">
                         <label>Ngày kết thúc</label>
                         <input type="date" id="tEndDate" autocomplete="off">
@@ -196,17 +200,105 @@
         window.supabaseClient = null;
         window._autoSportName = '';
 
-        // ✅ TỰ ĐỘNG SINH sport_name TỪ DROPDOWN
-        window.autoFillSportName = function() {
+        // ✅ SINH DROPDOWN MÔN TỪ sports-config.js
+        window.populateSportDropdown = function() {
             const select = document.getElementById('tSport');
-            const selected = select.options[select.selectedIndex];
-            const sportName = selected.getAttribute('data-name') || selected.textContent.trim().replace(/^[^\w\sÀ-ỹ]+\s*/, '');
-            window._autoSportName = sportName;
-            console.log('✅ sport_name =', sportName);
+            if (!select) return;
+
+            const sports = window.getAllSports ? window.getAllSports() : [];
+            if (sports.length === 0) {
+                console.warn('⚠️ sports-config.js chưa load hoặc không có môn nào');
+                select.innerHTML = '<option value="">-- Lỗi cấu hình --</option>';
+                return;
+            }
+
+            select.innerHTML = '<option value="">-- Chọn môn --</option>' +
+                sports.map(s => `<option value="${s.code}" data-name="${s.name}">${s.icon} ${s.name}</option>`).join('');
+
+            console.log('✅ Đã load', sports.length, 'môn thể thao');
+        };
+
+        // ✅ KHI CHỌN MÔN - HIỂN THỊ CẤU HÌNH
+        window.onSportChange = function() {
+            const sport = document.getElementById('tSport').value;
+            const box = document.getElementById('sportConfigBox');
+            const content = document.getElementById('sportConfigContent');
+
+            if (!sport || !window.getSportConfig) {
+                box.style.display = 'none';
+                window._autoSportName = '';
+                return;
+            }
+
+            const config = window.getSportConfig(sport);
+            if (!config) {
+                box.style.display = 'none';
+                window._autoSportName = '';
+                return;
+            }
+
+            // Lưu sport_name để submit
+            window._autoSportName = config.name;
+
+            // Tạo HTML hiển thị cấu hình
+            let html = `<strong>${config.icon} ${config.name}</strong><br>`;
+
+            if (config.bestOf) html += `• Best of <strong>${config.bestOf}</strong><br>`;
+            if (config.pointsPerSet) html += `• <strong>${config.pointsPerSet}</strong> điểm/set<br>`;
+            if (config.gamesPerSet) html += `• <strong>${config.gamesPerSet}</strong> game/set<br>`;
+            if (config.matchDuration) html += `• Thời gian: <strong>${config.matchDuration} phút</strong>/trận<br>`;
+            if (config.periods) {
+                html += `• <strong>${config.periods}</strong> hiệp`;
+                if (config.periodDuration) html += ` x ${config.periodDuration} phút`;
+                html += `<br>`;
+            }
+            if (config.breakDuration) html += `• Nghỉ: ${config.breakDuration} phút<br>`;
+            if (config.hasDraw) html += `• ✅ Có kết quả <strong>HÒA</strong><br>`;
+            if (config.hasExtraTime) html += `• ✅ Có <strong>hiệp phụ</strong><br>`;
+            if (config.hasPenalty) html += `• ✅ Có <strong>luân lưu</strong><br>`;
+            if (config.hasOvertime) html += `• ✅ Có <strong>hiệp phụ</strong><br>`;
+            if (config.tieBreak) html += `• ✅ Có <strong>tie-break</strong><br>`;
+            if (config.hasWeightClasses) html += `• ⚖️ Chia <strong>hạng cân</strong><br>`;
+            if (config.categories && config.categories.length > 0) {
+                html += `• Nội dung: <em>${config.categories.join(', ')}</em><br>`;
+            }
+            if (config.allowedDrawTypes && config.allowedDrawTypes.length > 0) {
+                const typeNames = {
+                    'knockout': 'Loại trực tiếp',
+                    'round-robin-even': 'Vòng tròn chia đều',
+                    'round-robin-custom': 'Vòng tròn tùy chỉnh',
+                    'round-robin-single': 'Vòng tròn 1 bảng',
+                    'round-robin-knockout': 'Vòng tròn + Knockout',
+                    'round-robin-playoffs': 'Vòng tròn + Playoffs',
+                    'swiss': 'Thi đấu Swiss',
+                    'time-based': 'Tính thời gian',
+                    'multi-round': 'Nhiều lượt'
+                };
+                html += `• Thể thức: <em>${config.allowedDrawTypes.map(t => typeNames[t] || t).join(', ')}</em><br>`;
+            }
+
+            content.innerHTML = html;
+            box.style.display = 'block';
+
+            // Cập nhật số đội mặc định
+            if (config.defaultTeamCount) {
+                const teamInput = document.getElementById('tTeamCount');
+                if (teamInput && !teamInput.value) {
+                    teamInput.value = config.defaultTeamCount;
+                }
+            }
+
+            console.log('✅ Đã chọn môn:', config.name);
         };
 
         document.addEventListener('DOMContentLoaded', async function() {
             'use strict';
+
+            // ✅ SINH DROPDOWN MÔN NGAY KHI LOAD
+            // (đợi 1 chút để sports-config.js kịp load)
+            setTimeout(() => {
+                window.populateSportDropdown();
+            }, 100);
 
             const config = window.SPORTSVN_CONFIG || {};
             if (!config.SUPABASE_URL || !config.SUPABASE_ANON_KEY) {
@@ -361,8 +453,13 @@
 
             // ================================
             // 6. HELPER - SPORT ICON
+            // ✅ Đọc từ sports-config.js trước, fallback về icons cũ
             // ================================
             function getSportIcon(sport) {
+                if (window.getSportConfig) {
+                    const cfg = window.getSportConfig(sport);
+                    if (cfg && cfg.icon) return cfg.icon;
+                }
                 const icons = {
                     football: '⚽', swimming: '🏊', basketball: '🏀',
                     pickleball: '◉', volleyball: '🏐', tennis: '🎾',
@@ -415,6 +512,11 @@
                 window._autoSportName = '';
                 formMessage.textContent = '';
                 formMessage.className = 'tournament-form-message';
+
+                // Ẩn box cấu hình môn
+                document.getElementById('sportConfigBox').style.display = 'none';
+
+                // Set ngày mặc định = hôm nay
                 const today = new Date().toISOString().split('T')[0];
                 document.getElementById('tStartDate').value = today;
             }
