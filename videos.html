@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Quản lý Video - SportsVN</title>
+    <title>Video thể thao - SportsVN</title>
     <link rel="stylesheet" href="styles.css">
     <script src="sidebar.js" defer></script>
     <style>
@@ -64,6 +64,7 @@
             transition: all 0.25s;
             display: flex;
             flex-direction: column;
+            cursor: pointer;
         }
         .video-card:hover {
             transform: translateY(-4px);
@@ -96,6 +97,11 @@
             color: #fff;
             font-size: 24px;
             pointer-events: none;
+            transition: all 0.3s;
+        }
+        .video-card:hover .video-play-icon {
+            transform: translate(-50%, -50%) scale(1.15);
+            background: rgba(220, 38, 38, 1);
         }
         .video-card-body {
             padding: 16px;
@@ -371,7 +377,7 @@
         }
     </style>
 </head>
-<body>
+<body data-page="videos.html">
     <div class="app">
 
         <!-- Sidebar sẽ được tự động render bởi sidebar.js -->
@@ -383,17 +389,17 @@
                     <div class="topbar-brand">
                         <span class="topbar-label">SPORTS MANAGEMENT PLATFORM</span>
                         <h1 class="topbar-title-main">SPORTS<span>VN</span></h1>
-                        <p class="topbar-subtitle">Quản lý video thể thao</p>
+                        <p class="topbar-subtitle">Video thể thao</p>
                     </div>
                 </div>
                 <div class="topbar-right">
                     <a href="index.html" class="topbar-cta" style="background: #f3f4f6; color: #4b5563; box-shadow: none;">
                         ← Về trang chủ
                     </a>
-                    <div class="top-user">
-                        <div class="avatar">H</div>
+                    <div class="top-user" id="topUser" style="display: none;">
+                        <div class="avatar" id="topAvatar">A</div>
                         <div class="top-user-info">
-                            <strong>Quản trị viên</strong>
+                            <strong id="topUserName">Admin</strong>
                             <span>SportsVN</span>
                         </div>
                     </div>
@@ -403,14 +409,15 @@
             <section class="content">
                 <div class="video-header">
                     <div>
-                        <h1>🎬 Quản lý Video</h1>
-                        <p>Đăng video, quản lý nội dung video thể thao</p>
+                        <h1>🎬 Video thể thao</h1>
+                        <p id="videoSubtitle">Tổng hợp video highlight, phóng sự, hướng dẫn</p>
                     </div>
                 </div>
 
-                <div class="video-tabs">
+                <!-- TABS - Chỉ hiện tab "Đăng video" nếu admin -->
+                <div class="video-tabs" id="videoTabs">
                     <button class="video-tab active" data-tab="list">📋 Danh sách video</button>
-                    <button class="video-tab" data-tab="create">➕ Đăng video mới</button>
+                    <button class="video-tab" data-tab="create" id="tabCreateBtn" style="display: none;">➕ Đăng video mới</button>
                 </div>
 
                 <!-- TAB 1: DANH SÁCH -->
@@ -418,7 +425,7 @@
                     <div class="video-grid" id="videoGrid"></div>
                 </div>
 
-                <!-- TAB 2: ĐĂNG VIDEO -->
+                <!-- TAB 2: ĐĂNG VIDEO - Chỉ hiện nếu admin -->
                 <div id="tabCreate" class="tab-content" style="display: none;">
                     <div class="video-form-container">
                         <h2 class="video-form-title">➕ Đăng video mới</h2>
@@ -521,13 +528,17 @@
     <script src="config.js"></script>
     <script>
         // ==========================================
-        // QUẢN LÝ VIDEO - SUPABASE
+        // VIDEO - CÔNG KHAI CHO KHÁCH XEM
+        // CHỈ ADMIN MỚI CÓ QUYỀN ĐĂNG/SỬA/XÓA
         // ==========================================
         
         let supabaseClient = null;
         let currentSession = null;
+        let isAdmin = false;
         let currentEditingId = null;
         let currentVideoType = 'youtube';
+
+        const ADMIN_EMAIL = 'nguyenquanghao2505@gmail.com';
 
         document.addEventListener('DOMContentLoaded', async function() {
             'use strict';
@@ -543,40 +554,58 @@
                 config.SUPABASE_ANON_KEY
             );
 
-            // ===== KIỂM TRA ĐĂNG NHẬP =====
+            // ===== KIỂM TRA ĐĂNG NHẬP (KHÔNG CHẶN KHÁCH) =====
             async function checkAuth() {
-                const { data: { session } } = await supabaseClient.auth.getSession();
-                if (!session) {
-                    window.location.href = 'login.html';
-                    return false;
+                try {
+                    const { data: { session } } = await supabaseClient.auth.getSession();
+                    
+                    if (!session) {
+                        console.log('👤 Chế độ khách - chỉ xem video');
+                        return;
+                    }
+                    
+                    currentSession = session;
+
+                    // Check admin
+                    if (session.user.email === ADMIN_EMAIL) {
+                        isAdmin = true;
+                    } else {
+                        const { data: roleData } = await supabaseClient
+                            .from('user_roles')
+                            .select('role')
+                            .eq('user_id', session.user.id)
+                            .eq('role', 'admin')
+                            .maybeSingle();
+                        if (roleData) isAdmin = true;
+                    }
+
+                    if (isAdmin) {
+                        // Hiện tab đăng video
+                        document.getElementById('tabCreateBtn').style.display = 'inline-block';
+                        
+                        // Hiện user info
+                        document.getElementById('topUser').style.display = 'flex';
+                        const name = session.user.user_metadata?.full_name ||
+                                     session.user.email.split('@')[0];
+                        const initials = name.split(' ').map(w => w[0]).join('').slice(0, 2).toUpperCase();
+                        document.getElementById('topAvatar').textContent = initials;
+                        document.getElementById('topUserName').textContent = name;
+
+                        // Update subtitle
+                        document.getElementById('videoSubtitle').textContent = 
+                            'Quản lý video thể thao (Admin)';
+                    }
+                } catch (err) {
+                    console.warn('⚠️ Lỗi check auth:', err);
                 }
-                currentSession = session;
-
-                const { data: roleData } = await supabaseClient
-                    .from('user_roles')
-                    .select('role')
-                    .eq('user_id', session.user.id)
-                    .single();
-
-                if (!roleData || roleData.role !== 'admin') {
-                    alert('Tài khoản không có quyền Admin');
-                    await supabaseClient.auth.signOut();
-                    window.location.href = 'login.html';
-                    return false;
-                }
-
-                const name = session.user.user_metadata?.full_name ||
-                             session.user.email.split('@')[0];
-                const initials = name.split(' ').map(w => w[0]).join('').slice(0, 2).toUpperCase();
-
-                document.querySelectorAll('.avatar').forEach(el => el.textContent = initials);
-                document.querySelectorAll('.user-info strong, .top-user-info strong').forEach(el => el.textContent = name);
-
-                return true;
             }
 
-            const isAuth = await checkAuth();
-            if (!isAuth) return;
+            await checkAuth();
+
+            // ===== MOBILE MENU =====
+            document.getElementById('mobileMenu')?.addEventListener('click', () => {
+                document.querySelector('.sidebar')?.classList.toggle('open');
+            });
 
             // ===== TABS =====
             const tabs = document.querySelectorAll('.video-tab');
@@ -619,11 +648,11 @@
                 });
             });
 
-            // ===== PREVIEW VIDEO KHI DÁN LINK =====
+            // ===== PREVIEW VIDEO =====
             const videoUrlInput = document.getElementById('videoUrl');
             const videoPreview = document.getElementById('videoPreview');
 
-            videoUrlInput.addEventListener('input', () => {
+            videoUrlInput?.addEventListener('input', () => {
                 const url = videoUrlInput.value.trim();
                 if (!url) {
                     videoPreview.innerHTML = 'Dán link để xem trước video';
@@ -643,7 +672,6 @@
                 try {
                     if (type === 'youtube' || url.includes('youtube.com') || url.includes('youtu.be')) {
                         let videoId = '';
-                        
                         if (url.includes('youtube.com/watch')) {
                             const urlParams = new URLSearchParams(url.split('?')[1]);
                             videoId = urlParams.get('v');
@@ -652,7 +680,6 @@
                         } else if (url.includes('youtube.com/embed/')) {
                             videoId = url.split('embed/')[1]?.split('?')[0];
                         }
-
                         if (videoId) {
                             return `<iframe src="https://www.youtube.com/embed/${videoId}" allowfullscreen></iframe>`;
                         }
@@ -665,9 +692,7 @@
                     if (type === 'mp4' || url.match(/\.(mp4|webm|ogg)$/i)) {
                         return `<video controls src="${url}"></video>`;
                     }
-                } catch (e) {
-                    console.warn('Lỗi parse video URL:', e);
-                }
+                } catch (e) {}
                 return null;
             }
 
@@ -693,13 +718,18 @@
                 return null;
             }
 
-            // ===== SUBMIT FORM =====
+            // ===== SUBMIT FORM (chỉ admin) =====
             const videoForm = document.getElementById('videoForm');
             const formMessage = document.getElementById('formMessage');
             const submitBtn = document.getElementById('submitBtn');
 
-            videoForm.addEventListener('submit', async function(e) {
+            videoForm?.addEventListener('submit', async function(e) {
                 e.preventDefault();
+
+                if (!isAdmin) {
+                    alert('⛔ Chỉ admin mới có quyền đăng video!');
+                    return;
+                }
 
                 const title = document.getElementById('videoTitle').value.trim();
                 const url = document.getElementById('videoUrl').value.trim();
@@ -762,7 +792,7 @@
                 }, 1500);
             });
 
-            // ===== LOAD DANH SÁCH VIDEO =====
+            // ===== LOAD DANH SÁCH VIDEO (AI CŨNG XEM ĐƯỢC) =====
             async function loadVideos() {
                 const grid = document.getElementById('videoGrid');
                 grid.innerHTML = '<div class="empty-state"><p>⏳ Đang tải...</p></div>';
@@ -782,7 +812,7 @@
                         <div class="empty-state" style="grid-column: 1/-1;">
                             <div class="empty-state-icon">🎬</div>
                             <h3 style="font-size:18px;color:#111827;">Chưa có video nào</h3>
-                            <p style="font-size:13px;">Nhấn tab "Đăng video mới" để bắt đầu</p>
+                            <p style="font-size:13px;">${isAdmin ? 'Nhấn tab "Đăng video mới" để bắt đầu' : 'Admin sẽ sớm cập nhật video'}</p>
                         </div>
                     `;
                     return;
@@ -790,8 +820,17 @@
 
                 grid.innerHTML = data.map(video => {
                     const thumb = video.thumbnail_url || 'https://via.placeholder.com/400x225/1769ff/ffffff?text=Video';
+                    
+                    // Chỉ admin mới có nút Sửa/Xóa
+                    const adminActions = isAdmin ? `
+                        <div class="video-actions">
+                            <button class="btn-icon btn-edit" onclick="event.stopPropagation(); editVideo('${video.id}')" title="Sửa">✏️</button>
+                            <button class="btn-icon btn-delete" onclick="event.stopPropagation(); deleteVideo('${video.id}')" title="Xóa">🗑️</button>
+                        </div>
+                    ` : '';
+
                     return `
-                        <div class="video-card">
+                        <div class="video-card" onclick="openVideo('${video.video_url}')">
                             <div class="video-thumb-wrap">
                                 <img src="${thumb}" alt="${video.title}" onerror="this.src='https://via.placeholder.com/400x225/1769ff/ffffff?text=Video'">
                                 <div class="video-play-icon">▶</div>
@@ -804,11 +843,7 @@
                                 <p class="video-card-desc">${video.description || ''}</p>
                                 <div class="video-card-footer">
                                     <span>📅 ${new Date(video.created_at).toLocaleDateString('vi-VN')}</span>
-                                    <div class="video-actions">
-                                        <a href="${video.video_url}" target="_blank" class="btn-icon btn-edit" title="Xem" style="text-decoration:none;">👁</a>
-                                        <button class="btn-icon btn-edit" onclick="editVideo('${video.id}')" title="Sửa">✏️</button>
-                                        <button class="btn-icon btn-delete" onclick="deleteVideo('${video.id}')" title="Xóa">🗑️</button>
-                                    </div>
+                                    ${adminActions}
                                 </div>
                             </div>
                         </div>
@@ -816,9 +851,15 @@
                 }).join('');
             }
 
+            // ===== MỞ VIDEO (KHÁCH + ADMIN) =====
+            window.openVideo = function(url) {
+                if (!url) return;
+                window.open(url, '_blank');
+            };
+
             // ===== RESET FORM =====
             function resetForm() {
-                videoForm.reset();
+                videoForm?.reset();
                 currentEditingId = null;
                 videoPreview.innerHTML = 'Dán link để xem trước video';
                 formMessage.className = 'form-message';
@@ -826,12 +867,14 @@
                 submitBtn.innerHTML = '💾 Đăng video';
             }
 
-            document.getElementById('cancelBtn').addEventListener('click', () => {
+            document.getElementById('cancelBtn')?.addEventListener('click', () => {
                 document.querySelector('[data-tab="list"]').click();
             });
 
-            // ===== SỬA VIDEO =====
+            // ===== SỬA VIDEO (chỉ admin) =====
             window.editVideo = async function(id) {
+                if (!isAdmin) return;
+
                 const { data, error } = await supabaseClient
                     .from('videos')
                     .select('*')
@@ -865,8 +908,9 @@
                 document.querySelector('[data-tab="create"]').click();
             };
 
-            // ===== XÓA VIDEO =====
+            // ===== XÓA VIDEO (chỉ admin) =====
             window.deleteVideo = async function(id) {
+                if (!isAdmin) return;
                 if (!confirm('Bạn có chắc muốn xóa video này?')) return;
 
                 const { error } = await supabaseClient
@@ -893,7 +937,7 @@
             }
 
             loadVideos();
-            console.log('✅ Trang Quản lý Video đã sẵn sàng');
+            console.log('✅ Trang Video đã sẵn sàng - Chế độ:', isAdmin ? 'Admin' : 'Khách');
         });
     </script>
 </body>
