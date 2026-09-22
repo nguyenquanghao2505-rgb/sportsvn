@@ -107,44 +107,51 @@
                 <button class="tournament-modal-close" id="closeCreateModal">×</button>
             </div>
 
-            <form class="tournament-form" id="createTournamentForm">
+            <form class="tournament-form" id="createTournamentForm" autocomplete="off">
                 <div class="tournament-form-grid">
 
+                    <!-- ✅ BỎ AUTOCOMPLETE + ĐỔI NAME FIELD ĐỂ TRÁNH TRÌNH DUYỆT GỢI Ý -->
                     <div class="tournament-field full">
                         <label>Tên giải đấu <span>*</span></label>
-                        <input type="text" id="tName" placeholder="VD: Giải Bóng đá Đại hội TDTT TP Đà Nẵng" required>
+                        <input type="text" 
+                               id="tName" 
+                               name="tournament_name_field_xyz_2026"
+                               placeholder="VD: Giải Bóng đá Đại hội TDTT TP Đà Nẵng" 
+                               autocomplete="off"
+                               autocorrect="off"
+                               autocapitalize="off"
+                               spellcheck="false"
+                               required>
                     </div>
 
-                    <div class="tournament-field">
+                    <!-- ✅ MÔN THỂ THAO - TỰ SINH sport_name -->
+                    <div class="tournament-field full">
                         <label>Môn thể thao <span>*</span></label>
-                        <select id="tSport" required>
+                        <select id="tSport" required onchange="autoFillSportName()" autocomplete="off">
                             <option value="">-- Chọn môn --</option>
-                            <option value="football">⚽ Bóng đá</option>
-                            <option value="swimming">🏊 Bơi</option>
-                            <option value="basketball">🏀 Bóng rổ</option>
-                            <option value="pickleball">◉ Pickleball</option>
-                            <option value="volleyball">🏐 Bóng chuyền</option>
-                            <option value="tennis">🎾 Quần vợt</option>
-                            <option value="badminton">🏸 Cầu lông</option>
-                            <option value="chess">♟️ Cờ tướng</option>
-                            <option value="athletics">🏃 Điền kinh</option>
-                            <option value="martial_arts">🥋 Võ thuật</option>
+                            <option value="football" data-name="Bóng đá">⚽ Bóng đá</option>
+                            <option value="swimming" data-name="Bơi">🏊 Bơi</option>
+                            <option value="basketball" data-name="Bóng rổ">🏀 Bóng rổ</option>
+                            <option value="pickleball" data-name="Pickleball">◉ Pickleball</option>
+                            <option value="volleyball" data-name="Bóng chuyền">🏐 Bóng chuyền</option>
+                            <option value="tennis" data-name="Quần vợt">🎾 Quần vợt</option>
+                            <option value="badminton" data-name="Cầu lông">🏸 Cầu lông</option>
+                            <option value="chess" data-name="Cờ tướng">♟️ Cờ tướng</option>
+                            <option value="athletics" data-name="Điền kinh">🏃 Điền kinh</option>
+                            <option value="martial_arts" data-name="Võ thuật">🥋 Võ thuật</option>
                         </select>
                     </div>
 
-                    <div class="tournament-field">
-                        <label>Tên hiển thị môn <span>*</span></label>
-                        <input type="text" id="tSportName" placeholder="VD: Bóng đá nam" required>
-                    </div>
+                    <!-- ✅ ĐÃ XÓA DÒNG "Hiển thị tên môn" -->
 
                     <div class="tournament-field">
                         <label>Số đội tham gia</label>
-                        <input type="number" id="tTeamCount" placeholder="VD: 16" min="1" value="16">
+                        <input type="number" id="tTeamCount" name="team_count_field" placeholder="VD: 16" min="1" value="16" autocomplete="off">
                     </div>
 
                     <div class="tournament-field">
                         <label>Trạng thái <span>*</span></label>
-                        <select id="tStatus" required>
+                        <select id="tStatus" required autocomplete="off">
                             <option value="upcoming">🟠 Sắp diễn ra</option>
                             <option value="active">🟢 Đang diễn ra</option>
                             <option value="completed">⚫ Đã kết thúc</option>
@@ -153,12 +160,12 @@
 
                     <div class="tournament-field">
                         <label>Ngày bắt đầu <span>*</span></label>
-                        <input type="date" id="tStartDate" required>
+                        <input type="date" id="tStartDate" required autocomplete="off">
                     </div>
 
                     <div class="tournament-field">
                         <label>Ngày kết thúc</label>
-                        <input type="date" id="tEndDate">
+                        <input type="date" id="tEndDate" autocomplete="off">
                     </div>
 
                 </div>
@@ -187,6 +194,16 @@
         // ==========================================
 
         window.supabaseClient = null;
+        window._autoSportName = '';
+
+        // ✅ TỰ ĐỘNG SINH sport_name TỪ DROPDOWN
+        window.autoFillSportName = function() {
+            const select = document.getElementById('tSport');
+            const selected = select.options[select.selectedIndex];
+            const sportName = selected.getAttribute('data-name') || selected.textContent.trim().replace(/^[^\w\sÀ-ỹ]+\s*/, '');
+            window._autoSportName = sportName;
+            console.log('✅ sport_name =', sportName);
+        };
 
         document.addEventListener('DOMContentLoaded', async function() {
             'use strict';
@@ -356,7 +373,7 @@
             }
 
             // ================================
-            // 7. ĐIỀU HƯỚNG - BỐC THĂM / XẾP LỊCH / CHI TIẾT
+            // 7. ĐIỀU HƯỚNG
             // ================================
             window.goToDraw = function(id) {
                 window.location.href = 'draw.html?id=' + id;
@@ -395,6 +412,7 @@
             function openModal() {
                 modal.hidden = false;
                 form.reset();
+                window._autoSportName = '';
                 formMessage.textContent = '';
                 formMessage.className = 'tournament-form-message';
                 const today = new Date().toISOString().split('T')[0];
@@ -426,11 +444,13 @@
                 const submitBtn = document.getElementById('submitCreate');
                 const name = document.getElementById('tName').value.trim();
                 const sport = document.getElementById('tSport').value;
-                const sportName = document.getElementById('tSportName').value.trim();
                 const teamCount = parseInt(document.getElementById('tTeamCount').value) || 0;
                 const status = document.getElementById('tStatus').value;
                 const startDate = document.getElementById('tStartDate').value;
                 const endDate = document.getElementById('tEndDate').value || null;
+
+                // ✅ Lấy sport_name từ biến toàn cục (đã tự sinh khi chọn dropdown)
+                const sportName = window._autoSportName || '';
 
                 if (!name || !sport || !sportName || !status || !startDate) {
                     formMessage.textContent = '⚠️ Vui lòng điền đầy đủ các trường bắt buộc (*)';
