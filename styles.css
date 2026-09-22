@@ -227,7 +227,7 @@ img { max-width: 100%; display: block; }
 }
 
 /* =========================================================
-   TOPBAR MỚI - CHỨA NỘI DUNG BANNER CŨ
+   TOPBAR
    ========================================================= */
 
 .topbar {
@@ -252,7 +252,6 @@ img { max-width: 100%; display: block; }
     flex-shrink: 0;
 }
 
-/* Brand trong Topbar */
 .topbar-brand {
     display: flex;
     flex-direction: column;
@@ -295,7 +294,6 @@ img { max-width: 100%; display: block; }
     line-height: 1.4;
 }
 
-/* Nút CTA trong Topbar */
 .topbar-cta {
     display: inline-flex;
     align-items: center;
@@ -389,7 +387,7 @@ img { max-width: 100%; display: block; }
 }
 
 /* =========================================================
-   HERO BANNER - HIỂN THỊ FULL ẢNH, KHÔNG BỊ CẮT
+   HERO BANNER
    ========================================================= */
 
 .welcome-banner {
@@ -577,12 +575,97 @@ img { max-width: 100%; display: block; }
 .tournament-status small { color: var(--text-light); font-size: 9.5px; }
 
 /* =========================================================
+   TOURNAMENT GROUPS - 3 NHÓM TRẠNG THÁI (MỚI)
+   Dùng cho trang chủ công khai index.html
+   ========================================================= */
+
+.tournament-group {
+    margin-bottom: 20px;
+    padding-bottom: 4px;
+}
+
+.tournament-group:last-child {
+    margin-bottom: 0;
+}
+
+.tournament-group-title {
+    display: flex;
+    align-items: center;
+    gap: 8px;
+    font-size: 13px;
+    font-weight: 700;
+    color: #374151;
+    padding: 10px 0 8px;
+    border-bottom: 1px dashed var(--border, #e5e7eb);
+    margin-bottom: 10px;
+    margin-left: 12px;
+    margin-right: 12px;
+    text-transform: uppercase;
+    letter-spacing: 0.3px;
+}
+
+.dot {
+    width: 8px;
+    height: 8px;
+    border-radius: 50%;
+    display: inline-block;
+    flex-shrink: 0;
+}
+
+.active-dot {
+    background: #10b981;
+    box-shadow: 0 0 0 3px rgba(16, 185, 129, 0.2);
+    animation: pulse-green 2s infinite;
+}
+
+.upcoming-dot {
+    background: #f59e0b;
+    box-shadow: 0 0 0 3px rgba(245, 158, 11, 0.2);
+}
+
+.completed-dot {
+    background: #9ca3af;
+    box-shadow: 0 0 0 3px rgba(156, 163, 175, 0.2);
+}
+
+@keyframes pulse-green {
+    0%, 100% {
+        box-shadow: 0 0 0 3px rgba(16, 185, 129, 0.2);
+    }
+    50% {
+        box-shadow: 0 0 0 6px rgba(16, 185, 129, 0.05);
+    }
+}
+
+.tournament-group .tournament-list {
+    display: flex;
+    flex-direction: column;
+    gap: 4px;
+}
+
+.tournament-link {
+    display: block;
+    text-decoration: none;
+    color: inherit;
+    border-radius: 10px;
+    transition: all 0.2s ease;
+}
+
+.tournament-link:hover {
+    background: #f9fafb;
+    transform: translateX(4px);
+}
+
+.tournament-link:hover .tournament {
+    border-color: transparent;
+}
+
+/* =========================================================
    NEWS LIST - TRANG CHỦ
    ========================================================= */
 
 .news-list { padding: 12px 16px; display: flex; flex-direction: column; gap: 16px; }
 
-/* ✅ LINK BAO QUANH MỖI TIN TỨC ĐỂ CLICK ĐƯỢC */
 .news-item-link {
     text-decoration: none;
     color: inherit;
@@ -960,6 +1043,19 @@ select:focus-visible, textarea:focus-visible {
     .tournament-field.full { grid-column: auto; }
     .tournament-form-actions { flex-direction: column-reverse; }
     .tournament-form-actions button { width: 100%; }
+
+    /* Responsive cho 3 nhóm giải đấu */
+    .tournament-group-title {
+        font-size: 12px;
+        padding: 8px 0 6px;
+        margin-left: 8px;
+        margin-right: 8px;
+    }
+
+    .dot {
+        width: 6px;
+        height: 6px;
+    }
 }
 
 @media (max-width: 420px) {
