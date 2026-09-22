@@ -452,7 +452,7 @@
 (function() {
     'use strict';
 
-    console.log('🚀 draw.html v18 - Berger schedule + Compact Excel');
+    console.log('🚀 draw.html v19 - Berger schedule + Compact Excel + URL param fix');
 
     const config = window.SPORTSVN_CONFIG || {};
     const supabaseClient = window.supabase.createClient(config.SUPABASE_URL, config.SUPABASE_ANON_KEY);
@@ -557,8 +557,6 @@
 
     // ==========================================
     // SINH LỊCH VÒNG TRÒN CHUẨN BERGER TABLES
-    // Input: n = số đội
-    // Output: Mảng các vòng, mỗi vòng chứa các cặp [i, j] (0-based)
     // ==========================================
     function generateRoundRobinSchedule(n) {
         const hasBye = (n % 2 === 1);
@@ -589,17 +587,32 @@
 
     // ==========================================
     // LOAD CATEGORIES
+    // ✅ ĐÃ SỬA: Đọc cả ?id= và ?tournament_id=
     // ==========================================
     async function loadCategories() {
         const urlParams = new URLSearchParams(window.location.search);
-        tournamentId = urlParams.get('tournament_id');
+
+        // ✅ HỖ TRỢ CẢ 2 ĐỊNH DẠNG URL
+        tournamentId = urlParams.get('tournament_id') || urlParams.get('id');
+
         window.tournamentId = tournamentId;
-        if (!tournamentId) { alert('Thiếu ID giải đấu!'); window.location.href = 'tournaments.html'; return; }
+
+        if (!tournamentId) {
+            alert('Thiếu ID giải đấu! Vui lòng truy cập từ trang Quản lý giải đấu.');
+            window.location.href = 'tournaments.html';
+            return;
+        }
+
+        console.log('✅ Tournament ID:', tournamentId);
 
         const { data, error } = await supabaseClient.from('categories')
             .select('id, name, category_type, scoring_type')
             .eq('tournament_id', tournamentId).order('priority');
-        if (error) { showAlert('Lỗi tải danh sách nội dung: ' + error.message, 'error'); return; }
+
+        if (error) {
+            showAlert('Lỗi tải danh sách nội dung: ' + error.message, 'error');
+            return;
+        }
 
         categoriesList = data || [];
         const select = document.getElementById('category-select');
@@ -2004,7 +2017,7 @@
     }
 
     // ==========================================
-    // BUILD ALL-IN-ONE SHEET — Layout gọn + Lịch Berger
+    // BUILD ALL-IN-ONE SHEET
     // ==========================================
     async function buildAllInOneSheet(wb, result, categoryName) {
         const sheetName = categoryName.replace(/[\\\/\?\*\[\]:]/g, '_').slice(0, 31) || 'Sheet1';
@@ -2021,7 +2034,6 @@
         const groupNames = ['A', 'B', 'C', 'D', 'E', 'F', 'G', 'H', 'I', 'J', 'K', 'L', 'M', 'N', 'O', 'P'];
         let currentRow = 1;
 
-        // Tiêu đề chính
         ws.addRow([`${categoryName.toUpperCase()} - BỐC THĂM & SƠ ĐỒ THI ĐẤU`]);
         ws.mergeCells(`A${currentRow}:M${currentRow}`);
         const titleCell = ws.getCell(`A${currentRow}`);
@@ -2037,13 +2049,11 @@
                 const gName = groupNames[gi];
                 const n = group.length;
 
-                // Tiêu đề bảng
                 ws.addRow([`BẢNG ${gName} (${n} VĐV)`]);
                 ws.mergeCells(`A${currentRow}:M${currentRow}`);
                 styleSectionTitle(ws.getRow(currentRow));
                 currentRow++;
 
-                // HEADER: Stt | (trống) | (trống) | Tên VĐV | CLB/Đơn vị | 1 | 2 | 3 | ... | Điểm | T/B | XH
                 const headerCols = ['Stt', '', '', 'Tên VĐV / Đội', 'CLB/Đơn vị'];
                 for (let i = 1; i <= n; i++) headerCols.push(String(i));
                 headerCols.push('Điểm', 'T/B', 'XH');
@@ -2052,7 +2062,6 @@
                 const hRow = ws.addRow(headerCols);
                 styleHeaderRow(hRow); currentRow++;
 
-                // Body VĐV + Ma trận gộp
                 group.forEach((team, i) => {
                     const rowData = [i + 1, '', '', team.name, team.club || '—'];
                     for (let j = 0; j < n; j++) {
@@ -2077,13 +2086,9 @@
 
                 ws.addRow([]); currentRow++;
 
-                // HEADER DANH SÁCH TRẬN
                 const mHeader = ws.addRow(['MS', 'VĐV', 'vs', 'VĐV', '', '', '', '', 'Thời gian', 'Bàn', 'Trận', 'KQ', '']);
                 styleHeaderRow(mHeader); currentRow++;
 
-                // ======================
-                // DANH SÁCH TRẬN — DÙNG BERGER SCHEDULE
-                // ======================
                 const rrSchedule = generateRoundRobinSchedule(n);
                 const matchesList = [];
                 rrSchedule.forEach((roundPairs) => {
@@ -2114,7 +2119,6 @@
                 ws.addRow([]); currentRow++;
             });
 
-            // GIAI ĐOẠN 2: Knockout
             if (result.numGroups >= 2 && result.knockoutData) {
                 const d = result.knockoutData;
                 const totalRounds = Math.log2(d.bracketSize);
@@ -2386,7 +2390,7 @@
         }
     });
 
-    console.log('✅ draw.html v18 loaded');
+    console.log('✅ draw.html v19 loaded');
 
 })();
 </script>
