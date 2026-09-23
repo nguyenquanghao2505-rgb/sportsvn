@@ -10,74 +10,75 @@
         .page-header {
             background: linear-gradient(135deg, #0d1b3e, #1a3a7a);
             border-radius: 20px;
-            padding: 32px;
+            padding: 24px 28px;
             color: #fff;
-            margin-bottom: 24px;
+            margin-bottom: 20px;
             display: flex;
             justify-content: space-between;
             align-items: center;
             flex-wrap: wrap;
             gap: 16px;
         }
-        .page-header h1 { font-size: 28px; margin-bottom: 8px; }
-        .page-header p { opacity: 0.85; font-size: 14px; }
+        .page-header h1 { font-size: 24px; margin-bottom: 6px; }
+        .page-header p { opacity: 0.85; font-size: 13px; }
 
         .btn-primary {
-            padding: 12px 24px;
+            padding: 10px 20px;
             background: linear-gradient(135deg, #e94560, #ff6b8a);
             color: #fff;
             border: none;
             border-radius: 10px;
-            font-size: 14px;
+            font-size: 13px;
             font-weight: 700;
             cursor: pointer;
             transition: all 0.3s ease;
             display: inline-flex;
             align-items: center;
-            gap: 8px;
+            gap: 6px;
             text-decoration: none;
+            font-family: inherit;
         }
         .btn-primary:hover { transform: translateY(-2px); box-shadow: 0 8px 20px rgba(233, 69, 96, 0.4); }
 
         /* FILTER BAR */
         .filter-bar {
             background: #fff;
-            border-radius: 16px;
-            padding: 16px 20px;
-            margin-bottom: 24px;
+            border-radius: 14px;
+            padding: 12px 18px;
+            margin-bottom: 16px;
             box-shadow: 0 2px 8px rgba(0, 0, 0, 0.06);
             display: flex;
             gap: 12px;
             flex-wrap: wrap;
             align-items: center;
         }
-        .filter-label { font-weight: 700; font-size: 14px; color: #1a1a2e; }
+        .filter-label { font-weight: 700; font-size: 13px; color: #1a1a2e; }
         .filter-bar select {
-            padding: 10px 14px;
+            padding: 9px 14px;
             border: 2px solid #e9ecef;
             border-radius: 10px;
-            font-size: 14px;
+            font-size: 13px;
             outline: none;
             font-family: inherit;
             background: #f9fafb;
-            min-width: 220px;
+            min-width: 200px;
         }
         .filter-bar select:focus { border-color: #1a3a7a; background: #fff; }
 
         /* TYPE TABS */
         .type-tabs {
             display: flex;
-            gap: 8px;
-            margin-bottom: 20px;
+            gap: 6px;
+            margin-bottom: 16px;
             overflow-x: auto;
             padding-bottom: 4px;
         }
         .type-tab {
-            padding: 10px 18px;
+            padding: 8px 16px;
             border-radius: 20px;
             background: #fff;
             border: 2px solid #e9ecef;
-            font-size: 13px;
+            font-size: 12px;
             font-weight: 700;
             color: #6c757d;
             cursor: pointer;
@@ -85,7 +86,7 @@
             transition: all 0.2s;
             display: inline-flex;
             align-items: center;
-            gap: 6px;
+            gap: 4px;
             font-family: inherit;
         }
         .type-tab.active {
@@ -98,49 +99,102 @@
             color: #1a3a7a;
         }
 
-        /* ALBUM GRID */
+        /* ALBUM GRID - THU GỌN */
         .album-grid {
             display: grid;
-            grid-template-columns: repeat(auto-fill, minmax(300px, 1fr));
-            gap: 24px;
+            grid-template-columns: repeat(auto-fill, minmax(220px, 1fr));
+            gap: 14px;
         }
         .album-card {
             background: #fff;
-            border-radius: 16px;
+            border-radius: 12px;
             overflow: hidden;
-            box-shadow: 0 2px 8px rgba(0, 0, 0, 0.06);
+            box-shadow: 0 2px 6px rgba(0, 0, 0, 0.06);
             border: 1px solid #e9ecef;
-            transition: all 0.3s ease;
+            transition: all 0.25s ease;
             cursor: pointer;
             display: flex;
             flex-direction: column;
+            position: relative;
         }
-        .album-card:hover { transform: translateY(-6px); box-shadow: 0 16px 32px rgba(0, 0, 0, 0.12); }
+        .album-card:hover { 
+            transform: translateY(-4px); 
+            box-shadow: 0 10px 24px rgba(0, 0, 0, 0.1); 
+        }
         .album-cover {
             width: 100%;
-            height: 200px;
+            height: 140px;
             object-fit: cover;
             background: linear-gradient(135deg, #e3f2fd, #bbdefb);
             display: block;
-            position: relative;
         }
         .album-cover-placeholder {
             width: 100%;
-            height: 200px;
+            height: 140px;
             background: linear-gradient(135deg, #e3f2fd, #bbdefb);
             display: flex;
             align-items: center;
             justify-content: center;
-            font-size: 64px;
+            font-size: 42px;
         }
-        .album-body { padding: 18px; flex: 1; display: flex; flex-direction: column; }
+        .album-body { 
+            padding: 12px 14px 14px; 
+            flex: 1; 
+            display: flex; 
+            flex-direction: column; 
+        }
+
+        /* Admin actions */
+        .album-admin-actions {
+            position: absolute;
+            top: 8px;
+            right: 8px;
+            display: flex;
+            gap: 4px;
+            z-index: 5;
+            opacity: 0;
+            transition: opacity 0.2s;
+        }
+        .album-card:hover .album-admin-actions {
+            opacity: 1;
+        }
+        .album-action-btn {
+            width: 30px;
+            height: 30px;
+            border-radius: 50%;
+            border: 0;
+            cursor: pointer;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 13px;
+            transition: all 0.2s;
+            box-shadow: 0 3px 10px rgba(0,0,0,0.2);
+            font-family: inherit;
+        }
+        .album-action-btn.edit {
+            background: #1769ff;
+            color: #fff;
+        }
+        .album-action-btn.edit:hover {
+            background: #0d47a1;
+            transform: scale(1.1);
+        }
+        .album-action-btn.delete {
+            background: #dc2626;
+            color: #fff;
+        }
+        .album-action-btn.delete:hover {
+            background: #991b1b;
+            transform: scale(1.1);
+        }
 
         /* Badge loại album */
         .album-type-badge {
             display: inline-block;
-            padding: 4px 10px;
+            padding: 3px 8px;
             border-radius: 20px;
-            font-size: 10px;
+            font-size: 9px;
             font-weight: 800;
             text-transform: uppercase;
             width: fit-content;
@@ -153,28 +207,32 @@
 
         .album-tournament {
             display: inline-block;
-            padding: 4px 10px;
+            padding: 3px 8px;
             background: #f3f4f6;
             color: #4b5563;
             border-radius: 20px;
-            font-size: 10px;
+            font-size: 9px;
             font-weight: 700;
             text-transform: uppercase;
             width: fit-content;
-            margin-bottom: 10px;
+            margin-bottom: 6px;
         }
         .album-title {
-            font-size: 16px;
+            font-size: 14px;
             font-weight: 800;
             color: #1a1a2e;
-            line-height: 1.4;
-            margin-bottom: 8px;
+            line-height: 1.35;
+            margin-bottom: 6px;
+            display: -webkit-box;
+            -webkit-line-clamp: 2;
+            -webkit-box-orient: vertical;
+            overflow: hidden;
         }
         .album-meta {
-            font-size: 13px;
+            font-size: 11px;
             color: #6c757d;
             margin-top: auto;
-            padding-top: 12px;
+            padding-top: 8px;
             border-top: 1px solid #f3f4f6;
             display: flex;
             justify-content: space-between;
@@ -183,14 +241,14 @@
 
         .empty-state {
             text-align: center;
-            padding: 80px 20px;
+            padding: 60px 20px;
             background: #fff;
             border-radius: 16px;
             border: 2px dashed #e9ecef;
             grid-column: 1/-1;
         }
-        .empty-state-icon { font-size: 64px; margin-bottom: 16px; opacity: 0.5; }
-        .empty-state h3 { color: #1a1a2e; margin-bottom: 8px; font-size: 20px; }
+        .empty-state-icon { font-size: 56px; margin-bottom: 14px; opacity: 0.5; }
+        .empty-state h3 { color: #1a1a2e; margin-bottom: 6px; font-size: 18px; }
         .empty-state p { font-size: 13px; color: #6c757d; }
 
         /* MODAL */
@@ -218,38 +276,38 @@
             align-items: flex-start;
             justify-content: space-between;
             gap: 16px;
-            padding: 24px 28px 20px;
+            padding: 20px 24px 18px;
             border-bottom: 1px solid #f3f4f6;
             position: sticky;
             top: 0;
             background: #fff;
             z-index: 10;
         }
-        .modal-head h2 { font-size: 20px; font-weight: 800; color: #1a1a2e; }
+        .modal-head h2 { font-size: 18px; font-weight: 800; color: #1a1a2e; }
         .modal-close {
-            width: 36px; height: 36px;
+            width: 34px; height: 34px;
             display: flex; align-items: center; justify-content: center;
             background: #f3f4f6; border: 0; border-radius: 10px;
-            color: #6c757d; font-size: 22px;
+            color: #6c757d; font-size: 20px;
             cursor: pointer; transition: all 0.2s;
             flex-shrink: 0;
         }
         .modal-close:hover { background: #fee2e2; color: #dc2626; transform: rotate(90deg); }
-        .modal-body { padding: 24px 28px 28px; }
+        .modal-body { padding: 20px 24px 24px; }
 
-        .form-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 18px; }
-        .form-field { display: flex; flex-direction: column; gap: 8px; }
+        .form-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 16px; }
+        .form-field { display: flex; flex-direction: column; gap: 6px; }
         .form-field.full { grid-column: 1 / -1; }
-        .form-label { font-size: 13px; font-weight: 700; color: #1a1a2e; }
+        .form-label { font-size: 12px; font-weight: 700; color: #1a1a2e; }
         .form-label span { color: #dc2626; }
         .form-label small { font-weight: 500; color: #6c757d; font-size: 11px; }
         .form-input, .form-select, .form-textarea {
-            width: 100%; padding: 12px 14px;
+            width: 100%; padding: 10px 12px;
             border: 1.5px solid #e9ecef; border-radius: 10px;
-            background: #f9fafb; font-size: 13.5px; outline: none;
+            background: #f9fafb; font-size: 13px; outline: none;
             font-family: inherit; transition: all 0.2s;
         }
-        .form-textarea { min-height: 80px; resize: vertical; }
+        .form-textarea { min-height: 70px; resize: vertical; }
         .form-input:focus, .form-select:focus, .form-textarea:focus {
             background: #fff; border-color: #1a3a7a;
             box-shadow: 0 0 0 4px rgba(26, 58, 122, 0.1);
@@ -261,7 +319,7 @@
             font-style: italic;
         }
 
-        /* ===== COVER UPLOAD ===== */
+        /* COVER UPLOAD */
         .cover-tabs {
             display: flex;
             gap: 6px;
@@ -272,11 +330,11 @@
             width: fit-content;
         }
         .cover-tab {
-            padding: 8px 16px;
+            padding: 7px 14px;
             border-radius: 8px;
             border: 0;
             background: transparent;
-            font-size: 13px;
+            font-size: 12px;
             font-weight: 700;
             color: #6c757d;
             cursor: pointer;
@@ -290,12 +348,12 @@
         }
         .btn-upload-cover {
             width: 100%;
-            padding: 14px;
+            padding: 12px;
             border: 2px dashed #cbd5e1;
             border-radius: 10px;
             background: #f9fafb;
             color: #4b5563;
-            font-size: 14px;
+            font-size: 13px;
             font-weight: 700;
             cursor: pointer;
             transition: all 0.2s;
@@ -308,11 +366,11 @@
         }
         .cover-preview-wrap {
             position: relative;
-            margin-top: 12px;
+            margin-top: 10px;
             border-radius: 10px;
             overflow: hidden;
             border: 2px solid #e9ecef;
-            max-width: 300px;
+            max-width: 260px;
         }
         .cover-preview-wrap img {
             width: 100%;
@@ -323,15 +381,15 @@
         }
         .cover-remove-btn {
             position: absolute;
-            top: 8px;
-            right: 8px;
-            width: 32px;
-            height: 32px;
+            top: 6px;
+            right: 6px;
+            width: 28px;
+            height: 28px;
             background: rgba(220, 38, 38, 0.95);
             color: #fff;
             border: 0;
             border-radius: 50%;
-            font-size: 18px;
+            font-size: 16px;
             cursor: pointer;
             display: flex;
             align-items: center;
@@ -344,29 +402,30 @@
         }
 
         .form-message {
-            padding: 14px 18px; border-radius: 10px;
-            font-size: 13px; font-weight: 600; margin-bottom: 16px; display: none;
+            padding: 12px 16px; border-radius: 10px;
+            font-size: 13px; font-weight: 600; margin-bottom: 14px; display: none;
         }
         .form-message.show { display: block; }
         .form-message.success { background: #ecfdf5; color: #059669; border: 1px solid #a7f3d0; }
         .form-message.error { background: #fef2f2; color: #dc2626; border: 1px solid #fecaca; }
 
         .form-actions {
-            display: flex; justify-content: flex-end; gap: 12px;
-            margin-top: 24px; padding-top: 20px; border-top: 1px solid #f3f4f6;
+            display: flex; justify-content: flex-end; gap: 10px;
+            margin-top: 20px; padding-top: 16px; border-top: 1px solid #f3f4f6;
         }
         .btn-cancel {
-            padding: 12px 24px; background: #f3f4f6; color: #4b5563;
+            padding: 10px 20px; background: #f3f4f6; color: #4b5563;
             border: 0; border-radius: 10px; font-weight: 700;
             cursor: pointer; transition: all 0.2s;
+            font-family: inherit; font-size: 13px;
         }
         .btn-cancel:hover { background: #e5e7eb; }
         .btn-submit {
-            padding: 12px 24px;
+            padding: 10px 20px;
             background: linear-gradient(135deg, #1a3a7a, #2d4a9e);
             color: #fff; border: 0; border-radius: 10px; font-weight: 700;
             cursor: pointer; box-shadow: 0 4px 12px rgba(26, 58, 122, 0.25);
-            transition: all 0.2s;
+            transition: all 0.2s; font-family: inherit; font-size: 13px;
         }
         .btn-submit:hover:not(:disabled) { transform: translateY(-2px); box-shadow: 0 6px 16px rgba(26, 58, 122, 0.35); }
         .btn-submit:disabled { opacity: 0.6; cursor: wait; }
@@ -375,27 +434,27 @@
         .album-detail-header {
             background: linear-gradient(135deg, #0d1b3e, #1a3a7a);
             color: #fff;
-            padding: 24px 28px;
+            padding: 20px 24px;
             border-radius: 16px 16px 0 0;
-            margin: -24px -28px 24px;
+            margin: -20px -24px 20px;
             position: relative;
         }
-        .album-detail-header h2 { font-size: 22px; margin-bottom: 8px; }
-        .album-detail-header p { opacity: 0.85; font-size: 14px; }
+        .album-detail-header h2 { font-size: 20px; margin-bottom: 6px; }
+        .album-detail-header p { opacity: 0.85; font-size: 13px; }
 
         .album-detail-actions {
             display: flex;
             gap: 8px;
-            margin-top: 12px;
+            margin-top: 10px;
             flex-wrap: wrap;
         }
         .btn-download-all {
-            padding: 10px 18px;
+            padding: 8px 16px;
             background: rgba(255, 255, 255, 0.2);
             color: #fff;
             border: 2px solid rgba(255, 255, 255, 0.3);
             border-radius: 10px;
-            font-size: 13px;
+            font-size: 12px;
             font-weight: 700;
             cursor: pointer;
             display: inline-flex;
@@ -417,8 +476,8 @@
 
         .photo-grid {
             display: grid;
-            grid-template-columns: repeat(auto-fill, minmax(180px, 1fr));
-            gap: 12px;
+            grid-template-columns: repeat(auto-fill, minmax(140px, 1fr));
+            gap: 10px;
         }
         .photo-item {
             position: relative;
@@ -439,13 +498,13 @@
             position: absolute;
             top: 8px;
             right: 8px;
-            width: 30px;
-            height: 30px;
+            width: 28px;
+            height: 28px;
             background: rgba(220, 38, 38, 0.9);
             color: #fff;
             border: 0;
             border-radius: 50%;
-            font-size: 16px;
+            font-size: 15px;
             cursor: pointer;
             display: flex;
             align-items: center;
@@ -457,7 +516,7 @@
         .photo-item:hover .photo-remove { opacity: 1; }
         .photo-remove:hover { background: #dc2626; transform: scale(1.1); }
 
-        /* ========== LIGHTBOX ========== */
+        /* LIGHTBOX */
         .lightbox {
             position: fixed;
             inset: 0;
@@ -491,13 +550,13 @@
             position: absolute;
             top: 20px;
             right: 20px;
-            width: 48px;
-            height: 48px;
+            width: 44px;
+            height: 44px;
             background: rgba(255, 255, 255, 0.15);
             color: #fff;
             border: 0;
             border-radius: 50%;
-            font-size: 28px;
+            font-size: 26px;
             cursor: pointer;
             display: flex;
             align-items: center;
@@ -515,13 +574,13 @@
             position: absolute;
             top: 50%;
             transform: translateY(-50%);
-            width: 56px;
-            height: 56px;
+            width: 52px;
+            height: 52px;
             background: rgba(255, 255, 255, 0.15);
             color: #fff;
             border: 0;
             border-radius: 50%;
-            font-size: 28px;
+            font-size: 26px;
             cursor: pointer;
             display: flex;
             align-items: center;
@@ -551,9 +610,9 @@
             left: 50%;
             transform: translateX(-50%);
             display: flex;
-            gap: 10px;
+            gap: 8px;
             background: rgba(0, 0, 0, 0.75);
-            padding: 10px 14px;
+            padding: 8px 12px;
             border-radius: 30px;
             backdrop-filter: blur(10px);
             z-index: 10;
@@ -562,12 +621,12 @@
         }
         .lightbox-toolbar button,
         .lightbox-toolbar a {
-            padding: 10px 18px;
+            padding: 8px 16px;
             border-radius: 20px;
             background: rgba(255, 255, 255, 0.15);
             color: #fff;
             border: 0;
-            font-size: 13px;
+            font-size: 12px;
             font-weight: 700;
             cursor: pointer;
             display: inline-flex;
@@ -590,27 +649,30 @@
             transform: translateX(-50%);
             background: rgba(0, 0, 0, 0.6);
             color: #fff;
-            padding: 8px 16px;
+            padding: 6px 14px;
             border-radius: 20px;
-            font-size: 13px;
+            font-size: 12px;
             font-weight: 700;
             z-index: 10;
             backdrop-filter: blur(10px);
         }
 
         @media (max-width: 768px) {
-            .page-header { padding: 20px; }
-            .page-header h1 { font-size: 22px; }
+            .page-header { padding: 18px; }
+            .page-header h1 { font-size: 20px; }
             .form-grid { grid-template-columns: 1fr; }
-            .album-grid { grid-template-columns: 1fr; }
-            .photo-grid { grid-template-columns: repeat(auto-fill, minmax(120px, 1fr)); }
-            .lightbox-nav { width: 44px; height: 44px; font-size: 22px; }
+            .album-grid { grid-template-columns: repeat(auto-fill, minmax(160px, 1fr)); gap: 10px; }
+            .album-cover, .album-cover-placeholder { height: 120px; }
+            .album-body { padding: 10px 12px 12px; }
+            .album-title { font-size: 13px; }
+            .photo-grid { grid-template-columns: repeat(auto-fill, minmax(100px, 1fr)); }
+            .lightbox-nav { width: 40px; height: 40px; font-size: 20px; }
             .lightbox-prev { left: 8px; }
             .lightbox-next { right: 8px; }
-            .lightbox-close { width: 40px; height: 40px; font-size: 24px; top: 12px; right: 12px; }
-            .lightbox-toolbar { bottom: 12px; padding: 8px 10px; gap: 6px; }
+            .lightbox-close { width: 38px; height: 38px; font-size: 22px; top: 12px; right: 12px; }
+            .lightbox-toolbar { bottom: 12px; padding: 6px 10px; gap: 6px; }
             .lightbox-toolbar button,
-            .lightbox-toolbar a { padding: 8px 12px; font-size: 12px; }
+            .lightbox-toolbar a { padding: 7px 12px; font-size: 11px; }
         }
     </style>
 </head>
@@ -678,11 +740,11 @@
         </main>
     </div>
 
-    <!-- MODAL TẠO ALBUM -->
+    <!-- MODAL TẠO/SỬA ALBUM -->
     <div class="modal-overlay" id="albumModal" hidden>
         <div class="modal-card">
             <div class="modal-head">
-                <h2>➕ Tạo Album ảnh mới</h2>
+                <h2 id="albumModalTitle">➕ Tạo Album ảnh mới</h2>
                 <button class="modal-close" id="closeAlbumModal">×</button>
             </div>
             <div class="modal-body">
@@ -744,24 +806,20 @@
                                       placeholder="Mô tả ngắn về album..."></textarea>
                         </div>
 
-                        <!-- ẢNH ĐẠI DIỆN - CÓ UPLOAD -->
                         <div class="form-field full">
                             <label class="form-label">Ảnh đại diện</label>
                             
-                            <!-- Tabs -->
                             <div class="cover-tabs">
                                 <button type="button" class="cover-tab active" data-mode="url">🔗 Dán URL</button>
                                 <button type="button" class="cover-tab" data-mode="upload">📤 Tải từ máy</button>
                             </div>
 
-                            <!-- Mode URL -->
                             <div id="coverUrlMode">
                                 <input type="text" class="form-input" name="cover_image" id="coverImageUrl"
                                        placeholder="https://example.com/cover.jpg">
                                 <p class="form-hint">💡 Có thể để trống, sẽ dùng ảnh đầu tiên trong album</p>
                             </div>
 
-                            <!-- Mode Upload -->
                             <div id="coverUploadMode" style="display: none;">
                                 <input type="file" id="coverFileInput" accept="image/*" style="display: none;">
                                 <button type="button" class="btn-upload-cover" id="uploadCoverBtn">
@@ -770,7 +828,6 @@
                                 <p class="form-hint">💡 Ảnh JPG/PNG, tối đa 5MB</p>
                             </div>
 
-                            <!-- Preview -->
                             <div id="coverPreview" style="display: none;">
                                 <div class="cover-preview-wrap">
                                     <img id="coverPreviewImg" src="" alt="Preview">
@@ -800,12 +857,12 @@
                 <div id="viewAlbumInfo" style="margin-bottom: 20px;"></div>
                 <div id="viewAlbumPhotos" class="photo-grid"></div>
                 <div id="uploadPhotoSection" style="display: none; margin-top: 24px; padding-top: 20px; border-top: 1px solid #f3f4f6;">
-                    <h3 style="font-size: 16px; font-weight: 700; margin-bottom: 16px; color: #1a1a2e;">📤 Thêm ảnh vào album</h3>
+                    <h3 style="font-size: 15px; font-weight: 700; margin-bottom: 14px; color: #1a1a2e;">📤 Thêm ảnh vào album</h3>
                     <div style="display: flex; gap: 8px; margin-bottom: 12px;">
                         <input type="text" class="form-input" id="photoUrlInput" placeholder="Dán URL ảnh..." style="flex: 1;">
                         <button type="button" class="btn-submit" id="addPhotoUrlBtn">+ Thêm URL</button>
                     </div>
-                    <div style="text-align: center; color: #6c757d; font-size: 13px; margin: 12px 0;">hoặc</div>
+                    <div style="text-align: center; color: #6c757d; font-size: 12px; margin: 10px 0;">hoặc</div>
                     <input type="file" id="photoFileInput" accept="image/*" multiple style="display: none;">
                     <button type="button" class="btn-primary" id="uploadPhotoBtn" style="width: 100%; justify-content: center;">
                         📤 Chọn ảnh từ máy
@@ -849,6 +906,7 @@
     let selectedType = 'all';
     let coverMode = 'url';
     let uploadedCoverUrl = null;
+    let editingAlbumId = null;
 
     const ADMIN_EMAIL = 'nguyenquanghao2505@gmail.com';
     const STORAGE_BUCKET = 'sports-images';
@@ -982,7 +1040,7 @@
     }
 
     // ==========================================
-    // 4. RENDER ALBUM
+    // 4. RENDER ALBUM (có nút Sửa/Xóa cho admin)
     // ==========================================
     function renderAlbums() {
         const grid = document.getElementById('albumGrid');
@@ -1030,8 +1088,20 @@
                 subtitle = '📁 Album tự do';
             }
 
+            const adminActions = isAdmin ? `
+                <div class="album-admin-actions">
+                    <button class="album-action-btn edit" 
+                            onclick="event.stopPropagation(); editAlbum(${album.id})"
+                            title="Sửa album">✏️</button>
+                    <button class="album-action-btn delete" 
+                            onclick="event.stopPropagation(); deleteAlbum(${album.id})"
+                            title="Xóa album">🗑️</button>
+                </div>
+            ` : '';
+
             return `
                 <div class="album-card" onclick="viewAlbum(${album.id})">
+                    ${adminActions}
                     ${coverUrl 
                         ? `<img src="${escapeHtml(coverUrl)}" alt="${escapeHtml(album.title)}" class="album-cover" onerror="this.style.display='none'; this.nextElementSibling.style.display='flex';"><div class="album-cover-placeholder" style="display:none;">📸</div>`
                         : `<div class="album-cover-placeholder">📸</div>`
@@ -1043,7 +1113,7 @@
                         ${subtitle ? `<span class="album-tournament">${escapeHtml(subtitle)}</span>` : ''}
                         <h3 class="album-title">${escapeHtml(album.title)}</h3>
                         <div class="album-meta">
-                            <span>📷 ${album.photo_count} ảnh</span>
+                            <span>📷 ${album.photo_count}</span>
                             <span>${formatDate(album.event_date || album.created_at)}</span>
                         </div>
                     </div>
@@ -1051,6 +1121,111 @@
             `;
         }).join('');
     }
+
+    // ==========================================
+    // 4b. XÓA ALBUM
+    // ==========================================
+    window.deleteAlbum = async function(albumId) {
+        if (!isAdmin) {
+            alert('⛔ Chỉ admin mới có quyền xóa!');
+            return;
+        }
+
+        const album = allAlbums.find(a => a.id === albumId);
+        if (!album) return;
+
+        const photoCount = album.photo_count || 0;
+        const confirmMsg = photoCount > 0 
+            ? `⚠️ CẢNH BÁO!\n\nBạn có chắc muốn xóa album:\n"${album.title}"?\n\nAlbum này có ${photoCount} ảnh. Tất cả ảnh sẽ bị XÓA VĨNH VIỄN!\n\nHành động này KHÔNG THỂ hoàn tác!`
+            : `Xóa album "${album.title}"?`;
+
+        if (!confirm(confirmMsg)) return;
+
+        try {
+            const { data: photos } = await supabaseClient
+                .from('photos')
+                .select('image_url')
+                .eq('album_id', albumId);
+
+            if (photos && photos.length > 0) {
+                const filePaths = photos.map(p => {
+                    const url = p.image_url;
+                    const match = url.match(/\/storage\/v1\/object\/public\/[^/]+\/(.+)$/);
+                    return match ? decodeURIComponent(match[1].split('?')[0]) : null;
+                }).filter(Boolean);
+
+                if (filePaths.length > 0) {
+                    const { error: storageErr } = await supabaseClient.storage
+                        .from(STORAGE_BUCKET)
+                        .remove(filePaths);
+                    
+                    if (storageErr) {
+                        console.warn('Lỗi xóa file storage:', storageErr);
+                    }
+                }
+            }
+
+            await supabaseClient
+                .from('photos')
+                .delete()
+                .eq('album_id', albumId);
+
+            const { error } = await supabaseClient
+                .from('photo_albums')
+                .delete()
+                .eq('id', albumId);
+
+            if (error) throw error;
+
+            console.log('✅ Đã xóa album:', album.title);
+            await loadAlbums();
+
+        } catch (err) {
+            console.error('❌ Lỗi xóa album:', err);
+            alert('Lỗi xóa: ' + err.message);
+        }
+    };
+
+    // ==========================================
+    // 4c. SỬA ALBUM
+    // ==========================================
+    window.editAlbum = async function(albumId) {
+        if (!isAdmin) return;
+
+        const album = allAlbums.find(a => a.id === albumId);
+        if (!album) return;
+
+        // Reset form
+        document.getElementById('albumForm').reset();
+        document.getElementById('albumFormMessage').className = 'form-message';
+        hideCoverPreview();
+
+        // Đổi tiêu đề modal
+        document.getElementById('albumModalTitle').textContent = '✏️ Chỉnh sửa Album';
+        document.getElementById('submitAlbumBtn').textContent = '💾 Cập nhật';
+
+        // Điền dữ liệu cũ
+        document.getElementById('albumType').value = album.album_type || 'tournament';
+        onAlbumTypeChange();
+        
+        document.getElementById('albumTournament').value = album.tournament_id || '';
+        document.querySelector('input[name="event_name"]').value = album.event_name || '';
+        document.querySelector('input[name="location"]').value = album.location || '';
+        document.querySelector('input[name="event_date"]').value = album.event_date || '';
+        document.querySelector('input[name="title"]').value = album.title || '';
+        document.querySelector('textarea[name="description"]').value = album.description || '';
+        document.getElementById('coverImageUrl').value = album.cover_image || '';
+
+        if (album.cover_image) {
+            showCoverPreview(album.cover_image, 'Ảnh hiện tại');
+        }
+
+        // Đánh dấu đang sửa
+        editingAlbumId = albumId;
+
+        // Mở modal
+        document.getElementById('albumModal').hidden = false;
+    };
 
     // ==========================================
     // 5. BIND EVENTS
@@ -1092,7 +1267,7 @@
             handlePhotoFiles(e.target.files);
         });
 
-        // ===== COVER UPLOAD =====
+        // COVER UPLOAD
         document.querySelectorAll('.cover-tab').forEach(tab => {
             tab.addEventListener('click', () => {
                 document.querySelectorAll('.cover-tab').forEach(t => t.classList.remove('active'));
@@ -1232,6 +1407,12 @@
             alert('⛔ Chỉ admin mới có thể tạo album!');
             return;
         }
+
+        // Reset trạng thái edit
+        editingAlbumId = null;
+        document.getElementById('albumModalTitle').textContent = '➕ Tạo Album ảnh mới';
+        document.getElementById('submitAlbumBtn').textContent = '💾 Tạo Album';
+
         document.getElementById('albumModal').hidden = false;
         document.getElementById('albumForm').reset();
         document.getElementById('albumFormMessage').className = 'form-message';
@@ -1251,6 +1432,7 @@
 
     function closeAlbumModal() {
         document.getElementById('albumModal').hidden = true;
+        editingAlbumId = null;
     }
 
     async function handleAlbumSubmit(e) {
@@ -1277,33 +1459,43 @@
             event_date: eventDate || null,
             title: title,
             description: formData.get('description')?.trim() || null,
-            cover_image: formData.get('cover_image')?.trim() || null,
-            created_by: currentSession?.user?.id || null
+            cover_image: formData.get('cover_image')?.trim() || null
         };
 
         const btn = document.getElementById('submitAlbumBtn');
         btn.disabled = true;
-        btn.textContent = '⏳ Đang tạo...';
+        btn.textContent = '⏳ Đang lưu...';
 
         try {
-            const { error } = await supabaseClient
-                .from('photo_albums')
-                .insert(payload);
+            let result;
+            if (editingAlbumId) {
+                // Update
+                result = await supabaseClient
+                    .from('photo_albums')
+                    .update(payload)
+                    .eq('id', editingAlbumId);
+            } else {
+                // Insert
+                payload.created_by = currentSession?.user?.id || null;
+                result = await supabaseClient
+                    .from('photo_albums')
+                    .insert(payload);
+            }
 
-            if (error) throw error;
+            if (result.error) throw result.error;
 
-            showAlbumFormMessage('✅ Tạo album thành công!', 'success');
+            showAlbumFormMessage('✅ ' + (editingAlbumId ? 'Cập nhật' : 'Tạo') + ' album thành công!', 'success');
             setTimeout(() => {
                 closeAlbumModal();
                 loadAlbums();
             }, 1000);
 
         } catch (err) {
-            console.error('❌ Lỗi tạo album:', err);
+            console.error('❌ Lỗi:', err);
             showAlbumFormMessage('Lỗi: ' + err.message, 'error');
         } finally {
             btn.disabled = false;
-            btn.textContent = '💾 Tạo Album';
+            btn.textContent = editingAlbumId ? '💾 Cập nhật' : '💾 Tạo Album';
         }
     }
 
@@ -1318,10 +1510,7 @@
     // ==========================================
     window.viewAlbum = async function(albumId) {
         const album = allAlbums.find(a => a.id === albumId);
-        if (!album) {
-            console.warn('Không tìm thấy album:', albumId);
-            return;
-        }
+        if (!album) return;
 
         currentAlbum = album;
         const tournament = allTournaments.find(t => t.id === album.tournament_id);
@@ -1433,7 +1622,7 @@
     };
 
     // ==========================================
-    // 9. LIGHTBOX XEM ẢNH
+    // 9. LIGHTBOX
     // ==========================================
     window.openLightbox = function(index) {
         if (!currentPhotoList || currentPhotoList.length === 0) return;
@@ -1547,7 +1736,7 @@
             document.body.removeChild(a);
             URL.revokeObjectURL(url);
 
-            console.log(`✅ Đã tải ZIP: ${successCount} ảnh thành công, ${failCount} lỗi`);
+            console.log(`✅ Đã tải ZIP: ${successCount} ảnh`);
 
         } catch (err) {
             console.error('❌ Lỗi tạo ZIP:', err);
@@ -1589,7 +1778,6 @@
             input.value = '';
             await loadPhotos(currentAlbum.id);
             await loadAlbums();
-            console.log('✅ Đã thêm ảnh từ URL');
 
         } catch (err) {
             alert('Lỗi thêm ảnh: ' + err.message);
@@ -1621,8 +1809,6 @@
                         image_url: url,
                         created_by: currentSession?.user?.id || null
                     });
-
-                console.log('✅ Upload:', file.name);
             } catch (err) {
                 console.error('Lỗi upload:', err);
                 alert(`Lỗi upload "${file.name}": ` + err.message);
