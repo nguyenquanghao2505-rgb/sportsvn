@@ -342,6 +342,30 @@
         .bank-info .row { display: flex; justify-content: space-between; padding: 4px 0; }
         .bank-info .row span:first-child { color: #6c757d; }
         .bank-info .row span:last-child { font-weight: 800; color: #1a1a2e; }
+        .bank-info .order-code-highlight {
+            background: #fff;
+            padding: 10px 14px;
+            border-radius: 8px;
+            border: 2px dashed #f39c12;
+            margin: 12px 0;
+            text-align: center;
+        }
+        .bank-info .order-code-highlight .label {
+            font-size: 11px;
+            color: #856404;
+            text-transform: uppercase;
+            font-weight: 800;
+            letter-spacing: 1px;
+            display: block;
+            margin-bottom: 6px;
+        }
+        .bank-info .order-code-highlight .code {
+            font-size: 22px;
+            font-weight: 900;
+            color: #e94560;
+            letter-spacing: 2px;
+            font-family: 'Courier New', monospace;
+        }
 
         .form-actions {
             display: flex;
@@ -404,6 +428,7 @@
             color: #1a3a7a;
             letter-spacing: 2px;
             margin-bottom: 20px;
+            font-family: 'Courier New', monospace;
         }
     </style>
 </head>
@@ -504,9 +529,14 @@
                     <div class="row"><span>Số tài khoản:</span><span>027999999</span></div>
                     <div class="row"><span>Chủ tài khoản:</span><span>Nguyễn Quang Hảo</span></div>
                     <div class="row"><span>Số tiền:</span><span id="bankAmount">0đ</span></div>
-                    <div class="row"><span>Nội dung:</span><span id="bankContent">SPORTSVN</span></div>
-                    <p style="margin-top:12px; font-size:12px; color:#856404;">
-                        ⚠️ Vui lòng ghi đúng nội dung chuyển khoản để đơn hàng được xử lý nhanh.
+                    
+                    <div class="order-code-highlight">
+                        <span class="label">📝 Nội dung chuyển khoản</span>
+                        <div class="code" id="bankContent">SV------</div>
+                    </div>
+                    
+                    <p style="margin-top:12px; font-size:12px; color:#856404; text-align:center;">
+                        ⚠️ Vui lòng ghi đúng mã đơn hàng vào nội dung chuyển khoản để đơn được xử lý nhanh.
                     </p>
                 </div>
 
@@ -557,6 +587,7 @@
     let cart = [];
     let settings = {};
     let selectedPayment = 'cod';
+    let pendingOrderCode = null; // ← Mã đơn được tạo trước khi submit
 
     const SHIPPING_FEE = 30000;
     const FREE_SHIP_THRESHOLD = 500000;
@@ -744,7 +775,12 @@
         const shippingFee = subtotal >= FREE_SHIP_THRESHOLD ? 0 : SHIPPING_FEE;
         const total = subtotal + shippingFee;
 
+        // ✅ TẠO MÃ ĐƠN TRƯỚC KHI SUBMIT
+        pendingOrderCode = generateOrderCode();
+
+        // ✅ HIỆN MÃ ĐƠN TRONG "NỘI DUNG CHUYỂN KHOẢN"
         document.getElementById('bankAmount').textContent = formatPrice(total);
+        document.getElementById('bankContent').textContent = pendingOrderCode;
         
         document.getElementById('checkoutModal').hidden = false;
         document.getElementById('orderMessage').className = 'form-message';
@@ -798,7 +834,9 @@
         }, 0);
         const shippingFee = subtotal >= FREE_SHIP_THRESHOLD ? 0 : SHIPPING_FEE;
         const total = subtotal + shippingFee;
-        const orderCode = generateOrderCode();
+        
+        // ✅ DÙNG MÃ ĐƠN ĐÃ TẠO TRƯỚC ĐÓ (hoặc tạo mới nếu chưa có)
+        const orderCode = pendingOrderCode || generateOrderCode();
 
         const orderData = {
             order_code: orderCode,
@@ -846,12 +884,9 @@
 
             if (itemsError) throw itemsError;
 
-            if (selectedPayment === 'bank') {
-                document.getElementById('bankContent').textContent = orderCode;
-            }
-
             cart = [];
             saveCart();
+            pendingOrderCode = null;
 
             closeCheckout();
             document.getElementById('successOrderCode').textContent = orderCode;
