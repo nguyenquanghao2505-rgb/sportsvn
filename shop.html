@@ -1,0 +1,1095 @@
+<!DOCTYPE html>
+<html lang="vi">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Cửa hàng thể thao - SportsVN</title>
+    <link rel="stylesheet" href="styles.css">
+    <script src="sidebar.js" defer></script>
+    <style>
+        /* ========== SHOP PAGE ========== */
+        .shop-header {
+            background: linear-gradient(135deg, #0d1b3e, #1a3a7a);
+            border-radius: 16px;
+            padding: 24px 28px;
+            color: #fff;
+            margin-bottom: 20px;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            flex-wrap: wrap;
+            gap: 16px;
+        }
+        .shop-header h1 { font-size: 24px; margin-bottom: 4px; }
+        .shop-header p { opacity: 0.85; font-size: 13px; }
+        .shop-header-actions { display: flex; gap: 8px; flex-wrap: wrap; }
+
+        .btn-shop {
+            padding: 10px 18px;
+            border-radius: 10px;
+            font-size: 13px;
+            font-weight: 700;
+            cursor: pointer;
+            border: 0;
+            display: inline-flex;
+            align-items: center;
+            gap: 6px;
+            text-decoration: none;
+            transition: all 0.2s;
+            font-family: inherit;
+        }
+        .btn-cart {
+            background: #00b894;
+            color: #fff;
+            position: relative;
+        }
+        .btn-cart:hover { background: #00997a; transform: translateY(-2px); }
+        .btn-cart .cart-count {
+            position: absolute;
+            top: -6px;
+            right: -6px;
+            min-width: 20px;
+            height: 20px;
+            background: #e94560;
+            color: #fff;
+            border-radius: 10px;
+            font-size: 11px;
+            font-weight: 800;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            padding: 0 5px;
+        }
+        .btn-admin-add {
+            background: #f39c12;
+            color: #fff;
+        }
+        .btn-admin-add:hover { background: #e67e22; transform: translateY(-2px); }
+
+        /* ========== SEARCH + FILTER ========== */
+        .shop-toolbar {
+            background: #fff;
+            border-radius: 14px;
+            padding: 14px 18px;
+            margin-bottom: 16px;
+            box-shadow: 0 2px 8px rgba(0,0,0,0.06);
+            display: flex;
+            gap: 10px;
+            flex-wrap: wrap;
+            align-items: center;
+        }
+        .shop-search {
+            flex: 1;
+            min-width: 200px;
+            position: relative;
+        }
+        .shop-search input {
+            width: 100%;
+            padding: 10px 14px 10px 38px;
+            border: 2px solid #e9ecef;
+            border-radius: 10px;
+            font-size: 13px;
+            font-family: inherit;
+            outline: none;
+            transition: all 0.2s;
+        }
+        .shop-search input:focus { border-color: #1a3a7a; }
+        .shop-search::before {
+            content: '🔍';
+            position: absolute;
+            left: 12px;
+            top: 50%;
+            transform: translateY(-50%);
+            font-size: 14px;
+        }
+        .shop-toolbar select {
+            padding: 10px 14px;
+            border: 2px solid #e9ecef;
+            border-radius: 10px;
+            font-size: 13px;
+            font-family: inherit;
+            background: #fff;
+            outline: none;
+            cursor: pointer;
+        }
+        .shop-toolbar select:focus { border-color: #1a3a7a; }
+
+        /* ========== CATEGORY PILLS ========== */
+        .cat-pills {
+            display: flex;
+            gap: 6px;
+            margin-bottom: 16px;
+            overflow-x: auto;
+            padding-bottom: 4px;
+        }
+        .cat-pill {
+            padding: 8px 16px;
+            border-radius: 20px;
+            background: #fff;
+            border: 2px solid #e9ecef;
+            font-size: 12px;
+            font-weight: 700;
+            color: #6c757d;
+            cursor: pointer;
+            white-space: nowrap;
+            transition: all 0.2s;
+            font-family: inherit;
+            display: inline-flex;
+            align-items: center;
+            gap: 4px;
+        }
+        .cat-pill.active {
+            background: #0d1b3e;
+            color: #fff;
+            border-color: #0d1b3e;
+        }
+        .cat-pill:hover:not(.active) {
+            border-color: #1a3a7a;
+            color: #1a3a7a;
+        }
+
+        /* ========== PRODUCT GRID ========== */
+        .product-grid {
+            display: grid !important;
+            grid-template-columns: repeat(auto-fill, minmax(200px, 1fr)) !important;
+            gap: 12px !important;
+        }
+        .product-card {
+            background: #fff;
+            border-radius: 12px;
+            overflow: hidden;
+            border: 1px solid #e9ecef;
+            box-shadow: 0 2px 6px rgba(0,0,0,0.06);
+            transition: all 0.25s;
+            cursor: pointer;
+            display: flex;
+            flex-direction: column;
+            position: relative;
+            text-decoration: none;
+            color: inherit;
+        }
+        .product-card:hover {
+            transform: translateY(-4px);
+            box-shadow: 0 10px 24px rgba(0,0,0,0.1);
+        }
+        .product-img {
+            width: 100%;
+            height: 160px;
+            object-fit: cover;
+            background: #f3f4f6;
+            display: block;
+        }
+        .product-img-placeholder {
+            width: 100%;
+            height: 160px;
+            background: linear-gradient(135deg, #e3f2fd, #bbdefb);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 48px;
+        }
+        .product-body {
+            padding: 12px 14px 14px;
+            flex: 1;
+            display: flex;
+            flex-direction: column;
+        }
+        .product-brand {
+            font-size: 10px;
+            color: #6c757d;
+            font-weight: 700;
+            text-transform: uppercase;
+            margin-bottom: 4px;
+        }
+        .product-name {
+            font-size: 13px;
+            font-weight: 800;
+            color: #1a1a2e;
+            line-height: 1.35;
+            margin-bottom: 8px;
+            display: -webkit-box;
+            -webkit-line-clamp: 2;
+            -webkit-box-orient: vertical;
+            overflow: hidden;
+            min-height: 35px;
+        }
+        .product-price-row {
+            display: flex;
+            align-items: center;
+            gap: 6px;
+            margin-bottom: 4px;
+            flex-wrap: wrap;
+        }
+        .product-price {
+            font-size: 15px;
+            font-weight: 900;
+            color: #e94560;
+        }
+        .product-price-old {
+            font-size: 11px;
+            color: #adb5bd;
+            text-decoration: line-through;
+        }
+        .product-sale-badge {
+            background: #e94560;
+            color: #fff;
+            font-size: 9px;
+            font-weight: 800;
+            padding: 2px 6px;
+            border-radius: 4px;
+        }
+        .product-meta {
+            font-size: 10px;
+            color: #9ca3af;
+            display: flex;
+            justify-content: space-between;
+            margin-top: auto;
+            padding-top: 8px;
+            border-top: 1px solid #f3f4f6;
+        }
+
+        /* ========== BADGES ========== */
+        .product-badge {
+            position: absolute;
+            top: 8px;
+            left: 8px;
+            background: #f39c12;
+            color: #fff;
+            font-size: 9px;
+            font-weight: 800;
+            padding: 4px 8px;
+            border-radius: 12px;
+            z-index: 2;
+            text-transform: uppercase;
+        }
+        .product-badge.hot { background: #e94560; }
+        .product-badge.out { background: #6c757d; }
+
+        /* ========== EMPTY ========== */
+        .shop-empty {
+            grid-column: 1 / -1;
+            text-align: center;
+            padding: 60px 20px;
+            color: #6c757d;
+        }
+        .shop-empty-icon { font-size: 64px; margin-bottom: 16px; opacity: 0.5; }
+
+        /* ========== ADMIN MODAL ========== */
+        .modal-overlay {
+            position: fixed;
+            inset: 0;
+            z-index: 1000;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            padding: 20px;
+            background: rgba(15, 23, 42, 0.5);
+            backdrop-filter: blur(4px);
+        }
+        .modal-overlay[hidden] { display: none; }
+        .modal-card {
+            width: min(600px, 100%);
+            max-height: 90vh;
+            overflow: auto;
+            background: #fff;
+            border-radius: 20px;
+            box-shadow: 0 25px 50px -12px rgba(0,0,0,0.25);
+        }
+        .modal-head {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            padding: 18px 22px;
+            border-bottom: 1px solid #f3f4f6;
+            position: sticky;
+            top: 0;
+            background: #fff;
+            z-index: 10;
+        }
+        .modal-head h2 { font-size: 17px; font-weight: 800; }
+        .modal-close {
+            width: 32px; height: 32px;
+            display: flex; align-items: center; justify-content: center;
+            background: #f3f4f6; border: 0; border-radius: 10px;
+            font-size: 20px; color: #6c757d;
+            cursor: pointer; transition: all 0.2s;
+        }
+        .modal-close:hover { background: #fee2e2; color: #dc2626; transform: rotate(90deg); }
+        .modal-body { padding: 20px 22px; }
+
+        .form-field { margin-bottom: 14px; }
+        .form-label {
+            display: block;
+            font-size: 12px;
+            font-weight: 700;
+            color: #1a1a2e;
+            margin-bottom: 6px;
+        }
+        .form-label span { color: #dc2626; }
+        .form-input, .form-select, .form-textarea {
+            width: 100%;
+            padding: 10px 12px;
+            border: 1.5px solid #e9ecef;
+            border-radius: 10px;
+            font-size: 13px;
+            background: #f9fafb;
+            outline: none;
+            font-family: inherit;
+            transition: all 0.2s;
+        }
+        .form-textarea { min-height: 70px; resize: vertical; }
+        .form-input:focus, .form-select:focus, .form-textarea:focus {
+            border-color: #1a3a7a;
+            background: #fff;
+            box-shadow: 0 0 0 4px rgba(26,58,122,0.1);
+        }
+        .form-row-2 { display: grid; grid-template-columns: 1fr 1fr; gap: 12px; }
+        .form-actions {
+            display: flex;
+            justify-content: flex-end;
+            gap: 10px;
+            padding-top: 16px;
+            border-top: 1px solid #f3f4f6;
+            margin-top: 16px;
+        }
+        .btn-cancel {
+            padding: 10px 20px;
+            background: #f3f4f6;
+            color: #4b5563;
+            border: 0;
+            border-radius: 10px;
+            font-weight: 700;
+            cursor: pointer;
+            font-size: 13px;
+            font-family: inherit;
+        }
+        .btn-submit {
+            padding: 10px 20px;
+            background: linear-gradient(135deg, #1a3a7a, #2d4a9e);
+            color: #fff;
+            border: 0;
+            border-radius: 10px;
+            font-weight: 700;
+            cursor: pointer;
+            font-size: 13px;
+            font-family: inherit;
+        }
+        .btn-submit:disabled { opacity: 0.6; cursor: wait; }
+
+        .form-message {
+            padding: 12px 16px;
+            border-radius: 10px;
+            font-size: 13px;
+            font-weight: 600;
+            margin-bottom: 14px;
+            display: none;
+        }
+        .form-message.show { display: block; }
+        .form-message.success { background: #ecfdf5; color: #059669; }
+        .form-message.error { background: #fef2f2; color: #dc2626; }
+
+        @media (max-width: 768px) {
+            .shop-header { padding: 18px; }
+            .shop-header h1 { font-size: 20px; }
+            .product-grid { grid-template-columns: repeat(auto-fill, minmax(150px, 1fr)) !important; }
+            .product-img, .product-img-placeholder { height: 130px; }
+            .form-row-2 { grid-template-columns: 1fr; }
+        }
+    </style>
+</head>
+<body data-page="shop.html">
+
+<div class="app">
+    <main class="main">
+        <header class="topbar">
+            <div class="topbar-left">
+                <button class="mobile-menu" id="mobileMenu">☰</button>
+                <div class="topbar-brand">
+                    <span class="topbar-label">SPORTS MANAGEMENT PLATFORM</span>
+                    <h1 class="topbar-title-main">SPORTS<span>VN</span></h1>
+                    <p class="topbar-subtitle">Cửa hàng dụng cụ thể thao</p>
+                </div>
+            </div>
+            <div class="topbar-right">
+                <a href="index.html" class="topbar-cta" style="background: #f3f4f6; color: #4b5563; box-shadow: none;">
+                    ← Về trang chủ
+                </a>
+            </div>
+        </header>
+
+        <section class="content">
+
+            <div class="shop-header">
+                <div>
+                    <h1>🛍️ Cửa hàng thể thao</h1>
+                    <p>Dụng cụ, quần áo, nước uống thể thao chính hãng</p>
+                </div>
+                <div class="shop-header-actions">
+                    <button class="btn-shop btn-admin-add" id="adminAddBtn" style="display: none;">
+                        ➕ Thêm sản phẩm
+                    </button>
+                    <a href="cart.html" class="btn-shop btn-cart">
+                        🛒 Giỏ hàng
+                        <span class="cart-count" id="cartCount">0</span>
+                    </a>
+                </div>
+            </div>
+
+            <!-- TOOLBAR -->
+            <div class="shop-toolbar">
+                <div class="shop-search">
+                    <input type="text" id="searchInput" placeholder="Tìm sản phẩm..." oninput="filterProducts()">
+                </div>
+                <select id="sortSelect" onchange="filterProducts()">
+                    <option value="newest">Mới nhất</option>
+                    <option value="price-asc">Giá thấp → cao</option>
+                    <option value="price-desc">Giá cao → thấp</option>
+                    <option value="bestseller">Bán chạy</option>
+                </select>
+                <select id="priceSelect" onchange="filterProducts()">
+                    <option value="all">Tất cả giá</option>
+                    <option value="0-100000">Dưới 100k</option>
+                    <option value="100000-500000">100k - 500k</option>
+                    <option value="500000-1000000">500k - 1 triệu</option>
+                    <option value="1000000-999999999">Trên 1 triệu</option>
+                </select>
+            </div>
+
+            <!-- CATEGORIES -->
+            <div class="cat-pills" id="catPills"></div>
+
+            <!-- PRODUCTS -->
+            <div class="product-grid" id="productGrid">
+                <div class="shop-empty">⏳ Đang tải sản phẩm...</div>
+            </div>
+
+        </section>
+
+        <footer class="footer">
+            <span>© 2026 SportsVN</span>
+            <span>Nền tảng công nghệ thể thao Việt Nam</span>
+        </footer>
+    </main>
+</div>
+
+<!-- MODAL THÊM/SỬA SẢN PHẨM (ADMIN) -->
+<div class="modal-overlay" id="productModal" hidden>
+    <div class="modal-card">
+        <div class="modal-head">
+            <h2 id="productModalTitle">➕ Thêm sản phẩm mới</h2>
+            <button class="modal-close" id="closeProductModal">×</button>
+        </div>
+        <div class="modal-body">
+            <div class="form-message" id="productFormMessage"></div>
+            <form id="productForm">
+                <div class="form-field">
+                    <label class="form-label">Tên sản phẩm <span>*</span></label>
+                    <input type="text" class="form-input" name="name" required placeholder="VD: Vợt cầu lông Yonex...">
+                </div>
+
+                <div class="form-field">
+                    <label class="form-label">Danh mục <span>*</span></label>
+                    <select class="form-select" name="category_id" id="productCategory" required>
+                        <option value="">-- Chọn danh mục --</option>
+                    </select>
+                </div>
+
+                <div class="form-row-2">
+                    <div class="form-field">
+                        <label class="form-label">Giá gốc <span>*</span></label>
+                        <input type="number" class="form-input" name="price" required min="0" placeholder="0">
+                    </div>
+                    <div class="form-field">
+                        <label class="form-label">Giá khuyến mãi</label>
+                        <input type="number" class="form-input" name="sale_price" min="0" placeholder="Để trống nếu không giảm">
+                    </div>
+                </div>
+
+                <div class="form-row-2">
+                    <div class="form-field">
+                        <label class="form-label">Số lượng kho</label>
+                        <input type="number" class="form-input" name="stock" min="0" value="0">
+                    </div>
+                    <div class="form-field">
+                        <label class="form-label">Đơn vị</label>
+                        <input type="text" class="form-input" name="unit" value="cái" placeholder="cái / hộp / chai...">
+                    </div>
+                </div>
+
+                <div class="form-field">
+                    <label class="form-label">Thương hiệu</label>
+                    <input type="text" class="form-input" name="brand" placeholder="VD: Yonex, Nike, Adidas...">
+                </div>
+
+                <div class="form-field">
+                    <label class="form-label">Mô tả ngắn</label>
+                    <input type="text" class="form-input" name="short_description" placeholder="Mô tả ngắn gọn">
+                </div>
+
+                <div class="form-field">
+                    <label class="form-label">Mô tả chi tiết</label>
+                    <textarea class="form-textarea" name="description" placeholder="Mô tả đầy đủ về sản phẩm..."></textarea>
+                </div>
+
+                <div class="form-field">
+                    <label class="form-label">Ảnh sản phẩm</label>
+                    <div style="display: flex; gap: 6px; margin-bottom: 8px;">
+                        <button type="button" class="btn-cancel" id="tabUrlBtn" style="flex: 1;">🔗 Dán URL</button>
+                        <button type="button" class="btn-cancel" id="tabUploadBtn" style="flex: 1;">📤 Tải từ máy</button>
+                    </div>
+                    <div id="urlMode">
+                        <input type="text" class="form-input" name="image_url" id="imageUrlInput" placeholder="https://...">
+                    </div>
+                    <div id="uploadMode" style="display: none;">
+                        <input type="file" id="imageFileInput" accept="image/*" style="display: none;">
+                        <button type="button" class="btn-submit" id="uploadImageBtn" style="width: 100%;">📤 Chọn ảnh</button>
+                    </div>
+                    <div id="imagePreview" style="display: none; margin-top: 10px;">
+                        <img id="imagePreviewImg" src="" style="max-width: 200px; border-radius: 10px; border: 2px solid #e9ecef;">
+                    </div>
+                </div>
+
+                <div class="form-row-2">
+                    <div class="form-field">
+                        <label><input type="checkbox" name="is_featured"> ⭐ Sản phẩm nổi bật</label>
+                    </div>
+                    <div class="form-field">
+                        <label><input type="checkbox" name="is_active" checked> ✅ Kích hoạt</label>
+                    </div>
+                </div>
+
+                <div class="form-actions">
+                    <button type="button" class="btn-cancel" id="cancelProductBtn">Hủy</button>
+                    <button type="submit" class="btn-submit" id="submitProductBtn">💾 Lưu</button>
+                </div>
+            </form>
+        </div>
+    </div>
+</div>
+
+<script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+<script src="config.js"></script>
+<script>
+(function() {
+    'use strict';
+
+    let supabaseClient = null;
+    let isAdmin = false;
+    let allProducts = [];
+    let allCategories = [];
+    let selectedCategory = 'all';
+    let editingProductId = null;
+    let currentImageMode = 'url';
+
+    const ADMIN_EMAIL = 'nguyenquanghao2505@gmail.com';
+    const STORAGE_BUCKET = 'sports-images';
+
+    // ==========================================
+    // KHỞI TẠO
+    // ==========================================
+    document.addEventListener('DOMContentLoaded', async function() {
+        const config = window.SPORTSVN_CONFIG || {};
+        if (!config.SUPABASE_URL || !config.SUPABASE_ANON_KEY) {
+            console.error('❌ Chưa cấu hình Supabase');
+            return;
+        }
+
+        supabaseClient = window.supabase.createClient(
+            config.SUPABASE_URL,
+            config.SUPABASE_ANON_KEY
+        );
+
+        await checkAuth();
+        await loadCategories();
+        await loadProducts();
+        updateCartCount();
+        bindEvents();
+    });
+
+    // ==========================================
+    // CHECK ADMIN
+    // ==========================================
+    async function checkAuth() {
+        try {
+            const { data: { session } } = await supabaseClient.auth.getSession();
+            if (!session) {
+                console.log('👤 Chế độ khách');
+                return;
+            }
+
+            if (session.user.email === ADMIN_EMAIL) {
+                isAdmin = true;
+            } else {
+                const { data: roleData } = await supabaseClient
+                    .from('user_roles')
+                    .select('role')
+                    .eq('user_id', session.user.id)
+                    .eq('role', 'admin')
+                    .maybeSingle();
+                if (roleData) isAdmin = true;
+            }
+
+            if (isAdmin) {
+                document.getElementById('adminAddBtn').style.display = 'inline-flex';
+                console.log('✅ Admin');
+            }
+        } catch (e) {
+            console.warn('Lỗi check auth:', e);
+        }
+    }
+
+    // ==========================================
+    // LOAD CATEGORIES
+    // ==========================================
+    async function loadCategories() {
+        try {
+            const { data, error } = await supabaseClient
+                .from('product_categories')
+                .select('*')
+                .eq('is_active', true)
+                .order('sort_order', { ascending: true });
+
+            if (error) throw error;
+            allCategories = data || [];
+
+            // Render pills
+            const pillsEl = document.getElementById('catPills');
+            pillsEl.innerHTML = `
+                <button class="cat-pill active" onclick="filterCat('all')">📦 Tất cả</button>
+                ${allCategories.map(c => `
+                    <button class="cat-pill" onclick="filterCat('${c.id}')">
+                        ${c.icon || '📦'} ${escapeHtml(c.name)}
+                    </button>
+                `).join('')}
+            `;
+
+            // Render dropdown admin
+            const sel = document.getElementById('productCategory');
+            allCategories.forEach(c => {
+                const opt = document.createElement('option');
+                opt.value = c.id;
+                opt.textContent = `${c.icon || ''} ${c.name}`;
+                sel.appendChild(opt);
+            });
+
+        } catch (err) {
+            console.error('Lỗi load categories:', err);
+        }
+    }
+
+    // ==========================================
+    // LOAD PRODUCTS
+    // ==========================================
+    async function loadProducts() {
+        try {
+            const { data, error } = await supabaseClient
+                .from('products')
+                .select('*')
+                .eq('is_active', true)
+                .order('created_at', { ascending: false });
+
+            if (error) throw error;
+            allProducts = data || [];
+
+            renderProducts();
+            console.log('✅ Loaded', allProducts.length, 'sản phẩm');
+
+        } catch (err) {
+            console.error('Lỗi load products:', err);
+            document.getElementById('productGrid').innerHTML = `
+                <div class="shop-empty" style="color: #dc2626;">
+                    ❌ Lỗi: ${escapeHtml(err.message)}
+                </div>
+            `;
+        }
+    }
+
+    // ==========================================
+    // RENDER PRODUCTS
+    // ==========================================
+    function renderProducts() {
+        const grid = document.getElementById('productGrid');
+        let filtered = [...allProducts];
+
+        // Filter category
+        if (selectedCategory !== 'all') {
+            filtered = filtered.filter(p => p.category_id === selectedCategory);
+        }
+
+        // Filter search
+        const searchQuery = document.getElementById('searchInput').value.toLowerCase().trim();
+        if (searchQuery) {
+            filtered = filtered.filter(p =>
+                (p.name || '').toLowerCase().includes(searchQuery) ||
+                (p.brand || '').toLowerCase().includes(searchQuery) ||
+                (p.short_description || '').toLowerCase().includes(searchQuery)
+            );
+        }
+
+        // Filter price
+        const priceRange = document.getElementById('priceSelect').value;
+        if (priceRange !== 'all') {
+            const [min, max] = priceRange.split('-').map(Number);
+            filtered = filtered.filter(p => {
+                const price = p.sale_price || p.price;
+                return price >= min && price <= max;
+            });
+        }
+
+        // Sort
+        const sortBy = document.getElementById('sortSelect').value;
+        if (sortBy === 'price-asc') {
+            filtered.sort((a, b) => (a.sale_price || a.price) - (b.sale_price || b.price));
+        } else if (sortBy === 'price-desc') {
+            filtered.sort((a, b) => (b.sale_price || b.price) - (a.sale_price || a.price));
+        } else if (sortBy === 'bestseller') {
+            filtered.sort((a, b) => (b.sold_count || 0) - (a.sold_count || 0));
+        }
+
+        if (filtered.length === 0) {
+            grid.innerHTML = `
+                <div class="shop-empty">
+                    <div class="shop-empty-icon">🛍️</div>
+                    <h3 style="font-size: 18px; color: #1a1a2e;">Chưa có sản phẩm nào</h3>
+                    <p style="font-size: 13px; margin-top: 6px;">
+                        ${isAdmin ? 'Nhấn "Thêm sản phẩm" để bắt đầu' : 'Admin sẽ sớm cập nhật sản phẩm'}
+                    </p>
+                </div>
+            `;
+            return;
+        }
+
+        grid.innerHTML = filtered.map(p => renderProductCard(p)).join('');
+    }
+
+    function renderProductCard(p) {
+        const hasSale = p.sale_price && p.sale_price < p.price;
+        const finalPrice = hasSale ? p.sale_price : p.price;
+        const discount = hasSale ? Math.round((1 - p.sale_price / p.price) * 100) : 0;
+        const outOfStock = p.stock === 0;
+
+        let badge = '';
+        if (outOfStock) badge = `<span class="product-badge out">Hết hàng</span>`;
+        else if (p.is_featured) badge = `<span class="product-badge hot">⭐ Nổi bật</span>`;
+
+        const adminActions = isAdmin ? `
+            <div style="position: absolute; top: 8px; right: 8px; display: flex; gap: 4px; z-index: 5;">
+                <button onclick="event.preventDefault(); event.stopPropagation(); editProduct('${p.id}')"
+                        style="width: 30px; height: 30px; border-radius: 50%; border: 0; background: #1769ff; color: #fff; cursor: pointer; font-size: 13px; box-shadow: 0 3px 10px rgba(0,0,0,0.2);">✏️</button>
+                <button onclick="event.preventDefault(); event.stopPropagation(); deleteProduct('${p.id}')"
+                        style="width: 30px; height: 30px; border-radius: 50%; border: 0; background: #dc2626; color: #fff; cursor: pointer; font-size: 13px; box-shadow: 0 3px 10px rgba(0,0,0,0.2);">🗑️</button>
+            </div>
+        ` : '';
+
+        const imageHtml = p.image_url
+            ? `<img src="${escapeHtml(p.image_url)}" class="product-img" alt="${escapeHtml(p.name)}" onerror="this.style.display='none'; this.nextElementSibling.style.display='flex';">
+               <div class="product-img-placeholder" style="display:none;">🛍️</div>`
+            : `<div class="product-img-placeholder">🛍️</div>`;
+
+        return `
+            <a href="product-detail.html?id=${p.id}" class="product-card">
+                ${badge}
+                ${adminActions}
+                ${imageHtml}
+                <div class="product-body">
+                    ${p.brand ? `<div class="product-brand">${escapeHtml(p.brand)}</div>` : ''}
+                    <h3 class="product-name">${escapeHtml(p.name)}</h3>
+                    <div class="product-price-row">
+                        <span class="product-price">${formatPrice(finalPrice)}</span>
+                        ${hasSale ? `
+                            <span class="product-price-old">${formatPrice(p.price)}</span>
+                            <span class="product-sale-badge">-${discount}%</span>
+                        ` : ''}
+                    </div>
+                    <div class="product-meta">
+                        <span>👁 ${p.views || 0}</span>
+                        <span>${outOfStock ? '❌ Hết' : `📦 Còn ${p.stock}`}</span>
+                    </div>
+                </div>
+            </a>
+        `;
+    }
+
+    // ==========================================
+    // FILTER
+    // ==========================================
+    window.filterCat = function(catId) {
+        selectedCategory = catId;
+        document.querySelectorAll('.cat-pill').forEach(p => p.classList.remove('active'));
+        event.target.classList.add('active');
+        renderProducts();
+    };
+
+    window.filterProducts = function() {
+        renderProducts();
+    };
+
+    // ==========================================
+    // ADMIN: THÊM/SỬA SẢN PHẨM
+    // ==========================================
+    function openProductModal(productId = null) {
+        if (!isAdmin) {
+            alert('⛔ Chỉ admin mới có quyền!');
+            return;
+        }
+
+        editingProductId = productId;
+        const modal = document.getElementById('productModal');
+        const form = document.getElementById('productForm');
+        const title = document.getElementById('productModalTitle');
+        const msgEl = document.getElementById('productFormMessage');
+
+        form.reset();
+        msgEl.className = 'form-message';
+        document.getElementById('imagePreview').style.display = 'none';
+
+        if (productId) {
+            const p = allProducts.find(x => x.id === productId);
+            if (!p) return;
+
+            title.textContent = '✏️ Sửa sản phẩm';
+            form.querySelector('[name="name"]').value = p.name || '';
+            form.querySelector('[name="category_id"]').value = p.category_id || '';
+            form.querySelector('[name="price"]').value = p.price || 0;
+            form.querySelector('[name="sale_price"]').value = p.sale_price || '';
+            form.querySelector('[name="stock"]').value = p.stock || 0;
+            form.querySelector('[name="unit"]').value = p.unit || 'cái';
+            form.querySelector('[name="brand"]').value = p.brand || '';
+            form.querySelector('[name="short_description"]').value = p.short_description || '';
+            form.querySelector('[name="description"]').value = p.description || '';
+            form.querySelector('[name="image_url"]').value = p.image_url || '';
+            form.querySelector('[name="is_featured"]').checked = p.is_featured || false;
+            form.querySelector('[name="is_active"]').checked = p.is_active !== false;
+
+            if (p.image_url) {
+                document.getElementById('imagePreviewImg').src = p.image_url;
+                document.getElementById('imagePreview').style.display = 'block';
+            }
+        } else {
+            title.textContent = '➕ Thêm sản phẩm mới';
+        }
+
+        modal.hidden = false;
+    }
+
+    window.editProduct = function(id) {
+        openProductModal(id);
+    };
+
+    window.deleteProduct = async function(id) {
+        if (!isAdmin) return;
+        if (!confirm('Xóa sản phẩm này?')) return;
+
+        try {
+            const { error } = await supabaseClient
+                .from('products')
+                .delete()
+                .eq('id', id);
+
+            if (error) throw error;
+
+            console.log('✅ Đã xóa sản phẩm');
+            await loadProducts();
+
+        } catch (err) {
+            alert('Lỗi xóa: ' + err.message);
+        }
+    };
+
+    async function handleProductSubmit(e) {
+        e.preventDefault();
+        const form = e.target;
+        const formData = new FormData(form);
+
+        const name = formData.get('name').trim();
+        const categoryId = formData.get('category_id');
+        const price = parseInt(formData.get('price'));
+        const salePrice = formData.get('sale_price') ? parseInt(formData.get('sale_price')) : null;
+
+        if (!name || !categoryId || isNaN(price)) {
+            showFormMessage('⚠️ Vui lòng nhập đủ thông tin bắt buộc!', 'error');
+            return;
+        }
+
+        if (salePrice && salePrice >= price) {
+            showFormMessage('⚠️ Giá khuyến mãi phải nhỏ hơn giá gốc!', 'error');
+            return;
+        }
+
+        const payload = {
+            name: name,
+            slug: slugify(name),
+            category_id: categoryId,
+            price: price,
+            sale_price: salePrice,
+            stock: parseInt(formData.get('stock')) || 0,
+            unit: formData.get('unit') || 'cái',
+            brand: formData.get('brand')?.trim() || null,
+            short_description: formData.get('short_description')?.trim() || null,
+            description: formData.get('description')?.trim() || null,
+            image_url: formData.get('image_url')?.trim() || null,
+            is_featured: formData.get('is_featured') === 'on',
+            is_active: formData.get('is_active') === 'on'
+        };
+
+        const btn = document.getElementById('submitProductBtn');
+        btn.disabled = true;
+        btn.textContent = '⏳ Đang lưu...';
+
+        try {
+            let result;
+            if (editingProductId) {
+                result = await supabaseClient
+                    .from('products')
+                    .update(payload)
+                    .eq('id', editingProductId);
+            } else {
+                result = await supabaseClient
+                    .from('products')
+                    .insert(payload);
+            }
+
+            if (result.error) throw result.error;
+
+            showFormMessage('✅ ' + (editingProductId ? 'Cập nhật' : 'Thêm') + ' sản phẩm thành công!', 'success');
+            setTimeout(() => {
+                document.getElementById('productModal').hidden = true;
+                loadProducts();
+            }, 800);
+
+        } catch (err) {
+            console.error(err);
+            showFormMessage('Lỗi: ' + err.message, 'error');
+        } finally {
+            btn.disabled = false;
+            btn.textContent = '💾 Lưu';
+        }
+    }
+
+    function showFormMessage(text, type) {
+        const el = document.getElementById('productFormMessage');
+        el.textContent = text;
+        el.className = 'form-message show ' + type;
+    }
+
+    // ==========================================
+    // IMAGE UPLOAD
+    // ==========================================
+    async function handleImageUpload(file) {
+        if (!file) return;
+        if (file.size > 5 * 1024 * 1024) {
+            alert('Ảnh quá 5MB!');
+            return;
+        }
+
+        const localUrl = URL.createObjectURL(file);
+        document.getElementById('imagePreviewImg').src = localUrl;
+        document.getElementById('imagePreview').style.display = 'block';
+
+        try {
+            const fileName = `products/${Date.now()}-${Math.random().toString(36).substring(7)}-${file.name.replace(/[^a-zA-Z0-9.-]/g, '_')}`;
+            const { data, error } = await supabaseClient.storage
+                .from(STORAGE_BUCKET)
+                .upload(fileName, file);
+
+            if (error) throw error;
+
+            const { data: { publicUrl } } = supabaseClient.storage
+                .from(STORAGE_BUCKET)
+                .getPublicUrl(fileName);
+
+            document.querySelector('[name="image_url"]').value = publicUrl;
+            document.getElementById('imagePreviewImg').src = publicUrl;
+            console.log('✅ Upload ảnh:', publicUrl);
+
+        } catch (err) {
+            alert('Lỗi upload: ' + err.message);
+        }
+    }
+
+    // ==========================================
+    // CART COUNT
+    // ==========================================
+    function updateCartCount() {
+        try {
+            const cart = JSON.parse(localStorage.getItem('sportsvn_cart') || '[]');
+            const count = cart.reduce((sum, item) => sum + (item.quantity || 1), 0);
+            document.getElementById('cartCount').textContent = count;
+        } catch (e) {}
+    }
+
+    // ==========================================
+    // BIND EVENTS
+    // ==========================================
+    function bindEvents() {
+        document.getElementById('mobileMenu')?.addEventListener('click', () => {
+            document.querySelector('.sidebar')?.classList.toggle('open');
+        });
+
+        document.getElementById('adminAddBtn')?.addEventListener('click', () => openProductModal());
+        document.getElementById('closeProductModal')?.addEventListener('click', () => {
+            document.getElementById('productModal').hidden = true;
+        });
+        document.getElementById('cancelProductBtn')?.addEventListener('click', () => {
+            document.getElementById('productModal').hidden = true;
+        });
+        document.getElementById('productForm')?.addEventListener('submit', handleProductSubmit);
+        document.getElementById('productModal')?.addEventListener('click', (e) => {
+            if (e.target.id === 'productModal') e.target.hidden = true;
+        });
+
+        // Image tabs
+        document.getElementById('tabUrlBtn')?.addEventListener('click', () => {
+            currentImageMode = 'url';
+            document.getElementById('urlMode').style.display = 'block';
+            document.getElementById('uploadMode').style.display = 'none';
+        });
+        document.getElementById('tabUploadBtn')?.addEventListener('click', () => {
+            currentImageMode = 'upload';
+            document.getElementById('urlMode').style.display = 'none';
+            document.getElementById('uploadMode').style.display = 'block';
+        });
+        document.getElementById('uploadImageBtn')?.addEventListener('click', () => {
+            document.getElementById('imageFileInput').click();
+        });
+        document.getElementById('imageFileInput')?.addEventListener('change', (e) => {
+            handleImageUpload(e.target.files[0]);
+        });
+        document.getElementById('imageUrlInput')?.addEventListener('input', (e) => {
+            const url = e.target.value.trim();
+            if (url && /^https?:\/\//.test(url)) {
+                document.getElementById('imagePreviewImg').src = url;
+                document.getElementById('imagePreview').style.display = 'block';
+            }
+        });
+    }
+
+    // ==========================================
+    // HELPERS
+    // ==========================================
+    function formatPrice(price) {
+        return new Intl.NumberFormat('vi-VN').format(price) + 'đ';
+    }
+
+    function slugify(text) {
+        return text.toLowerCase()
+            .normalize('NFD').replace(/[\u0300-\u036f]/g, '')
+            .replace(/đ/g, 'd').replace(/Đ/g, 'D')
+            .replace(/[^a-z0-9]+/g, '-')
+            .replace(/^-+|-+$/g, '')
+            .substring(0, 80);
+    }
+
+    function escapeHtml(text) {
+        return String(text || '')
+            .replace(/&/g, '&amp;')
+            .replace(/</g, '&lt;')
+            .replace(/>/g, '&gt;')
+            .replace(/"/g, '&quot;')
+            .replace(/'/g, '&#039;');
+    }
+})();
+</script>
+
+</body>
+</html>
