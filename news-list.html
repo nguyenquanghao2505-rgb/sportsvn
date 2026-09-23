@@ -11,9 +11,9 @@
             display: flex;
             justify-content: space-between;
             align-items: center;
-            margin-bottom: 32px;
+            margin-bottom: 20px;
             flex-wrap: wrap;
-            gap: 16px;
+            gap: 12px;
         }
         
         .news-page-header-left {
@@ -21,27 +21,27 @@
         }
         
         .news-page-header h1 {
-            font-size: 32px;
+            font-size: 24px;
             font-weight: 900;
             color: var(--text-dark);
-            margin-bottom: 8px;
+            margin-bottom: 4px;
         }
         
         .news-page-header p {
             color: var(--text-muted);
-            font-size: 14px;
+            font-size: 13px;
         }
         
-        /* ✅ NÚT ĐĂNG BÀI - CHỈ HIỆN VỚI ADMIN */
+        /* NÚT ĐĂNG BÀI - CHỈ HIỆN VỚI ADMIN */
         .admin-upload-btn {
             display: none;
             align-items: center;
-            gap: 8px;
-            padding: 12px 24px;
+            gap: 6px;
+            padding: 10px 20px;
             background: linear-gradient(135deg, #1769ff 0%, #4d94ff 100%);
             color: #fff;
             border-radius: 10px;
-            font-size: 13.5px;
+            font-size: 13px;
             font-weight: 700;
             text-decoration: none;
             box-shadow: 0 4px 12px rgba(23, 105, 255, 0.3);
@@ -58,41 +58,88 @@
             box-shadow: 0 6px 20px rgba(23, 105, 255, 0.4);
         }
         
+        /* GRID THU GỌN */
         .public-news-grid {
             display: grid;
-            grid-template-columns: repeat(auto-fill, minmax(340px, 1fr));
-            gap: 24px;
+            grid-template-columns: repeat(auto-fill, minmax(220px, 1fr));
+            gap: 12px;
         }
         
         .public-news-card {
             background: #fff;
-            border-radius: 16px;
+            border-radius: 12px;
             overflow: hidden;
-            box-shadow: 0 2px 8px rgba(0, 0, 0, 0.06);
+            box-shadow: 0 2px 6px rgba(0, 0, 0, 0.06);
             border: 1px solid var(--border);
-            transition: all 0.3s ease;
+            transition: all 0.25s ease;
             text-decoration: none;
             color: inherit;
             display: flex;
             flex-direction: column;
             cursor: pointer;
+            position: relative;
         }
         
         .public-news-card:hover {
-            transform: translateY(-6px);
-            box-shadow: 0 16px 32px rgba(0, 0, 0, 0.12);
+            transform: translateY(-4px);
+            box-shadow: 0 10px 24px rgba(0, 0, 0, 0.1);
+        }
+        
+        /* Admin actions */
+        .news-admin-actions {
+            position: absolute;
+            top: 8px;
+            right: 8px;
+            display: flex;
+            gap: 4px;
+            z-index: 5;
+            opacity: 0;
+            transition: opacity 0.2s;
+        }
+        .public-news-card:hover .news-admin-actions {
+            opacity: 1;
+        }
+        .news-action-btn {
+            width: 30px;
+            height: 30px;
+            border-radius: 50%;
+            border: 0;
+            cursor: pointer;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 13px;
+            transition: all 0.2s;
+            box-shadow: 0 3px 10px rgba(0,0,0,0.2);
+            font-family: inherit;
+        }
+        .news-action-btn.edit {
+            background: #1769ff;
+            color: #fff;
+        }
+        .news-action-btn.edit:hover {
+            background: #0d47a1;
+            transform: scale(1.1);
+        }
+        .news-action-btn.delete {
+            background: #dc2626;
+            color: #fff;
+        }
+        .news-action-btn.delete:hover {
+            background: #991b1b;
+            transform: scale(1.1);
         }
         
         .public-news-card-image {
             width: 100%;
-            height: 200px;
+            height: 130px;
             object-fit: cover;
             background: #e5e7eb;
             display: block;
         }
         
         .public-news-card-body {
-            padding: 20px;
+            padding: 12px 14px 14px;
             flex: 1;
             display: flex;
             flex-direction: column;
@@ -100,16 +147,16 @@
         
         .public-news-card-category {
             display: inline-block;
-            padding: 4px 12px;
+            padding: 3px 9px;
             background: var(--primary-light);
             color: var(--primary);
             border-radius: 20px;
-            font-size: 10px;
+            font-size: 9px;
             font-weight: 800;
             text-transform: uppercase;
             letter-spacing: 0.5px;
             width: fit-content;
-            margin-bottom: 12px;
+            margin-bottom: 6px;
         }
         
         .public-news-card-category.hot {
@@ -118,11 +165,11 @@
         }
         
         .public-news-card-title {
-            font-size: 17px;
+            font-size: 13px;
             font-weight: 800;
             color: var(--text-dark);
-            line-height: 1.4;
-            margin-bottom: 10px;
+            line-height: 1.35;
+            margin-bottom: 6px;
             display: -webkit-box;
             -webkit-line-clamp: 2;
             -webkit-box-orient: vertical;
@@ -130,12 +177,12 @@
         }
         
         .public-news-card-summary {
-            font-size: 13px;
+            font-size: 11px;
             color: var(--text-muted);
-            line-height: 1.6;
-            margin-bottom: 16px;
+            line-height: 1.5;
+            margin-bottom: 10px;
             display: -webkit-box;
-            -webkit-line-clamp: 3;
+            -webkit-line-clamp: 2;
             -webkit-box-orient: vertical;
             overflow: hidden;
             flex: 1;
@@ -145,42 +192,42 @@
             display: flex;
             justify-content: space-between;
             align-items: center;
-            padding-top: 14px;
+            padding-top: 8px;
             border-top: 1px solid var(--border-light);
-            font-size: 11px;
+            font-size: 10px;
             color: var(--text-light);
         }
         
         .public-news-card-readmore {
             color: var(--primary);
             font-weight: 700;
-            font-size: 12px;
+            font-size: 10px;
         }
         
-        @media (max-width: 640px) {
+        @media (max-width: 768px) {
             .public-news-grid {
-                grid-template-columns: 1fr;
+                grid-template-columns: repeat(auto-fill, minmax(160px, 1fr));
+                gap: 10px;
             }
-            .news-page-header {
-                flex-direction: column;
-                align-items: flex-start;
+            .public-news-card-image {
+                height: 110px;
             }
             .news-page-header h1 {
-                font-size: 24px;
+                font-size: 20px;
             }
-            .admin-upload-btn {
-                width: 100%;
-                justify-content: center;
+        }
+        
+        @media (max-width: 480px) {
+            .public-news-grid {
+                grid-template-columns: 1fr 1fr;
             }
         }
     </style>
 </head>
 
-<body>
+<body data-page="news-list.html">
 
     <div class="app">
-
-        <!-- Sidebar sẽ được tự động render bởi sidebar.js -->
 
         <main class="main">
 
@@ -209,7 +256,6 @@
                         <h1>📰 Tin tức thể thao</h1>
                         <p>Cập nhật tin tức & sự kiện thể thao mới nhất</p>
                     </div>
-                    <!-- ✅ NÚT ĐĂNG BÀI - CHỈ ADMIN THẤY -->
                     <a href="news.html" class="admin-upload-btn" id="adminUploadBtn">
                         ➕ Đăng bài viết
                     </a>
@@ -252,86 +298,159 @@
             );
 
             const grid = document.getElementById('publicNewsGrid');
+            const ADMIN_EMAIL = 'nguyenquanghao2505@gmail.com';
+            let isAdmin = false;
 
             // ==========================================
-            // 1. HIỆN NÚT "ĐĂNG BÀI" NẾU LÀ ADMIN
+            // MOBILE MENU
             // ==========================================
-            async function checkAdminAndShowButton() {
+            document.getElementById('mobileMenu')?.addEventListener('click', () => {
+                document.querySelector('.sidebar')?.classList.toggle('open');
+            });
+
+            // ==========================================
+            // 1. CHECK ADMIN
+            // ==========================================
+            async function checkAdmin() {
                 try {
                     const { data: { session } } = await supabaseClient.auth.getSession();
-                    if (!session) {
-                        console.log('ℹ️ Khách - Ẩn nút đăng bài');
-                        return;
+                    if (!session) return;
+
+                    if (session.user.email === ADMIN_EMAIL) {
+                        isAdmin = true;
+                    } else {
+                        const { data: roleData } = await supabaseClient
+                            .from('user_roles')
+                            .select('role')
+                            .eq('user_id', session.user.id)
+                            .eq('role', 'admin')
+                            .maybeSingle();
+                        if (roleData) isAdmin = true;
                     }
 
-                    const ADMIN_EMAIL = 'nguyenquanghao2505@gmail.com';
-                    if (session.user.email === ADMIN_EMAIL) {
+                    if (isAdmin) {
                         const btn = document.getElementById('adminUploadBtn');
-                        if (btn) {
-                            btn.classList.add('visible');
-                            console.log('✅ Admin - Hiện nút đăng bài');
-                        }
-                    } else {
-                        console.log('ℹ️ Người dùng thường - Ẩn nút đăng bài');
+                        if (btn) btn.classList.add('visible');
+                        console.log('✅ Admin');
                     }
                 } catch (e) {
                     console.warn('Lỗi check admin:', e);
                 }
             }
 
-            await checkAdminAndShowButton();
+            await checkAdmin();
 
             // ==========================================
-            // 2. LOAD DANH SÁCH TIN TỨC
+            // 2. LOAD TIN TỨC
             // ==========================================
-            try {
-                const { data, error } = await supabaseClient
-                    .from('news')
-                    .select('*')
-                    .order('created_at', { ascending: false });
+            async function loadNews() {
+                try {
+                    const { data, error } = await supabaseClient
+                        .from('news')
+                        .select('*')
+                        .order('created_at', { ascending: false });
 
-                if (error) throw error;
+                    if (error) throw error;
 
-                if (!data || data.length === 0) {
+                    if (!data || data.length === 0) {
+                        grid.innerHTML = `
+                            <div style="grid-column:1/-1;text-align:center;padding:80px 20px;color:#6b7280;">
+                                <div style="font-size:64px;margin-bottom:16px;opacity:0.5;">📰</div>
+                                <h3 style="font-size:18px;color:#111827;margin-bottom:8px;">Chưa có tin tức nào</h3>
+                                <p style="font-size:13px;">Hãy quay lại sau để xem tin mới nhất</p>
+                            </div>
+                        `;
+                        return;
+                    }
+
+                    grid.innerHTML = data.map(news => {
+                        const adminActions = isAdmin ? `
+                            <div class="news-admin-actions">
+                                <a href="news.html?id=${news.id}" 
+                                   class="news-action-btn edit"
+                                   onclick="event.stopPropagation();"
+                                   title="Sửa bài viết">✏️</a>
+                                <button class="news-action-btn delete" 
+                                        onclick="event.stopPropagation(); event.preventDefault(); deleteNews('${news.id}')"
+                                        title="Xóa bài viết">🗑️</button>
+                            </div>
+                        ` : '';
+
+                        return `
+                            <a href="news-detail.html?id=${news.id}" class="public-news-card">
+                                ${adminActions}
+                                ${news.image_url ? 
+                                    `<img src="${news.image_url}" class="public-news-card-image" alt="${news.title}" onerror="this.style.display='none'; this.nextElementSibling.style.display='flex';">
+                                     <div class="public-news-card-image" style="display:none;align-items:center;justify-content:center;font-size:48px;">📰</div>` :
+                                    `<div class="public-news-card-image" style="display:flex;align-items:center;justify-content:center;font-size:48px;">📰</div>`
+                                }
+                                <div class="public-news-card-body">
+                                    <span class="public-news-card-category ${news.is_hot ? 'hot' : ''}">
+                                        ${news.is_hot ? '🔥 HOT' : (news.category || 'Tin thể thao')}
+                                    </span>
+                                    <h3 class="public-news-card-title">${escapeHtml(news.title)}</h3>
+                                    <p class="public-news-card-summary">${escapeHtml(news.summary || 'Nhấn để xem chi tiết...')}</p>
+                                    <div class="public-news-card-footer">
+                                        <span>📅 ${new Date(news.created_at).toLocaleDateString('vi-VN')}</span>
+                                        <span class="public-news-card-readmore">Đọc →</span>
+                                    </div>
+                                </div>
+                            </a>
+                        `;
+                    }).join('');
+
+                    console.log('✅ Đã load ' + data.length + ' tin tức');
+
+                } catch (err) {
+                    console.error('Lỗi:', err);
                     grid.innerHTML = `
-                        <div style="grid-column:1/-1;text-align:center;padding:80px 20px;color:#6b7280;">
-                            <div style="font-size:64px;margin-bottom:16px;opacity:0.5;">📰</div>
-                            <h3 style="font-size:20px;color:#111827;margin-bottom:8px;">Chưa có tin tức nào</h3>
-                            <p style="font-size:13px;">Hãy quay lại sau để xem tin mới nhất</p>
+                        <div style="grid-column:1/-1;text-align:center;padding:60px 20px;color:#dc2626;">
+                            ❌ Lỗi: ${err.message}
                         </div>
                     `;
+                }
+            }
+
+            await loadNews();
+
+            // ==========================================
+            // 3. XÓA BÀI VIẾT
+            // ==========================================
+            window.deleteNews = async function(newsId) {
+                if (!isAdmin) {
+                    alert('⛔ Chỉ admin mới có quyền xóa!');
                     return;
                 }
 
-                grid.innerHTML = data.map(news => `
-                    <a href="news-detail.html?id=${news.id}" class="public-news-card">
-                        ${news.image_url ? 
-                            `<img src="${news.image_url}" class="public-news-card-image" alt="${news.title}">` :
-                            `<div class="public-news-card-image" style="display:flex;align-items:center;justify-content:center;font-size:48px;">📰</div>`
-                        }
-                        <div class="public-news-card-body">
-                            <span class="public-news-card-category ${news.is_hot ? 'hot' : ''}">
-                                ${news.is_hot ? '🔥 HOT' : (news.category || 'Tin thể thao')}
-                            </span>
-                            <h3 class="public-news-card-title">${news.title}</h3>
-                            <p class="public-news-card-summary">${news.summary || 'Nhấn để xem chi tiết...'}</p>
-                            <div class="public-news-card-footer">
-                                <span>📅 ${new Date(news.created_at).toLocaleDateString('vi-VN')}</span>
-                                <span class="public-news-card-readmore">Đọc tiếp →</span>
-                            </div>
-                        </div>
-                    </a>
-                `).join('');
+                if (!confirm('Bạn có chắc muốn xóa bài viết này?\n\nHành động không thể hoàn tác!')) return;
 
-                console.log('✅ Đã load ' + data.length + ' tin tức');
+                try {
+                    const { error } = await supabaseClient
+                        .from('news')
+                        .delete()
+                        .eq('id', newsId);
 
-            } catch (err) {
-                console.error('Lỗi:', err);
-                grid.innerHTML = `
-                    <div style="grid-column:1/-1;text-align:center;padding:60px 20px;color:#dc2626;">
-                        ❌ Lỗi: ${err.message}
-                    </div>
-                `;
+                    if (error) throw error;
+
+                    console.log('✅ Đã xóa bài viết:', newsId);
+                    await loadNews();
+
+                } catch (err) {
+                    console.error('Lỗi xóa:', err);
+                    alert('Lỗi xóa: ' + err.message);
+                }
+            };
+
+            // ==========================================
+            // HELPERS
+            // ==========================================
+            function escapeHtml(text) {
+                return String(text || '')
+                    .replace(/&/g, '&amp;')
+                    .replace(/</g, '&lt;')
+                    .replace(/>/g, '&gt;')
+                    .replace(/"/g, '&quot;')
+                    .replace(/'/g, '&#039;');
             }
         });
     </script>
