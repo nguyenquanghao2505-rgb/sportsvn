@@ -27,7 +27,6 @@
             .cart-layout { grid-template-columns: 1fr; }
         }
 
-        /* CART ITEMS */
         .cart-items-box {
             background: #fff;
             border-radius: 16px;
@@ -131,7 +130,6 @@
         }
         .cart-remove-btn:hover { background: #dc2626; color: #fff; }
 
-        /* SUMMARY */
         .cart-summary {
             background: #fff;
             border-radius: 16px;
@@ -206,7 +204,6 @@
         }
         .btn-continue:hover { text-decoration: underline; }
 
-        /* EMPTY */
         .cart-empty {
             text-align: center;
             padding: 80px 20px;
@@ -230,7 +227,6 @@
         }
         .btn-shop-now:hover { transform: translateY(-2px); box-shadow: 0 8px 20px rgba(26,58,122,0.3); }
 
-        /* CHECKOUT MODAL */
         .modal-overlay {
             position: fixed;
             inset: 0;
@@ -414,7 +410,6 @@
         .form-message.error { background: #fef2f2; color: #dc2626; border: 1px solid #fecaca; }
         .form-message.success { background: #ecfdf5; color: #059669; border: 1px solid #a7f3d0; }
 
-        /* SUCCESS MODAL */
         .success-box { text-align: center; padding: 20px; }
         .success-icon { font-size: 80px; margin-bottom: 16px; }
         .success-box h2 { font-size: 22px; margin-bottom: 10px; color: #059669; }
@@ -577,6 +572,8 @@
     </div>
 </div>
 
+<!-- ✅ EMAILJS LIBRARY -->
+<script src="https://cdn.jsdelivr.net/npm/@emailjs/browser@3/dist/email.min.js"></script>
 <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
 <script src="config.js"></script>
 <script>
@@ -587,7 +584,7 @@
     let cart = [];
     let settings = {};
     let selectedPayment = 'cod';
-    let pendingOrderCode = null; // ← Mã đơn được tạo trước khi submit
+    let pendingOrderCode = null;
 
     const SHIPPING_FEE = 30000;
     const FREE_SHIP_THRESHOLD = 500000;
@@ -595,6 +592,16 @@
     document.addEventListener('DOMContentLoaded', async function() {
         const config = window.SPORTSVN_CONFIG || {};
         if (!config.SUPABASE_URL || !config.SUPABASE_ANON_KEY) return;
+
+        // ✅ KHỞI TẠO EMAILJS
+        if (window.emailjs && config.EMAILJS_PUBLIC_KEY) {
+            try {
+                emailjs.init(config.EMAILJS_PUBLIC_KEY);
+                console.log('✅ EmailJS đã khởi tạo');
+            } catch (e) {
+                console.warn('⚠️ Lỗi khởi tạo EmailJS:', e);
+            }
+        }
 
         supabaseClient = window.supabase.createClient(
             config.SUPABASE_URL,
@@ -733,9 +740,6 @@
         `;
     }
 
-    // ==========================================
-    // CART ACTIONS
-    // ==========================================
     window.changeQty = function(idx, delta) {
         const item = cart[idx];
         if (!item) return;
@@ -762,9 +766,6 @@
         renderCart();
     };
 
-    // ==========================================
-    // CHECKOUT
-    // ==========================================
     window.openCheckout = function() {
         if (cart.length === 0) return;
 
@@ -775,10 +776,8 @@
         const shippingFee = subtotal >= FREE_SHIP_THRESHOLD ? 0 : SHIPPING_FEE;
         const total = subtotal + shippingFee;
 
-        // ✅ TẠO MÃ ĐƠN TRƯỚC KHI SUBMIT
         pendingOrderCode = generateOrderCode();
 
-        // ✅ HIỆN MÃ ĐƠN TRONG "NỘI DUNG CHUYỂN KHOẢN"
         document.getElementById('bankAmount').textContent = formatPrice(total);
         document.getElementById('bankContent').textContent = pendingOrderCode;
         
@@ -835,7 +834,6 @@
         const shippingFee = subtotal >= FREE_SHIP_THRESHOLD ? 0 : SHIPPING_FEE;
         const total = subtotal + shippingFee;
         
-        // ✅ DÙNG MÃ ĐƠN ĐÃ TẠO TRƯỚC ĐÓ (hoặc tạo mới nếu chưa có)
         const orderCode = pendingOrderCode || generateOrderCode();
 
         const orderData = {
@@ -860,6 +858,7 @@
         btn.textContent = '⏳ Đang xử lý...';
 
         try {
+            // 1. Lưu đơn vào Supabase
             const { data: order, error: orderError } = await supabaseClient
                 .from('orders')
                 .insert(orderData)
@@ -868,6 +867,7 @@
 
             if (orderError) throw orderError;
 
+            // 2. Lưu chi tiết đơn
             const orderItems = cart.map(item => ({
                 order_id: order.id,
                 product_id: item.id,
@@ -884,10 +884,45 @@
 
             if (itemsError) throw itemsError;
 
+            // ✅ 3. GỬI EMAIL THÔNG BÁO CHO ADMIN
+            try {
+                const config = window.SPORTSVN_CONFIG || {};
+                if (window.emailjs && config.EMAILJS_SERVICE_ID && config.EMAILJS_TEMPLATE_ID) {
+                    const itemsText = cart.map(item => 
+                        `• ${item.name} × ${item.quantity} = ${formatPrice((item.sale_price || item.price) * item.quantity)}`
+                    ).join('\n');
+
+                    const emailResult = await emailjs.send(
+                        config.EMAILJS_SERVICE_ID,
+                        config.EMAILJS_TEMPLATE_ID,
+                        {
+                            order_code: orderCode,
+                            customer_name: customerName,
+                            customer_phone: customerPhone,
+                            customer_email: formData.get('customer_email')?.trim() || 'Không có',
+                            customer_zalo: formData.get('customer_zalo')?.trim() || 'Không có',
+                            customer_address: customerAddress,
+                            customer_note: formData.get('customer_note')?.trim() || 'Không có',
+                            order_items: itemsText,
+                            total: formatPrice(total),
+                            payment_method: selectedPayment === 'bank' ? '🏦 Chuyển khoản' : '💵 COD'
+                        }
+                    );
+                    console.log('✅ Đã gửi email thông báo cho admin:', emailResult);
+                } else {
+                    console.warn('⚠️ EmailJS chưa sẵn sàng');
+                }
+            } catch (emailErr) {
+                console.error('⚠️ Không gửi được email:', emailErr);
+                // Không throw — vì đơn hàng đã được lưu trong DB
+            }
+
+            // 4. Xóa giỏ hàng
             cart = [];
             saveCart();
             pendingOrderCode = null;
 
+            // 5. Hiện modal thành công
             closeCheckout();
             document.getElementById('successOrderCode').textContent = orderCode;
             document.getElementById('successModal').hidden = false;
@@ -909,9 +944,6 @@
         el.className = 'form-message show ' + type;
     }
 
-    // ==========================================
-    // BIND EVENTS
-    // ==========================================
     function bindEvents() {
         document.getElementById('mobileMenu')?.addEventListener('click', () => {
             document.querySelector('.sidebar')?.classList.toggle('open');
@@ -925,9 +957,6 @@
         document.getElementById('orderForm')?.addEventListener('submit', handleOrderSubmit);
     }
 
-    // ==========================================
-    // HELPERS
-    // ==========================================
     function formatPrice(price) {
         return new Intl.NumberFormat('vi-VN').format(price) + 'đ';
     }
