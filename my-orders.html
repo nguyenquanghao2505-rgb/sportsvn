@@ -1,0 +1,726 @@
+<!DOCTYPE html>
+<html lang="vi">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Tra cứu đơn hàng - SportsVN</title>
+    <link rel="stylesheet" href="styles.css">
+    <script src="sidebar.js" defer></script>
+    <style>
+        .mo-header {
+            background: linear-gradient(135deg, #0d1b3e, #1a3a7a);
+            border-radius: 16px;
+            padding: 28px;
+            color: #fff;
+            margin-bottom: 20px;
+            text-align: center;
+        }
+        .mo-header h1 { font-size: 26px; margin-bottom: 8px; }
+        .mo-header p { opacity: 0.85; font-size: 14px; }
+
+        /* SEARCH BOX */
+        .mo-search {
+            background: #fff;
+            border-radius: 16px;
+            padding: 24px;
+            box-shadow: 0 2px 10px rgba(0,0,0,0.06);
+            margin-bottom: 20px;
+        }
+        .mo-search-grid {
+            display: grid;
+            grid-template-columns: 1fr 1fr auto;
+            gap: 12px;
+            align-items: end;
+        }
+        @media (max-width: 768px) {
+            .mo-search-grid { grid-template-columns: 1fr; }
+        }
+        .mo-field label {
+            display: block;
+            font-size: 13px;
+            font-weight: 700;
+            color: #1a1a2e;
+            margin-bottom: 6px;
+        }
+        .mo-field input {
+            width: 100%;
+            padding: 12px 14px;
+            border: 2px solid #e9ecef;
+            border-radius: 10px;
+            font-size: 14px;
+            font-family: inherit;
+            outline: none;
+            transition: all 0.2s;
+            background: #f9fafb;
+        }
+        .mo-field input:focus {
+            border-color: #1a3a7a;
+            background: #fff;
+            box-shadow: 0 0 0 4px rgba(26,58,122,0.1);
+        }
+        .mo-btn-search {
+            padding: 12px 28px;
+            background: linear-gradient(135deg, #1a3a7a, #2d4a9e);
+            color: #fff;
+            border: 0;
+            border-radius: 10px;
+            font-size: 14px;
+            font-weight: 800;
+            cursor: pointer;
+            font-family: inherit;
+            white-space: nowrap;
+            transition: all 0.2s;
+        }
+        .mo-btn-search:hover:not(:disabled) { transform: translateY(-2px); box-shadow: 0 8px 20px rgba(26,58,122,0.3); }
+        .mo-btn-search:disabled { opacity: 0.6; cursor: wait; }
+
+        .mo-hint {
+            font-size: 12px;
+            color: #6c757d;
+            margin-top: 12px;
+            padding: 10px 14px;
+            background: #f9fafb;
+            border-left: 3px solid #1769ff;
+            border-radius: 8px;
+        }
+
+        /* ORDER RESULT */
+        .mo-order-card {
+            background: #fff;
+            border-radius: 16px;
+            box-shadow: 0 2px 10px rgba(0,0,0,0.06);
+            overflow: hidden;
+            margin-bottom: 20px;
+        }
+
+        .mo-order-header {
+            background: linear-gradient(135deg, #0d1b3e, #1a3a7a);
+            color: #fff;
+            padding: 20px 24px;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            flex-wrap: wrap;
+            gap: 12px;
+        }
+        .mo-order-code {
+            font-size: 20px;
+            font-weight: 900;
+            letter-spacing: 1px;
+            font-family: 'Courier New', monospace;
+            margin-bottom: 4px;
+        }
+        .mo-order-date {
+            font-size: 13px;
+            opacity: 0.85;
+        }
+        .mo-order-status-badge {
+            padding: 8px 16px;
+            border-radius: 20px;
+            font-size: 12px;
+            font-weight: 800;
+            text-transform: uppercase;
+            letter-spacing: 0.5px;
+        }
+
+        /* TIMELINE */
+        .mo-timeline {
+            padding: 24px;
+            background: #f9fafb;
+        }
+        .mo-timeline-steps {
+            display: flex;
+            justify-content: space-between;
+            position: relative;
+            margin-bottom: 8px;
+        }
+        .mo-timeline-steps::before {
+            content: '';
+            position: absolute;
+            top: 20px;
+            left: 10%;
+            right: 10%;
+            height: 3px;
+            background: #e5e7eb;
+            z-index: 0;
+        }
+        .mo-step {
+            flex: 1;
+            text-align: center;
+            position: relative;
+            z-index: 1;
+        }
+        .mo-step-icon {
+            width: 40px;
+            height: 40px;
+            border-radius: 50%;
+            background: #e5e7eb;
+            color: #9ca3af;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 18px;
+            margin: 0 auto 8px;
+            border: 3px solid #f9fafb;
+            transition: all 0.3s;
+        }
+        .mo-step.done .mo-step-icon {
+            background: #00b894;
+            color: #fff;
+        }
+        .mo-step.active .mo-step-icon {
+            background: #1769ff;
+            color: #fff;
+            box-shadow: 0 0 0 4px rgba(23,105,255,0.2);
+            animation: pulse 1.5s infinite;
+        }
+        @keyframes pulse {
+            0%, 100% { box-shadow: 0 0 0 4px rgba(23,105,255,0.2); }
+            50% { box-shadow: 0 0 0 8px rgba(23,105,255,0.1); }
+        }
+        .mo-step-label {
+            font-size: 12px;
+            font-weight: 700;
+            color: #6c757d;
+        }
+        .mo-step.done .mo-step-label,
+        .mo-step.active .mo-step-label {
+            color: #1a1a2e;
+        }
+        .mo-step-time {
+            font-size: 10px;
+            color: #9ca3af;
+            margin-top: 2px;
+        }
+
+        .mo-cancelled-banner {
+            background: #fee2e2;
+            color: #991b1b;
+            padding: 14px 20px;
+            border-radius: 10px;
+            text-align: center;
+            font-weight: 700;
+            font-size: 14px;
+        }
+
+        /* ORDER INFO */
+        .mo-order-info {
+            padding: 24px;
+        }
+        .mo-info-section {
+            margin-bottom: 20px;
+            padding-bottom: 20px;
+            border-bottom: 1px solid #f3f4f6;
+        }
+        .mo-info-section:last-child { border-bottom: 0; padding-bottom: 0; margin-bottom: 0; }
+        .mo-info-section h3 {
+            font-size: 14px;
+            font-weight: 900;
+            color: #1a3a7a;
+            margin-bottom: 12px;
+            display: flex;
+            align-items: center;
+            gap: 6px;
+        }
+        .mo-info-row {
+            display: flex;
+            justify-content: space-between;
+            padding: 6px 0;
+            font-size: 13px;
+        }
+        .mo-info-row span:first-child { color: #6c757d; }
+        .mo-info-row span:last-child { font-weight: 700; color: #1a1a2e; text-align: right; }
+
+        .mo-items-list {
+            background: #f9fafb;
+            border-radius: 10px;
+            padding: 12px 14px;
+        }
+        .mo-item {
+            display: flex;
+            gap: 10px;
+            padding: 8px 0;
+            border-bottom: 1px solid #e5e7eb;
+            align-items: center;
+        }
+        .mo-item:last-child { border-bottom: 0; }
+        .mo-item-img {
+            width: 50px;
+            height: 50px;
+            border-radius: 8px;
+            object-fit: cover;
+            background: #f3f4f6;
+        }
+        .mo-item-info { flex: 1; }
+        .mo-item-name {
+            font-size: 13px;
+            font-weight: 700;
+            color: #1a1a2e;
+            margin-bottom: 2px;
+        }
+        .mo-item-price {
+            font-size: 12px;
+            color: #6c757d;
+        }
+        .mo-item-qty {
+            font-size: 12px;
+            color: #6c757d;
+            font-weight: 700;
+        }
+
+        .mo-total-row {
+            display: flex;
+            justify-content: space-between;
+            padding: 8px 0;
+            font-size: 14px;
+        }
+        .mo-total-row span:first-child { color: #6c757d; }
+        .mo-total-row span:last-child { font-weight: 700; color: #1a1a2e; }
+        .mo-total-row.grand {
+            font-size: 18px;
+            font-weight: 900;
+            padding-top: 14px;
+            margin-top: 8px;
+            border-top: 2px solid #f3f4f6;
+        }
+        .mo-total-row.grand span:last-child {
+            color: #e94560;
+            font-size: 22px;
+        }
+
+        .mo-support-bar {
+            background: linear-gradient(135deg, #fff8e6, #fff3cd);
+            border-left: 4px solid #f39c12;
+            padding: 14px 18px;
+            border-radius: 10px;
+            margin-top: 20px;
+            font-size: 13px;
+            color: #856404;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            flex-wrap: wrap;
+            gap: 10px;
+        }
+        .mo-support-bar .btn {
+            padding: 8px 16px;
+            background: #f39c12;
+            color: #fff;
+            border: 0;
+            border-radius: 8px;
+            font-weight: 700;
+            cursor: pointer;
+            text-decoration: none;
+            font-size: 12px;
+            font-family: inherit;
+        }
+        .mo-support-bar .btn:hover { background: #e67e22; }
+
+        /* EMPTY */
+        .mo-empty {
+            text-align: center;
+            padding: 60px 20px;
+            background: #fff;
+            border-radius: 16px;
+            box-shadow: 0 2px 10px rgba(0,0,0,0.06);
+        }
+        .mo-empty-icon { font-size: 64px; margin-bottom: 16px; opacity: 0.4; }
+        .mo-empty h2 { font-size: 20px; color: #1a1a2e; margin-bottom: 8px; }
+        .mo-empty p { color: #6c757d; font-size: 14px; }
+
+        .mo-error {
+            background: #fef2f2;
+            color: #dc2626;
+            padding: 16px 20px;
+            border-radius: 10px;
+            border-left: 4px solid #dc2626;
+            font-size: 14px;
+            font-weight: 600;
+            margin-bottom: 20px;
+        }
+
+        /* LOADING */
+        .mo-loading {
+            text-align: center;
+            padding: 60px 20px;
+            color: #6c757d;
+        }
+        .mo-loading-icon {
+            font-size: 40px;
+            display: inline-block;
+            animation: spin 1s linear infinite;
+            margin-bottom: 12px;
+        }
+        @keyframes spin {
+            from { transform: rotate(0deg); }
+            to { transform: rotate(360deg); }
+        }
+    </style>
+</head>
+<body data-page="my-orders.html">
+
+<div class="app">
+    <main class="main">
+        <header class="topbar">
+            <div class="topbar-left">
+                <button class="mobile-menu" id="mobileMenu">☰</button>
+                <div class="topbar-brand">
+                    <span class="topbar-label">SPORTS MANAGEMENT PLATFORM</span>
+                    <h1 class="topbar-title-main">SPORTS<span>VN</span></h1>
+                    <p class="topbar-subtitle">Tra cứu đơn hàng</p>
+                </div>
+            </div>
+            <div class="topbar-right">
+                <a href="shop.html" class="topbar-cta" style="background: #f3f4f6; color: #4b5563; box-shadow: none;">
+                    ← Cửa hàng
+                </a>
+            </div>
+        </header>
+
+        <section class="content">
+            <div class="mo-header">
+                <h1>📦 Tra cứu đơn hàng</h1>
+                <p>Nhập mã đơn hàng và số điện thoại để kiểm tra trạng thái đơn</p>
+            </div>
+
+            <div class="mo-search">
+                <div class="mo-search-grid">
+                    <div class="mo-field">
+                        <label>🔖 Mã đơn hàng</label>
+                        <input type="text" id="orderCodeInput" placeholder="VD: SV2309AB12" style="text-transform: uppercase;">
+                    </div>
+                    <div class="mo-field">
+                        <label>📞 Số điện thoại</label>
+                        <input type="tel" id="phoneInput" placeholder="VD: 0905771177">
+                    </div>
+                    <button class="mo-btn-search" id="searchBtn" onclick="searchOrder()">
+                        🔍 Tra cứu
+                    </button>
+                </div>
+                <div class="mo-hint">
+                    💡 Mã đơn hàng được gửi trong thông báo "Đặt hàng thành công". Nếu quên, vui lòng liên hệ hotline <strong>0905.771177</strong>.
+                </div>
+            </div>
+
+            <div id="resultContainer"></div>
+        </section>
+
+        <footer class="footer">
+            <span>© 2026 SportsVN</span>
+            <span>Nền tảng công nghệ thể thao Việt Nam</span>
+        </footer>
+    </main>
+</div>
+
+<script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+<script src="config.js"></script>
+<script>
+(function() {
+    'use strict';
+
+    let supabaseClient = null;
+
+    document.addEventListener('DOMContentLoaded', function() {
+        const config = window.SPORTSVN_CONFIG || {};
+        if (!config.SUPABASE_URL || !config.SUPABASE_ANON_KEY) return;
+
+        supabaseClient = window.supabase.createClient(
+            config.SUPABASE_URL,
+            config.SUPABASE_ANON_KEY
+        );
+
+        // Enter để tìm
+        document.getElementById('orderCodeInput')?.addEventListener('keypress', (e) => {
+            if (e.key === 'Enter') searchOrder();
+        });
+        document.getElementById('phoneInput')?.addEventListener('keypress', (e) => {
+            if (e.key === 'Enter') searchOrder();
+        });
+
+        // Mobile menu
+        document.getElementById('mobileMenu')?.addEventListener('click', () => {
+            document.querySelector('.sidebar')?.classList.toggle('open');
+        });
+
+        // Tự động tra cứu nếu URL có ?code=...
+        const params = new URLSearchParams(window.location.search);
+        const codeFromUrl = params.get('code');
+        if (codeFromUrl) {
+            document.getElementById('orderCodeInput').value = codeFromUrl.toUpperCase();
+            // Focus vào ô SĐT
+            document.getElementById('phoneInput').focus();
+        }
+    });
+
+    window.searchOrder = async function() {
+        const code = document.getElementById('orderCodeInput').value.trim().toUpperCase();
+        const phone = document.getElementById('phoneInput').value.trim().replace(/\s/g, '');
+        const btn = document.getElementById('searchBtn');
+        const container = document.getElementById('resultContainer');
+
+        if (!code || !phone) {
+            container.innerHTML = `
+                <div class="mo-error">
+                    ⚠️ Vui lòng nhập đầy đủ <strong>mã đơn hàng</strong> và <strong>số điện thoại</strong>!
+                </div>
+            `;
+            return;
+        }
+
+        btn.disabled = true;
+        btn.innerHTML = '⏳ Đang tìm...';
+
+        container.innerHTML = `
+            <div class="mo-loading">
+                <div class="mo-loading-icon">⏳</div>
+                <p>Đang tra cứu đơn hàng...</p>
+            </div>
+        `;
+
+        try {
+            // Tìm đơn hàng theo mã + SĐT
+            const { data: order, error } = await supabaseClient
+                .from('orders')
+                .select('*')
+                .eq('order_code', code)
+                .eq('customer_phone', phone)
+                .maybeSingle();
+
+            if (error) throw error;
+
+            if (!order) {
+                container.innerHTML = `
+                    <div class="mo-error">
+                        ❌ Không tìm thấy đơn hàng nào khớp với mã <strong>${escapeHtml(code)}</strong> và SĐT <strong>${escapeHtml(phone)}</strong>.<br><br>
+                        💡 Vui lòng kiểm tra lại:<br>
+                        • Mã đơn hàng có đúng không?<br>
+                        • Số điện thoại có đúng với số đã dùng khi đặt hàng không?<br>
+                        • Liên hệ hotline <strong>0905.771177</strong> để được hỗ trợ.
+                    </div>
+                `;
+                return;
+            }
+
+            // Load chi tiết sản phẩm
+            const { data: items } = await supabaseClient
+                .from('order_items')
+                .select('*')
+                .eq('order_id', order.id);
+
+            renderOrder(order, items || []);
+
+        } catch (err) {
+            console.error('Lỗi tra cứu:', err);
+            container.innerHTML = `
+                <div class="mo-error">
+                    ❌ Lỗi: ${escapeHtml(err.message)}
+                </div>
+            `;
+        } finally {
+            btn.disabled = false;
+            btn.innerHTML = '🔍 Tra cứu';
+        }
+    };
+
+    function renderOrder(order, items) {
+        const container = document.getElementById('resultContainer');
+        const statusInfo = getStatusInfo(order.status);
+        const steps = getTimelineSteps(order);
+
+        // Render timeline
+        let timelineHtml = '';
+        if (order.status === 'cancelled') {
+            timelineHtml = `
+                <div class="mo-timeline">
+                    <div class="mo-cancelled-banner">
+                        ❌ Đơn hàng đã bị hủy
+                    </div>
+                </div>
+            `;
+        } else {
+            timelineHtml = `
+                <div class="mo-timeline">
+                    <div class="mo-timeline-steps">
+                        ${steps.map(s => `
+                            <div class="mo-step ${s.state}">
+                                <div class="mo-step-icon">${s.icon}</div>
+                                <div class="mo-step-label">${s.label}</div>
+                                <div class="mo-step-time">${s.time || ''}</div>
+                            </div>
+                        `).join('')}
+                    </div>
+                </div>
+            `;
+        }
+
+        // Render items
+        const itemsHtml = items.length > 0 ? items.map(item => `
+            <div class="mo-item">
+                ${item.product_image
+                    ? `<img src="${escapeHtml(item.product_image)}" class="mo-item-img" onerror="this.style.display='none'; this.nextElementSibling.style.display='flex';">
+                       <div class="mo-item-img" style="display:none;align-items:center;justify-content:center;font-size:24px;">🛍️</div>`
+                    : `<div class="mo-item-img" style="display:flex;align-items:center;justify-content:center;font-size:24px;">🛍️</div>`
+                }
+                <div class="mo-item-info">
+                    <div class="mo-item-name">${escapeHtml(item.product_name)}</div>
+                    <div class="mo-item-price">${formatPrice(item.price)} × ${item.quantity}</div>
+                </div>
+                <div class="mo-item-qty">${formatPrice(item.subtotal)}</div>
+            </div>
+        `).join('') : '<p style="text-align:center;color:#9ca3af;padding:10px;">Không có sản phẩm</p>';
+
+        container.innerHTML = `
+            <div class="mo-order-card">
+                <div class="mo-order-header">
+                    <div>
+                        <div class="mo-order-code">📦 ${escapeHtml(order.order_code)}</div>
+                        <div class="mo-order-date">Đặt ngày ${formatDate(order.created_at)}</div>
+                    </div>
+                    <div class="mo-order-status-badge" style="background: ${statusInfo.bg}; color: ${statusInfo.color};">
+                        ${statusInfo.icon} ${statusInfo.label}
+                    </div>
+                </div>
+
+                ${timelineHtml}
+
+                <div class="mo-order-info">
+                    <!-- THÔNG TIN KHÁCH -->
+                    <div class="mo-info-section">
+                        <h3>👤 Thông tin khách hàng</h3>
+                        <div class="mo-info-row">
+                            <span>Họ tên</span>
+                            <span>${escapeHtml(order.customer_name)}</span>
+                        </div>
+                        <div class="mo-info-row">
+                            <span>Điện thoại</span>
+                            <span>${escapeHtml(order.customer_phone)}</span>
+                        </div>
+                        ${order.customer_email ? `
+                            <div class="mo-info-row">
+                                <span>Email</span>
+                                <span>${escapeHtml(order.customer_email)}</span>
+                            </div>
+                        ` : ''}
+                        <div class="mo-info-row">
+                            <span>Địa chỉ giao</span>
+                            <span style="max-width: 60%; text-align: right;">${escapeHtml(order.customer_address)}</span>
+                        </div>
+                        ${order.customer_note ? `
+                            <div class="mo-info-row">
+                                <span>Ghi chú</span>
+                                <span style="max-width: 60%; text-align: right; color: #856404;">${escapeHtml(order.customer_note)}</span>
+                            </div>
+                        ` : ''}
+                    </div>
+
+                    <!-- SẢN PHẨM -->
+                    <div class="mo-info-section">
+                        <h3>🛍️ Sản phẩm (${items.length})</h3>
+                        <div class="mo-items-list">${itemsHtml}</div>
+                    </div>
+
+                    <!-- THANH TOÁN -->
+                    <div class="mo-info-section">
+                        <h3>💰 Thanh toán</h3>
+                        <div class="mo-total-row">
+                            <span>Tạm tính</span>
+                            <span>${formatPrice(order.subtotal)}</span>
+                        </div>
+                        <div class="mo-total-row">
+                            <span>Phí vận chuyển</span>
+                            <span>${order.shipping_fee === 0 ? 'Miễn phí' : formatPrice(order.shipping_fee)}</span>
+                        </div>
+                        ${order.discount > 0 ? `
+                            <div class="mo-total-row">
+                                <span>Giảm giá</span>
+                                <span style="color: #059669;">-${formatPrice(order.discount)}</span>
+                            </div>
+                        ` : ''}
+                        <div class="mo-total-row grand">
+                            <span>TỔNG CỘNG</span>
+                            <span>${formatPrice(order.total)}</span>
+                        </div>
+                        <div class="mo-total-row" style="margin-top: 12px;">
+                            <span>Phương thức</span>
+                            <span>${order.payment_method === 'bank' ? '🏦 Chuyển khoản' : '💵 COD (khi nhận hàng)'}</span>
+                        </div>
+                    </div>
+
+                    <!-- HỖ TRỢ -->
+                    <div class="mo-support-bar">
+                        <span>💬 Cần hỗ trợ? Liên hệ hotline <strong>0905.771177</strong></span>
+                        <a href="https://zalo.me/0905771177" target="_blank" class="btn">📱 Chat Zalo</a>
+                    </div>
+                </div>
+            </div>
+        `;
+    }
+
+    // ==========================================
+    // HELPER: STATUS INFO
+    // ==========================================
+    function getStatusInfo(status) {
+        const map = {
+            pending: { label: 'Chờ xác nhận', icon: '⏳', bg: '#fff3cd', color: '#856404' },
+            confirmed: { label: 'Đã xác nhận', icon: '✅', bg: '#dbeafe', color: '#1e40af' },
+            shipping: { label: 'Đang giao hàng', icon: '🚚', bg: '#d1fae5', color: '#065f46' },
+            completed: { label: 'Đã giao thành công', icon: '✔️', bg: '#d1fae5', color: '#059669' },
+            cancelled: { label: 'Đã hủy', icon: '❌', bg: '#fee2e2', color: '#991b1b' }
+        };
+        return map[status] || map.pending;
+    }
+
+    // ==========================================
+    // HELPER: TIMELINE STEPS
+    // ==========================================
+    function getTimelineSteps(order) {
+        const statusOrder = ['pending', 'confirmed', 'shipping', 'completed'];
+        const currentIdx = statusOrder.indexOf(order.status);
+
+        const steps = [
+            { key: 'pending', icon: '📝', label: 'Đặt hàng' },
+            { key: 'confirmed', icon: '✅', label: 'Xác nhận' },
+            { key: 'shipping', icon: '🚚', label: 'Đang giao' },
+            { key: 'completed', icon: '🏠', label: 'Đã nhận' }
+        ];
+
+        return steps.map((s, idx) => {
+            let state = '';
+            if (idx < currentIdx) state = 'done';
+            else if (idx === currentIdx) state = 'active';
+            return { ...s, state, time: '' };
+        });
+    }
+
+    // ==========================================
+    // HELPERS
+    // ==========================================
+    function formatDate(dateStr) {
+        if (!dateStr) return '—';
+        const d = new Date(dateStr);
+        return d.toLocaleDateString('vi-VN', {
+            day: '2-digit',
+            month: '2-digit',
+            year: 'numeric',
+            hour: '2-digit',
+            minute: '2-digit'
+        });
+    }
+
+    function formatPrice(price) {
+        return new Intl.NumberFormat('vi-VN').format(price) + 'đ';
+    }
+
+    function escapeHtml(text) {
+        return String(text || '')
+            .replace(/&/g, '&amp;')
+            .replace(/</g, '&lt;')
+            .replace(/>/g, '&gt;')
+            .replace(/"/g, '&quot;')
+            .replace(/'/g, '&#039;');
+    }
+})();
+</script>
+
+</body>
+</html>
