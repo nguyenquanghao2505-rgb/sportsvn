@@ -11,7 +11,6 @@
     <script src="provinces.js" defer></script>
     <style>
         /* ===== SIDEBAR FALLBACK CSS ===== */
-        /* Đảm bảo sidebar luôn hiện đúng, kể cả khi styles.css thiếu */
         .app {
             display: flex !important;
             min-height: 100vh !important;
@@ -57,27 +56,10 @@
             flex-shrink: 0 !important;
         }
 
-        .sidebar .brand-text {
-            display: flex !important;
-            flex-direction: column !important;
-        }
-
-        .sidebar .brand-text strong {
-            font-size: 16px !important;
-            color: #fff !important;
-        }
-
-        .sidebar .brand-text span {
-            font-size: 11px !important;
-            color: rgba(255, 255, 255, 0.6) !important;
-        }
-
-        .sidebar .main-nav {
-            display: flex !important;
-            flex-direction: column !important;
-            padding: 0 12px !important;
-        }
-
+        .sidebar .brand-text { display: flex !important; flex-direction: column !important; }
+        .sidebar .brand-text strong { font-size: 16px !important; color: #fff !important; }
+        .sidebar .brand-text span { font-size: 11px !important; color: rgba(255, 255, 255, 0.6) !important; }
+        .sidebar .main-nav { display: flex !important; flex-direction: column !important; padding: 0 12px !important; }
         .sidebar .nav-title {
             font-size: 10px !important;
             color: rgba(255, 255, 255, 0.45) !important;
@@ -86,7 +68,6 @@
             font-weight: 800 !important;
             padding: 16px 8px 8px !important;
         }
-
         .sidebar .nav-item {
             display: flex !important;
             align-items: center !important;
@@ -100,136 +81,181 @@
             transition: all 0.2s !important;
             margin-bottom: 2px !important;
         }
-
-        .sidebar .nav-item:hover {
-            background: rgba(255, 255, 255, 0.08) !important;
-            color: #fff !important;
-        }
-
+        .sidebar .nav-item:hover { background: rgba(255, 255, 255, 0.08) !important; color: #fff !important; }
         .sidebar .nav-item.active {
             background: rgba(233, 69, 96, 0.2) !important;
             color: #fff !important;
             border-left: 3px solid #e94560 !important;
         }
+        .sidebar .nav-icon { font-size: 16px !important; width: 22px !important; text-align: center !important; flex-shrink: 0 !important; }
 
-        .sidebar .nav-icon {
-            font-size: 16px !important;
-            width: 22px !important;
-            text-align: center !important;
-            flex-shrink: 0 !important;
-        }
-
-        .sidebar .sidebar-bottom {
-            padding: 16px 20px !important;
-            border-top: 1px solid rgba(255, 255, 255, 0.1) !important;
-            margin-top: 16px !important;
-        }
-
-        .sidebar .help-box {
-            display: flex !important;
-            align-items: center !important;
-            gap: 10px !important;
-            background: rgba(255, 255, 255, 0.08) !important;
-            padding: 10px 12px !important;
-            border-radius: 10px !important;
-            margin-bottom: 12px !important;
-        }
-
-        .sidebar .help-icon {
-            width: 32px !important;
-            height: 32px !important;
-            background: rgba(233, 69, 96, 0.3) !important;
-            border-radius: 8px !important;
-            display: flex !important;
-            align-items: center !important;
-            justify-content: center !important;
-            font-weight: 800 !important;
-            color: #fff !important;
-        }
-
-        .sidebar .help-box strong {
-            display: block !important;
-            font-size: 12px !important;
-            color: #fff !important;
-        }
-
-        .sidebar .help-box span {
-            font-size: 10px !important;
-            color: rgba(255, 255, 255, 0.6) !important;
-        }
-
-        .sidebar .user-mini {
-            display: flex !important;
-            align-items: center !important;
-            gap: 10px !important;
-            padding: 10px !important;
-            background: rgba(255, 255, 255, 0.06) !important;
-            border-radius: 10px !important;
-        }
-
-        .sidebar .avatar {
-            width: 36px !important;
-            height: 36px !important;
-            background: linear-gradient(135deg, #e94560, #ff6b8a) !important;
-            border-radius: 50% !important;
-            display: flex !important;
-            align-items: center !important;
-            justify-content: center !important;
-            font-weight: 800 !important;
-            color: #fff !important;
-            font-size: 14px !important;
-            flex-shrink: 0 !important;
-        }
-
-        .sidebar .user-info {
-            flex: 1 !important;
-            min-width: 0 !important;
-        }
-
-        .sidebar .user-info strong {
-            display: block !important;
-            font-size: 12px !important;
-            color: #fff !important;
-            white-space: nowrap !important;
-            overflow: hidden !important;
-            text-overflow: ellipsis !important;
-        }
-
-        .sidebar .user-info span {
-            font-size: 10px !important;
-            color: rgba(255, 255, 255, 0.5) !important;
-        }
-
-        .sidebar .more-button {
-            background: transparent !important;
-            border: none !important;
-            color: rgba(255, 255, 255, 0.6) !important;
-            font-size: 16px !important;
-            cursor: pointer !important;
-            padding: 4px 8px !important;
-        }
-
-        /* Đẩy main sang phải */
         .main {
             margin-left: 240px !important;
             flex: 1 !important;
             max-width: calc(100vw - 240px) !important;
-            padding: 20px !important;
+            padding: 16px !important;
             transition: margin-left 0.3s ease !important;
         }
 
-        /* Mobile: ẩn sidebar mặc định */
+        /* ===== TOPBAR GỌN ===== */
+        .topbar {
+            background: #fff;
+            border-radius: 12px;
+            padding: 10px 18px !important;
+            margin-bottom: 14px !important;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            box-shadow: 0 2px 10px rgba(0,0,0,0.05);
+            gap: 12px;
+        }
+
+        .topbar-left { display: flex; align-items: center; gap: 12px; flex: 1; min-width: 0; }
+
+        .topbar-brand .topbar-label {
+            display: block;
+            font-size: 9px !important;
+            color: #6c757d;
+            font-weight: 700;
+            letter-spacing: 0.5px;
+            margin-bottom: 1px;
+        }
+
+        .topbar-brand .topbar-title-main {
+            font-size: 20px !important;
+            font-weight: 900;
+            color: #1a3a7a;
+            margin: 0;
+            line-height: 1.1;
+        }
+
+        .topbar-brand .topbar-title-main span { color: #e94560; }
+
+        .topbar-brand .topbar-subtitle {
+            font-size: 11px !important;
+            color: #6c757d;
+            margin-top: 1px;
+            display: block;
+        }
+
+        .topbar-right { display: flex; align-items: center; gap: 10px; }
+
+        .topbar-cta {
+            padding: 8px 16px !important;
+            background: linear-gradient(135deg, #1769ff, #4d94ff);
+            color: #fff;
+            border-radius: 10px;
+            font-size: 12px !important;
+            font-weight: 700;
+            text-decoration: none;
+            white-space: nowrap;
+            transition: all 0.2s;
+        }
+        .topbar-cta:hover { transform: translateY(-2px); box-shadow: 0 6px 16px rgba(23,105,255,0.3); }
+
+        /* ===== BANNER SLIDER - GỌN ===== */
+        .welcome-banner {
+            position: relative;
+            width: 100%;
+            height: 40vh;
+            min-height: 200px;
+            max-height: 360px;
+            border-radius: 14px;
+            overflow: hidden;
+            margin-bottom: 16px;
+            background: linear-gradient(135deg, #0d1b3e, #1a3a7a);
+            box-shadow: 0 4px 20px rgba(0,0,0,0.08);
+            user-select: none;
+        }
+
+        .banner-slide {
+            position: absolute;
+            inset: 0;
+            opacity: 0;
+            transition: opacity 0.8s ease-in-out;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+        }
+        .banner-slide.active { opacity: 1; }
+
+        .banner-slide img {
+            width: 100%;
+            height: 100%;
+            object-fit: cover;
+            object-position: center;
+            display: block;
+        }
+
+        .banner-slide-fallback {
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            width: 100%;
+            height: 100%;
+            color: #fff;
+            font-size: 24px;
+            font-weight: 900;
+            background: linear-gradient(135deg, #0d1b3e, #1a3a7a);
+        }
+
+        /* Dots điều hướng */
+        .banner-dots {
+            position: absolute;
+            bottom: 12px;
+            left: 50%;
+            transform: translateX(-50%);
+            display: flex;
+            gap: 6px;
+            z-index: 10;
+            padding: 5px 10px;
+            background: rgba(0,0,0,0.4);
+            border-radius: 20px;
+            backdrop-filter: blur(8px);
+        }
+
+        .banner-dot {
+            width: 8px;
+            height: 8px;
+            border-radius: 50%;
+            background: rgba(255,255,255,0.5);
+            cursor: pointer;
+            transition: all 0.3s;
+            border: 0;
+            padding: 0;
+        }
+        .banner-dot.active { background: #fff; width: 22px; border-radius: 4px; }
+
+        /* ===== MOBILE ===== */
         @media (max-width: 768px) {
             .sidebar {
                 transform: translateX(-100%) !important;
+                box-shadow: 4px 0 20px rgba(0,0,0,0.3) !important;
             }
-            .sidebar.open {
-                transform: translateX(0) !important;
-            }
+            .sidebar.open { transform: translateX(0) !important; }
             .main {
                 margin-left: 0 !important;
                 max-width: 100vw !important;
+                padding: 10px !important;
             }
+
+            .topbar { padding: 8px 12px !important; }
+            .topbar-brand .topbar-title-main { font-size: 17px !important; }
+            .topbar-brand .topbar-subtitle { display: none !important; }
+            .topbar-brand .topbar-label { display: none !important; }
+            .topbar-cta { padding: 6px 12px !important; font-size: 11px !important; }
+
+            .welcome-banner {
+                height: 32vh !important;
+                min-height: 160px !important;
+                max-height: 240px !important;
+                border-radius: 10px !important;
+                margin-bottom: 12px !important;
+            }
+
+            .banner-dots { bottom: 8px; padding: 4px 8px; }
+            .banner-dot { width: 6px; height: 6px; }
+            .banner-dot.active { width: 16px; }
         }
 
         .mobile-menu {
@@ -239,33 +265,45 @@
             font-size: 22px;
             color: #1a3a7a;
             cursor: pointer;
-            margin-right: 12px;
+            padding: 4px 8px;
+            margin-right: 4px;
+            border-radius: 8px;
         }
+        .mobile-menu:hover { background: #f0f2f8; }
 
         @media (max-width: 768px) {
-            .mobile-menu {
-                display: block !important;
-            }
+            .mobile-menu { display: block !important; }
         }
+
+        /* Overlay khi mở sidebar mobile */
+        .sidebar-overlay {
+            display: none;
+            position: fixed;
+            inset: 0;
+            background: rgba(0,0,0,0.5);
+            z-index: 998;
+            backdrop-filter: blur(2px);
+        }
+        .sidebar-overlay.show { display: block; }
     </style>
 </head>
 
 <body data-page="index.html">
 
+    <div class="sidebar-overlay" id="sidebarOverlay"></div>
+
     <div class="app">
 
         <main class="main">
 
-            <!-- ============================== -->
-            <!-- TOPBAR CÔNG KHAI -->
-            <!-- ============================== -->
+            <!-- TOPBAR -->
             <header class="topbar">
                 <div class="topbar-left">
                     <button class="mobile-menu" id="mobileMenu" aria-label="Mở menu">☰</button>
                     <div class="topbar-brand">
                         <span class="topbar-label">SPORTS MANAGEMENT PLATFORM</span>
                         <h1 class="topbar-title-main">SPORTS<span>VN</span></h1>
-                        <p class="topbar-subtitle">Kết nối đam mê thể thao — Cập nhật nhanh chóng — Chính xác — Toàn diện</p>
+                        <p class="topbar-subtitle">Kết nối đam mê thể thao — Nhanh chóng — Chính xác — Toàn diện</p>
                     </div>
                 </div>
 
@@ -275,24 +313,23 @@
                     </a>
 
                     <div class="top-user" id="topUser" style="display: none;">
-                        <div class="avatar" id="topAvatar">A</div>
-                        <div class="top-user-info">
-                            <strong id="topUserName">Admin</strong>
-                            <span>SportsVN</span>
+                        <div class="avatar" id="topAvatar" style="width: 32px; height: 32px; border-radius: 50%; background: linear-gradient(135deg, #e94560, #ff6b8a); color: #fff; display: flex; align-items: center; justify-content: center; font-weight: 800; font-size: 13px;">A</div>
+                        <div class="top-user-info" style="display: flex; flex-direction: column;">
+                            <strong id="topUserName" style="font-size: 12px;">Admin</strong>
+                            <span style="font-size: 10px; color: #6c757d;">SportsVN</span>
                         </div>
-                        <span class="arrow">▾</span>
                     </div>
                 </div>
             </header>
 
 
-            <!-- ============================== -->
             <!-- CONTENT -->
-            <!-- ============================== -->
             <section class="content">
 
+                <!-- BANNER SLIDER -->
                 <section class="welcome-banner" id="bannerSection">
-                    <img src="banner.jpg" alt="SportsVN Banner" class="banner-image" id="bannerImage">
+                    <div id="bannerSlides"></div>
+                    <div class="banner-dots" id="bannerDots"></div>
                 </section>
 
 
@@ -487,9 +524,7 @@
     </div>
 
 
-    <!-- ============================== -->
     <!-- SCRIPTS -->
-    <!-- ============================== -->
     <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
     <script src="config.js"></script>
     <script>
@@ -507,24 +542,54 @@
                 config.SUPABASE_ANON_KEY
             );
 
-            // MOBILE MENU TOGGLE
-            document.getElementById('mobileMenu')?.addEventListener('click', () => {
-                document.querySelector('.sidebar')?.classList.toggle('open');
+            // ==========================================
+            // MOBILE MENU + OVERLAY
+            // ==========================================
+            const sidebarEl = document.querySelector('.sidebar');
+            const overlayEl = document.getElementById('sidebarOverlay');
+            const mobileMenuBtn = document.getElementById('mobileMenu');
+
+            function openSidebar() {
+                sidebarEl?.classList.add('open');
+                overlayEl?.classList.add('show');
+                document.body.style.overflow = 'hidden';
+            }
+
+            function closeSidebar() {
+                sidebarEl?.classList.remove('open');
+                overlayEl?.classList.remove('show');
+                document.body.style.overflow = '';
+            }
+
+            mobileMenuBtn?.addEventListener('click', () => {
+                if (sidebarEl?.classList.contains('open')) closeSidebar();
+                else openSidebar();
             });
 
+            overlayEl?.addEventListener('click', closeSidebar);
+
+            // Đóng sidebar khi click vào link trong sidebar (mobile)
+            document.querySelectorAll('.sidebar .nav-item').forEach(link => {
+                link.addEventListener('click', () => {
+                    if (window.innerWidth <= 768) closeSidebar();
+                });
+            });
+
+            // ==========================================
             // CHECK LOGIN
+            // ==========================================
             async function checkLoginStatus() {
                 try {
                     const { data: { session } } = await supabase.auth.getSession();
-                    
+
                     if (session) {
                         const loginBtn = document.getElementById('loginBtn');
                         const topUser = document.getElementById('topUser');
-                        
+
                         if (loginBtn) loginBtn.style.display = 'none';
                         if (topUser) topUser.style.display = 'flex';
 
-                        const userName = session.user.user_metadata?.full_name || 
+                        const userName = session.user.user_metadata?.full_name ||
                                         session.user.email.split('@')[0];
                         const initials = userName.split(' ')
                             .map(w => w[0])
@@ -551,46 +616,150 @@
 
             checkLoginStatus();
 
-            // LOAD BANNER
-            async function loadBanner() {
+            // ==========================================
+            // BANNER SLIDESHOW (TỰ ĐỘNG ĐỔI SAU 5 GIÂY)
+            // ==========================================
+            let bannerSlideIndex = 0;
+            let bannerSlideInterval = null;
+            let bannerSlideUrls = [];
+
+            async function loadBanners() {
                 try {
                     const { data, error } = await supabase
                         .storage
                         .from('banners')
                         .list('', { limit: 100, sortBy: { column: 'name', order: 'desc' } });
 
-                    if (error) return;
+                    if (error) throw error;
 
-                    var imageFiles = (data || []).filter(function(f) {
-                        return f.name && !f.name.startsWith('.') &&
-                               /\.(jpg|jpeg|png|gif|webp)$/i.test(f.name);
-                    });
+                    const imageFiles = (data || []).filter(f =>
+                        f.name &&
+                        !f.name.startsWith('.') &&
+                        /\.(jpg|jpeg|png|gif|webp)$/i.test(f.name)
+                    );
 
-                    if (imageFiles.length === 0) return;
+                    if (imageFiles.length === 0) {
+                        bannerSlideUrls = [];
+                        renderBannerSlider();
+                        return;
+                    }
 
-                    imageFiles.sort(function(a, b) {
-                        var aTime = parseInt((a.name.match(/banner-(\d+)/) || [])[1] || 0);
-                        var bTime = parseInt((b.name.match(/banner-(\d+)/) || [])[1] || 0);
+                    // Sắp xếp mới nhất trước
+                    imageFiles.sort((a, b) => {
+                        const aTime = parseInt((a.name.match(/banner-(\d+)/) || [])[1] || 0);
+                        const bTime = parseInt((b.name.match(/banner-(\d+)/) || [])[1] || 0);
                         return bTime - aTime;
                     });
 
-                    const { data: urlData } = supabase
-                        .storage
-                        .from('banners')
-                        .getPublicUrl(imageFiles[0].name);
+                    // Lấy TẤT CẢ ảnh để làm slideshow
+                    bannerSlideUrls = imageFiles.map(f => {
+                        const { data: urlData } = supabase
+                            .storage
+                            .from('banners')
+                            .getPublicUrl(f.name);
+                        return urlData.publicUrl;
+                    });
 
-                    if (urlData && urlData.publicUrl) {
-                        document.getElementById('bannerImage').src = 
-                            urlData.publicUrl + '?t=' + Date.now();
-                    }
+                    console.log('✅ Đã load', bannerSlideUrls.length, 'banner');
+                    renderBannerSlider();
+
                 } catch (err) {
-                    console.error('Lỗi load banner:', err);
+                    console.error('Lỗi load banners:', err);
+                    bannerSlideUrls = [];
+                    renderBannerSlider();
                 }
             }
 
-            loadBanner();
+            function renderBannerSlider() {
+                const slidesEl = document.getElementById('bannerSlides');
+                const dotsEl = document.getElementById('bannerDots');
+                if (!slidesEl || !dotsEl) return;
 
+                if (bannerSlideUrls.length === 0) {
+                    slidesEl.innerHTML = `
+                        <div class="banner-slide active">
+                            <div class="banner-slide-fallback">🏆 SPORTSVN</div>
+                        </div>
+                    `;
+                    dotsEl.innerHTML = '';
+                    return;
+                }
+
+                // Render slides
+                slidesEl.innerHTML = bannerSlideUrls.map((url, idx) => `
+                    <div class="banner-slide ${idx === 0 ? 'active' : ''}" data-index="${idx}">
+                        <img src="${url}?t=${Date.now()}" alt="Banner ${idx + 1}" ${idx === 0 ? 'loading="eager" fetchpriority="high"' : 'loading="lazy"'}>
+                    </div>
+                `).join('');
+
+                // Render dots
+                dotsEl.innerHTML = bannerSlideUrls.map((_, idx) => `
+                    <button class="banner-dot ${idx === 0 ? 'active' : ''}" 
+                            onclick="goToBannerSlide(${idx})" 
+                            aria-label="Banner ${idx + 1}"></button>
+                `).join('');
+
+                // Bắt đầu auto slide
+                if (bannerSlideUrls.length > 1) startBannerAutoSlide();
+
+                // Pause khi hover
+                const bannerEl = document.getElementById('bannerSection');
+                bannerEl?.addEventListener('mouseenter', stopBannerAutoSlide);
+                bannerEl?.addEventListener('mouseleave', () => {
+                    if (bannerSlideUrls.length > 1) startBannerAutoSlide();
+                });
+
+                // Swipe mobile
+                let touchStartX = 0;
+                bannerEl?.addEventListener('touchstart', (e) => {
+                    touchStartX = e.touches[0].clientX;
+                }, { passive: true });
+                bannerEl?.addEventListener('touchend', (e) => {
+                    const diff = e.changedTouches[0].clientX - touchStartX;
+                    if (Math.abs(diff) > 50) {
+                        if (diff > 0) {
+                            goToBannerSlide((bannerSlideIndex - 1 + bannerSlideUrls.length) % bannerSlideUrls.length);
+                        } else {
+                            goToBannerSlide((bannerSlideIndex + 1) % bannerSlideUrls.length);
+                        }
+                    }
+                }, { passive: true });
+            }
+
+            window.goToBannerSlide = function(index) {
+                const slides = document.querySelectorAll('.banner-slide');
+                const dots = document.querySelectorAll('.banner-dot');
+                slides.forEach((s, i) => s.classList.toggle('active', i === index));
+                dots.forEach((d, i) => d.classList.toggle('active', i === index));
+                bannerSlideIndex = index;
+                stopBannerAutoSlide();
+                if (bannerSlideUrls.length > 1) startBannerAutoSlide();
+            };
+
+            function startBannerAutoSlide() {
+                stopBannerAutoSlide();
+                bannerSlideInterval = setInterval(() => {
+                    const nextIndex = (bannerSlideIndex + 1) % bannerSlideUrls.length;
+                    const slides = document.querySelectorAll('.banner-slide');
+                    const dots = document.querySelectorAll('.banner-dot');
+                    slides.forEach((s, i) => s.classList.toggle('active', i === nextIndex));
+                    dots.forEach((d, i) => d.classList.toggle('active', i === nextIndex));
+                    bannerSlideIndex = nextIndex;
+                }, 5000);
+            }
+
+            function stopBannerAutoSlide() {
+                if (bannerSlideInterval) {
+                    clearInterval(bannerSlideInterval);
+                    bannerSlideInterval = null;
+                }
+            }
+
+            loadBanners();
+
+            // ==========================================
             // LOAD TOURNAMENTS
+            // ==========================================
             async function loadTournaments() {
                 try {
                     const { data, error } = await supabase
@@ -638,8 +807,8 @@
                                       status === 'upcoming' ? 'Sắp diễn ra' :
                                       'Đã kết thúc';
                     const sportIcon = getSportIcon(t.sport);
-                    const dateDisplay = t.start_date 
-                        ? new Date(t.start_date).toLocaleDateString('vi-VN') 
+                    const dateDisplay = t.start_date
+                        ? new Date(t.start_date).toLocaleDateString('vi-VN')
                         : '';
 
                     return `
@@ -672,7 +841,9 @@
 
             loadTournaments();
 
+            // ==========================================
             // LOAD NEWS
+            // ==========================================
             async function loadNews() {
                 try {
                     const { data, error } = await supabase
@@ -691,7 +862,7 @@
                         <a href="news-detail.html?id=${news.id}" class="news-item-link">
                             <div class="news-item">
                                 <div class="news-thumb">
-                                    ${news.image_url ? 
+                                    ${news.image_url ?
                                         `<img src="${news.image_url}" alt="${news.title}">` :
                                         `<div style="width:100%;height:100%;display:flex;align-items:center;justify-content:center;font-size:32px;background:#f3f4f6;">📰</div>`
                                     }
@@ -715,7 +886,9 @@
 
             loadNews();
 
+            // ==========================================
             // FOOTBALL
+            // ==========================================
             let currentLeague = '4328';
             let currentStatus = 'upcoming';
 
@@ -750,8 +923,8 @@
                         const homeScore = match.intHomeScore ?? '-';
                         const awayScore = match.intAwayScore ?? '-';
                         const isFinished = match.intHomeScore !== null && match.intHomeScore !== undefined;
-                        const statusText = isFinished 
-                            ? 'KT' 
+                        const statusText = isFinished
+                            ? 'KT'
                             : (match.strTime ? window.FootballAPI.formatMatchTime(match.strTime) : '—');
                         const statusColor = isFinished ? '#6b7280' : '#1769ff';
 
