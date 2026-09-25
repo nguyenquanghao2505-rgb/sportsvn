@@ -1,0 +1,299 @@
+<!DOCTYPE html>
+<html lang="vi">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Đăng ký — SportsVN</title>
+  <link rel="stylesheet" href="styles.css" />
+  <style>
+    /* CSS riêng cho trang đăng ký, không đụng styles.css cũ */
+    .reg-page {
+      min-height: 100vh;
+      display: flex; align-items: center; justify-content: center;
+      background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+      padding: 20px;
+    }
+    .reg-card {
+      background: white; padding: 36px; border-radius: 16px;
+      box-shadow: 0 20px 60px rgba(0,0,0,.2);
+      width: 100%; max-width: 480px;
+    }
+    .reg-card h1 {
+      text-align: center; margin-bottom: 8px; color: #0f172a;
+    }
+    .reg-card .subtitle {
+      text-align: center; color: #64748b; font-size: 0.9rem;
+      margin-bottom: 24px;
+    }
+    .step { display: none; }
+    .step.active { display: block; animation: fadeIn .3s; }
+    @keyframes fadeIn {
+      from { opacity: 0; transform: translateY(8px); }
+      to   { opacity: 1; transform: translateY(0); }
+    }
+    .form-row { margin-bottom: 14px; }
+    .form-row label {
+      display: block; margin-bottom: 6px; font-weight: 600;
+      font-size: 0.9rem; color: #334155;
+    }
+    .form-row input {
+      width: 100%; padding: 10px 14px; border: 1px solid #cbd5e1;
+      border-radius: 8px; font-size: 0.95rem; font-family: inherit;
+      transition: border-color .15s, box-shadow .15s;
+    }
+    .form-row input:focus {
+      outline: none; border-color: #667eea;
+      box-shadow: 0 0 0 3px rgba(102,126,234,.15);
+    }
+    .btn-reg {
+      width: 100%; padding: 12px; border: none; border-radius: 8px;
+      font-size: 1rem; font-weight: 600; cursor: pointer;
+      background: linear-gradient(135deg, #667eea, #764ba2);
+      color: white; transition: transform .15s;
+    }
+    .btn-reg:hover { transform: translateY(-1px); }
+    .btn-reg:disabled { opacity: .6; cursor: not-allowed; }
+    .btn-outline {
+      width: 100%; padding: 10px; border: 2px solid #e2e8f0;
+      background: white; border-radius: 8px; font-weight: 600;
+      cursor: pointer; margin-top: 10px;
+    }
+    .method-tabs {
+      display: flex; gap: 8px; margin-bottom: 16px;
+    }
+    .method-tabs button {
+      flex: 1; padding: 10px; border: 2px solid #e2e8f0;
+      background: white; border-radius: 8px; cursor: pointer;
+      font-weight: 600; transition: all .15s;
+    }
+    .method-tabs button.active {
+      border-color: #667eea; color: #667eea;
+      background: rgba(102,126,234,.05);
+    }
+    .otp-input {
+      font-size: 1.8rem; letter-spacing: 0.6rem; text-align: center;
+      padding: 14px; border: 2px solid #cbd5e1; border-radius: 10px;
+      width: 100%; font-family: monospace;
+    }
+    .error { color: #dc2626; font-size: 0.85rem; margin-top: 8px; min-height: 18px; }
+    .success { color: #16a34a; font-size: 0.9rem; margin-top: 8px; }
+    .demo-code {
+      background: #fef3c7; border: 1px dashed #f59e0b;
+      padding: 10px; border-radius: 6px; margin-top: 12px;
+      font-size: 0.85rem; color: #92400e;
+    }
+    .step-done { text-align: center; padding: 20px 0; }
+    .step-done .check {
+      font-size: 4rem; margin-bottom: 16px;
+    }
+  </style>
+</head>
+<body class="reg-page">
+
+  <div class="reg-card">
+
+    <!-- ============ BƯỚC 1: FORM ============ -->
+    <div id="step1" class="step active">
+      <h1>📝 Đăng ký</h1>
+      <p class="subtitle">Tạo tài khoản để tham gia SportsVN</p>
+
+      <div class="form-row">
+        <label>Họ và tên *</label>
+        <input id="fullName" type="text" placeholder="Nguyễn Văn A" />
+      </div>
+      <div class="form-row">
+        <label>Tên đăng nhập * (≥ 3 ký tự)</label>
+        <input id="username" type="text" placeholder="nguyenvana" />
+      </div>
+      <div class="form-row">
+        <label>Mật khẩu * (≥ 6 ký tự)</label>
+        <input id="password" type="password" placeholder="••••••" />
+      </div>
+      <div class="form-row">
+        <label>Email</label>
+        <input id="email" type="email" placeholder="ban@example.com" />
+      </div>
+      <div class="form-row">
+        <label>Số điện thoại</label>
+        <input id="phone" type="tel" placeholder="0901234567" />
+      </div>
+
+      <button id="btn-step1" class="btn-reg">Tiếp tục → Xác thực</button>
+      <div id="err1" class="error"></div>
+
+      <p style="text-align:center; margin-top:16px; font-size:0.9rem; color:#64748b;">
+        Đã có tài khoản? <a href="login.html" style="color:#667eea;">Đăng nhập</a>
+      </p>
+    </div>
+
+    <!-- ============ BƯỚC 2: XÁC THỰC OTP ============ -->
+    <div id="step2" class="step">
+      <h1>🔐 Xác thực</h1>
+      <p class="subtitle">Chọn kênh nhận mã để xác minh danh tính</p>
+
+      <div class="method-tabs">
+        <button data-method="email">📧 Email</button>
+        <button data-method="zalo">💬 Zalo</button>
+        <button data-method="sms">📱 SMS</button>
+      </div>
+
+      <div class="form-row">
+        <label id="contact-label">Email nhận mã</label>
+        <input id="contact" type="text" />
+      </div>
+
+      <button id="btn-send-code" class="btn-reg" style="background:#64748b;">
+        Gửi mã xác thực
+      </button>
+
+      <div id="code-area" class="hidden" style="margin-top:16px;">
+        <div class="form-row">
+          <label>Nhập mã 6 số</label>
+          <input id="otp" class="otp-input" maxlength="6" inputmode="numeric"
+                 placeholder="000000" />
+        </div>
+        <button id="btn-verify" class="btn-reg">✓ Xác nhận & Hoàn tất</button>
+      </div>
+
+      <div id="demo-area"></div>
+      <div id="err2" class="error"></div>
+      <div id="msg2" class="success"></div>
+
+      <button class="btn-outline" onclick="location.reload()">← Quay lại</button>
+    </div>
+
+    <!-- ============ BƯỚC 3: HOÀN TẤT ============ -->
+    <div id="step3" class="step">
+      <div class="step-done">
+        <div class="check">✅</div>
+        <h1>Đăng ký thành công!</h1>
+        <p class="subtitle">
+          Tài khoản của bạn đã được xác thực.<br>
+          Bạn có thể đăng nhập ngay bây giờ.
+        </p>
+        <a href="login.html" class="btn-reg"
+           style="display:inline-block; width:auto; padding:12px 32px;
+                  text-decoration:none; margin-top:16px;">
+          → Đăng nhập
+        </a>
+      </div>
+    </div>
+
+  </div>
+
+  <script type="module">
+    import { seedDemoUsers, register, activateUser, getUserById }
+      from './auth.js';
+    import { sendVerificationCode, verifyCode }
+      from './verification.js';
+
+    seedDemoUsers();
+
+    let pendingUserId = null;
+    let currentMethod = 'email';
+    let currentUser   = null;
+
+    const $ = id => document.getElementById(id);
+    const showStep = n => {
+      document.querySelectorAll('.step').forEach(s => s.classList.remove('active'));
+      $(`step${n}`).classList.add('active');
+    };
+
+    // ---------- BƯỚC 1 ----------
+    $('btn-step1').onclick = () => {
+      $('err1').textContent = '';
+      try {
+        const user = register({
+          fullName: $('fullName').value.trim(),
+          username: $('username').value.trim(),
+          password: $('password').value,
+          email:    $('email').value.trim(),
+          phone:    $('phone').value.trim(),
+        });
+        if (!user.email && !user.phone)
+          throw new Error('Cần ít nhất Email hoặc SĐT để xác thực');
+
+        pendingUserId = user.id;
+        currentUser = user;
+
+        if (user.email) {
+          currentMethod = 'email';
+          $('contact').value = user.email;
+        } else {
+          currentMethod = 'sms';
+          $('contact').value = user.phone;
+        }
+        updateMethodUI();
+        showStep(2);
+      } catch (e) {
+        $('err1').textContent = e.message;
+      }
+    };
+
+    // ---------- BƯỚC 2 ----------
+    function updateMethodUI() {
+      document.querySelectorAll('.method-tabs button').forEach(b => {
+        b.classList.toggle('active', b.dataset.method === currentMethod);
+      });
+      const labels = {
+        email: 'Email nhận mã',
+        zalo:  'Zalo ID',
+        sms:   'Số điện thoại',
+      };
+      $('contact-label').textContent = labels[currentMethod];
+    }
+
+    document.querySelectorAll('.method-tabs button').forEach(btn => {
+      btn.onclick = () => {
+        currentMethod = btn.dataset.method;
+        updateMethodUI();
+        $('code-area').classList.add('hidden');
+        $('demo-area').innerHTML = '';
+      };
+    });
+
+    $('btn-send-code').onclick = async () => {
+      $('err2').textContent = '';
+      $('msg2').textContent = '';
+      $('demo-area').innerHTML = '';
+      try {
+        const contact = $('contact').value.trim();
+        const res = await sendVerificationCode(currentUser, currentMethod, contact);
+        $('msg2').textContent = `Đã gửi mã tới ${contact}`;
+        $('demo-area').innerHTML =
+          `<div class="demo-code">
+            ⚠️ DEMO: Mã xác thực của bạn là <strong>${res.demoCode}</strong>
+            (trong production, mã sẽ được gửi qua ${currentMethod})
+          </div>`;
+        $('code-area').classList.remove('hidden');
+        $('otp').focus();
+      } catch (e) {
+        $('err2').textContent = e.message;
+      }
+    };
+
+    $('btn-verify').onclick = () => {
+      $('err2').textContent = '';
+      try {
+        const code = $('otp').value.trim();
+        if (code.length !== 6) throw new Error('Mã phải có 6 số');
+        const verification = verifyCode(pendingUserId, code);
+        activateUser(pendingUserId, verification);
+        showStep(3);
+      } catch (e) {
+        $('err2').textContent = e.message;
+      }
+    };
+
+    // Enter để chuyển bước
+    document.addEventListener('keydown', e => {
+      if (e.key !== 'Enter') return;
+      if ($('step1').classList.contains('active')) $('btn-step1').click();
+      else if ($('step2').classList.contains('active')) {
+        if ($('code-area').classList.contains('hidden')) $('btn-send-code').click();
+        else $('btn-verify').click();
+      }
+    });
+  </script>
+</body>
+</html>
