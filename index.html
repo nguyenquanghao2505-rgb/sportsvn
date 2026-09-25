@@ -50,11 +50,17 @@
             <!-- CONTENT -->
             <section class="content">
 
-                <!-- BANNER SLIDER -->
-                <section class="welcome-banner" id="bannerSection">
-                    <div id="bannerSlides"></div>
-                    <div class="banner-dots" id="bannerDots"></div>
-                </section>
+                <!-- BANNER ĐÔI -->
+                <div class="banner-double" id="bannerSection">
+                    <div class="banner-half" id="bannerLeft">
+                        <div class="banner-half-slides" id="bannerLeftSlides"></div>
+                        <div class="banner-half-dots" id="bannerLeftDots"></div>
+                    </div>
+                    <div class="banner-half" id="bannerRight">
+                        <div class="banner-half-slides" id="bannerRightSlides"></div>
+                        <div class="banner-half-dots" id="bannerRightDots"></div>
+                    </div>
+                </div>
 
 
                 <div class="dashboard-grid">
@@ -340,11 +346,17 @@
             checkLoginStatus();
 
             // ==========================================
-            // BANNER SLIDESHOW (TỰ ĐỘNG ĐỔI SAU 5 GIÂY)
+            // BANNER ĐÔI - 2 BANNER SONG SONG, ĐỔI SAU 5S
             // ==========================================
-            let bannerSlideIndex = 0;
-            let bannerSlideInterval = null;
-            let bannerSlideUrls = [];
+            const BANNER_INTERVAL = 5000;
+
+            let leftBannerUrls = [];
+            let leftBannerIndex = 0;
+            let leftBannerTimer = null;
+
+            let rightBannerUrls = [];
+            let rightBannerIndex = 0;
+            let rightBannerTimer = null;
 
             async function loadBanners() {
                 try {
@@ -362,8 +374,7 @@
                     );
 
                     if (imageFiles.length === 0) {
-                        bannerSlideUrls = [];
-                        renderBannerSlider();
+                        renderEmptyBanners();
                         return;
                     }
 
@@ -373,102 +384,171 @@
                         return bTime - aTime;
                     });
 
-                    bannerSlideUrls = imageFiles.map(f => {
-                        const { data: urlData } = supabase
-                            .storage
+                    const allUrls = imageFiles.map(f => {
+                        const { data: urlData } = supabase.storage
                             .from('banners')
                             .getPublicUrl(f.name);
                         return urlData.publicUrl;
                     });
 
-                    console.log('✅ Đã load', bannerSlideUrls.length, 'banner');
-                    renderBannerSlider();
+                    // Chia đôi: trái = ảnh lẻ, phải = ảnh chẵn
+                    leftBannerUrls = allUrls.filter((_, i) => i % 2 === 0);
+                    rightBannerUrls = allUrls.filter((_, i) => i % 2 === 1);
+
+                    if (leftBannerUrls.length === 0) leftBannerUrls = allUrls;
+                    if (rightBannerUrls.length === 0) rightBannerUrls = allUrls;
+
+                    console.log('✅ Banner trái:', leftBannerUrls.length, '| Banner phải:', rightBannerUrls.length);
+
+                    renderBannerHalf('left');
+                    renderBannerHalf('right');
 
                 } catch (err) {
                     console.error('Lỗi load banners:', err);
-                    bannerSlideUrls = [];
-                    renderBannerSlider();
+                    renderEmptyBanners();
                 }
             }
 
-            function renderBannerSlider() {
-                const slidesEl = document.getElementById('bannerSlides');
-                const dotsEl = document.getElementById('bannerDots');
+            function renderBannerHalf(side) {
+                const slidesEl = document.getElementById(side === 'left' ? 'bannerLeftSlides' : 'bannerRightSlides');
+                const dotsEl = document.getElementById(side === 'left' ? 'bannerLeftDots' : 'bannerRightDots');
+                const urls = side === 'left' ? leftBannerUrls : rightBannerUrls;
+
                 if (!slidesEl || !dotsEl) return;
 
-                if (bannerSlideUrls.length === 0) {
+                if (urls.length === 0) {
                     slidesEl.innerHTML = `
-                        <div class="banner-slide active">
-                            <div class="banner-slide-fallback">🏆 SPORTSVN</div>
+                        <div class="banner-half-slide active">
+                            <div class="banner-half-slide-fallback">🏆 SPORTSVN</div>
                         </div>
                     `;
                     dotsEl.innerHTML = '';
                     return;
                 }
 
-                slidesEl.innerHTML = bannerSlideUrls.map((url, idx) => `
-                    <div class="banner-slide ${idx === 0 ? 'active' : ''}" data-index="${idx}">
-                        <img src="${url}?t=${Date.now()}" alt="Banner ${idx + 1}" ${idx === 0 ? 'loading="eager" fetchpriority="high"' : 'loading="lazy"'}>
+                slidesEl.innerHTML = urls.map((url, idx) => `
+                    <div class="banner-half-slide ${idx === 0 ? 'active' : ''}" data-index="${idx}">
+                        <img src="${url}?t=${Date.now()}" 
+                             alt="Banner ${side} ${idx + 1}" 
+                             ${idx === 0 ? 'loading="eager" fetchpriority="high"' : 'loading="lazy"'}>
                     </div>
                 `).join('');
 
-                dotsEl.innerHTML = bannerSlideUrls.map((_, idx) => `
-                    <button class="banner-dot ${idx === 0 ? 'active' : ''}" 
-                            onclick="goToBannerSlide(${idx})" 
+                dotsEl.innerHTML = urls.map((_, idx) => `
+                    <button class="banner-half-dot ${idx === 0 ? 'active' : ''}" 
+                            onclick="goToBanner('${side}', ${idx})" 
                             aria-label="Banner ${idx + 1}"></button>
                 `).join('');
 
-                if (bannerSlideUrls.length > 1) startBannerAutoSlide();
+                const halfEl = document.getElementById(side === 'left' ? 'bannerLeft' : 'bannerRight');
+                if (halfEl && !halfEl.querySelector('.banner-nav-btn')) {
+                    halfEl.insertAdjacentHTML('beforeend', `
+                        <button class="banner-nav-btn prev" onclick="prevBanner('${side}')">‹</button>
+                        <button class="banner-nav-btn next" onclick="nextBanner('${side}')">›</button>
+                    `);
+                }
 
-                const bannerEl = document.getElementById('bannerSection');
-                bannerEl?.addEventListener('mouseenter', stopBannerAutoSlide);
-                bannerEl?.addEventListener('mouseleave', () => {
-                    if (bannerSlideUrls.length > 1) startBannerAutoSlide();
+                if (urls.length > 1) startAutoSlide(side);
+
+                halfEl?.addEventListener('mouseenter', () => stopAutoSlide(side));
+                halfEl?.addEventListener('mouseleave', () => {
+                    if (urls.length > 1) startAutoSlide(side);
                 });
 
                 let touchStartX = 0;
-                bannerEl?.addEventListener('touchstart', (e) => {
+                halfEl?.addEventListener('touchstart', (e) => {
                     touchStartX = e.touches[0].clientX;
                 }, { passive: true });
-                bannerEl?.addEventListener('touchend', (e) => {
+                halfEl?.addEventListener('touchend', (e) => {
                     const diff = e.changedTouches[0].clientX - touchStartX;
-                    if (Math.abs(diff) > 50) {
-                        if (diff > 0) {
-                            goToBannerSlide((bannerSlideIndex - 1 + bannerSlideUrls.length) % bannerSlideUrls.length);
-                        } else {
-                            goToBannerSlide((bannerSlideIndex + 1) % bannerSlideUrls.length);
-                        }
+                    if (Math.abs(diff) > 40) {
+                        if (diff > 0) prevBanner(side);
+                        else nextBanner(side);
                     }
                 }, { passive: true });
             }
 
-            window.goToBannerSlide = function(index) {
-                const slides = document.querySelectorAll('.banner-slide');
-                const dots = document.querySelectorAll('.banner-dot');
-                slides.forEach((s, i) => s.classList.toggle('active', i === index));
-                dots.forEach((d, i) => d.classList.toggle('active', i === index));
-                bannerSlideIndex = index;
-                stopBannerAutoSlide();
-                if (bannerSlideUrls.length > 1) startBannerAutoSlide();
+            window.goToBanner = function(side, index) {
+                const urls = side === 'left' ? leftBannerUrls : rightBannerUrls;
+                const currentIndex = side === 'left' ? leftBannerIndex : rightBannerIndex;
+                const containerId = side === 'left' ? 'bannerLeft' : 'bannerRight';
+                const slides = document.querySelectorAll(`#${containerId} .banner-half-slide`);
+                const dots = document.querySelectorAll(`#${containerId} .banner-half-dot`);
+
+                slides.forEach((s, i) => {
+                    s.classList.remove('active', 'exit-left');
+                    if (i === currentIndex) s.classList.add('exit-left');
+                });
+
+                setTimeout(() => {
+                    slides.forEach((s, i) => {
+                        s.classList.remove('exit-left');
+                        if (i === index) s.classList.add('active');
+                    });
+                    dots.forEach((d, i) => d.classList.toggle('active', i === index));
+                }, 50);
+
+                if (side === 'left') leftBannerIndex = index;
+                else rightBannerIndex = index;
             };
 
-            function startBannerAutoSlide() {
-                stopBannerAutoSlide();
-                bannerSlideInterval = setInterval(() => {
-                    const nextIndex = (bannerSlideIndex + 1) % bannerSlideUrls.length;
-                    const slides = document.querySelectorAll('.banner-slide');
-                    const dots = document.querySelectorAll('.banner-dot');
-                    slides.forEach((s, i) => s.classList.toggle('active', i === nextIndex));
-                    dots.forEach((d, i) => d.classList.toggle('active', i === nextIndex));
-                    bannerSlideIndex = nextIndex;
-                }, 5000);
+            window.nextBanner = function(side) {
+                const urls = side === 'left' ? leftBannerUrls : rightBannerUrls;
+                const currentIndex = side === 'left' ? leftBannerIndex : rightBannerIndex;
+                goToBanner(side, (currentIndex + 1) % urls.length);
+                if (urls.length > 1) {
+                    stopAutoSlide(side);
+                    startAutoSlide(side);
+                }
+            };
+
+            window.prevBanner = function(side) {
+                const urls = side === 'left' ? leftBannerUrls : rightBannerUrls;
+                const currentIndex = side === 'left' ? leftBannerIndex : rightBannerIndex;
+                goToBanner(side, (currentIndex - 1 + urls.length) % urls.length);
+                if (urls.length > 1) {
+                    stopAutoSlide(side);
+                    startAutoSlide(side);
+                }
+            };
+
+            function startAutoSlide(side) {
+                stopAutoSlide(side);
+                const urls = side === 'left' ? leftBannerUrls : rightBannerUrls;
+                if (urls.length < 2) return;
+
+                const timer = setInterval(() => {
+                    const currentIndex = side === 'left' ? leftBannerIndex : rightBannerIndex;
+                    goToBanner(side, (currentIndex + 1) % urls.length);
+                }, BANNER_INTERVAL);
+
+                if (side === 'left') leftBannerTimer = timer;
+                else rightBannerTimer = timer;
             }
 
-            function stopBannerAutoSlide() {
-                if (bannerSlideInterval) {
-                    clearInterval(bannerSlideInterval);
-                    bannerSlideInterval = null;
+            function stopAutoSlide(side) {
+                if (side === 'left' && leftBannerTimer) {
+                    clearInterval(leftBannerTimer);
+                    leftBannerTimer = null;
+                } else if (side === 'right' && rightBannerTimer) {
+                    clearInterval(rightBannerTimer);
+                    rightBannerTimer = null;
                 }
+            }
+
+            function renderEmptyBanners() {
+                ['Left', 'Right'].forEach(side => {
+                    const slidesEl = document.getElementById(`banner${side}Slides`);
+                    const dotsEl = document.getElementById(`banner${side}Dots`);
+                    if (slidesEl) {
+                        slidesEl.innerHTML = `
+                            <div class="banner-half-slide active">
+                                <div class="banner-half-slide-fallback">🏆 SPORTSVN</div>
+                            </div>
+                        `;
+                    }
+                    if (dotsEl) dotsEl.innerHTML = '';
+                });
             }
 
             loadBanners();
