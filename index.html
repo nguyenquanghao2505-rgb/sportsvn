@@ -10,6 +10,251 @@
     <script src="banner.js" defer></script>
     <script src="football.js" defer></script>
     <script src="provinces.js" defer></script>
+    <script src="sports-config.js" defer></script>
+    <style>
+        /* ========== HOME SECTION (dùng chung cho 4 section ngang) ========== */
+        .home-section {
+            margin-top: 20px;
+            background: #fff;
+            border-radius: 12px;
+            overflow: hidden;
+            box-shadow: 0 2px 10px rgba(0,0,0,0.05);
+        }
+        .home-section-header {
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            background: linear-gradient(135deg, #c8102e, #e94560);
+            color: #fff;
+            padding: 10px 16px;
+        }
+        .home-section-header.blue {
+            background: linear-gradient(135deg, #0d47a1, #1769ff);
+        }
+        .home-section-header.green {
+            background: linear-gradient(135deg, #059669, #10b981);
+        }
+        .home-section-header.orange {
+            background: linear-gradient(135deg, #d97706, #f59e0b);
+        }
+        .home-section-title {
+            display: flex;
+            align-items: center;
+            gap: 8px;
+            font-size: 14px;
+            font-weight: 900;
+            text-transform: uppercase;
+            letter-spacing: 0.4px;
+        }
+        .home-section-title .icon { font-size: 18px; }
+        .home-section-viewall {
+            color: rgba(255,255,255,0.9);
+            font-size: 11.5px;
+            font-weight: 700;
+            text-decoration: none;
+            padding: 5px 10px;
+            border-radius: 6px;
+            transition: background 0.2s;
+        }
+        .home-section-viewall:hover {
+            background: rgba(255,255,255,0.15);
+            color: #fff;
+        }
+        .home-section-body { padding: 12px; }
+
+        /* ========== GRID 4 CỘT ========== */
+        .home-grid-4 {
+            display: grid;
+            grid-template-columns: 1.4fr 1fr 1fr 1fr;
+            gap: 8px;
+        }
+
+        /* ========== HERO CHUNG ========== */
+        .home-hero {
+            position: relative;
+            background: #000;
+            border-radius: 8px;
+            overflow: hidden;
+            cursor: pointer;
+            aspect-ratio: 16 / 10;
+            display: block;
+            text-decoration: none;
+            color: inherit;
+        }
+        .home-hero img {
+            width: 100%; height: 100%;
+            object-fit: cover;
+            transition: transform 0.4s;
+        }
+        .home-hero:hover img { transform: scale(1.05); }
+        .home-hero-overlay {
+            position: absolute; inset: 0;
+            background: linear-gradient(180deg, transparent 40%, rgba(0,0,0,0.9) 100%);
+            display: flex; flex-direction: column; justify-content: flex-end;
+            padding: 10px 12px; color: #fff;
+        }
+        .home-hero-badge {
+            display: inline-flex; align-items: center; gap: 3px;
+            padding: 2px 8px; border-radius: 10px;
+            font-size: 9px; font-weight: 800; text-transform: uppercase;
+            background: #e94560; color: #fff;
+            width: fit-content; margin-bottom: 5px;
+        }
+        .home-hero-badge.blue { background: #1769ff; }
+        .home-hero-badge.green { background: #00b894; }
+        .home-hero-badge.orange { background: #f39c12; }
+        .home-hero-title {
+            font-size: 13px; font-weight: 800; line-height: 1.3;
+            margin-bottom: 3px;
+            display: -webkit-box; -webkit-line-clamp: 2;
+            -webkit-box-orient: vertical; overflow: hidden;
+        }
+        .home-hero-desc {
+            font-size: 10.5px; opacity: 0.85; line-height: 1.4;
+            display: -webkit-box; -webkit-line-clamp: 1;
+            -webkit-box-orient: vertical; overflow: hidden;
+        }
+        .home-hero-play {
+            position: absolute; top: 50%; left: 50%;
+            transform: translate(-50%, -50%);
+            width: 44px; height: 44px;
+            background: rgba(233, 69, 96, 0.95);
+            border-radius: 50%;
+            display: flex; align-items: center; justify-content: center;
+            color: #fff; font-size: 18px;
+            pointer-events: none;
+            box-shadow: 0 4px 12px rgba(0,0,0,0.4);
+            transition: transform 0.3s;
+        }
+        .home-hero:hover .home-hero-play {
+            transform: translate(-50%, -50%) scale(1.15);
+        }
+
+        /* ========== SMALL CARD CHUNG ========== */
+        .home-small {
+            position: relative;
+            background: #fff;
+            border-radius: 6px;
+            overflow: hidden;
+            cursor: pointer;
+            display: flex;
+            flex-direction: column;
+            border: 1px solid #e9ecef;
+            transition: all 0.2s;
+            text-decoration: none;
+            color: inherit;
+        }
+        .home-small:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 6px 16px rgba(0,0,0,0.08);
+        }
+        .home-small-thumb {
+            position: relative;
+            width: 100%;
+            aspect-ratio: 16 / 10;
+            overflow: hidden;
+            background: #000;
+        }
+        .home-small-thumb img {
+            width: 100%; height: 100%;
+            object-fit: cover;
+            transition: transform 0.3s;
+        }
+        .home-small:hover .home-small-thumb img { transform: scale(1.05); }
+        .home-small-play {
+            position: absolute; top: 50%; left: 50%;
+            transform: translate(-50%, -50%);
+            width: 28px; height: 28px;
+            background: rgba(233, 69, 96, 0.9);
+            border-radius: 50%;
+            display: flex; align-items: center; justify-content: center;
+            color: #fff; font-size: 11px;
+            pointer-events: none;
+        }
+        .home-small-count {
+            position: absolute; top: 6px; right: 6px;
+            background: rgba(0,0,0,0.7); color: #fff;
+            padding: 2px 7px; border-radius: 8px;
+            font-size: 9px; font-weight: 800;
+        }
+        .home-small-body { padding: 8px; flex: 1; }
+        .home-small-title {
+            font-size: 11px; font-weight: 700;
+            color: #1a1a2e; line-height: 1.35;
+            display: -webkit-box; -webkit-line-clamp: 2;
+            -webkit-box-orient: vertical; overflow: hidden;
+            margin-bottom: 3px;
+        }
+        .home-small-meta {
+            font-size: 9px; color: #9ca3af;
+            display: flex; align-items: center; gap: 5px;
+        }
+        .home-small-meta .hot-tag {
+            background: #fee2e2; color: #dc2626;
+            padding: 1px 5px; border-radius: 3px;
+            font-weight: 800; font-size: 8px;
+        }
+
+        /* ========== ĐẶT SÂN CARDS ========== */
+        .booking-card {
+            position: relative;
+            background: linear-gradient(135deg, #f0fdf4, #d1fae5);
+            border-radius: 8px;
+            overflow: hidden;
+            cursor: pointer;
+            padding: 16px;
+            display: flex;
+            flex-direction: column;
+            justify-content: center;
+            align-items: center;
+            text-align: center;
+            border: 1px solid #a7f3d0;
+            transition: all 0.2s;
+            aspect-ratio: 16 / 10;
+            text-decoration: none;
+            color: inherit;
+        }
+        .booking-card:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 8px 20px rgba(16, 185, 129, 0.15);
+            background: linear-gradient(135deg, #ecfdf5, #a7f3d0);
+        }
+        .booking-card .booking-icon { font-size: 32px; margin-bottom: 8px; }
+        .booking-card .booking-title {
+            font-size: 13px; font-weight: 800;
+            color: #065f46; margin-bottom: 4px;
+        }
+        .booking-card .booking-desc {
+            font-size: 10.5px; color: #047857; line-height: 1.4;
+        }
+        .booking-card .booking-arrow {
+            margin-top: 8px; font-size: 11px;
+            font-weight: 700; color: #059669;
+        }
+
+        /* ========== RESPONSIVE ========== */
+        @media (max-width: 900px) {
+            .home-grid-4 { grid-template-columns: 1.5fr 1fr; }
+            .home-hero {
+                grid-column: 1 / 2;
+                grid-row: 1 / 3;
+                aspect-ratio: auto;
+                min-height: 200px;
+            }
+        }
+
+        @media (max-width: 640px) {
+            .home-grid-4 { grid-template-columns: 1fr 1fr; gap: 6px; }
+            .home-hero {
+                grid-column: 1 / -1;
+                grid-row: auto;
+                min-height: 170px;
+            }
+            .home-hero-desc { display: none; }
+            .home-section-title { font-size: 12px; }
+            .home-section-title .icon { font-size: 15px; }
+        }
+    </style>
 </head>
 
 <body data-page="index.html">
@@ -64,6 +309,9 @@
                 </div>
 
 
+                <!-- ============================================== -->
+                <!-- 1. DASHBOARD 3 CỘT -->
+                <!-- ============================================== -->
                 <div class="dashboard-grid">
 
                     <!-- CỘT 1: GIẢI ĐẤU -->
@@ -196,6 +444,120 @@
                 </div>
 
 
+                <!-- ============================================== -->
+                <!-- 2. 📰 TIN TỨC THỂ THAO (MỚI) -->
+                <!-- ============================================== -->
+                <section class="home-section">
+                    <div class="home-section-header orange">
+                        <div class="home-section-title">
+                            <span class="icon">📰</span>
+                            <span>Tin tức thể thao</span>
+                        </div>
+                        <a href="news-list.html" class="home-section-viewall">Xem tất cả →</a>
+                    </div>
+                    <div class="home-section-body">
+                        <div class="home-grid-4" id="homeNewsGrid">
+                            <div style="grid-column:1/-1;text-align:center;padding:30px;color:#9ca3af;font-size:12px;">
+                                ⏳ Đang tải tin tức...
+                            </div>
+                        </div>
+                    </div>
+                </section>
+
+
+                <!-- ============================================== -->
+                <!-- 3. 🏟️ ĐẶT SÂN (MỚI) -->
+                <!-- ============================================== -->
+                <section class="home-section">
+                    <div class="home-section-header green">
+                        <div class="home-section-title">
+                            <span class="icon">🏟️</span>
+                            <span>Đặt sân thể thao</span>
+                        </div>
+                        <a href="booking.html" class="home-section-viewall">Đặt sân ngay →</a>
+                    </div>
+                    <div class="home-section-body">
+                        <div class="home-grid-4">
+                            <a href="booking.html" class="home-hero">
+                                <div style="position: absolute; inset: 0; display: flex; align-items: center; justify-content: center; background: linear-gradient(135deg, #059669, #10b981);">
+                                    <div style="text-align: center; color: #fff; padding: 20px;">
+                                        <div style="font-size: 48px; margin-bottom: 10px;">🏟️</div>
+                                        <div style="font-size: 16px; font-weight: 900; margin-bottom: 6px;">ĐẶT SÂN ONLINE</div>
+                                        <div style="font-size: 12px; opacity: 0.9;">Đặt sân nhanh chóng, tiện lợi 24/7</div>
+                                    </div>
+                                </div>
+                            </a>
+
+                            <a href="booking.html?type=badminton" class="booking-card">
+                                <div class="booking-icon">🏸</div>
+                                <div class="booking-title">Sân Cầu lông</div>
+                                <div class="booking-desc">Đặt sân cầu lông</div>
+                                <div class="booking-arrow">Đặt ngay →</div>
+                            </a>
+
+                            <a href="booking.html?type=football" class="booking-card">
+                                <div class="booking-icon">⚽</div>
+                                <div class="booking-title">Sân Bóng đá</div>
+                                <div class="booking-desc">Đặt sân bóng đá</div>
+                                <div class="booking-arrow">Đặt ngay →</div>
+                            </a>
+
+                            <a href="booking.html?type=pickleball" class="booking-card">
+                                <div class="booking-icon">🎾</div>
+                                <div class="booking-title">Sân Pickleball</div>
+                                <div class="booking-desc">Đặt sân pickleball</div>
+                                <div class="booking-arrow">Đặt ngay →</div>
+                            </a>
+                        </div>
+                    </div>
+                </section>
+
+
+                <!-- ============================================== -->
+                <!-- 4. 🎬 VIDEO THỂ THAO (MỚI) -->
+                <!-- ============================================== -->
+                <section class="home-section">
+                    <div class="home-section-header">
+                        <div class="home-section-title">
+                            <span class="icon">🎬</span>
+                            <span>Video thể thao</span>
+                        </div>
+                        <a href="videos.html" class="home-section-viewall">Xem tất cả →</a>
+                    </div>
+                    <div class="home-section-body">
+                        <div class="home-grid-4" id="homeVideosGrid">
+                            <div style="grid-column:1/-1;text-align:center;padding:30px;color:#9ca3af;font-size:12px;">
+                                ⏳ Đang tải video...
+                            </div>
+                        </div>
+                    </div>
+                </section>
+
+
+                <!-- ============================================== -->
+                <!-- 5. 📸 HÌNH ẢNH GIẢI ĐẤU (MỚI) -->
+                <!-- ============================================== -->
+                <section class="home-section">
+                    <div class="home-section-header blue">
+                        <div class="home-section-title">
+                            <span class="icon">📸</span>
+                            <span>Hình ảnh giải đấu</span>
+                        </div>
+                        <a href="photos.html" class="home-section-viewall">Xem tất cả →</a>
+                    </div>
+                    <div class="home-section-body">
+                        <div class="home-grid-4" id="homePhotosGrid">
+                            <div style="grid-column:1/-1;text-align:center;padding:30px;color:#9ca3af;font-size:12px;">
+                                ⏳ Đang tải album...
+                            </div>
+                        </div>
+                    </div>
+                </section>
+
+
+                <!-- ============================================== -->
+                <!-- 6. 📅 UPCOMING BAR -->
+                <!-- ============================================== -->
                 <div class="upcoming-bar">
                     <div class="upcoming-title">
                         <span>📅</span> Giải đấu sắp tới
@@ -255,6 +617,29 @@
     </div>
 
 
+    <!-- MODAL VIDEO PLAYER -->
+    <div class="video-modal-overlay" id="videoModal" hidden style="
+        position: fixed; inset: 0; z-index: 2000;
+        display: flex; align-items: center; justify-content: center;
+        padding: 20px; background: rgba(0,0,0,0.9);
+        backdrop-filter: blur(6px);
+    ">
+        <div style="width: 100%; max-width: 900px; background: #000; border-radius: 12px; overflow: hidden; position: relative; max-height: 92vh; overflow-y: auto;">
+            <button onclick="closeVideoModal()" style="
+                position: absolute; top: 12px; right: 12px;
+                width: 40px; height: 40px; border-radius: 50%;
+                background: rgba(255,255,255,0.95); border: 0;
+                font-size: 22px; cursor: pointer; z-index: 10;
+            ">×</button>
+            <div id="videoPlayer" style="width: 100%; aspect-ratio: 16 / 9; background: #000;"></div>
+            <div style="background: #fff; padding: 18px 22px;">
+                <h2 id="videoModalTitle" style="font-size: 17px; margin-bottom: 6px;"></h2>
+                <p id="videoModalDesc" style="font-size: 13.5px; color: #6c757d; line-height: 1.6;"></p>
+            </div>
+        </div>
+    </div>
+
+
     <!-- SCRIPTS -->
     <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
     <script src="config.js"></script>
@@ -274,7 +659,7 @@
             );
 
             // ==========================================
-            // MOBILE MENU + OVERLAY
+            // MOBILE MENU
             // ==========================================
             const sidebarEl = document.querySelector('.sidebar');
             const overlayEl = document.getElementById('sidebarOverlay');
@@ -285,25 +670,16 @@
                 overlayEl?.classList.add('show');
                 document.body.style.overflow = 'hidden';
             }
-
             function closeSidebar() {
                 sidebarEl?.classList.remove('open');
                 overlayEl?.classList.remove('show');
                 document.body.style.overflow = '';
             }
-
             mobileMenuBtn?.addEventListener('click', () => {
                 if (sidebarEl?.classList.contains('open')) closeSidebar();
                 else openSidebar();
             });
-
             overlayEl?.addEventListener('click', closeSidebar);
-
-            document.querySelectorAll('.sidebar .nav-item').forEach(link => {
-                link.addEventListener('click', () => {
-                    if (window.innerWidth <= 768) closeSidebar();
-                });
-            });
 
             // ==========================================
             // CHECK LOGIN
@@ -311,22 +687,15 @@
             async function checkLoginStatus() {
                 try {
                     const { data: { session } } = await supabase.auth.getSession();
-
                     if (session) {
                         const loginBtn = document.getElementById('loginBtn');
                         const topUser = document.getElementById('topUser');
-
                         if (loginBtn) loginBtn.style.display = 'none';
                         if (topUser) topUser.style.display = 'flex';
 
                         const userName = session.user.user_metadata?.full_name ||
                                         session.user.email.split('@')[0];
-                        const initials = userName.split(' ')
-                            .map(w => w[0])
-                            .join('')
-                            .slice(0, 2)
-                            .toUpperCase();
-
+                        const initials = userName.split(' ').map(w => w[0]).join('').slice(0, 2).toUpperCase();
                         const topUserName = document.getElementById('topUserName');
                         const topAvatar = document.getElementById('topAvatar');
                         if (topUserName) topUserName.textContent = userName;
@@ -339,32 +708,60 @@
                             }
                         });
                     }
-                } catch (err) {
-                    console.warn('⚠️ Lỗi check login:', err);
-                }
+                } catch (err) { console.warn('Lỗi check login:', err); }
             }
-
             checkLoginStatus();
 
             // ==========================================
-            // ⚠️ BANNER ĐÃ CHUYỂN SANG banner.js
-            // Code banner cũ đã được xóa khỏi đây
+            // HELPERS
             // ==========================================
+            function getSportIcon(sport) {
+                if (window.getSportConfig) {
+                    const cfg = window.getSportConfig(sport);
+                    if (cfg && cfg.icon) return cfg.icon;
+                }
+                const icons = {
+                    football: '⚽', swimming: '🏊', basketball: '🏀',
+                    pickleball: '◉', volleyball: '🏐', tennis: '🎾',
+                    badminton: '🏸', chess: '♟️', athletics: '🏃',
+                    martial_arts: '🥋', default: '🏆'
+                };
+                return icons[sport] || icons.default;
+            }
+
+            function formatDate(dateStr) {
+                if (!dateStr) return '—';
+                return new Date(dateStr).toLocaleDateString('vi-VN');
+            }
+
+            function escapeHtml(text) {
+                return String(text || '')
+                    .replace(/&/g, '&amp;').replace(/</g, '&lt;')
+                    .replace(/>/g, '&gt;').replace(/"/g, '&quot;')
+                    .replace(/'/g, '&#039;');
+            }
+
+            function extractYouTubeId(url) {
+                if (!url) return '';
+                if (url.includes('youtube.com/watch')) {
+                    return new URLSearchParams(url.split('?')[1]).get('v');
+                } else if (url.includes('youtu.be/')) {
+                    return url.split('youtu.be/')[1]?.split('?')[0];
+                } else if (url.includes('youtube.com/embed/')) {
+                    return url.split('embed/')[1]?.split('?')[0];
+                }
+                return '';
+            }
 
             // ==========================================
-            // LOAD TOURNAMENTS
+            // 1. LOAD TOURNAMENTS
             // ==========================================
             async function loadTournaments() {
                 try {
                     const { data, error } = await supabase
-                        .from('tournaments')
-                        .select('*')
+                        .from('tournaments').select('*')
                         .order('start_date', { ascending: false });
-
-                    if (error) {
-                        console.error('Lỗi load tournaments:', error);
-                        return;
-                    }
+                    if (error) { console.error(error); return; }
 
                     const activeList = (data || []).filter(t => t.status === 'active');
                     const upcomingList = (data || []).filter(t => t.status === 'upcoming');
@@ -373,12 +770,7 @@
                     renderTournamentGroup('tournamentsActive', activeList, 'active');
                     renderTournamentGroup('tournamentsUpcoming', upcomingList, 'upcoming');
                     renderTournamentGroup('tournamentsCompleted', completedList, 'completed');
-
-                    console.log(`✅ Tournaments: ${activeList.length} active, ${upcomingList.length} upcoming, ${completedList.length} completed`);
-
-                } catch (err) {
-                    console.error('Lỗi load giải đấu:', err);
-                }
+                } catch (err) { console.error(err); }
             }
 
             function renderTournamentGroup(containerId, tournaments, status) {
@@ -393,28 +785,22 @@
                     return;
                 }
 
-                const displayList = tournaments.slice(0, 4);
-
-                container.innerHTML = displayList.map(t => {
-                    const statusClass = status;
+                container.innerHTML = tournaments.slice(0, 4).map(t => {
                     const statusText = status === 'active' ? 'Đang diễn ra' :
-                                      status === 'upcoming' ? 'Sắp diễn ra' :
-                                      'Đã kết thúc';
+                                      status === 'upcoming' ? 'Sắp diễn ra' : 'Đã kết thúc';
                     const sportIcon = getSportIcon(t.sport);
-                    const dateDisplay = t.start_date
-                        ? new Date(t.start_date).toLocaleDateString('vi-VN')
-                        : '';
+                    const dateDisplay = t.start_date ? new Date(t.start_date).toLocaleDateString('vi-VN') : '';
 
                     return `
                         <a href="tournament-detail.html?id=${t.id}" class="tournament-link" style="text-decoration:none;color:inherit;">
                             <div class="tournament">
                                 <div class="sport-logo ${t.sport || 'football'}">${sportIcon}</div>
                                 <div class="tournament-info">
-                                    <strong>${t.name}</strong>
-                                    <span>${t.sport_name || ''}${t.team_count ? ' · ' + t.team_count + ' đội' : ''}</span>
+                                    <strong>${escapeHtml(t.name)}</strong>
+                                    <span>${escapeHtml(t.sport_name || '')}${t.team_count ? ' · ' + t.team_count + ' đội' : ''}</span>
                                 </div>
                                 <div class="tournament-status">
-                                    <span class="status ${statusClass}">${statusText}</span>
+                                    <span class="status ${status}">${statusText}</span>
                                     <small>${dateDisplay}</small>
                                 </div>
                             </div>
@@ -423,65 +809,330 @@
                 }).join('');
             }
 
-            function getSportIcon(sport) {
-                const icons = {
-                    football: '⚽', swimming: '🏊', basketball: '🏀',
-                    pickleball: '◉', volleyball: '🏐', tennis: '🎾',
-                    badminton: '🏸', chess: '♟️', athletics: '🏃',
-                    martial_arts: '🥋', default: '🏆'
-                };
-                return icons[sport] || icons.default;
-            }
-
             loadTournaments();
 
             // ==========================================
-            // LOAD NEWS
+            // 2. LOAD NEWS (cột nhỏ + section ngang)
             // ==========================================
             async function loadNews() {
                 try {
                     const { data, error } = await supabase
-                        .from('news')
-                        .select('*')
+                        .from('news').select('*')
                         .order('created_at', { ascending: false })
-                        .limit(3);
+                        .limit(20);
 
+                    // Cột nhỏ (3 tin)
                     const container = document.getElementById('homeNewsList');
                     if (error || !data || data.length === 0) {
                         container.innerHTML = '<div style="text-align:center;padding:30px;color:#9ca3af;font-size:12px;">📰 Chưa có tin tức</div>';
-                        return;
-                    }
-
-                    container.innerHTML = data.map(news => `
-                        <a href="news-detail.html?id=${news.id}" class="news-item-link">
-                            <div class="news-item">
-                                <div class="news-thumb">
-                                    ${news.image_url ?
-                                        `<img src="${news.image_url}" alt="${news.title}">` :
-                                        `<div style="width:100%;height:100%;display:flex;align-items:center;justify-content:center;font-size:32px;background:#f3f4f6;">📰</div>`
-                                    }
-                                </div>
-                                <div class="news-content">
-                                    <strong>${news.title}</strong>
-                                    <p>${news.summary || ''}</p>
-                                    <div class="news-meta">
-                                        <span>${new Date(news.created_at).toLocaleDateString('vi-VN')}</span>
-                                        ${news.is_hot ? '<span class="news-tag">HOT</span>' : ''}
+                    } else {
+                        container.innerHTML = data.slice(0, 3).map(news => `
+                            <a href="news-detail.html?id=${news.id}" class="news-item-link">
+                                <div class="news-item">
+                                    <div class="news-thumb">
+                                        ${news.image_url ?
+                                            `<img src="${escapeHtml(news.image_url)}" alt="${escapeHtml(news.title)}">` :
+                                            `<div style="width:100%;height:100%;display:flex;align-items:center;justify-content:center;font-size:32px;background:#f3f4f6;">📰</div>`
+                                        }
+                                    </div>
+                                    <div class="news-content">
+                                        <strong>${escapeHtml(news.title)}</strong>
+                                        <p>${escapeHtml(news.summary || '')}</p>
+                                        <div class="news-meta">
+                                            <span>${formatDate(news.created_at)}</span>
+                                            ${news.is_hot ? '<span class="news-tag">HOT</span>' : ''}
+                                        </div>
                                     </div>
                                 </div>
-                            </div>
-                        </a>
-                    `).join('');
+                            </a>
+                        `).join('');
+                    }
+
+                    // Section ngang (4 tin)
+                    renderHomeNewsSection(data || []);
 
                 } catch (err) {
                     console.error('Lỗi load tin tức:', err);
                 }
             }
 
+            function renderHomeNewsSection(newsList) {
+                const grid = document.getElementById('homeNewsGrid');
+                if (!grid) return;
+
+                if (newsList.length === 0) {
+                    grid.innerHTML = '<div style="grid-column:1/-1;text-align:center;padding:30px;color:#9ca3af;font-size:12px;">📰 Chưa có tin tức</div>';
+                    return;
+                }
+
+                const heroNews = newsList[0];
+                const otherNews = newsList.slice(1, 4);
+
+                let html = '';
+
+                // Hero news
+                html += `
+                    <a href="news-detail.html?id=${heroNews.id}" class="home-hero">
+                        ${heroNews.image_url ?
+                            `<img src="${escapeHtml(heroNews.image_url)}" alt="${escapeHtml(heroNews.title)}" loading="lazy">` :
+                            `<div style="width:100%;height:100%;display:flex;align-items:center;justify-content:center;font-size:64px;background:#f3f4f6;">📰</div>`
+                        }
+                        <div class="home-hero-overlay">
+                            ${heroNews.is_hot ? '<span class="home-hero-badge">🔥 HOT</span>' : ''}
+                            <div class="home-hero-title">${escapeHtml(heroNews.title)}</div>
+                            ${heroNews.summary ? `<div class="home-hero-desc">${escapeHtml(heroNews.summary)}</div>` : ''}
+                        </div>
+                    </a>
+                `;
+
+                // Small news
+                otherNews.forEach(news => {
+                    html += `
+                        <a href="news-detail.html?id=${news.id}" class="home-small">
+                            <div class="home-small-thumb">
+                                ${news.image_url ?
+                                    `<img src="${escapeHtml(news.image_url)}" alt="${escapeHtml(news.title)}" loading="lazy">` :
+                                    `<div style="width:100%;height:100%;display:flex;align-items:center;justify-content:center;font-size:36px;background:#f3f4f6;">📰</div>`
+                                }
+                            </div>
+                            <div class="home-small-body">
+                                <div class="home-small-title">${escapeHtml(news.title)}</div>
+                                <div class="home-small-meta">
+                                    <span>📅 ${formatDate(news.created_at)}</span>
+                                    ${news.is_hot ? '<span class="hot-tag">HOT</span>' : ''}
+                                </div>
+                            </div>
+                        </a>
+                    `;
+                });
+
+                grid.innerHTML = html;
+            }
+
             loadNews();
 
             // ==========================================
-            // FOOTBALL
+            // 3. LOAD VIDEOS (section ngang)
+            // ==========================================
+            let homeVideos = [];
+
+            async function loadHomeVideos() {
+                const grid = document.getElementById('homeVideosGrid');
+
+                try {
+                    const { data, error } = await supabase
+                        .from('videos').select('*')
+                        .order('created_at', { ascending: false })
+                        .limit(4);
+
+                    if (error || !data || data.length === 0) {
+                        grid.innerHTML = '<div style="grid-column:1/-1;text-align:center;padding:30px;color:#9ca3af;font-size:12px;">🎬 Chưa có video</div>';
+                        return;
+                    }
+
+                    homeVideos = data;
+                    renderHomeVideosSection(data);
+
+                } catch (err) {
+                    console.error('Lỗi load video:', err);
+                    grid.innerHTML = '<div style="grid-column:1/-1;text-align:center;padding:30px;color:#dc2626;font-size:12px;">❌ Lỗi tải video</div>';
+                }
+            }
+
+            function renderHomeVideosSection(videos) {
+                const grid = document.getElementById('homeVideosGrid');
+                const heroVideo = videos[0];
+                const otherVideos = videos.slice(1, 4);
+
+                let html = '';
+
+                // Hero video
+                const heroThumb = getVideoThumb(heroVideo);
+                html += `
+                    <div class="home-hero" onclick="openVideoModal('${heroVideo.id}')">
+                        ${heroThumb ?
+                            `<img src="${escapeHtml(heroThumb)}" alt="${escapeHtml(heroVideo.title)}" loading="lazy">` :
+                            `<div style="width:100%;height:100%;display:flex;align-items:center;justify-content:center;font-size:64px;background:#000;color:#fff;">🎬</div>`
+                        }
+                        <div class="home-hero-play">▶</div>
+                        <div class="home-hero-overlay">
+                            ${heroVideo.is_hot ? '<span class="home-hero-badge">🔥 HOT</span>' :
+                              heroVideo.category ? `<span class="home-hero-badge">${escapeHtml(heroVideo.category)}</span>` : ''}
+                            <div class="home-hero-title">${escapeHtml(heroVideo.title)}</div>
+                            ${heroVideo.description ? `<div class="home-hero-desc">${escapeHtml(heroVideo.description)}</div>` : ''}
+                        </div>
+                    </div>
+                `;
+
+                // Small videos
+                otherVideos.forEach(v => {
+                    const thumb = getVideoThumb(v);
+                    html += `
+                        <div class="home-small" onclick="openVideoModal('${v.id}')">
+                            <div class="home-small-thumb">
+                                ${thumb ?
+                                    `<img src="${escapeHtml(thumb)}" alt="${escapeHtml(v.title)}" loading="lazy">` :
+                                    `<div style="width:100%;height:100%;display:flex;align-items:center;justify-content:center;font-size:36px;background:#000;color:#fff;">🎬</div>`
+                                }
+                                <div class="home-small-play">▶</div>
+                            </div>
+                            <div class="home-small-body">
+                                <div class="home-small-title">${escapeHtml(v.title)}</div>
+                                <div class="home-small-meta">
+                                    <span>📅 ${formatDate(v.created_at)}</span>
+                                    ${v.is_hot ? '<span class="hot-tag">HOT</span>' : ''}
+                                </div>
+                            </div>
+                        </div>
+                    `;
+                });
+
+                grid.innerHTML = html;
+            }
+
+            function getVideoThumb(v) {
+                if (v.thumbnail_url) return v.thumbnail_url;
+                if (v.video_id) return `https://img.youtube.com/vi/${v.video_id}/hqdefault.jpg`;
+                if (v.video_url?.includes('youtube')) {
+                    const id = extractYouTubeId(v.video_url);
+                    if (id) return `https://img.youtube.com/vi/${id}/hqdefault.jpg`;
+                }
+                return null;
+            }
+
+            loadHomeVideos();
+
+            // ==========================================
+            // 4. LOAD PHOTOS (section ngang)
+            // ==========================================
+            async function loadHomePhotos() {
+                const grid = document.getElementById('homePhotosGrid');
+
+                try {
+                    // Lấy album (photo_albums)
+                    const { data: albums, error } = await supabase
+                        .from('photo_albums')
+                        .select('*')
+                        .order('created_at', { ascending: false })
+                        .limit(4);
+
+                    if (error || !albums || albums.length === 0) {
+                        grid.innerHTML = '<div style="grid-column:1/-1;text-align:center;padding:30px;color:#9ca3af;font-size:12px;">📸 Chưa có album ảnh</div>';
+                        return;
+                    }
+
+                    // Đếm số ảnh cho mỗi album
+                    for (const album of albums) {
+                        const { count } = await supabase
+                            .from('photos')
+                            .select('*', { count: 'exact', head: true })
+                            .eq('album_id', album.id);
+                        album.photo_count = count || 0;
+                    }
+
+                    renderHomePhotosSection(albums);
+
+                } catch (err) {
+                    console.error('Lỗi load album:', err);
+                    grid.innerHTML = '<div style="grid-column:1/-1;text-align:center;padding:30px;color:#dc2626;font-size:12px;">❌ Lỗi tải album</div>';
+                }
+            }
+
+            function renderHomePhotosSection(albums) {
+                const grid = document.getElementById('homePhotosGrid');
+                const heroAlbum = albums[0];
+                const otherAlbums = albums.slice(1, 4);
+
+                let html = '';
+
+                // Hero album
+                html += `
+                    <a href="photos.html" class="home-hero">
+                        ${heroAlbum.cover_image ?
+                            `<img src="${escapeHtml(heroAlbum.cover_image)}" alt="${escapeHtml(heroAlbum.title)}" loading="lazy">` :
+                            `<div style="width:100%;height:100%;display:flex;align-items:center;justify-content:center;font-size:64px;background:linear-gradient(135deg,#e3f2fd,#bbdefb);">📸</div>`
+                        }
+                        <div class="home-hero-overlay">
+                            <span class="home-hero-badge blue">📸 ${heroAlbum.photo_count} ảnh</span>
+                            <div class="home-hero-title">${escapeHtml(heroAlbum.title)}</div>
+                            ${heroAlbum.description ? `<div class="home-hero-desc">${escapeHtml(heroAlbum.description)}</div>` : ''}
+                        </div>
+                    </a>
+                `;
+
+                // Small albums
+                otherAlbums.forEach(album => {
+                    html += `
+                        <a href="photos.html" class="home-small">
+                            <div class="home-small-thumb">
+                                ${album.cover_image ?
+                                    `<img src="${escapeHtml(album.cover_image)}" alt="${escapeHtml(album.title)}" loading="lazy">` :
+                                    `<div style="width:100%;height:100%;display:flex;align-items:center;justify-content:center;font-size:36px;background:linear-gradient(135deg,#e3f2fd,#bbdefb);">📸</div>`
+                                }
+                                <span class="home-small-count">${album.photo_count} ảnh</span>
+                            </div>
+                            <div class="home-small-body">
+                                <div class="home-small-title">${escapeHtml(album.title)}</div>
+                                <div class="home-small-meta">
+                                    <span>📅 ${formatDate(album.created_at)}</span>
+                                </div>
+                            </div>
+                        </a>
+                    `;
+                });
+
+                grid.innerHTML = html;
+            }
+
+            loadHomePhotos();
+
+            // ==========================================
+            // 5. VIDEO MODAL
+            // ==========================================
+            window.openVideoModal = function(id) {
+                const v = homeVideos.find(x => x.id === id);
+                if (!v) return;
+
+                let embedHtml = '';
+
+                if (v.video_type === 'youtube' || v.video_url?.includes('youtube')) {
+                    const videoId = v.video_id || extractYouTubeId(v.video_url);
+                    embedHtml = `<iframe src="https://www.youtube.com/embed/${videoId}?autoplay=1" allow="autoplay; encrypted-media" allowfullscreen style="width:100%;height:100%;border:0;display:block;"></iframe>`;
+                } else if (v.video_type === 'facebook' || v.video_url?.includes('facebook')) {
+                    embedHtml = `<iframe src="https://www.facebook.com/plugins/video.php?href=${encodeURIComponent(v.video_url)}&show_text=false" allowfullscreen style="width:100%;height:100%;border:0;display:block;"></iframe>`;
+                } else if (v.video_url?.match(/\.(mp4|webm|ogg)$/i)) {
+                    embedHtml = `<video controls autoplay style="width:100%;height:100%;"><source src="${v.video_url}" type="video/mp4"></video>`;
+                } else {
+                    embedHtml = `<div style="display:flex;align-items:center;justify-content:center;height:100%;color:#fff;flex-direction:column;gap:16px;padding:40px;">
+                        <p>Không thể phát video này</p>
+                        <a href="${v.video_url}" target="_blank" style="color:#4d94ff;text-decoration:none;padding:10px 20px;border:2px solid #4d94ff;border-radius:10px;">Mở trong tab mới →</a>
+                    </div>`;
+                }
+
+                document.getElementById('videoPlayer').innerHTML = embedHtml;
+                document.getElementById('videoModalTitle').textContent = v.title;
+                document.getElementById('videoModalDesc').textContent = v.description || '';
+
+                document.getElementById('videoModal').hidden = false;
+                document.body.style.overflow = 'hidden';
+            };
+
+            window.closeVideoModal = function() {
+                document.getElementById('videoModal').hidden = true;
+                document.getElementById('videoPlayer').innerHTML = '';
+                document.body.style.overflow = '';
+            };
+
+            document.getElementById('videoModal')?.addEventListener('click', (e) => {
+                if (e.target.id === 'videoModal') closeVideoModal();
+            });
+
+            document.addEventListener('keydown', (e) => {
+                if (e.key === 'Escape') closeVideoModal();
+            });
+
+            // ==========================================
+            // 6. FOOTBALL
             // ==========================================
             let currentLeague = '4328';
             let currentStatus = 'upcoming';
@@ -524,9 +1175,9 @@
 
                         return `
                             <div class="result-item">
-                                <div class="result-team">${match.strHomeTeam}</div>
+                                <div class="result-team">${escapeHtml(match.strHomeTeam)}</div>
                                 <div class="result-score">${homeScore} - ${awayScore}</div>
-                                <div class="result-team" style="text-align:right;">${match.strAwayTeam}</div>
+                                <div class="result-team" style="text-align:right;">${escapeHtml(match.strAwayTeam)}</div>
                                 <div class="result-status" style="color:${statusColor};font-weight:700;">${statusText}</div>
                             </div>
                         `;
