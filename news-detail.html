@@ -6,6 +6,7 @@
     <title>Chi tiết tin tức - SportsVN</title>
     <link rel="stylesheet" href="styles.css">
     <script src="sidebar.js" defer></script>
+    <script src="analytics.js" defer></script>   <!-- 👈 THÊM DÒNG NÀY -->
     <style>
         /* ===== ARTICLE CONTAINER ===== */
         .article-container {
@@ -454,6 +455,12 @@
                             <span>✍️</span>
                             <span id="articleAuthor"></span>
                         </div>
+                        <!-- 👇 THÊM: Hiển thị lượt xem -->
+                        <div class="article-meta-item" id="articleViewsWrap" style="display:none;">
+                            <span>👁️</span>
+                            <span id="articleViews"></span>
+                        </div>
+                        <!-- 👆 HẾT ĐOẠN THÊM -->
                     </div>
 
                     <!-- ẢNH BÌA (figure có figcaption) -->
@@ -533,6 +540,15 @@
                 errorState.style.display = 'block';
                 return;
             }
+
+            // 👇 ==========================================
+            // 👇 THÊM: GHI NHẬN LƯỢT TRUY CẬP + LƯỢT XEM BÀI
+            // 👇 ==========================================
+            if (window.SportsVNAnalytics) {
+                window.SportsVNAnalytics.trackVisit(supabaseClient);
+                window.SportsVNAnalytics.trackNewsView(supabaseClient, newsId);
+            }
+            // 👆 =============== HẾT ĐOẠN THÊM =============
 
             try {
                 const { data, error } = await supabaseClient
@@ -619,6 +635,19 @@
                     (data.author_email ? data.author_email.split('@')[0] : 'SportsVN');
                 document.getElementById('articleAuthor').textContent = authorName;
 
+                // 👇 ==========================================
+                // 👇 THÊM: HIỂN THỊ LƯỢT XEM BÀI VIẾT
+                // 👇 ==========================================
+                const viewsWrap = document.getElementById('articleViewsWrap');
+                const viewsEl   = document.getElementById('articleViews');
+                if (viewsWrap && viewsEl) {
+                    // views + 1 vì trackNewsView() vừa được gọi phía trên (nếu chưa tính trong 24h)
+                    const displayViews = Number(data.views || 0);
+                    viewsEl.textContent = displayViews.toLocaleString('vi-VN') + ' lượt xem';
+                    viewsWrap.style.display = displayViews > 0 ? 'flex' : 'none';
+                }
+                // 👆 =============== HẾT ĐOẠN THÊM =============
+
                 // ===== ẢNH BÌA — render dạng <figure> + <figcaption> =====
                 const coverWrap = document.getElementById('articleCoverWrap');
                 if (data.image_url) {
@@ -658,6 +687,7 @@
                 console.log('✅ Đã load tin tức:', data.title);
                 console.log('   → Bút danh:', authorName);
                 console.log('   → Số ảnh nội dung:', images.length);
+                console.log('   → Lượt xem:', data.views || 0);
 
                 // ===== LOAD TIN TỨC LIÊN QUAN =====
                 await loadRelatedNews(supabaseClient, newsId, data.category);
