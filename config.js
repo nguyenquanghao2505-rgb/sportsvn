@@ -1,55 +1,131 @@
-/*
-============================================================
-SPORTSVN - CONFIG.JS
-Cấu hình Supabase + EmailJS cho toàn bộ hệ thống SportsVN
-============================================================
-*/
+/* ============================================================
+   SPORTSVN - ANALYTICS.JS
+   Đếm lượt truy cập + lượt xem tin tức
+   Dùng chung cho mọi trang: index, news, news-detail, admin...
+   ============================================================ */
 
-window.SPORTSVN_CONFIG = {
-    // ==========================================
-    // URL Supabase - ĐÚNG 100% (không sửa)
-    // 3 ký tự cuối là "kggk" - KHÔNG phải "kgkg"
-    // ==========================================
-    SUPABASE_URL: 'https://bqzjksmsdtnodcfykggk.supabase.co',
+(function () {
+    'use strict';
 
-    // ==========================================
-    // Legacy anon key (KHÔNG phải publishable key)
-    // ==========================================
-    SUPABASE_ANON_KEY: 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6ImJxemprc21zZHRub2RjZnlrZ2drIiwicm9sZSI6ImFub24iLCJpYXQiOjE3ODczNzkwNTYsImV4cCI6MjEwMjk1NTA1Nn0.nmIhW8qg547V9vcoUCuX8alDIrxH14hkr8nKMRPwLhE',
+    // ---------- 1. SESSION ID ẨN DANH (lưu localStorage) ----------
+    function getSessionId() {
+        const KEY = 'sportsvn_sid';
+        let sid = localStorage.getItem(KEY);
+        if (!sid) {
+            sid = 'sid_' + Date.now() + '_' + Math.random().toString(36).slice(2, 12);
+            localStorage.setItem(KEY, sid);
+        }
+        return sid;
+    }
 
-    // ==========================================
-    // ✅ EMAILJS - Gửi email thông báo đơn hàng
-    // ==========================================
-    EMAILJS_SERVICE_ID: 'service_yjd0x5c',
-    EMAILJS_TEMPLATE_ID: 'template_v8wwu3p',
-    EMAILJS_PUBLIC_KEY: 'Dsj2LUVxhjbQYEnQA',
+    // ---------- 2. HASH IP ĐƠN GIẢN (không lưu IP gốc) ----------
+    async function hashIP() {
+        try {
+            const res  = await fetch('https://api.ipify.org?format=json', { cache: 'no-store' });
+            const data = await res.json();
+            const raw  = (data.ip || '') + 'sportsvn_salt_2026';
 
-    // ==========================================
-    // Thông tin liên hệ
-    // ==========================================
-    CONTACT_NAME: 'Nguyễn Quang Hảo',
-    CONTACT_PHONE: '0905.771.177',
-    CONTACT_EMAIL: 'nguyenquanghao2505@gmail.com',
-    WEBSITE: 'https://sportsvn.com',
+            const buf = await crypto.subtle.digest('SHA-256', new TextEncoder().encode(raw));
+            const arr = Array.from(new Uint8Array(buf));
+            return arr.map(b => b.toString(16).padStart(2, '0')).join('').slice(0, 32);
+        } catch (e) {
+            return null;
+        }
+    }
 
-    // ==========================================
-    // Thông tin ngân hàng - MBV CN Đà Nẵng
-    // ==========================================
-    BANK_NAME: 'MBV - CN Đà Nẵng',
-    BANK_ACCOUNT_NAME: 'Nguyễn Quang Hảo',
-    BANK_ACCOUNT_NUMBER: '027999999',
-    BANK_BRANCH: 'Đà Nẵng',
+    // ---------- 3. XÁC ĐỊNH TÊN TRANG ----------
+    function getPageName() {
+        const path = window.location.pathname.toLowerCase();
+        const file = path.split('/').pop() || 'index.html';
 
-    // ==========================================
-    // Thông tin khác
-    // ==========================================
-    SITE_NAME: 'SportsVN',
-    SITE_DESCRIPTION: 'Nền tảng quản lý giải thể thao Việt Nam',
-    VERSION: '1.1.0'
-};
+        if (file.includes('index'))       return 'home';
+        if (file.includes('news-detail')) return 'news-detail';
+        if (file.includes('news'))        return 'news-list';
+        if (file.includes('admin'))       return 'admin';
+        if (file.includes('tournament'))  return 'tournaments';
+        if (file.includes('booking'))     return 'booking';
+        if (file.includes('shop'))        return 'shop';
+        if (file.includes('draw'))        return 'draw';
+        if (file.includes('login'))       return 'login';
+        return file.replace('.html', '') || 'unknown';
+    }
 
-console.log('✅ SportsVN config loaded:', {
-    url: window.SPORTSVN_CONFIG.SUPABASE_URL,
-    hasKey: Boolean(window.SPORTSVN_CONFIG.SUPABASE_ANON_KEY),
-    hasEmailJS: Boolean(window.SPORTSVN_CONFIG.EMAILJS_SERVICE_ID)
-});
+    // ---------- 4. TRACK PAGE VISIT ----------
+    async function trackVisit(supabaseClient) {
+        if (!supabaseClient) {
+            console.warn('⚠️ Analytics: chưa có supabaseClient');
+            return;
+        }
+
+        const sessionId = getSessionId();
+        const page      = getPageName();
+
+        // Chống double-count: trong 30 giây không ghi lại cùng 1 trang
+        const throttleKey = 'sportsvn_lastvisit_' + page;
+        const last = parseInt(localStorage.getItem(throttleKey) || '0', 10);
+        if (Date.now() - last < 30000) {
+            console.log('⏭️ Analytics: bỏ qua (vừa track < 30s):', page);
+            return;
+        }
+        localStorage.setItem(throttleKey, String(Date.now()));
+
+        try {
+            const ipHash = await hashIP();
+
+            const { error } = await supabaseClient.rpc('log_visit', {
+                p_session_id: sessionId,
+                p_page:       page,
+                p_path:       window.location.pathname + window.location.search,
+                p_user_agent: navigator.userAgent.slice(0, 200),
+                p_referrer:   (document.referrer || '').slice(0, 200),
+                p_ip_hash:    ipHash
+            });
+
+            if (error) {
+                console.warn('❌ Analytics log_visit lỗi:', error.message);
+            } else {
+                console.log('✅ Analytics: đã ghi nhận lượt truy cập →', page);
+            }
+        } catch (err) {
+            console.warn('❌ Analytics tracking lỗi:', err);
+        }
+    }
+
+    // ---------- 5. TRACK NEWS VIEW ----------
+    async function trackNewsView(supabaseClient, newsId) {
+        if (!supabaseClient || !newsId) return;
+
+        // 1 người chỉ tính 1 view / bài / 24h
+        const key  = 'sportsvn_viewed_' + newsId;
+        const last = parseInt(localStorage.getItem(key) || '0', 10);
+        if (Date.now() - last < 24 * 60 * 60 * 1000) {
+            console.log('⏭️ Analytics: bỏ qua (đã xem bài này < 24h)');
+            return;
+        }
+
+        try {
+            const { error } = await supabaseClient.rpc('increment_news_view', {
+                news_id: newsId
+            });
+
+            if (error) {
+                console.warn('❌ Analytics increment_news_view lỗi:', error.message);
+            } else {
+                localStorage.setItem(key, String(Date.now()));
+                console.log('✅ Analytics: đã tăng lượt xem bài →', newsId);
+            }
+        } catch (err) {
+            console.warn('❌ Analytics news view lỗi:', err);
+        }
+    }
+
+    // ---------- 6. EXPORT ----------
+    window.SportsVNAnalytics = {
+        trackVisit,
+        trackNewsView,
+        getSessionId,
+        getPageName
+    };
+
+    console.log('✅ analytics.js loaded');
+})();
