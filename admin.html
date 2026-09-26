@@ -10,6 +10,76 @@
     <script src="football.js" defer></script>
     <script src="provinces.js" defer></script>
     <script src="sidebar.js" defer></script>
+
+    <!-- CSS riêng cho Post Editor (bổ sung) -->
+    <style>
+        /* ============================================
+           POST EDITOR — Admin đăng bài thể thao
+           ============================================ */
+        .post-form { display: flex; flex-direction: column; gap: 14px; padding: 0 4px 12px; }
+        .form-row { display: flex; gap: 12px; flex-wrap: wrap; }
+        .form-row > .form-group { flex: 1; min-width: 200px; }
+        .form-group { display: flex; flex-direction: column; gap: 6px; }
+        .form-group label { font-weight: 600; font-size: 12px; }
+        .form-group .req { color: #dc2626; }
+        .form-group input[type="text"],
+        .form-group input[type="file"],
+        .form-group textarea,
+        .form-group select {
+            padding: 9px 10px; border: 1px solid #d8dee6;
+            border-radius: 8px; font-size: 13px; font-family: inherit; background: #fff;
+        }
+        .form-group textarea { resize: vertical; min-height: 120px; }
+        .form-hint { font-size: 11px; color: #6b7280; }
+        .form-fieldset {
+            border: 1px dashed #c7d0db; border-radius: 10px;
+            padding: 14px; background: #fafbfc;
+            display: flex; flex-direction: column; gap: 12px;
+        }
+        .form-fieldset legend { font-weight: 700; font-size: 13px; color: #1769ff; padding: 0 6px; }
+        .checkbox-inline { display: flex; align-items: center; gap: 6px; font-size: 13px; cursor: pointer; }
+        .form-actions {
+            display: flex; gap: 10px; flex-wrap: wrap;
+            padding-top: 8px; border-top: 1px solid #e5e9ee;
+        }
+        .btn-primary, .btn-secondary, .btn-ghost {
+            padding: 9px 16px; border-radius: 8px; border: none;
+            font-size: 13px; font-weight: 600; cursor: pointer;
+        }
+        .btn-primary { background: #1769ff; color: #fff; }
+        .btn-primary:disabled { opacity: .6; cursor: not-allowed; }
+        .btn-secondary { background: #eef2f7; color: #111; }
+        .btn-ghost { background: transparent; color: #1769ff; }
+
+        .image-block {
+            position: relative; border: 1px solid #d8dee6; border-radius: 8px;
+            padding: 12px; margin-bottom: 12px; background: #fff;
+            display: flex; flex-direction: column; gap: 8px;
+        }
+        .image-block h4 { margin: 0; font-size: 12px; color: #1769ff; text-transform: uppercase; }
+        .image-block .remove-img {
+            position: absolute; top: 8px; right: 8px;
+            background: #e63946; color: #fff; border: none;
+            border-radius: 6px; padding: 4px 8px; font-size: 11px; cursor: pointer;
+        }
+        .img-preview { max-width: 100%; max-height: 220px; border-radius: 8px; margin-top: 6px; object-fit: cover; }
+
+        .post-preview {
+            margin-top: 20px; padding-top: 20px;
+            border-top: 1px solid #e5e9ee; max-width: 720px;
+        }
+        .post-preview .post-title { font-size: 22px; margin: 0 0 4px; }
+        .post-preview .post-author { color: #6b7280; font-size: 13px; margin: 0 0 14px; }
+        .post-preview p { line-height: 1.7; margin: 12px 0; }
+
+        .post-figure { margin: 18px 0; text-align: center; }
+        .post-figure img { max-width: 100%; border-radius: 8px; display: block; margin: 0 auto; }
+        .post-figure figcaption {
+            font-size: 12px; color: #6b7280; font-style: italic;
+            margin-top: 6px; text-align: center;
+        }
+        .post-figure.cover img { width: 100%; }
+    </style>
 </head>
 
 <body data-page="admin.html">
@@ -233,6 +303,101 @@
                 </div>
 
 
+                <!-- ============================================ -->
+                <!-- PANEL ĐĂNG BÀI (chỉ admin chính thấy) -->
+                <!-- ============================================ -->
+                <section class="panel post-editor-panel" id="postEditorPanel" style="display:none;margin-top:16px;">
+                    <div class="panel-header">
+                        <div>
+                            <h2>✍️ Đăng bài thể thao</h2>
+                            <p>Soạn tin, thêm ảnh bìa và ảnh nội dung có chú thích + nguồn</p>
+                        </div>
+                    </div>
+
+                    <form id="postForm" class="post-form">
+
+                        <div class="form-row">
+                            <div class="form-group" style="flex:2;">
+                                <label for="postTitle">Tiêu đề bài viết <span class="req">*</span></label>
+                                <input type="text" id="postTitle" placeholder="VD: Việt Nam vô địch AFF Cup 2026" required>
+                            </div>
+                            <div class="form-group" style="flex:1;">
+                                <label for="postPenName">Bút danh</label>
+                                <input type="text" id="postPenName" placeholder="Bút danh cho bài viết">
+                                <small class="form-hint">Mặc định lấy từ tài khoản — có thể sửa cho từng bài.</small>
+                            </div>
+                        </div>
+
+                        <div class="form-row">
+                            <div class="form-group" style="flex:3;">
+                                <label for="postSummary">Tóm tắt (summary)</label>
+                                <input type="text" id="postSummary" placeholder="Mô tả ngắn hiển thị ở trang chủ">
+                            </div>
+                            <div class="form-group" style="flex:1;">
+                                <label for="postHot">Đánh dấu</label>
+                                <label class="checkbox-inline">
+                                    <input type="checkbox" id="postHot"> Tin HOT
+                                </label>
+                            </div>
+                        </div>
+
+                        <!-- ẢNH BÌA -->
+                        <fieldset class="form-fieldset">
+                            <legend>🖼️ Ảnh bìa</legend>
+
+                            <div class="form-row">
+                                <div class="form-group">
+                                    <label>File ảnh bìa</label>
+                                    <input type="file" id="coverFile" accept="image/*">
+                                </div>
+                                <div class="form-group">
+                                    <label for="coverUrl">Hoặc URL ảnh bìa</label>
+                                    <input type="text" id="coverUrl" placeholder="https://...">
+                                </div>
+                            </div>
+
+                            <div class="form-row">
+                                <div class="form-group">
+                                    <label for="coverCaption">Chú thích ảnh bìa</label>
+                                    <input type="text" id="coverCaption" placeholder="VD: Cầu thủ ăn mừng bàn thắng">
+                                </div>
+                                <div class="form-group">
+                                    <label for="coverSource">Nguồn ảnh bìa</label>
+                                    <input type="text" id="coverSource" placeholder="VD: Ảnh: Văn Hùng">
+                                </div>
+                            </div>
+
+                            <img id="coverPreview" class="img-preview" alt="preview" style="display:none;">
+                        </fieldset>
+
+                        <!-- NỘI DUNG -->
+                        <div class="form-group">
+                            <label for="postContent">Nội dung bài viết <span class="req">*</span></label>
+                            <textarea id="postContent" rows="8" placeholder="Nhập nội dung... (xuống dòng để tách đoạn)"></textarea>
+                        </div>
+
+                        <!-- ẢNH NỘI DUNG -->
+                        <fieldset class="form-fieldset">
+                            <legend>📷 Ảnh nội dung</legend>
+                            <p class="form-hint" style="margin-top:0;">
+                                Thêm nhiều ảnh — mỗi ảnh có chú thích + nguồn và chọn vị trí chèn (giữa bài / cuối bài).
+                            </p>
+                            <div id="contentImages"></div>
+                            <button type="button" class="btn-secondary" id="addImageBtn" style="align-self:flex-start;">➕ Thêm ảnh nội dung</button>
+                        </fieldset>
+
+                        <!-- ACTIONS -->
+                        <div class="form-actions">
+                            <button type="submit" class="btn-primary" id="submitPostBtn">💾 Đăng bài</button>
+                            <button type="button" class="btn-secondary" id="previewPostBtn">👁️ Xem trước</button>
+                            <button type="reset" class="btn-ghost">↺ Xóa form</button>
+                        </div>
+                    </form>
+
+                    <div id="postPreview" class="post-preview" style="display:none;"></div>
+                </section>
+
+
                 <!-- UPCOMING BAR -->
                 <div class="upcoming-bar">
                     <div class="upcoming-title">
@@ -384,6 +549,8 @@
             const isAuth = await checkAuth();
             if (!isAuth) return;
 
+            const session = window.currentSession;
+
             // ==========================================
             // 2. ĐĂNG XUẤT
             // ==========================================
@@ -437,13 +604,11 @@
 
             if (changeBtn && fileInput) {
 
-                // Nút đổi ảnh
                 changeBtn.addEventListener('click', function(e) {
                     e.stopPropagation();
                     fileInput.click();
                 });
 
-                // Upload ảnh mới
                 fileInput.addEventListener('change', async function(e) {
                     var file = e.target.files[0];
                     if (!file) return;
@@ -486,7 +651,6 @@
 
                         showToast('✓ Đã đổi ảnh bìa thành công!');
 
-                        // Reload lại banner (banner.js sẽ tự động load ảnh mới)
                         setTimeout(() => {
                             window.location.reload();
                         }, 1500);
@@ -521,26 +685,32 @@
                         return;
                     }
 
-                    container.innerHTML = data.map(news => `
-                        <a href="news-detail.html?id=${news.id}" class="news-item-link">
-                            <div class="news-item">
-                                <div class="news-thumb">
-                                    ${news.image_url ?
-                                        `<img src="${news.image_url}" alt="${news.title}">` :
-                                        `<div style="width:100%;height:100%;display:flex;align-items:center;justify-content:center;font-size:32px;background:#f3f4f6;">📰</div>`
-                                    }
-                                </div>
-                                <div class="news-content">
-                                    <strong>${news.title}</strong>
-                                    <p>${news.summary || ''}</p>
-                                    <div class="news-meta">
-                                        <span>${new Date(news.created_at).toLocaleDateString('vi-VN')}</span>
-                                        ${news.is_hot ? '<span class="news-tag">HOT</span>' : ''}
+                    container.innerHTML = data.map(news => {
+                        const cap = [news.cover_caption, news.cover_source].filter(Boolean).join(' — ');
+                        const coverHTML = news.image_url
+                            ? `<figure class="post-figure cover" style="margin:0;">
+                                 <img src="${news.image_url}" alt="${news.title}" loading="lazy">
+                                 ${cap ? `<figcaption>${cap}</figcaption>` : ''}
+                               </figure>`
+                            : `<div style="width:100%;height:100%;display:flex;align-items:center;justify-content:center;font-size:32px;background:#f3f4f6;">📰</div>`;
+
+                        return `
+                            <a href="news-detail.html?id=${news.id}" class="news-item-link">
+                                <div class="news-item">
+                                    <div class="news-thumb">${coverHTML}</div>
+                                    <div class="news-content">
+                                        <strong>${news.title}</strong>
+                                        <p>${news.summary || ''}</p>
+                                        <div class="news-meta">
+                                            <span>${new Date(news.created_at).toLocaleDateString('vi-VN')}</span>
+                                            ${news.pen_name ? `<span>✍️ ${news.pen_name}</span>` : ''}
+                                            ${news.is_hot ? '<span class="news-tag">HOT</span>' : ''}
+                                        </div>
                                     </div>
                                 </div>
-                            </div>
-                        </a>
-                    `).join('');
+                            </a>
+                        `;
+                    }).join('');
 
                     console.log('✅ Đã load ' + data.length + ' tin tức');
                 } catch (err) {
@@ -651,6 +821,237 @@
                     toast.classList.remove('show');
                     setTimeout(function() { toast.remove(); }, 300);
                 }, 3500);
+            }
+
+            // ==========================================
+            // 8. FORM ĐĂNG BÀI THỂ THAO (chỉ admin chính)
+            // ==========================================
+            const postEditorPanel = document.getElementById('postEditorPanel');
+            const postForm        = document.getElementById('postForm');
+            const contentImagesEl = document.getElementById('contentImages');
+
+            if (postEditorPanel && postForm && session.user.email === ADMIN_EMAIL) {
+                postEditorPanel.style.display = '';
+
+                const meta = session.user.user_metadata || {};
+                const defaultPenName =
+                    meta.pen_name || meta.full_name || session.user.email.split('@')[0];
+                document.getElementById('postPenName').value = defaultPenName;
+
+                let imgIdx = 0;
+
+                function addImageBlock(data = {}) {
+                    const id = ++imgIdx;
+                    const block = document.createElement('div');
+                    block.className = 'image-block';
+                    block.dataset.id = id;
+                    block.innerHTML = `
+                        <button type="button" class="remove-img">✕ Xóa</button>
+                        <h4>Ảnh nội dung #${id}</h4>
+                        <div class="form-group">
+                            <label>File ảnh</label>
+                            <input type="file" class="img-file" accept="image/*">
+                        </div>
+                        <div class="form-group">
+                            <label>Hoặc URL ảnh</label>
+                            <input type="text" class="img-url" placeholder="https://..." value="${data.url || ''}">
+                        </div>
+                        <div class="form-row">
+                            <div class="form-group">
+                                <label>Chú thích ảnh</label>
+                                <input type="text" class="img-caption" placeholder="VD: HLV phát biểu sau trận" value="${data.caption || ''}">
+                            </div>
+                            <div class="form-group">
+                                <label>Nguồn ảnh</label>
+                                <input type="text" class="img-source" placeholder="VD: Ảnh: Văn Hùng" value="${data.source || ''}">
+                            </div>
+                        </div>
+                        <div class="form-group">
+                            <label>Vị trí chèn</label>
+                            <select class="img-position">
+                                <option value="middle">Giữa bài</option>
+                                <option value="end">Cuối bài</option>
+                            </select>
+                        </div>
+                        <img class="img-preview" alt="preview" style="display:none;">
+                    `;
+
+                    block.querySelector('.remove-img').addEventListener('click', () => block.remove());
+
+                    const urlInput = block.querySelector('.img-url');
+                    const preview  = block.querySelector('.img-preview');
+                    urlInput.addEventListener('input', () => {
+                        const v = urlInput.value.trim();
+                        if (v) { preview.src = v; preview.style.display = 'block'; }
+                        else preview.style.display = 'none';
+                    });
+                    block.querySelector('.img-file').addEventListener('change', (e) => {
+                        const f = e.target.files[0];
+                        if (f) { preview.src = URL.createObjectURL(f); preview.style.display = 'block'; }
+                    });
+                    if (data.url) { preview.src = data.url; preview.style.display = 'block'; }
+
+                    contentImagesEl.appendChild(block);
+                }
+
+                document.getElementById('addImageBtn')?.addEventListener('click', () => addImageBlock());
+
+                async function uploadImage(file, prefix = 'post') {
+                    if (!file.type.startsWith('image/')) throw new Error('File không phải ảnh');
+                    if (file.size > 5 * 1024 * 1024) throw new Error('Ảnh vượt quá 5MB');
+                    const ext = file.name.split('.').pop().toLowerCase();
+                    const fileName = `${prefix}-${Date.now()}-${Math.random().toString(36).slice(2, 7)}.${ext}`;
+                    const { error } = await supabase.storage.from('banners')
+                        .upload(fileName, file, { cacheControl: '3600', upsert: true, contentType: file.type });
+                    if (error) throw error;
+                    const { data } = supabase.storage.from('banners').getPublicUrl(fileName);
+                    return data.publicUrl;
+                }
+
+                document.getElementById('coverFile')?.addEventListener('change', (e) => {
+                    const f = e.target.files[0];
+                    const p = document.getElementById('coverPreview');
+                    if (f) { p.src = URL.createObjectURL(f); p.style.display = 'block'; }
+                    else p.style.display = 'none';
+                });
+                document.getElementById('coverUrl')?.addEventListener('input', (e) => {
+                    const p = document.getElementById('coverPreview');
+                    const v = e.target.value.trim();
+                    if (v) { p.src = v; p.style.display = 'block'; }
+                    else p.style.display = 'none';
+                });
+
+                function collectPostData() {
+                    const images = [...contentImagesEl.querySelectorAll('.image-block')].map(b => ({
+                        file:     b.querySelector('.img-file').files[0] || null,
+                        url:      b.querySelector('.img-url').value.trim(),
+                        caption:  b.querySelector('.img-caption').value.trim(),
+                        source:   b.querySelector('.img-source').value.trim(),
+                        position: b.querySelector('.img-position').value
+                    }));
+                    return {
+                        title:   document.getElementById('postTitle').value.trim(),
+                        penName: document.getElementById('postPenName').value.trim() || defaultPenName,
+                        summary: document.getElementById('postSummary').value.trim(),
+                        content: document.getElementById('postContent').value.trim(),
+                        isHot:   document.getElementById('postHot').checked,
+                        cover: {
+                            file:    document.getElementById('coverFile').files[0] || null,
+                            url:     document.getElementById('coverUrl').value.trim(),
+                            caption: document.getElementById('coverCaption').value.trim(),
+                            source:  document.getElementById('coverSource').value.trim()
+                        },
+                        images
+                    };
+                }
+
+                function renderFigure(url, caption, source, cls = '') {
+                    if (!url) return '';
+                    const cap = [caption, source].filter(Boolean).join(' — ');
+                    return `<figure class="post-figure ${cls}">
+                        <img src="${url}" alt="${caption || 'Ảnh bài viết'}" loading="lazy">
+                        ${cap ? `<figcaption>${cap}</figcaption>` : ''}
+                    </figure>`;
+                }
+
+                function renderPostPreview(post) {
+                    const middleHTML = post.images
+                        .filter(i => i.position === 'middle' && i.url)
+                        .map(i => renderFigure(i.url, i.caption, i.source)).join('');
+                    const endHTML = post.images
+                        .filter(i => i.position === 'end' && i.url)
+                        .map(i => renderFigure(i.url, i.caption, i.source)).join('');
+
+                    const paras = post.content.split('\n').filter(p => p.trim());
+                    const mid = Math.ceil(paras.length / 2);
+                    const first  = paras.slice(0, mid).map(p => `<p>${p}</p>`).join('');
+                    const second = paras.slice(mid).map(p => `<p>${p}</p>`).join('');
+
+                    return `
+                        <h1 class="post-title">${post.title}</h1>
+                        <p class="post-author">✍️ <strong>${post.penName}</strong></p>
+                        ${renderFigure(post.cover.url, post.cover.caption, post.cover.source, 'cover')}
+                        ${first}${middleHTML}${second}${endHTML}
+                    `;
+                }
+
+                document.getElementById('previewPostBtn')?.addEventListener('click', () => {
+                    const data = collectPostData();
+                    if (!data.title) { alert('Vui lòng nhập tiêu đề!'); return; }
+                    if (data.cover.file) data.cover.url = URL.createObjectURL(data.cover.file);
+                    data.images = data.images.map(i => {
+                        if (!i.url && i.file) i.url = URL.createObjectURL(i.file);
+                        return i;
+                    });
+                    const box = document.getElementById('postPreview');
+                    box.innerHTML = renderPostPreview(data);
+                    box.style.display = 'block';
+                    box.scrollIntoView({ behavior: 'smooth' });
+                });
+
+                postForm.addEventListener('submit', async (e) => {
+                    e.preventDefault();
+                    const data = collectPostData();
+                    if (!data.title)   { alert('Vui lòng nhập tiêu đề!'); return; }
+                    if (!data.content) { alert('Vui lòng nhập nội dung!'); return; }
+
+                    const btn = document.getElementById('submitPostBtn');
+                    const oldText = btn.textContent;
+                    btn.disabled = true;
+                    btn.textContent = '⏳ Đang xử lý...';
+
+                    try {
+                        let coverUrl = data.cover.url;
+                        if (data.cover.file) coverUrl = await uploadImage(data.cover.file, 'cover');
+
+                        const uploadedImages = [];
+                        for (const img of data.images) {
+                            let url = img.url;
+                            if (img.file) url = await uploadImage(img.file, 'content');
+                            if (!url) continue;
+                            uploadedImages.push({ url, caption: img.caption, source: img.source, position: img.position });
+                        }
+
+                        const payload = {
+                            title: data.title,
+                            summary: data.summary || data.content.slice(0, 160),
+                            image_url: coverUrl || null,
+                            content: data.content,
+                            pen_name: data.penName,
+                            cover_caption: data.cover.caption,
+                            cover_source: data.cover.source,
+                            images: uploadedImages,
+                            is_hot: data.isHot,
+                            created_at: new Date().toISOString()
+                        };
+
+                        const { error } = await supabase.from('news').insert([payload]);
+                        if (error) throw error;
+
+                        showToast('✓ Đã đăng bài thành công!');
+
+                        payload.cover = { url: coverUrl, caption: data.cover.caption, source: data.cover.source };
+                        const box = document.getElementById('postPreview');
+                        box.innerHTML = renderPostPreview(payload);
+                        box.style.display = 'block';
+
+                        postForm.reset();
+                        contentImagesEl.innerHTML = '';
+                        document.getElementById('coverPreview').style.display = 'none';
+
+                        await loadHomeNews();
+
+                    } catch (err) {
+                        console.error('Lỗi đăng bài:', err);
+                        alert('Lỗi: ' + err.message);
+                    } finally {
+                        btn.disabled = false;
+                        btn.textContent = oldText;
+                    }
+                });
+
+                addImageBlock();
+                console.log('✅ Post Editor sẵn sàng cho admin chính');
             }
 
             console.log('✅ Admin Dashboard SportsVN đã sẵn sàng');
