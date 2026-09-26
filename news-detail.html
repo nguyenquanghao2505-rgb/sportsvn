@@ -17,7 +17,7 @@
             box-shadow: 0 1px 3px rgba(0, 0, 0, 0.08);
             border: 1px solid var(--border);
         }
-        
+
         .article-back {
             display: inline-flex;
             align-items: center;
@@ -32,12 +32,12 @@
             text-decoration: none;
             transition: all 0.2s ease;
         }
-        
+
         .article-back:hover {
             background: var(--primary);
             color: #fff;
         }
-        
+
         .article-category {
             display: inline-block;
             padding: 6px 14px;
@@ -50,12 +50,12 @@
             letter-spacing: 0.5px;
             margin-bottom: 16px;
         }
-        
+
         .article-category.hot {
             background: #fee2e2;
             color: #dc2626;
         }
-        
+
         .article-title {
             font-size: 32px;
             font-weight: 900;
@@ -64,7 +64,7 @@
             margin-bottom: 16px;
             letter-spacing: -0.5px;
         }
-        
+
         .article-meta {
             display: flex;
             align-items: center;
@@ -76,22 +76,48 @@
             margin-bottom: 24px;
             flex-wrap: wrap;
         }
-        
+
         .article-meta-item {
             display: flex;
             align-items: center;
             gap: 6px;
         }
-        
-        .article-image {
+
+        /* ===== FIGURE CHUẨN CHO ẢNH BÌA + ẢNH NỘI DUNG ===== */
+        .post-figure {
+            margin: 22px 0;
+            text-align: center;
+        }
+
+        .post-figure img {
             width: 100%;
             max-height: 500px;
             object-fit: cover;
             border-radius: 12px;
-            margin-bottom: 24px;
             display: block;
+            margin: 0 auto;
         }
-        
+
+        .post-figure.cover img {
+            max-height: 500px;
+        }
+
+        .post-figure figcaption {
+            font-size: 13px;
+            color: var(--text-muted);
+            font-style: italic;
+            margin-top: 10px;
+            text-align: center;
+            line-height: 1.5;
+            padding: 0 12px;
+        }
+
+        .post-figure figcaption .src {
+            font-style: normal;
+            font-weight: 700;
+            color: var(--text-light);
+        }
+
         .article-summary {
             font-size: 16px;
             font-weight: 600;
@@ -103,7 +129,7 @@
             border-radius: 8px;
             margin-bottom: 24px;
         }
-        
+
         /* ===== ARTICLE CONTENT (HỖ TRỢ HTML TỪ QUILL) ===== */
         .article-content {
             font-size: 16px;
@@ -111,9 +137,9 @@
             color: var(--text);
             word-wrap: break-word;
         }
-        
+
         .article-content p { margin-bottom: 16px; }
-        
+
         .article-content h1,
         .article-content h2,
         .article-content h3,
@@ -124,20 +150,20 @@
             color: var(--text-dark);
             line-height: 1.3;
         }
-        
+
         .article-content h1 { font-size: 28px; }
         .article-content h2 { font-size: 24px; }
         .article-content h3 { font-size: 20px; }
         .article-content h4 { font-size: 18px; }
-        
+
         .article-content ul,
         .article-content ol {
             margin-bottom: 16px;
             padding-left: 28px;
         }
-        
+
         .article-content li { margin-bottom: 8px; }
-        
+
         .article-content blockquote {
             border-left: 4px solid var(--primary);
             padding: 12px 20px;
@@ -147,7 +173,7 @@
             background: #f9fafb;
             border-radius: 0 8px 8px 0;
         }
-        
+
         .article-content img {
             max-width: 100%;
             height: auto;
@@ -155,14 +181,14 @@
             margin: 16px 0;
             display: block;
         }
-        
+
         .article-content a {
             color: var(--primary);
             text-decoration: underline;
         }
-        
+
         .article-content a:hover { color: var(--primary-dark); }
-        
+
         .article-content code {
             background: #f3f4f6;
             padding: 2px 6px;
@@ -171,7 +197,7 @@
             font-size: 14px;
             color: #dc2626;
         }
-        
+
         .article-content pre {
             background: #1f2937;
             color: #f9fafb;
@@ -183,39 +209,39 @@
             font-size: 14px;
             line-height: 1.6;
         }
-        
+
         .article-content pre code {
             background: transparent;
             color: inherit;
             padding: 0;
         }
-        
+
         .article-content strong,
         .article-content b {
             font-weight: 800;
             color: var(--text-dark);
         }
-        
+
         .article-content em,
         .article-content i { font-style: italic; }
-        
+
         .article-content u { text-decoration: underline; }
-        
+
         .article-content s,
         .article-content strike { text-decoration: line-through; }
-        
+
         /* Hỗ trợ các class của Quill */
         .article-content .ql-align-center { text-align: center; }
         .article-content .ql-align-right { text-align: right; }
         .article-content .ql-align-justify { text-align: justify; }
-        
+
         .article-content .ql-size-small { font-size: 12px; }
         .article-content .ql-size-large { font-size: 20px; }
         .article-content .ql-size-huge { font-size: 28px; }
-        
+
         .article-content .ql-font-serif { font-family: Georgia, 'Times New Roman', serif; }
         .article-content .ql-font-monospace { font-family: 'Courier New', monospace; }
-        
+
         /* ===== STATES ===== */
         .loading-state {
             text-align: center;
@@ -223,23 +249,23 @@
             color: var(--text-muted);
             font-size: 14px;
         }
-        
+
         .error-state {
             text-align: center;
             padding: 80px 20px;
         }
-        
+
         .error-state h2 {
             font-size: 24px;
             color: var(--text-dark);
             margin-bottom: 12px;
         }
-        
+
         .error-state p {
             color: var(--text-muted);
             margin-bottom: 24px;
         }
-        
+
         .error-state a {
             display: inline-block;
             padding: 12px 24px;
@@ -249,7 +275,7 @@
             font-weight: 700;
             text-decoration: none;
         }
-        
+
         /* ===== ARTICLE FOOTER ===== */
         .article-footer {
             margin-top: 40px;
@@ -261,7 +287,7 @@
             flex-wrap: wrap;
             gap: 16px;
         }
-        
+
         .article-share {
             display: flex;
             align-items: center;
@@ -269,7 +295,7 @@
             font-size: 13px;
             color: var(--text-muted);
         }
-        
+
         .article-share-btn {
             width: 36px;
             height: 36px;
@@ -284,18 +310,18 @@
             border: 0;
             font-size: 16px;
         }
-        
+
         .article-share-btn:hover {
             background: var(--primary);
             color: #fff;
         }
-        
+
         /* ===== RELATED NEWS ===== */
         .related-news {
             max-width: 900px;
             margin: 40px auto 0;
         }
-        
+
         .related-news h3 {
             font-size: 20px;
             font-weight: 800;
@@ -304,13 +330,13 @@
             padding-left: 12px;
             border-left: 4px solid var(--primary);
         }
-        
+
         .related-grid {
             display: grid;
             grid-template-columns: repeat(auto-fill, minmax(260px, 1fr));
             gap: 16px;
         }
-        
+
         .related-card {
             background: #fff;
             border-radius: 12px;
@@ -322,21 +348,21 @@
             display: flex;
             flex-direction: column;
         }
-        
+
         .related-card:hover {
             transform: translateY(-4px);
             box-shadow: 0 8px 16px rgba(0, 0, 0, 0.1);
         }
-        
+
         .related-card-image {
             width: 100%;
             height: 140px;
             object-fit: cover;
             background: #e5e7eb;
         }
-        
+
         .related-card-body { padding: 14px; }
-        
+
         .related-card-title {
             font-size: 14px;
             font-weight: 700;
@@ -347,14 +373,14 @@
             -webkit-box-orient: vertical;
             overflow: hidden;
         }
-        
+
         .related-card-date {
             font-size: 11px;
             color: var(--text-light);
             margin-top: 8px;
             display: block;
         }
-        
+
         /* ===== RESPONSIVE ===== */
         @media (max-width: 640px) {
             .article-container {
@@ -373,6 +399,7 @@
             .article-content h1 { font-size: 22px; }
             .article-content h2 { font-size: 20px; }
             .article-content h3 { font-size: 18px; }
+            .post-figure figcaption { font-size: 12px; }
         }
     </style>
 </head>
@@ -414,10 +441,10 @@
                 <!-- ARTICLE -->
                 <article id="articleContainer" class="article-container" style="display: none;">
                     <a href="news-list.html" class="article-back">← Quay lại danh sách tin</a>
-                    
+
                     <div id="articleCategory" class="article-category">Tin thể thao</div>
                     <h1 id="articleTitle" class="article-title"></h1>
-                    
+
                     <div class="article-meta">
                         <div class="article-meta-item">
                             <span>📅</span>
@@ -429,11 +456,12 @@
                         </div>
                     </div>
 
-                    <img id="articleImage" class="article-image" src="" alt="">
+                    <!-- ẢNH BÌA (figure có figcaption) -->
+                    <div id="articleCoverWrap"></div>
 
                     <div id="articleSummary" class="article-summary"></div>
-                    
-                    <!-- ✅ NỘI DUNG HTML TỪ QUILL -->
+
+                    <!-- ✅ NỘI DUNG + ẢNH NỘI DUNG -->
                     <div id="articleContent" class="article-content"></div>
 
                     <div class="article-footer">
@@ -475,10 +503,10 @@
         // ==========================================
         // TRANG CHI TIẾT TIN TỨC - KHÁN GIẢ
         // ==========================================
-        
+
         let currentArticle = null;
-        
-        document.addEventListener('DOMContentLoaded', async function() {
+
+        document.addEventListener('DOMContentLoaded', async function () {
             'use strict';
 
             const config = window.SPORTSVN_CONFIG || {};
@@ -521,18 +549,62 @@
 
                 currentArticle = data;
 
+                // ===== HELPER: RENDER FIGURE =====
+                function renderFigure(url, caption, source, cls = '') {
+                    if (!url) return '';
+                    const parts = [];
+                    if (caption) parts.push(caption);
+                    if (source)  parts.push(`<span class="src">${source}</span>`);
+                    const cap = parts.join(' — ');
+
+                    return `<figure class="post-figure ${cls}">
+                        <img src="${url}" alt="${caption || 'Ảnh bài viết'}" loading="lazy">
+                        ${cap ? `<figcaption>${cap}</figcaption>` : ''}
+                    </figure>`;
+                }
+
+                // ===== HELPER: CHÈN ẢNH NỘI DUNG VÀO BÀI =====
+                function buildContentWithImages(contentHTML, images) {
+                    if (!Array.isArray(images) || images.length === 0) {
+                        return contentHTML;
+                    }
+
+                    const middleImgs = images.filter(i => i.position === 'middle' && i.url);
+                    const endImgs    = images.filter(i => i.position === 'end'    && i.url);
+
+                    const middleHTML = middleImgs
+                        .map(i => renderFigure(i.url, i.caption, i.source)).join('');
+                    const endHTML = endImgs
+                        .map(i => renderFigure(i.url, i.caption, i.source)).join('');
+
+                    // Chèn ảnh giữa bài: chia nội dung Quill thành 2 nửa
+                    if (middleHTML) {
+                        const tmp = document.createElement('div');
+                        tmp.innerHTML = contentHTML;
+                        const children = [...tmp.children];
+                        const mid = Math.ceil(children.length / 2);
+
+                        const firstHalf  = children.slice(0, mid).map(c => c.outerHTML).join('');
+                        const secondHalf = children.slice(mid).map(c => c.outerHTML).join('');
+
+                        return firstHalf + middleHTML + secondHalf + endHTML;
+                    }
+
+                    return contentHTML + endHTML;
+                }
+
                 // ===== HIỂN THỊ TIN TỨC =====
-                
+
                 // Category
                 const catEl = document.getElementById('articleCategory');
                 catEl.textContent = data.is_hot ? '🔥 HOT' : (data.category || 'Tin thể thao');
                 catEl.className = 'article-category' + (data.is_hot ? ' hot' : '');
-                
+
                 // Title
                 document.getElementById('articleTitle').textContent = data.title;
-                
+
                 // Date
-                document.getElementById('articleDate').textContent = 
+                document.getElementById('articleDate').textContent =
                     new Date(data.created_at).toLocaleDateString('vi-VN', {
                         year: 'numeric',
                         month: 'long',
@@ -540,18 +612,24 @@
                         hour: '2-digit',
                         minute: '2-digit'
                     });
-                
-                // Author
-                document.getElementById('articleAuthor').textContent = 
-                    data.author_email ? data.author_email.split('@')[0] : 'SportsVN';
 
-                // Image
-                const imgEl = document.getElementById('articleImage');
+                // Author — ưu tiên BÚT DANH (pen_name), fallback về email
+                const authorName =
+                    data.pen_name ||
+                    (data.author_email ? data.author_email.split('@')[0] : 'SportsVN');
+                document.getElementById('articleAuthor').textContent = authorName;
+
+                // ===== ẢNH BÌA — render dạng <figure> + <figcaption> =====
+                const coverWrap = document.getElementById('articleCoverWrap');
                 if (data.image_url) {
-                    imgEl.src = data.image_url;
-                    imgEl.style.display = 'block';
+                    coverWrap.innerHTML = renderFigure(
+                        data.image_url,
+                        data.cover_caption || '',
+                        data.cover_source  || '',
+                        'cover'
+                    );
                 } else {
-                    imgEl.style.display = 'none';
+                    coverWrap.innerHTML = '';
                 }
 
                 // Summary
@@ -563,9 +641,12 @@
                     summaryEl.style.display = 'none';
                 }
 
-                // ✅ Content (HTML từ Quill) — DÙNG innerHTML
-                document.getElementById('articleContent').innerHTML = 
-                    data.content || '<p>Chưa có nội dung chi tiết.</p>';
+                // ===== NỘI DUNG + ẢNH NỘI DUNG =====
+                const rawContent = data.content || '<p>Chưa có nội dung chi tiết.</p>';
+                const images = Array.isArray(data.images) ? data.images : [];
+
+                document.getElementById('articleContent').innerHTML =
+                    buildContentWithImages(rawContent, images);
 
                 // Update page title
                 document.title = data.title + ' - SportsVN';
@@ -575,6 +656,8 @@
                 articleContainer.style.display = 'block';
 
                 console.log('✅ Đã load tin tức:', data.title);
+                console.log('   → Bút danh:', authorName);
+                console.log('   → Số ảnh nội dung:', images.length);
 
                 // ===== LOAD TIN TỨC LIÊN QUAN =====
                 await loadRelatedNews(supabaseClient, newsId, data.category);
@@ -603,7 +686,7 @@
 
                 relatedGrid.innerHTML = data.map(news => `
                     <a href="news-detail.html?id=${news.id}" class="related-card">
-                        ${news.image_url ? 
+                        ${news.image_url ?
                             `<img src="${news.image_url}" class="related-card-image" alt="${news.title}">` :
                             `<div class="related-card-image" style="display:flex;align-items:center;justify-content:center;font-size:32px;">📰</div>`
                         }
@@ -621,7 +704,7 @@
         }
 
         // ===== SHARE FACEBOOK =====
-        window.shareFacebook = function() {
+        window.shareFacebook = function () {
             if (!currentArticle) return;
             const url = window.location.href;
             const fbUrl = `https://www.facebook.com/sharer/sharer.php?u=${encodeURIComponent(url)}`;
@@ -629,7 +712,7 @@
         };
 
         // ===== COPY LINK =====
-        window.copyLink = function() {
+        window.copyLink = function () {
             navigator.clipboard.writeText(window.location.href).then(() => {
                 alert('✅ Đã copy link!');
             }).catch(err => {
