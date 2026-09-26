@@ -1,6 +1,7 @@
 /* ============================================================
-   ANALYTICS TRACKER — Đếm lượt xem + người truy cập
-   Dùng chung cho mọi trang: index.html, news.html, news-detail.html...
+   SPORTSVN - ANALYTICS.JS
+   Đếm lượt truy cập + lượt xem tin tức
+   Dùng chung cho mọi trang: index, news, news-detail, admin...
    ============================================================ */
 
 (function () {
@@ -20,12 +21,10 @@
     // ---------- 2. HASH IP ĐƠN GIẢN (không lưu IP gốc) ----------
     async function hashIP() {
         try {
-            // Dùng API công khai để lấy IP, sau đó hash
             const res  = await fetch('https://api.ipify.org?format=json', { cache: 'no-store' });
             const data = await res.json();
             const raw  = (data.ip || '') + 'sportsvn_salt_2026';
 
-            // Hash đơn giản bằng SubtleCrypto
             const buf = await crypto.subtle.digest('SHA-256', new TextEncoder().encode(raw));
             const arr = Array.from(new Uint8Array(buf));
             return arr.map(b => b.toString(16).padStart(2, '0')).join('').slice(0, 32);
@@ -46,21 +45,26 @@
         if (file.includes('tournament'))  return 'tournaments';
         if (file.includes('booking'))     return 'booking';
         if (file.includes('shop'))        return 'shop';
-        return file.replace('.html', '');
+        if (file.includes('draw'))        return 'draw';
+        if (file.includes('login'))       return 'login';
+        return file.replace('.html', '') || 'unknown';
     }
 
     // ---------- 4. TRACK PAGE VISIT ----------
     async function trackVisit(supabaseClient) {
-        if (!supabaseClient) return;
+        if (!supabaseClient) {
+            console.warn('⚠️ Analytics: chưa có supabaseClient');
+            return;
+        }
 
         const sessionId = getSessionId();
         const page      = getPageName();
 
-        // Tránh double-count trong cùng 1 tab/refresh liên tục trong 30s
+        // Chống double-count: trong 30 giây không ghi lại cùng 1 trang
         const throttleKey = 'sportsvn_lastvisit_' + page;
         const last = parseInt(localStorage.getItem(throttleKey) || '0', 10);
         if (Date.now() - last < 30000) {
-            console.log('⏭️ Bỏ qua tracking (vừa track < 30s)');
+            console.log('⏭️ Analytics: bỏ qua (vừa track < 30s):', page);
             return;
         }
         localStorage.setItem(throttleKey, String(Date.now()));
@@ -77,11 +81,13 @@
                 p_ip_hash:    ipHash
             });
 
-            if (error) console.warn('Lỗi log_visit:', error.message);
-            else console.log('✅ Đã ghi nhận lượt truy cập:', page);
-
+            if (error) {
+                console.warn('❌ Analytics log_visit lỗi:', error.message);
+            } else {
+                console.log('✅ Analytics: đã ghi nhận lượt truy cập →', page);
+            }
         } catch (err) {
-            console.warn('Lỗi tracking:', err);
+            console.warn('❌ Analytics tracking lỗi:', err);
         }
     }
 
@@ -90,10 +96,10 @@
         if (!supabaseClient || !newsId) return;
 
         // 1 người chỉ tính 1 view / bài / 24h
-        const key = 'sportsvn_viewed_' + newsId;
+        const key  = 'sportsvn_viewed_' + newsId;
         const last = parseInt(localStorage.getItem(key) || '0', 10);
         if (Date.now() - last < 24 * 60 * 60 * 1000) {
-            console.log('⏭️ Bỏ qua (đã xem bài này < 24h)');
+            console.log('⏭️ Analytics: bỏ qua (đã xem bài này < 24h)');
             return;
         }
 
@@ -102,13 +108,14 @@
                 news_id: newsId
             });
 
-            if (error) console.warn('Lỗi increment_news_view:', error.message);
-            else {
+            if (error) {
+                console.warn('❌ Analytics increment_news_view lỗi:', error.message);
+            } else {
                 localStorage.setItem(key, String(Date.now()));
-                console.log('✅ Đã tăng lượt xem bài:', newsId);
+                console.log('✅ Analytics: đã tăng lượt xem bài →', newsId);
             }
         } catch (err) {
-            console.warn('Lỗi đếm view:', err);
+            console.warn('❌ Analytics news view lỗi:', err);
         }
     }
 
@@ -116,6 +123,9 @@
     window.SportsVNAnalytics = {
         trackVisit,
         trackNewsView,
-        getSessionId
+        getSessionId,
+        getPageName
     };
+
+    console.log('✅ analytics.js loaded');
 })();
