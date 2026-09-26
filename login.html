@@ -71,12 +71,15 @@
         </form>
     </div>
 
-    <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+    <!-- 👇 SỬA: Đưa config.js + analytics.js lên TRƯỚC Supabase CDN -->
     <script src="config.js"></script>
+    <script src="analytics.js" defer></script>
+    <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+
     <script>
         (function() {
             'use strict';
-            
+
             const config = window.SPORTSVN_CONFIG || {};
             if (!config.SUPABASE_URL || !config.SUPABASE_ANON_KEY) {
                 console.error('❌ Chưa cấu hình Supabase trong config.js');
@@ -87,6 +90,11 @@
                 config.SUPABASE_URL,
                 config.SUPABASE_ANON_KEY
             );
+
+            // 👇 THÊM: Ghi nhận lượt truy cập trang login
+            if (window.SportsVNAnalytics) {
+                window.SportsVNAnalytics.trackVisit(supabaseClient);
+            }
 
             // ==========================================
             // 1. NẾU ĐÃ ĐĂNG NHẬP → CHUYỂN THẲNG VÀO ADMIN
@@ -177,9 +185,6 @@
 
                     showAlert('✅ Đăng nhập thành công! Đang chuyển hướng...', 'success');
 
-                    // ==========================================
-                    // ✅ SỬA Ở ĐÂY: chuyển đến admin.html
-                    // ==========================================
                     setTimeout(() => {
                         window.location.href = 'admin.html';
                     }, 1000);
