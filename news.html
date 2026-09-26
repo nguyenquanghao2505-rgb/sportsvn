@@ -10,6 +10,7 @@
 
     <link rel="stylesheet" href="styles.css">
     <script src="sidebar.js" defer></script>
+    <script src="analytics.js" defer></script>   <!-- 👈 THÊM DÒNG NÀY -->
 
     <style>
         /* ===== STYLE RIÊNG CHO TRANG NEWS ===== */
@@ -442,6 +443,14 @@
                 config.SUPABASE_URL,
                 config.SUPABASE_ANON_KEY
             );
+
+            // 👇 ==========================================
+            // 👇 THÊM: GHI NHẬN LƯỢT TRUY CẬP
+            // 👇 ==========================================
+            if (window.SportsVNAnalytics) {
+                window.SportsVNAnalytics.trackVisit(supabaseClient);
+            }
+            // 👆 =============== HẾT ĐOẠN THÊM =============
 
             // ===== KHỞI TẠO QUILL EDITOR =====
             quill = new Quill('#quillEditor', {
