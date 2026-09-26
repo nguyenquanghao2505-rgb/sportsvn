@@ -11,6 +11,7 @@
     <script src="football.js" defer></script>
     <script src="provinces.js" defer></script>
     <script src="sports-config.js" defer></script>
+    <script src="analytics.js" defer></script>   <!-- 👈 THÊM DÒNG NÀY -->
     <style>
         /* ========== HOME SECTION ========== */
         .home-section {
@@ -917,6 +918,14 @@
                 config.SUPABASE_URL,
                 config.SUPABASE_ANON_KEY
             );
+
+            // 👇 ==========================================
+            // 👇 THÊM: GHI NHẬN LƯỢT TRUY CẬP
+            // 👇 ==========================================
+            if (window.SportsVNAnalytics) {
+                window.SportsVNAnalytics.trackVisit(supabase);
+            }
+            // 👆 =============== HẾT ĐOẠN THÊM =============
 
             // ==========================================
             // MOBILE MENU
