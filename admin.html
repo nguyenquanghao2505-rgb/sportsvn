@@ -10,8 +10,9 @@
     <script src="football.js" defer></script>
     <script src="provinces.js" defer></script>
     <script src="sidebar.js" defer></script>
+    <script src="analytics.js" defer></script>   <!-- 👈 THÊM DÒNG NÀY -->
 
-    <!-- CSS riêng cho Post Editor (bổ sung) -->
+    <!-- CSS riêng cho Post Editor + Analytics Widget -->
     <style>
         /* ============================================
            POST EDITOR — Admin đăng bài thể thao
@@ -79,6 +80,110 @@
             margin-top: 6px; text-align: center;
         }
         .post-figure.cover img { width: 100%; }
+
+        /* ============================================
+           ANALYTICS WIDGET — Thống kê truy cập
+           ============================================ */
+        .analytics-widget {
+            margin: 16px 0;
+            padding: 20px;
+            background: #fff;
+            border-radius: 16px;
+            border: 1px solid var(--border, #e5e9ee);
+            box-shadow: 0 1px 3px rgba(0,0,0,.06);
+        }
+        .analytics-header {
+            display: flex; justify-content: space-between; align-items: center;
+            margin-bottom: 16px;
+        }
+        .analytics-header h2 {
+            font-size: 16px; font-weight: 800; margin: 0;
+            color: var(--text-dark, #111);
+        }
+        .analytics-refresh {
+            width: 34px; height: 34px; border-radius: 8px; border: 0;
+            background: #f3f4f6; color: #4b5563; font-size: 16px;
+            cursor: pointer; transition: all .2s ease;
+        }
+        .analytics-refresh:hover { background: #1769ff; color: #fff; }
+        .analytics-refresh.spinning { animation: spin .8s linear infinite; }
+        @keyframes spin { to { transform: rotate(360deg); } }
+
+        .analytics-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(220px, 1fr));
+            gap: 12px;
+        }
+
+        .stat-card {
+            display: flex; align-items: center; gap: 14px;
+            padding: 16px; border-radius: 12px;
+            background: #fafbfc;
+            border: 1px solid #e5e9ee;
+            transition: all .2s ease;
+        }
+        .stat-card:hover { transform: translateY(-2px); box-shadow: 0 6px 16px rgba(0,0,0,.06); }
+        .stat-card.stat-primary {
+            background: linear-gradient(135deg, #1769ff 0%, #4d94ff 100%);
+            border-color: transparent; color: #fff;
+        }
+        .stat-card.stat-primary .stat-label,
+        .stat-card.stat-primary .stat-sub { color: rgba(255,255,255,.85); }
+        .stat-card.stat-primary .stat-value { color: #fff; }
+
+        .stat-icon {
+            width: 48px; height: 48px; border-radius: 12px;
+            background: #fff; display: flex; align-items: center; justify-content: center;
+            font-size: 24px;
+            box-shadow: 0 2px 6px rgba(0,0,0,.06);
+        }
+        .stat-card.stat-primary .stat-icon { background: rgba(255,255,255,.2); }
+
+        .stat-info { display: flex; flex-direction: column; gap: 2px; }
+        .stat-label { font-size: 11px; font-weight: 700; color: #6b7280; text-transform: uppercase; letter-spacing: .3px; }
+        .stat-value { font-size: 22px; font-weight: 900; color: #111; line-height: 1.1; }
+        .stat-sub { font-size: 11px; color: #9ca3af; }
+
+        .analytics-row {
+            display: grid; grid-template-columns: 1fr 1fr; gap: 16px; margin-top: 20px;
+        }
+        @media (max-width: 768px) { .analytics-row { grid-template-columns: 1fr; } }
+
+        .analytics-col h3 {
+            font-size: 13px; font-weight: 800; color: #111;
+            margin: 0 0 10px; padding-left: 8px;
+            border-left: 3px solid #1769ff;
+        }
+
+        .top-list { display: flex; flex-direction: column; gap: 8px; }
+        .top-item {
+            display: flex; align-items: center; gap: 10px;
+            padding: 10px 12px; background: #fafbfc;
+            border-radius: 8px; font-size: 12.5px;
+            border: 1px solid #e5e9ee;
+        }
+        .top-item .rank {
+            width: 24px; height: 24px; border-radius: 6px;
+            background: #eef2f7; color: #4b5563;
+            display: flex; align-items: center; justify-content: center;
+            font-size: 11px; font-weight: 800; flex-shrink: 0;
+        }
+        .top-item:nth-child(1) .rank { background: #fef3c7; color: #d97706; }
+        .top-item:nth-child(2) .rank { background: #e5e7eb; color: #6b7280; }
+        .top-item:nth-child(3) .rank { background: #fed7aa; color: #c2410c; }
+
+        .top-item .top-title {
+            flex: 1; overflow: hidden; text-overflow: ellipsis;
+            white-space: nowrap; color: #111; font-weight: 600;
+        }
+        .top-item .top-count {
+            font-weight: 800; color: #1769ff; font-size: 12px;
+        }
+
+        .analytics-loading {
+            text-align: center; padding: 20px;
+            color: #6b7280; font-size: 12px;
+        }
     </style>
 </head>
 
@@ -145,6 +250,72 @@
                     </button>
                     <input type="file" id="bannerInput" accept="image/*" style="display: none;">
                 </div>
+
+
+                <!-- 👇 ============================================ -->
+                <!-- 👇 THÊM: ANALYTICS WIDGET (chỉ admin thấy) -->
+                <!-- 👇 ============================================ -->
+                <section class="analytics-widget" id="analyticsWidget" style="display:none;">
+                    <div class="analytics-header">
+                        <h2>📊 Thống kê truy cập</h2>
+                        <button class="analytics-refresh" id="analyticsRefresh" title="Làm mới">↻</button>
+                    </div>
+
+                    <div class="analytics-grid">
+                        <div class="stat-card stat-primary">
+                            <div class="stat-icon">👥</div>
+                            <div class="stat-info">
+                                <span class="stat-label">Người truy cập duy nhất</span>
+                                <strong class="stat-value" id="statUniqueVisitors">—</strong>
+                                <span class="stat-sub" id="statUniqueSub">Đang tải...</span>
+                            </div>
+                        </div>
+
+                        <div class="stat-card">
+                            <div class="stat-icon">🟢</div>
+                            <div class="stat-info">
+                                <span class="stat-label">Đang online</span>
+                                <strong class="stat-value" id="statOnlineNow">—</strong>
+                                <span class="stat-sub">5 phút qua</span>
+                            </div>
+                        </div>
+
+                        <div class="stat-card">
+                            <div class="stat-icon">📄</div>
+                            <div class="stat-info">
+                                <span class="stat-label">Lượt xem trang</span>
+                                <strong class="stat-value" id="statTotalPageViews">—</strong>
+                                <span class="stat-sub" id="statTodayPageViews">Hôm nay: —</span>
+                            </div>
+                        </div>
+
+                        <div class="stat-card">
+                            <div class="stat-icon">👁️</div>
+                            <div class="stat-info">
+                                <span class="stat-label">Lượt xem tin tức</span>
+                                <strong class="stat-value" id="statTotalNewsViews">—</strong>
+                                <span class="stat-sub">tất cả bài viết</span>
+                            </div>
+                        </div>
+                    </div>
+
+                    <div class="analytics-row">
+                        <div class="analytics-col">
+                            <h3>🔥 Top bài viết xem nhiều</h3>
+                            <div id="topNewsList" class="top-list">
+                                <div class="analytics-loading">⏳ Đang tải...</div>
+                            </div>
+                        </div>
+
+                        <div class="analytics-col">
+                            <h3>📈 Top trang truy cập</h3>
+                            <div id="topPagesList" class="top-list">
+                                <div class="analytics-loading">⏳ Đang tải...</div>
+                            </div>
+                        </div>
+                    </div>
+                </section>
+                <!-- 👆 =============== HẾT ĐOẠN THÊM ============= -->
 
 
                 <!-- DASHBOARD 3 CỘT -->
@@ -485,6 +656,14 @@
                 config.SUPABASE_ANON_KEY
             );
             const supabase = window.supabaseClient;
+
+            // 👇 ==========================================
+            // 👇 THÊM: GHI NHẬN LƯỢT TRUY CẬP
+            // 👇 ==========================================
+            if (window.SportsVNAnalytics) {
+                window.SportsVNAnalytics.trackVisit(supabase);
+            }
+            // 👆 =============== HẾT ĐOẠN THÊM =============
 
             const ADMIN_EMAIL = 'nguyenquanghao2505@gmail.com';
 
@@ -1052,6 +1231,95 @@
 
                 addImageBlock();
                 console.log('✅ Post Editor sẵn sàng cho admin chính');
+            }
+
+            // ==========================================
+            // 9. ANALYTICS WIDGET — Thống kê truy cập
+            // ==========================================
+            if (session.user.email === ADMIN_EMAIL) {
+                const analyticsWidget = document.getElementById('analyticsWidget');
+                if (analyticsWidget) {
+                    analyticsWidget.style.display = '';
+
+                    async function loadAnalytics() {
+                        const refreshBtn = document.getElementById('analyticsRefresh');
+                        refreshBtn?.classList.add('spinning');
+
+                        try {
+                            const { data, error } = await supabase.rpc('get_visit_stats');
+                            if (error) throw error;
+                            if (!data) throw new Error('Không có dữ liệu');
+
+                            const s = data;
+
+                            // --- 4 ô số liệu chính ---
+                            document.getElementById('statUniqueVisitors').textContent =
+                                Number(s.unique_visitors || 0).toLocaleString('vi-VN');
+                            document.getElementById('statUniqueSub').textContent =
+                                `Tháng: ${Number(s.month_visitors || 0).toLocaleString('vi-VN')} · Tuần: ${Number(s.week_visitors || 0).toLocaleString('vi-VN')}`;
+
+                            document.getElementById('statOnlineNow').textContent =
+                                Number(s.online_now || 0).toLocaleString('vi-VN');
+
+                            document.getElementById('statTotalPageViews').textContent =
+                                Number(s.total_page_views || 0).toLocaleString('vi-VN');
+                            document.getElementById('statTodayPageViews').textContent =
+                                `Hôm nay: ${Number(s.today_page_views || 0).toLocaleString('vi-VN')}`;
+
+                            document.getElementById('statTotalNewsViews').textContent =
+                                Number(s.total_news_views || 0).toLocaleString('vi-VN');
+
+                            // --- Top bài viết ---
+                            const topNews = Array.isArray(s.top_news) ? s.top_news : [];
+                            const topNewsEl = document.getElementById('topNewsList');
+                            if (topNews.length === 0) {
+                                topNewsEl.innerHTML = '<div class="analytics-loading">Chưa có dữ liệu</div>';
+                            } else {
+                                topNewsEl.innerHTML = topNews.map((n, i) => `
+                                    <a href="news-detail.html?id=${n.id}" class="top-item" style="text-decoration:none;">
+                                        <div class="rank">${i + 1}</div>
+                                        <div class="top-title" title="${n.title}">${n.title}</div>
+                                        <div class="top-count">👁️ ${Number(n.views || 0).toLocaleString('vi-VN')}</div>
+                                    </a>
+                                `).join('');
+                            }
+
+                            // --- Top trang ---
+                            const topPages = Array.isArray(s.top_pages) ? s.top_pages : [];
+                            const topPagesEl = document.getElementById('topPagesList');
+                            if (topPages.length === 0) {
+                                topPagesEl.innerHTML = '<div class="analytics-loading">Chưa có dữ liệu</div>';
+                            } else {
+                                topPagesEl.innerHTML = topPages.map((p, i) => `
+                                    <div class="top-item">
+                                        <div class="rank">${i + 1}</div>
+                                        <div class="top-title">/${p.page}</div>
+                                        <div class="top-count">${Number(p.visits || 0).toLocaleString('vi-VN')} lượt</div>
+                                    </div>
+                                `).join('');
+                            }
+
+                            console.log('✅ Đã load analytics:', s);
+
+                        } catch (err) {
+                            console.error('Lỗi load analytics:', err);
+                            document.getElementById('topNewsList').innerHTML =
+                                '<div class="analytics-loading">❌ ' + err.message + '</div>';
+                            document.getElementById('topPagesList').innerHTML =
+                                '<div class="analytics-loading">❌ ' + err.message + '</div>';
+                        } finally {
+                            refreshBtn?.classList.remove('spinning');
+                        }
+                    }
+
+                    // Load lần đầu + tự động refresh mỗi 60s
+                    loadAnalytics();
+                    setInterval(loadAnalytics, 60000);
+
+                    document.getElementById('analyticsRefresh')?.addEventListener('click', loadAnalytics);
+
+                    console.log('✅ Analytics Widget đã sẵn sàng');
+                }
             }
 
             console.log('✅ Admin Dashboard SportsVN đã sẵn sàng');
