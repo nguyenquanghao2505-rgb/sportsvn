@@ -1,117 +1,134 @@
 // ============================================================
-// bracket-excel.js — Export bracket ra Excel đồng bộ web
-// Layout: bracket cây + merge cells + border (giống referee.vn)
+// bracket-excel.js — Export Excel với bracket layout + đường nối
+// Layout giống file Excel mẫu (bracket cây có đường kẻ)
 // ============================================================
 
 /**
  * Export bracket ra file Excel
- * Yêu cầu: ExcelJS đã được load trước
- * @param {Object} bracket - từ bracket-engine.js
- * @param {Object} options
- * @returns {Promise<Blob>}
+ * Yêu cầu: ExcelJS đã load trước
  */
 export async function exportBracketToExcel(bracket, options = {}) {
   if (typeof ExcelJS === 'undefined') {
-    throw new Error('ExcelJS chưa được load. Thêm: <script src="https://cdnjs.cloudflare.com/ajax/libs/exceljs/4.4.0/exceljs.min.js"></script>');
+    throw new Error('ExcelJS chưa được load. Thêm script ExcelJS vào <head>');
   }
 
   const {
     categoryName = 'Bốc thăm',
     tournamentName = '',
     includeTeamList = true,
-    includeSchedule = false,
-    scheduleConfig = null,
   } = options;
 
   const wb = new ExcelJS.Workbook();
   wb.creator = 'SportsVN';
   wb.created = new Date();
 
-  // Sheet 1: Bracket cây
   const wsBracket = wb.addWorksheet('Sơ đồ thi đấu', {
     pageSetup: {
-      paperSize: 9,           // A4
+      paperSize: 9,
       orientation: 'landscape',
       fitToPage: true,
       fitToWidth: 1,
       fitToHeight: 0,
-      margins: { left: 0.3, right: 0.3, top: 0.5, bottom: 0.5, header: 0.2, footer: 0.2 },
+      margins: { left: 0.2, right: 0.2, top: 0.4, bottom: 0.4, header: 0.2, footer: 0.2 },
     },
-    views: [{ state: 'frozen', xSplit: 0, ySplit: 3 }],
   });
 
   drawBracketSheet(wsBracket, bracket, { categoryName, tournamentName });
 
-  // Sheet 2: Danh sách đội
   if (includeTeamList) {
     const wsTeams = wb.addWorksheet('Danh sách đội');
     drawTeamListSheet(wsTeams, bracket);
   }
 
-  // Sheet 3: Lịch thi đấu (tùy chọn)
-  if (includeSchedule && scheduleConfig) {
-    const wsSchedule = wb.addWorksheet('Lịch thi đấu');
-    drawScheduleSheet(wsSchedule, bracket, scheduleConfig);
-  }
-
-  // Xuất file
   const buffer = await wb.xlsx.writeBuffer();
   return new Blob([buffer], {
     type: 'application/vnd.openxmlformats-officedocument.spreadsheetml.sheet',
   });
 }
 
-/**
- * Vẽ sheet bracket dạng cây
- */
+// ============================================================
+// LAYOUT CONSTANTS
+// ============================================================
+const LAYOUT = {
+  COL_TT:       1,   // Cột A: Số TT nhánh
+  COL_TEAM:     2,   // Cột B: Tên đội
+  COL_SCORE:    3,   // Cột C: Điểm
+  COL_LINE:     4,   // Cột D: Đường nối ─ (width nhỏ)
+  COL_GAP:      1,   // Cột E: Khoảng cách giữa các vòng (width 2)
+
+  ROW_HEIGHT_TEAM: 20,  // Chiều cao 1 row đội
+  ROW_GAP: 1,           // Số row trống giữa các match (1 = không có, sẽ merge)
+};
+
+const COL_WIDTHS = {
+  TT: 5,
+  TEAM: 26,
+  SCORE: 6,
+  LINE: 3,
+  GAP: 2,
+};
+
+const COLORS = {
+  headerBg:   'FF1A3A7A',
+  headerFg:   'FFFFFFFF',
+  winnerBg:   'FFD1FAE5',
+  winnerFg:   'FF16A34A',
+  byeBg:      'FFFFF3CD',
+  byeFg:      'FFB45309',
+  borderLine: 'FF1A3A7A',
+  borderSoft: 'FFDEE2E6',
+  sectionBg:  'FF0D1B3E',
+  lineColor:  'FF3B82F6',
+};
+
+// ============================================================
+// MAIN DRAW FUNCTION
+// ============================================================
 function drawBracketSheet(ws, bracket, options) {
   const { categoryName, tournamentName } = options;
   const totalRounds = bracket.rounds.length;
   const firstRoundMatchCount = bracket.rounds[0].length;
 
-  // ═══════════════════════════════════════════════════════════
+  // ------------------------------------------------------------
   // Bước 1: Cấu hình cột
-  // Mỗi vòng chiếm 3 cột (Đội A | VS | Đội B) + 1 cột khoảng cách
-  // ═══════════════════════════════════════════════════════════
-  const COLS_PER_ROUND = 3;
-  const GAP_COLS = 1;
-  const ROW_PER_MATCH = 2;      // mỗi match chiếm 2 rows (đội A + đội B)
-  const ROW_GAP = 1;            // 1 row khoảng cách giữa các match
+  // Mỗi vòng = 4 cột (Team + Score + Line + Gap)
+  // ------------------------------------------------------------
+  const COLS_PER_ROUND = 4;
 
-  // Tính tổng số cột
-  const totalDataCols = totalRounds * COLS_PER_ROUND + (totalRounds - 1) * GAP_COLS;
-  const totalCols = totalDataCols + 1; // thêm 1 cột số thứ tự
+  // Cột số TT vòng 1
+  ws.getColumn(LAYOUT.COL_TT).width = COL_WIDTHS.TT;
 
-  // Set độ rộng cột
-  ws.getColumn(1).width = 6;   // Cột STT
+  // Cấu hình cột cho từng vòng
   for (let r = 0; r < totalRounds; r++) {
-    const baseCol = 2 + r * (COLS_PER_ROUND + GAP_COLS);
-    ws.getColumn(baseCol).width = 22;      // Đội A
-    ws.getColumn(baseCol + 1).width = 5;   // VS
-    ws.getColumn(baseCol + 2).width = 22;  // Đội B
+    const baseCol = 2 + r * COLS_PER_ROUND;
+    ws.getColumn(baseCol).width = COL_WIDTHS.TEAM;       // Tên đội
+    ws.getColumn(baseCol + 1).width = COL_WIDTHS.SCORE;  // Điểm
+    ws.getColumn(baseCol + 2).width = COL_WIDTHS.LINE;   // Đường nối
     if (r < totalRounds - 1) {
-      ws.getColumn(baseCol + 3).width = 3; // Cột khoảng cách
+      ws.getColumn(baseCol + 3).width = COL_WIDTHS.GAP;  // Khoảng cách
     }
   }
 
+  const totalCols = 1 + totalRounds * COLS_PER_ROUND;
+
   let currentRow = 1;
 
-  // ═══════════════════════════════════════════════════════════
+  // ------------------------------------------------------------
   // Bước 2: Tiêu đề
-  // ═══════════════════════════════════════════════════════════
+  // ------------------------------------------------------------
   ws.mergeCells(currentRow, 1, currentRow, totalCols);
   const titleCell = ws.getCell(currentRow, 1);
   titleCell.value = tournamentName
     ? `${tournamentName.toUpperCase()} — ${categoryName.toUpperCase()}`
     : `${categoryName.toUpperCase()} — SƠ ĐỒ THI ĐẤU`;
   titleCell.font = { bold: true, size: 16, color: { argb: 'FFFFFFFF' } };
-  titleCell.fill = { type: 'pattern', pattern: 'solid', fgColor: { argb: 'FF0D1B3E' } };
+  titleCell.fill = { type: 'pattern', pattern: 'solid', fgColor: { argb: COLORS.sectionBg } };
   titleCell.alignment = { horizontal: 'center', vertical: 'middle' };
-  titleCell.border = mediumBorder('FF0D1B3E');
+  titleCell.border = mediumBorder(COLORS.sectionBg);
   ws.getRow(currentRow).height = 40;
   currentRow++;
 
-  // Dòng phụ: thông tin
+  // Sub-title
   ws.mergeCells(currentRow, 1, currentRow, totalCols);
   const subCell = ws.getCell(currentRow, 1);
   subCell.value = `${bracket.teamCount} đội · Bracket ${bracket.bracketSize} · ${bracket.numByes} BYE · ${bracket.rounds.length} vòng`;
@@ -120,61 +137,91 @@ function drawBracketSheet(ws, bracket, options) {
   ws.getRow(currentRow).height = 20;
   currentRow++;
 
-  // Dòng trống
+  // Row trống
   currentRow++;
 
-  // ═══════════════════════════════════════════════════════════
+  // ------------------------------------------------------------
   // Bước 3: Header các vòng
-  // ═══════════════════════════════════════════════════════════
+  // ------------------------------------------------------------
   const headerRow = currentRow;
+
+  // Header cột TT
+  ws.getCell(headerRow, LAYOUT.COL_TT).value = 'TT';
+  styleHeaderCell(ws.getCell(headerRow, LAYOUT.COL_TT));
+
   for (let r = 0; r < totalRounds; r++) {
-    const startCol = 2 + r * (COLS_PER_ROUND + GAP_COLS);
-    ws.mergeCells(headerRow, startCol, headerRow, startCol + COLS_PER_ROUND - 1);
-    const cell = ws.getCell(headerRow, startCol);
+    const baseCol = 2 + r * COLS_PER_ROUND;
+    ws.mergeCells(headerRow, baseCol, headerRow, baseCol + 2); // merge 3 cột (Team+Score+Line)
+    const cell = ws.getCell(headerRow, baseCol);
     cell.value = bracket.roundNames[r].toUpperCase();
-    cell.font = { bold: true, size: 11, color: { argb: 'FFC4F82A' } };
-    cell.fill = { type: 'pattern', pattern: 'solid', fgColor: { argb: 'FF1A3A7A' } };
-    cell.alignment = { horizontal: 'center', vertical: 'middle' };
-    cell.border = mediumBorder('FF1A3A7A');
+    styleHeaderCell(cell);
   }
   ws.getRow(headerRow).height = 28;
   currentRow++;
 
-  // ═══════════════════════════════════════════════════════════
-  // Bước 4: Tính vị trí các match
-  // ═══════════════════════════════════════════════════════════
-  const matchPositions = calculateMatchPositions(bracket, ROW_PER_MATCH, ROW_GAP);
+  // ------------------------------------------------------------
+  // Bước 4: Vẽ bracket
+  // Mỗi match = 2 rows (đội A + đội B)
+  // Vị trí Y của match được tính để vòng sau nằm giữa 2 match vòng trước
+  // ------------------------------------------------------------
   const bracketStartRow = currentRow;
+  const rowPerMatch = 2;      // 2 rows cho 1 match
+  const rowGap = 2;            // 2 rows trống giữa các match
 
-  // Vẽ bracket
+  // Tính vị trí Y cho mỗi match ở mỗi vòng
+  const matchPositions = computeMatchPositions(
+    bracket,
+    rowPerMatch,
+    rowGap
+  );
+
+  // Vẽ từng vòng
   let maxRow = bracketStartRow;
 
-  bracket.rounds.forEach((round, rIdx) => {
-    const baseCol = 2 + rIdx * (COLS_PER_ROUND + GAP_COLS);
+  for (let rIdx = 0; rIdx < totalRounds; rIdx++) {
+    const round = bracket.rounds[rIdx];
+    const baseCol = 2 + rIdx * COLS_PER_ROUND;
 
     round.forEach((match, mIdx) => {
       const startRow = bracketStartRow + matchPositions[rIdx][mIdx];
 
       // Vẽ match box
       drawMatchBox(ws, startRow, baseCol, match, {
+        rowPerMatch,
         isThirdPlace: false,
+        showTeamA: true,
+        showTeamB: true,
       });
 
-      // Ghi nhớ row cuối cùng
-      const endRow = startRow + ROW_PER_MATCH - 1;
+      // Vẽ đường nối sang vòng sau
+      if (rIdx < totalRounds - 1) {
+        const isLastInPair = mIdx % 2 === 1; // Chỉ vẽ đường nối cho cặp (0,1), (2,3), ...
+        drawConnector(
+          ws,
+          startRow,
+          baseCol + 3, // Cột đường nối (sau cột Score)
+          rowPerMatch,
+          matchPositions[rIdx][mIdx],
+          matchPositions[rIdx + 1][Math.floor(mIdx / 2)],
+          bracketStartRow,
+          isLastInPair
+        );
+      }
+
+      const endRow = startRow + rowPerMatch - 1;
       if (endRow > maxRow) maxRow = endRow;
     });
-  });
+  }
 
-  // ═══════════════════════════════════════════════════════════
-  // Bước 5: Vẽ tranh hạng 3 (nếu có)
-  // ═══════════════════════════════════════════════════════════
+  // ------------------------------------------------------------
+  // Bước 5: Tranh hạng 3
+  // ------------------------------------------------------------
   if (bracket.thirdPlaceMatch && totalRounds >= 2) {
     const thirdRow = maxRow + 3;
-    const thirdCol = 2 + (totalRounds - 1) * (COLS_PER_ROUND + GAP_COLS);
+    const thirdCol = 2 + (totalRounds - 1) * COLS_PER_ROUND;
 
     // Label
-    ws.mergeCells(thirdRow - 1, thirdCol, thirdRow - 1, thirdCol + COLS_PER_ROUND - 1);
+    ws.mergeCells(thirdRow - 1, thirdCol, thirdRow - 1, thirdCol + 2);
     const labelCell = ws.getCell(thirdRow - 1, thirdCol);
     labelCell.value = '🥉 TRANH HẠNG 3';
     labelCell.font = { bold: true, size: 11, color: { argb: 'FFFFFFFF' } };
@@ -183,141 +230,206 @@ function drawBracketSheet(ws, bracket, options) {
     labelCell.border = mediumBorder('FFE67E22');
 
     drawMatchBox(ws, thirdRow, thirdCol, bracket.thirdPlaceMatch, {
+      rowPerMatch,
       isThirdPlace: true,
+      showTeamA: true,
+      showTeamB: true,
     });
   }
 }
 
-/**
- * Tính vị trí Y (row) cho từng match
- */
-function calculateMatchPositions(bracket, rowPerMatch, rowGap) {
+// ============================================================
+// COMPUTE MATCH POSITIONS
+// ============================================================
+function computeMatchPositions(bracket, rowPerMatch, rowGap) {
   const positions = [];
   const firstRoundCount = bracket.rounds[0].length;
   const rowHeight = rowPerMatch + rowGap;
 
-  // Vòng 1: xếp đều
+  // Vòng 1
   const firstPositions = [];
   for (let i = 0; i < firstRoundCount; i++) {
     firstPositions.push(i * rowHeight);
   }
   positions.push(firstPositions);
 
-  // Các vòng sau: nằm giữa 2 match vòng trước
+  // Các vòng sau
   for (let r = 1; r < bracket.rounds.length; r++) {
-    const prevPositions = positions[r - 1];
-    const currPositions = [];
+    const prev = positions[r - 1];
+    const curr = [];
     for (let i = 0; i < bracket.rounds[r].length; i++) {
-      const posA = prevPositions[i * 2];
-      const posB = prevPositions[i * 2 + 1];
-      currPositions.push(Math.floor((posA + posB) / 2));
+      const posA = prev[i * 2];
+      const posB = prev[i * 2 + 1];
+      curr.push(Math.floor((posA + posB) / 2));
     }
-    positions.push(currPositions);
+    positions.push(curr);
   }
 
   return positions;
 }
 
-/**
- * Vẽ 1 match box (2 rows: đội A + đội B)
- */
+// ============================================================
+// DRAW MATCH BOX
+// ============================================================
 function drawMatchBox(ws, startRow, baseCol, match, options) {
-  const { isThirdPlace = false } = options;
+  const { rowPerMatch = 2, isThirdPlace = false } = options;
 
   const isBye = match.isBye;
-  const isDone = match.status === 'done';
   const isWinnerA = match.winner === 'A';
   const isWinnerB = match.winner === 'B';
 
-  // ═══════════════════════════════════════════════════════════
+  // ------------------------------------------------------------
   // Đội A — Row 1
-  // ═══════════════════════════════════════════════════════════
+  // ------------------------------------------------------------
   const cellA = ws.getCell(startRow, baseCol);
-  cellA.value = match.teamA ? match.teamA.name : (isBye ? '⭐ BYE' : '—');
+  cellA.value = match.teamA ? match.teamA.name : (isBye && match.teamB ? '' : '—');
   cellA.font = {
     size: 10,
     bold: isWinnerA,
-    color: { argb: isWinnerA ? 'FF16A34A' : isBye ? 'FFB45309' : 'FF1A1A2E' },
+    color: { argb: isWinnerA ? COLORS.winnerFg : isBye ? COLORS.byeFg : 'FF1A1A2E' },
   };
-  cellA.alignment = { horizontal: 'left', vertical: 'middle', wrapText: true };
+  cellA.alignment = { horizontal: 'left', vertical: 'middle', indent: 1 };
   cellA.border = thinBorder();
   if (isWinnerA) {
-    cellA.fill = { type: 'pattern', pattern: 'solid', fgColor: { argb: 'FFD1FAE5' } };
-  } else if (isBye) {
-    cellA.fill = { type: 'pattern', pattern: 'solid', fgColor: { argb: 'FFFFF3CD' } };
+    cellA.fill = { type: 'pattern', pattern: 'solid', fgColor: { argb: COLORS.winnerBg } };
+  } else if (isBye && match.teamA) {
+    cellA.fill = { type: 'pattern', pattern: 'solid', fgColor: { argb: COLORS.byeBg } };
   } else if (isThirdPlace) {
     cellA.fill = { type: 'pattern', pattern: 'solid', fgColor: { argb: 'FFFFF8F0' } };
   }
 
-  // Score A — cột VS (thực ra hiển thị tỷ số)
-  const scoreCellA = ws.getCell(startRow, baseCol + 1);
-  scoreCellA.value = match.scoreA !== null && match.scoreA !== undefined ? match.scoreA : '';
-  scoreCellA.font = { size: 11, bold: true, color: { argb: isWinnerA ? 'FF16A34A' : 'FF6C757D' } };
-  scoreCellA.alignment = { horizontal: 'center', vertical: 'middle' };
-  scoreCellA.border = thinBorder();
+  // Điểm A
+  const scoreA = ws.getCell(startRow, baseCol + 1);
+  scoreA.value = match.scoreA !== null && match.scoreA !== undefined ? match.scoreA : '';
+  scoreA.font = {
+    size: 11,
+    bold: true,
+    color: { argb: isWinnerA ? COLORS.winnerFg : 'FF6C757D' },
+  };
+  scoreA.alignment = { horizontal: 'center', vertical: 'middle' };
+  scoreA.border = thinBorder();
   if (isWinnerA) {
-    scoreCellA.fill = { type: 'pattern', pattern: 'solid', fgColor: { argb: 'FFD1FAE5' } };
+    scoreA.fill = { type: 'pattern', pattern: 'solid', fgColor: { argb: COLORS.winnerBg } };
   }
 
-  // ═══════════════════════════════════════════════════════════
+  // Cột đường nối (giữa) — dùng để vẽ đường
+  const lineA = ws.getCell(startRow, baseCol + 2);
+  lineA.value = '';
+  lineA.border = thinBorder();
+
+  // ------------------------------------------------------------
   // Đội B — Row 2
-  // ═══════════════════════════════════════════════════════════
+  // ------------------------------------------------------------
   const cellB = ws.getCell(startRow + 1, baseCol);
-  cellB.value = match.teamB ? match.teamB.name : (isBye ? '⭐ BYE' : '—');
+  cellB.value = match.teamB ? match.teamB.name : (isBye && match.teamA ? '⭐ BYE' : '—');
   cellB.font = {
     size: 10,
     bold: isWinnerB,
-    color: { argb: isWinnerB ? 'FF16A34A' : isBye ? 'FFB45309' : 'FF1A1A2E' },
+    color: { argb: isWinnerB ? COLORS.winnerFg : isBye ? COLORS.byeFg : 'FF1A1A2E' },
   };
-  cellB.alignment = { horizontal: 'left', vertical: 'middle', wrapText: true };
+  cellB.alignment = { horizontal: 'left', vertical: 'middle', indent: 1 };
   cellB.border = thinBorder();
   if (isWinnerB) {
-    cellB.fill = { type: 'pattern', pattern: 'solid', fgColor: { argb: 'FFD1FAE5' } };
-  } else if (isBye) {
-    cellB.fill = { type: 'pattern', pattern: 'solid', fgColor: { argb: 'FFFFF3CD' } };
+    cellB.fill = { type: 'pattern', pattern: 'solid', fgColor: { argb: COLORS.winnerBg } };
+  } else if (isBye && match.teamB) {
+    cellB.fill = { type: 'pattern', pattern: 'solid', fgColor: { argb: COLORS.byeBg } };
+  } else if (isBye && match.teamA) {
+    // BYE case: đội A có BYE
+    cellB.fill = { type: 'pattern', pattern: 'solid', fgColor: { argb: COLORS.byeBg } };
   } else if (isThirdPlace) {
     cellB.fill = { type: 'pattern', pattern: 'solid', fgColor: { argb: 'FFFFF8F0' } };
   }
 
-  // Score B — cột VS
-  const scoreCellB = ws.getCell(startRow + 1, baseCol + 1);
-  scoreCellB.value = match.scoreB !== null && match.scoreB !== undefined ? match.scoreB : '';
-  scoreCellB.font = { size: 11, bold: true, color: { argb: isWinnerB ? 'FF16A34A' : 'FF6C757D' } };
-  scoreCellB.alignment = { horizontal: 'center', vertical: 'middle' };
-  scoreCellB.border = thinBorder();
+  // Điểm B
+  const scoreB = ws.getCell(startRow + 1, baseCol + 1);
+  scoreB.value = match.scoreB !== null && match.scoreB !== undefined ? match.scoreB : '';
+  scoreB.font = {
+    size: 11,
+    bold: true,
+    color: { argb: isWinnerB ? COLORS.winnerFg : 'FF6C757D' },
+  };
+  scoreB.alignment = { horizontal: 'center', vertical: 'middle' };
+  scoreB.border = thinBorder();
   if (isWinnerB) {
-    scoreCellB.fill = { type: 'pattern', pattern: 'solid', fgColor: { argb: 'FFD1FAE5' } };
+    scoreB.fill = { type: 'pattern', pattern: 'solid', fgColor: { argb: COLORS.winnerBg } };
   }
 
-  // Cột VS bên phải (cột thứ 3 của block) — hiện "VS" hoặc mã trận
-  const vsCellA = ws.getCell(startRow, baseCol + 2);
-  vsCellA.value = match.id;
-  vsCellA.font = { size: 8, italic: true, color: { argb: 'FF94A3B8' } };
-  vsCellA.alignment = { horizontal: 'center', vertical: 'middle' };
-  vsCellA.border = thinBorder();
-
-  const vsCellB = ws.getCell(startRow + 1, baseCol + 2);
-  vsCellB.value = match.status === 'done' ? '✓' : match.status === 'ready' ? '🎯' : '';
-  vsCellB.font = { size: 9, color: { argb: 'FF94A3B8' } };
-  vsCellB.alignment = { horizontal: 'center', vertical: 'middle' };
-  vsCellB.border = thinBorder();
+  // Cột đường nối
+  const lineB = ws.getCell(startRow + 1, baseCol + 2);
+  lineB.value = '';
+  lineB.border = thinBorder();
 
   // Set row heights
-  ws.getRow(startRow).height = 22;
-  ws.getRow(startRow + 1).height = 22;
+  ws.getRow(startRow).height = LAYOUT.ROW_HEIGHT_TEAM;
+  ws.getRow(startRow + 1).height = LAYOUT.ROW_HEIGHT_TEAM;
+
+  // ------------------------------------------------------------
+  // Ghi mã trận vào cột TT nếu là vòng 1
+  // ------------------------------------------------------------
+  if (match.roundIndex === 0 && !isThirdPlace) {
+    const ttCell = ws.getCell(startRow, LAYOUT.COL_TT);
+    ws.mergeCells(startRow, LAYOUT.COL_TT, startRow + 1, LAYOUT.COL_TT);
+    ttCell.value = match.matchIndex + 1;
+    ttCell.font = { size: 9, color: { argb: 'FF94A3B8' } };
+    ttCell.alignment = { horizontal: 'center', vertical: 'middle' };
+    ttCell.border = thinBorder();
+  }
 }
 
-/**
- * Vẽ sheet danh sách đội
- */
+// ============================================================
+// DRAW CONNECTOR — Vẽ đường nối giữa 2 match
+// ============================================================
+function drawConnector(ws, startRow, lineCol, rowPerMatch, fromPos, toPos, bracketStartRow, isLastInPair) {
+  // lineCol = cột ngay sau cột Score (để vẽ đường ngang + dọc)
+  const fromRow = bracketStartRow + fromPos;
+  const toRow = bracketStartRow + toPos + Math.floor(rowPerMatch / 2);
+
+  // Nếu là match lẻ trong cặp (mIdx % 2 === 0) → vẽ đường ngang sang phải
+  // Nếu là match chẵn trong cặp (mIdx % 2 === 1) → vẽ đường dọc + ngang vào match đích
+
+  if (!isLastInPair) {
+    // Match trên của cặp: vẽ đường ngang từ cột Team->Score->Line
+    // Border: gạch ngang ở giữa row đầu
+    for (let i = 0; i < rowPerMatch; i++) {
+      const cell = ws.getCell(fromRow + i, lineCol);
+      if (i === 0) {
+        cell.border = {
+          ...cell.border,
+          top: { style: 'thin', color: { argb: COLORS.lineColor } },
+          right: { style: 'thin', color: { argb: COLORS.lineColor } },
+        };
+      }
+    }
+  } else {
+    // Match dưới của cặp: vẽ đường dọc ở cột Line kéo lên giữa 2 match
+    // Vẽ đường dọc + ngang
+    for (let i = 0; i < rowPerMatch; i++) {
+      const cell = ws.getCell(fromRow + i, lineCol);
+      cell.border = {
+        ...cell.border,
+        right: { style: 'thin', color: { argb: COLORS.lineColor } },
+      };
+    }
+
+    // Vẽ đường ngang từ cột Line sang cột Team của vòng sau
+    const targetCell = ws.getCell(toRow, lineCol + 1);
+    targetCell.border = {
+      ...targetCell.border,
+      left: { style: 'thin', color: { argb: COLORS.lineColor } },
+    };
+  }
+}
+
+// ============================================================
+// TEAM LIST SHEET
+// ============================================================
 function drawTeamListSheet(ws, bracket) {
-  // Cấu hình cột
   ws.columns = [
     { header: 'STT', key: 'stt', width: 8 },
     { header: 'Tên đội / VĐV', key: 'name', width: 30 },
     { header: 'CLB / Đơn vị', key: 'club', width: 25 },
     { header: 'Vị trí vòng 1', key: 'position', width: 20 },
-    { header: 'Trạng thái', key: 'status', width: 15 },
+    { header: 'Trạng thái', key: 'status', width: 18 },
   ];
 
   // Header style
@@ -325,125 +437,73 @@ function drawTeamListSheet(ws, bracket) {
   headerRow.height = 28;
   headerRow.eachCell((cell) => {
     cell.font = { bold: true, size: 11, color: { argb: 'FFFFFFFF' } };
-    cell.fill = { type: 'pattern', pattern: 'solid', fgColor: { argb: 'FF1A3A7A' } };
+    cell.fill = { type: 'pattern', pattern: 'solid', fgColor: { argb: COLORS.headerBg } };
     cell.alignment = { horizontal: 'center', vertical: 'middle' };
     cell.border = thinBorder();
   });
 
-  // Liệt kê đội
+  // Data
   const firstRound = bracket.rounds[0];
   let stt = 1;
-  firstRound.forEach((match, mIdx) => {
-    const matchId = match.id;
-
+  firstRound.forEach((match) => {
     if (match.teamA) {
-      const row = ws.addRow({
+      ws.addRow({
         stt: stt++,
         name: match.teamA.name,
         club: match.teamA.club || '—',
-        position: `${matchId} — Slot A`,
+        position: `${match.id} — Slot A`,
         status: match.isBye ? '⭐ BYE (đi tiếp)' : (match.status === 'done' ? '✓ Đã đấu' : '🎯 Chờ đấu'),
       });
-      styleTeamRow(row);
     }
-
     if (match.teamB) {
-      const row = ws.addRow({
+      ws.addRow({
         stt: stt++,
         name: match.teamB.name,
         club: match.teamB.club || '—',
-        position: `${matchId} — Slot B`,
+        position: `${match.id} — Slot B`,
         status: match.isBye ? '⭐ BYE (đi tiếp)' : (match.status === 'done' ? '✓ Đã đấu' : '🎯 Chờ đấu'),
       });
-      styleTeamRow(row);
     }
   });
 
-  // Border toàn bộ
+  // Style rows
   ws.eachRow((row, rowNumber) => {
     if (rowNumber === 1) return;
+    row.height = 22;
     row.eachCell((cell) => {
       cell.border = thinBorder();
+      cell.alignment = { vertical: 'middle' };
     });
+    row.getCell(1).alignment = { horizontal: 'center', vertical: 'middle' };
+    row.getCell(2).font = { bold: true };
   });
 }
 
-function styleTeamRow(row) {
-  row.height = 22;
-  row.eachCell((cell) => {
-    cell.border = thinBorder();
-    cell.alignment = { vertical: 'middle', wrapText: true };
-  });
-  row.getCell(1).alignment = { horizontal: 'center', vertical: 'middle' };
-  row.getCell(2).font = { bold: true, color: { argb: 'FF0F172A' } };
-}
-
-/**
- * Vẽ sheet lịch thi đấu (nếu có scheduleConfig)
- */
-function drawScheduleSheet(ws, bracket, scheduleConfig) {
-  ws.columns = [
-    { header: 'STT', key: 'stt', width: 6 },
-    { header: 'Trận', key: 'matchId', width: 12 },
-    { header: 'Vòng', key: 'round', width: 15 },
-    { header: 'Đội A', key: 'teamA', width: 25 },
-    { header: 'Đội B', key: 'teamB', width: 25 },
-    { header: 'Ngày', key: 'date', width: 12 },
-    { header: 'Giờ', key: 'time', width: 10 },
-    { header: 'Sân', key: 'court', width: 10 },
-  ];
-
-  // Header style
-  const headerRow = ws.getRow(1);
-  headerRow.height = 28;
-  headerRow.eachCell((cell) => {
-    cell.font = { bold: true, size: 11, color: { argb: 'FFFFFFFF' } };
-    cell.fill = { type: 'pattern', pattern: 'solid', fgColor: { argb: 'FF1A3A7A' } };
-    cell.alignment = { horizontal: 'center', vertical: 'middle' };
-    cell.border = thinBorder();
-  });
-
-  // Liệt kê tất cả match ready + done
-  let stt = 1;
-  bracket.rounds.forEach((round, rIdx) => {
-    round.forEach((match) => {
-      if (match.isBye) return; // Bỏ qua BYE
-
-      const row = ws.addRow({
-        stt: stt++,
-        matchId: match.id,
-        round: bracket.roundNames[rIdx],
-        teamA: match.teamA?.name || '—',
-        teamB: match.teamB?.name || '—',
-        date: '',
-        time: '',
-        court: '',
-      });
-      row.height = 22;
-      row.eachCell((cell) => {
-        cell.border = thinBorder();
-        cell.alignment = { vertical: 'middle' };
-      });
-      row.getCell(1).alignment = { horizontal: 'center', vertical: 'middle' };
-      row.getCell(4).font = { bold: true };
-      row.getCell(5).font = { bold: true };
-    });
-  });
-}
-
-/**
- * Border helpers
- */
-function thinBorder() {
-  return {
-    top: { style: 'thin', color: { argb: 'FFDEE2E6' } },
-    left: { style: 'thin', color: { argb: 'FFDEE2E6' } },
-    bottom: { style: 'thin', color: { argb: 'FFDEE2E6' } },
-    right: { style: 'thin', color: { argb: 'FFDEE2E6' } },
+// ============================================================
+// STYLE HELPERS
+// ============================================================
+function styleHeaderCell(cell) {
+  cell.font = { bold: true, size: 10, color: { argb: 'FFFFFFFF' } };
+  cell.fill = { type: 'pattern', pattern: 'solid', fgColor: { argb: COLORS.headerBg } };
+  cell.alignment = { horizontal: 'center', vertical: 'middle' };
+  cell.border = {
+    top: { style: 'medium', color: { argb: COLORS.headerBg } },
+    left: { style: 'medium', color: { argb: COLORS.headerBg } },
+    bottom: { style: 'medium', color: { argb: COLORS.headerBg } },
+    right: { style: 'medium', color: { argb: COLORS.headerBg } },
   };
 }
 
-function mediumBorder(color = 'FF1A3A7A') {
+function thinBorder() {
+  return {
+    top: { style: 'thin', color: { argb: COLORS.borderSoft } },
+    left: { style: 'thin', color: { argb: COLORS.borderSoft } },
+    bottom: { style: 'thin', color: { argb: COLORS.borderSoft } },
+    right: { style: 'thin', color: { argb: COLORS.borderSoft } },
+  };
+}
+
+function mediumBorder(color = COLORS.borderLine) {
   return {
     top: { style: 'medium', color: { argb: color } },
     left: { style: 'medium', color: { argb: color } },
@@ -452,26 +512,24 @@ function mediumBorder(color = 'FF1A3A7A') {
   };
 }
 
-/**
- * Tải file Excel về máy
- */
+// ============================================================
+// DOWNLOAD
+// ============================================================
 export async function downloadBracketExcel(bracket, options = {}) {
-  const { filename = null } = options;
-
   const blob = await exportBracketToExcel(bracket, options);
-
   const safeName = (options.categoryName || 'BocTham')
     .replace(/[^\w\u00C0-\u024F\u1E00-\u1EFF]/g, '_');
-  const name = filename || `Bracket_${safeName}_${new Date().toISOString().slice(0, 10)}.xlsx`;
+  const filename = options.filename
+    || `Bracket_${safeName}_${new Date().toISOString().slice(0, 10)}.xlsx`;
 
   const url = URL.createObjectURL(blob);
   const a = document.createElement('a');
   a.href = url;
-  a.download = name;
+  a.download = filename;
   document.body.appendChild(a);
   a.click();
   document.body.removeChild(a);
   URL.revokeObjectURL(url);
 
-  return name;
+  return filename;
 }
