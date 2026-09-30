@@ -1,412 +1,519 @@
-<!DOCTYPE html>
-<html lang="vi">
-<head>
-  <meta charset="UTF-8" />
-  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-  <title>Test Bracket Engine</title>
-  <style>
-    * { box-sizing: border-box; margin: 0; padding: 0; }
-    body {
-      font-family: system-ui, -apple-system, 'Segoe UI', Roboto, sans-serif;
-      background: #0a0e1a;
-      color: #e2e8f0;
-      padding: 24px;
-      min-height: 100vh;
-    }
-    .container { max-width: 1400px; margin: 0 auto; }
-    h1 {
-      color: #c4f82a;
-      margin-bottom: 8px;
-      font-size: 24px;
-    }
-    h2 {
-      color: #c4f82a;
-      margin: 24px 0 12px;
-      font-size: 18px;
-      border-bottom: 2px solid #1c2333;
-      padding-bottom: 8px;
-    }
-    .subtitle { color: #8b92a4; margin-bottom: 24px; }
-    .btn {
-      padding: 10px 18px;
-      border: none;
-      border-radius: 8px;
-      font-weight: 700;
-      font-size: 14px;
-      cursor: pointer;
-      transition: all 0.15s;
-      font-family: inherit;
-      margin-right: 8px;
-      margin-bottom: 8px;
-    }
-    .btn:hover { transform: translateY(-1px); }
-    .btn-primary { background: #c4f82a; color: #0a0e1a; }
-    .btn-primary:hover { background: #a8d91e; }
-    .btn-success { background: #22c55e; color: white; }
-    .btn-danger { background: #ef4444; color: white; }
-    .btn-secondary { background: #1c2333; color: #e2e8f0; border: 1px solid #2a3142; }
-    .btn-secondary:hover { background: #2a3142; }
+// ============================================================
+// bracket-engine.js — Bracket engine chuẩn (cây đấu)
+// Fix bug: đội thắng không đẩy lên vòng sau
+// Hỗ trợ: BYE, tranh hạng 3, validate, ghi kết quả
+// ============================================================
 
-    .stats {
-      display: grid;
-      grid-template-columns: repeat(auto-fit, minmax(150px, 1fr));
-      gap: 12px;
-      margin: 16px 0 24px;
-    }
-    .stat-card {
-      background: #131823;
-      padding: 16px;
-      border-radius: 12px;
-      border: 1px solid #2a3142;
-    }
-    .stat-label { color: #8b92a4; font-size: 12px; text-transform: uppercase; }
-    .stat-value { font-size: 22px; font-weight: 800; color: #c4f82a; margin-top: 4px; }
-
-    .bracket-view {
-      display: flex;
-      gap: 20px;
-      overflow-x: auto;
-      padding: 16px 0;
-      min-height: 400px;
-    }
-    .round {
-      flex-shrink: 0;
-      min-width: 240px;
-    }
-    .round-title {
-      background: linear-gradient(135deg, #1e293b, #334155);
-      color: #c4f82a;
-      padding: 10px;
-      border-radius: 8px;
-      font-weight: 800;
-      font-size: 13px;
-      text-align: center;
-      margin-bottom: 12px;
-      letter-spacing: 0.5px;
-    }
-    .match {
-      background: #131823;
-      border: 1px solid #2a3142;
-      border-left: 3px solid #3b82f6;
-      border-radius: 8px;
-      padding: 8px;
-      margin-bottom: 8px;
-      transition: all 0.15s;
-    }
-    .match.bye { border-left-color: #f59e0b; background: #1c1706; }
-    .match.done { border-left-color: #22c55e; }
-    .match.ready { border-left-color: #c4f82a; }
-    .match:hover { transform: translateX(4px); box-shadow: 0 4px 12px rgba(0, 0, 0, 0.3); }
-    .match-id {
-      font-size: 10px;
-      color: #8b92a4;
-      text-transform: uppercase;
-      font-weight: 700;
-      margin-bottom: 6px;
-    }
-    .team {
-      padding: 6px 8px;
-      border-radius: 4px;
-      font-size: 13px;
-      display: flex;
-      justify-content: space-between;
-      align-items: center;
-      margin-bottom: 3px;
-    }
-    .team-name { font-weight: 600; }
-    .team.winner { background: rgba(34, 197, 94, 0.15); color: #22c55e; }
-    .team.loser { color: #8b92a4; }
-    .team.empty { color: #4b5563; font-style: italic; }
-    .team.bye { color: #f59e0b; font-weight: 700; }
-    .score {
-      background: #1c2333;
-      padding: 2px 8px;
-      border-radius: 4px;
-      font-weight: 800;
-      font-size: 12px;
-      min-width: 32px;
-      text-align: center;
-    }
-    .team.winner .score { background: #22c55e; color: white; }
-    .vs-divider {
-      text-align: center;
-      color: #4b5563;
-      font-size: 10px;
-      font-weight: 700;
-      margin: 2px 0;
-    }
-
-    .log {
-      background: #0d1117;
-      border: 1px solid #2a3142;
-      border-radius: 8px;
-      padding: 12px;
-      font-family: 'SF Mono', monospace;
-      font-size: 12px;
-      color: #8b92a4;
-      max-height: 300px;
-      overflow-y: auto;
-      margin-top: 16px;
-    }
-    .log-entry { padding: 4px 0; border-bottom: 1px solid #161b22; }
-    .log-entry.ok { color: #22c55e; }
-    .log-entry.err { color: #ef4444; }
-    .log-entry.warn { color: #f59e0b; }
-
-    .test-section {
-      background: #131823;
-      border: 1px solid #2a3142;
-      border-radius: 12px;
-      padding: 20px;
-      margin-bottom: 20px;
-    }
-    .test-section h3 {
-      color: #c4f82a;
-      font-size: 15px;
-      margin-bottom: 12px;
-    }
-  </style>
-</head>
-<body>
-
-<div class="container">
-  <h1>🧪 Test Bracket Engine</h1>
-  <p class="subtitle">Kiểm tra: tạo bracket, ghi kết quả, đẩy winner lên vòng sau</p>
-
-  <!-- TEST 1: 8 đội -->
-  <div class="test-section">
-    <h3>Test 1: 8 đội — Knockout thuần</h3>
-    <button class="btn btn-primary" onclick="test8Teams()">▶ Chạy test 8 đội</button>
-    <button class="btn btn-success" onclick="simulateAll8()">⚡ Mô phỏng tất cả vòng</button>
-  </div>
-
-  <!-- TEST 2: 16 đội + BYE -->
-  <div class="test-section">
-    <h3>Test 2: 16 đội — Không có BYE</h3>
-    <button class="btn btn-primary" onclick="test16Teams()">▶ Chạy test 16 đội</button>
-    <button class="btn btn-success" onclick="simulateAll16()">⚡ Mô phỏng tất cả vòng</button>
-  </div>
-
-  <!-- TEST 3: 13 đội + 3 BYE -->
-  <div class="test-section">
-    <h3>Test 3: 13 đội — Có 3 BYE tự động</h3>
-    <button class="btn btn-primary" onclick="test13Teams()">▶ Chạy test 13 đội</button>
-    <button class="btn btn-success" onclick="simulateAll13()">⚡ Mô phỏng tất cả vòng</button>
-  </div>
-
-  <!-- Stats -->
-  <div id="stats-container"></div>
-
-  <!-- Bracket View -->
-  <h2>📊 Sơ đồ bracket</h2>
-  <div id="bracket-view" class="bracket-view"></div>
-
-  <!-- Log -->
-  <h2>📋 Log</h2>
-  <div id="log" class="log"></div>
-
-  <!-- Validation -->
-  <h2>✅ Validate</h2>
-  <div id="validation"></div>
-</div>
-
-<script type="module">
-  import {
-    createBracket,
-    recordWinner,
-    validateBracket,
-    getBracketStats,
-    getReadyMatches,
-    resetBracket,
-  } from './bracket-engine.js';
-
-  let currentBracket = null;
-
-  const logEl = document.getElementById('log');
-  const bracketViewEl = document.getElementById('bracket-view');
-  const statsEl = document.getElementById('stats-container');
-  const validationEl = document.getElementById('validation');
-
-  function log(msg, type = '') {
-    const div = document.createElement('div');
-    div.className = 'log-entry ' + type;
-    div.textContent = `[${new Date().toLocaleTimeString('vi-VN')}] ${msg}`;
-    logEl.appendChild(div);
-    logEl.scrollTop = logEl.scrollHeight;
+/**
+ * Tạo bracket từ danh sách đội
+ * @param {Array} teams - [{ name, club }, ...]
+ * @param {Object} options - { customByes: [2,15,...], seedOrder: [] }
+ * @returns {Object} bracket object
+ */
+export function createBracket(teams, options = {}) {
+  if (!Array.isArray(teams) || teams.length < 2) {
+    throw new Error('Cần ít nhất 2 đội');
   }
 
-  function clearLog() {
-    logEl.innerHTML = '';
+  const teamCount = teams.length;
+  let bracketSize = 2;
+  while (bracketSize < teamCount) bracketSize *= 2;
+  const numByes = bracketSize - teamCount;
+
+  // Validate customByes
+  let customByes = null;
+  if (options.customByes && options.customByes.length > 0) {
+    const unique = [...new Set(options.customByes)].sort((a, b) => a - b);
+    if (unique.length !== numByes) {
+      throw new Error(
+        `Số BYE nhập (${unique.length}) không khớp với bracket (cần ${numByes})`
+      );
+    }
+    if (unique.some((s) => s < 1 || s > bracketSize)) {
+      throw new Error(`Slot BYE phải từ 1 đến ${bracketSize}`);
+    }
+    customByes = unique;
   }
 
-  // ===== Tạo đội mẫu =====
-  function makeTeams(n, prefix = 'Đội') {
-    const teams = [];
-    for (let i = 1; i <= n; i++) {
-      teams.push({
-        name: `${prefix} ${i}`,
-        club: `CLB ${Math.ceil(i / 4)}`,
+  // Build vòng 1
+  const firstRound = buildFirstRound(teams, bracketSize, numByes, customByes);
+
+  // Build các vòng sau
+  const rounds = [firstRound];
+  let prevMatchCount = firstRound.length;
+  let roundIdx = 2;
+
+  while (prevMatchCount > 1) {
+    const matchCount = prevMatchCount / 2;
+    const matches = [];
+
+    for (let i = 0; i < matchCount; i++) {
+      const fromMatchA = rounds[roundIdx - 2][i * 2];
+      const fromMatchB = rounds[roundIdx - 2][i * 2 + 1];
+
+      matches.push({
+        id: `R${roundIdx}_M${i + 1}`,
+        roundIndex: roundIdx - 1,
+        matchIndex: i,
+        teamA: null,
+        teamB: null,
+        scoreA: null,
+        scoreB: null,
+        winner: null, // 'A' | 'B' | null
+        status: 'pending', // 'pending' | 'ready' | 'done'
+        fromA: fromMatchA.id,
+        fromB: fromMatchB.id,
+        isBye: false,
+        isPlaceholder: true,
       });
     }
-    return teams;
+
+    // Set status 'ready' nếu cả 2 nguồn đã done
+    matches.forEach((m) => updateMatchStatus(m, rounds));
+
+    rounds.push(matches);
+    prevMatchCount = matchCount;
+    roundIdx++;
   }
 
-  // ===== TEST 1: 8 đội =====
-  window.test8Teams = function () {
-    clearLog();
-    log('=== TEST 8 ĐỘI ===', 'ok');
-    const teams = makeTeams(8, 'VĐV');
-    currentBracket = createBracket(teams);
-    log(`✅ Tạo bracket: ${currentBracket.bracketSize} slots, ${currentBracket.numByes} BYE`, 'ok');
-    render();
+  return {
+    bracketSize,
+    numByes,
+    teamCount,
+    rounds,
+    roundNames: getRoundNames(rounds.length),
+    thirdPlaceMatch: {
+      id: 'THIRD',
+      teamA: null,
+      teamB: null,
+      scoreA: null,
+      scoreB: null,
+      winner: null,
+      status: 'pending',
+      fromA: null,
+      fromB: null,
+      isThirdPlace: true,
+    },
+    createdAt: Date.now(),
   };
+}
 
-  window.simulateAll8 = function () {
-    if (!currentBracket) return test8Teams();
-    simulateAll();
+/**
+ * Build vòng 1 (ghép cặp + chèn BYE)
+ */
+function buildFirstRound(teams, bracketSize, numByes, customByes) {
+  const matches = [];
+  const matchCount = bracketSize / 2;
+  let players = [...teams];
+
+  if (customByes) {
+    // Ghép theo slot chỉ định
+    const byeSet = new Set(customByes);
+    let playerIdx = 0;
+    for (let i = 0; i < matchCount; i++) {
+      const slotA = i * 2 + 1;
+      const slotB = i * 2 + 2;
+      const isByeA = byeSet.has(slotA);
+      const isByeB = byeSet.has(slotB);
+
+      if (isByeA && isByeB) {
+        matches.push(makeMatch(i, null, null, false, true));
+      } else if (isByeA) {
+        matches.push(makeMatch(i, players[playerIdx++] || null, null, true, false));
+      } else if (isByeB) {
+        matches.push(makeMatch(i, null, players[playerIdx++] || null, true, false));
+      } else {
+        matches.push(
+          makeMatch(i, players[playerIdx++] || null, players[playerIdx++] || null, false, false)
+        );
+      }
+    }
+  } else {
+    // Sinh BYE tự động — theo chuẩn thể thao
+    const byes = players.slice(0, numByes);
+    const playing = players.slice(numByes);
+
+    for (let i = 0; i < matchCount; i++) {
+      if (byes.length > 0 && playing.length <= (matchCount - i - 1) * 2) {
+        matches.push(makeMatch(i, byes.shift(), null, true, false));
+      } else {
+        const a = playing.shift() || null;
+        const b = playing.shift() || null;
+        if (a && !b) {
+          matches.push(makeMatch(i, a, null, true, false));
+        } else if (!a && !b) {
+          matches.push(makeMatch(i, null, null, false, true));
+        } else {
+          matches.push(makeMatch(i, a, b, false, false));
+        }
+      }
+    }
+
+    // Nếu còn BYE → thay vào các match placeholder
+    for (let i = 0; i < matches.length && byes.length > 0; i++) {
+      if (matches[i].isPlaceholder) {
+        matches[i] = makeMatch(i, byes.shift(), null, true, false);
+      }
+    }
+  }
+
+  // Set status ban đầu
+  matches.forEach((m) => {
+    if (m.isBye) {
+      m.status = 'done';
+      m.winner = m.teamA ? 'A' : 'B';
+    } else if (m.teamA && m.teamB) {
+      m.status = 'ready';
+    }
+  });
+
+  return matches;
+}
+
+function makeMatch(idx, teamA, teamB, isBye, isPlaceholder) {
+  return {
+    id: `R1_M${idx + 1}`,
+    roundIndex: 0,
+    matchIndex: idx,
+    teamA,
+    teamB,
+    scoreA: null,
+    scoreB: null,
+    winner: null,
+    status: 'pending',
+    fromA: null,
+    fromB: null,
+    isBye,
+    isPlaceholder,
   };
+}
 
-  // ===== TEST 2: 16 đội =====
-  window.test16Teams = function () {
-    clearLog();
-    log('=== TEST 16 ĐỘI ===', 'ok');
-    const teams = makeTeams(16, 'VĐV');
-    currentBracket = createBracket(teams);
-    log(`✅ Tạo bracket: ${currentBracket.bracketSize} slots, ${currentBracket.numByes} BYE`, 'ok');
-    render();
-  };
+/**
+ * ⚠️ HÀM QUAN TRỌNG NHẤT — Ghi kết quả + đẩy winner lên vòng sau
+ */
+export function recordWinner(bracket, matchId, winnerSlot, scoreA, scoreB) {
+  if (!['A', 'B'].includes(winnerSlot)) {
+    throw new Error('winnerSlot phải là "A" hoặc "B"');
+  }
 
-  window.simulateAll16 = function () {
-    if (!currentBracket) return test16Teams();
-    simulateAll();
-  };
+  const found = findMatch(bracket, matchId);
+  if (!found) throw new Error(`Không tìm thấy trận ${matchId}`);
 
-  // ===== TEST 3: 13 đội + 3 BYE =====
-  window.test13Teams = function () {
-    clearLog();
-    log('=== TEST 13 ĐỘI (3 BYE tự động) ===', 'ok');
-    const teams = makeTeams(13, 'VĐV');
-    currentBracket = createBracket(teams);
-    log(`✅ Tạo bracket: ${currentBracket.bracketSize} slots, ${currentBracket.numByes} BYE`, 'ok');
-    render();
-  };
+  const { match, roundIndex, matchIndex } = found;
 
-  window.simulateAll13 = function () {
-    if (!currentBracket) return test13Teams();
-    simulateAll();
-  };
+  // Validate
+  if (match.isPlaceholder) {
+    throw new Error('Trận chưa có đủ 2 đội');
+  }
+  const winnerTeam = winnerSlot === 'A' ? match.teamA : match.teamB;
+  if (!winnerTeam) {
+    throw new Error(`Slot ${winnerSlot} không có đội`);
+  }
 
-  // ===== Mô phỏng tất cả vòng =====
-  function simulateAll() {
-    let round = 0;
-    let safety = 0;
+  // Ghi kết quả
+  match.scoreA = scoreA !== undefined ? scoreA : null;
+  match.scoreB = scoreB !== undefined ? scoreB : null;
+  match.winner = winnerSlot;
+  match.status = 'done';
 
-    while (safety < 100) {
-      safety++;
-      const ready = getReadyMatches(currentBracket);
+  // Đẩy winner lên vòng sau
+  if (roundIndex < bracket.rounds.length - 1) {
+    const nextRound = bracket.rounds[roundIndex + 1];
+    const nextMatch = nextRound.find(
+      (m) => m.fromA === match.id || m.fromB === match.id
+    );
 
-      if (ready.length === 0) {
-        log('🎉 Không còn trận nào cần đấu', 'ok');
-        break;
+    if (!nextMatch) {
+      throw new Error(`Không tìm thấy trận tiếp theo của ${match.id}`);
+    }
+
+    if (nextMatch.fromA === match.id) {
+      nextMatch.teamA = winnerTeam;
+    } else {
+      nextMatch.teamB = winnerTeam;
+    }
+
+    updateMatchStatus(nextMatch, bracket.rounds);
+  }
+
+  // Xử lý tranh hạng 3 (đội thua bán kết)
+  const semiRoundIndex = bracket.rounds.length - 2;
+  if (roundIndex === semiRoundIndex) {
+    const loserTeam = winnerSlot === 'A' ? match.teamB : match.teamA;
+    if (loserTeam && bracket.thirdPlaceMatch) {
+      if (!bracket.thirdPlaceMatch.teamA) {
+        bracket.thirdPlaceMatch.teamA = loserTeam;
+      } else {
+        bracket.thirdPlaceMatch.teamB = loserTeam;
+      }
+      if (bracket.thirdPlaceMatch.teamA && bracket.thirdPlaceMatch.teamB) {
+        bracket.thirdPlaceMatch.status = 'ready';
+      }
+    }
+  }
+
+  return bracket;
+}
+
+/**
+ * Cập nhật status của match dựa vào nguồn gốc
+ */
+function updateMatchStatus(match, rounds) {
+  if (match.status === 'done') return;
+
+  if (match.teamA && match.teamB) {
+    match.status = 'ready';
+    match.isPlaceholder = false;
+  } else if (match.teamA || match.teamB) {
+    match.status = 'pending';
+    match.isPlaceholder = false;
+  } else {
+    match.status = 'pending';
+    match.isPlaceholder = true;
+  }
+}
+
+/**
+ * Tìm match theo ID
+ */
+export function findMatch(bracket, matchId) {
+  for (let r = 0; r < bracket.rounds.length; r++) {
+    for (let m = 0; m < bracket.rounds[r].length; m++) {
+      if (bracket.rounds[r][m].id === matchId) {
+        return {
+          match: bracket.rounds[r][m],
+          roundIndex: r,
+          matchIndex: m,
+        };
+      }
+    }
+  }
+  return null;
+}
+
+/**
+ * Validate bracket — phát hiện lỗi
+ */
+export function validateBracket(bracket) {
+  const issues = [];
+  const teamLocations = new Map();
+
+  bracket.rounds.forEach((round, rIdx) => {
+    round.forEach((match, mIdx) => {
+      const location = `${bracket.roundNames[rIdx]} - Trận ${mIdx + 1}`;
+
+      // Check nguồn gốc
+      if (rIdx > 0) {
+        if (!match.fromA || !match.fromB) {
+          issues.push({
+            level: 'error',
+            location,
+            message: `Thiếu nguồn gốc (fromA/fromB)`,
+          });
+        } else {
+          const hasA = findMatch(bracket, match.fromA);
+          const hasB = findMatch(bracket, match.fromB);
+          if (!hasA) issues.push({
+            level: 'error',
+            location,
+            message: `fromA="${match.fromA}" không tồn tại`,
+          });
+          if (!hasB) issues.push({
+            level: 'error',
+            location,
+            message: `fromB="${match.fromB}" không tồn tại`,
+          });
+        }
       }
 
-      log(`--- Vòng ${round + 1}: ${ready.length} trận ---`);
+      // Track vị trí đội
+      [match.teamA, match.teamB].forEach((team, slot) => {
+        if (!team) return;
+        const key = `${team.name}|${team.club || ''}`;
+        if (!teamLocations.has(key)) teamLocations.set(key, []);
+        teamLocations.get(key).push({
+          location,
+          slot: slot === 0 ? 'A' : 'B',
+          matchId: match.id,
+        });
+      });
+    });
+  });
 
-      ready.forEach((m) => {
-        const scoreA = Math.floor(Math.random() * 11) + 1;
-        const scoreB = Math.floor(Math.random() * 11) + 1;
-        const winner = scoreA > scoreB ? 'A' : 'B';
-
-        const winnerTeam = winner === 'A' ? m.teamA : m.teamB;
-        const loserTeam = winner === 'A' ? m.teamB : m.teamA;
-
-        try {
-          recordWinner(currentBracket, m.id, winner, scoreA, scoreB);
-          log(`  ✅ ${m.id}: ${m.teamA.name} ${scoreA} - ${scoreB} ${m.teamB.name} → ${winnerTeam.name} thắng`, 'ok');
-        } catch (err) {
-          log(`  ❌ ${m.id}: ${err.message}`, 'err');
-        }
+  // Phát hiện đội xuất hiện nhiều lần không hợp lệ
+  teamLocations.forEach((locs, key) => {
+    const [name] = key.split('|');
+    if (locs.length > 1) {
+      // Đội xuất hiện nhiều lần → check xem có hợp lệ không
+      // Hợp lệ: đội thắng ở vòng trước xuất hiện ở vòng sau
+      const sortedLocs = locs.sort((a, b) => {
+        const rA = getRoundIndexFromMatchId(bracket, a.matchId);
+        const rB = getRoundIndexFromMatchId(bracket, b.matchId);
+        return rA - rB;
       });
 
-      round++;
+      // Kiểm tra mỗi cặp liên tiếp có hợp lệ không
+      let valid = true;
+      for (let i = 1; i < sortedLocs.length; i++) {
+        const prevMatch = findMatch(bracket, sortedLocs[i - 1].matchId);
+        const currMatch = findMatch(bracket, sortedLocs[i].matchId);
+        if (!prevMatch || !currMatch) continue;
+
+        // Match sau phải là next của match trước
+        if (
+          currMatch.match.fromA !== prevMatch.match.id &&
+          currMatch.match.fromB !== prevMatch.match.id
+        ) {
+          valid = false;
+          break;
+        }
+
+        // Đội phải là winner của match trước
+        const winnerTeam = prevMatch.match.winner === 'A'
+          ? prevMatch.match.teamA
+          : prevMatch.match.teamB;
+        if (!winnerTeam || winnerTeam.name !== name) {
+          valid = false;
+          break;
+        }
+      }
+
+      if (!valid) {
+        issues.push({
+          level: 'warning',
+          team: name,
+          locations: locs.map((l) => l.location),
+          message: `Đội "${name}" xuất hiện ở ${locs.length} vị trí không hợp lệ`,
+        });
+      }
     }
+  });
 
-    render();
-    const v = validateBracket(currentBracket);
-    if (v.valid) {
-      log(`✅ Bracket HỢP LỆ — 0 lỗi, ${v.warningCount} cảnh báo`, 'ok');
-    } else {
-      log(`❌ Bracket có ${v.errorCount} LỖI, ${v.warningCount} cảnh báo`, 'err');
-    }
+  return {
+    valid: issues.filter((i) => i.level === 'error').length === 0,
+    issues,
+    errorCount: issues.filter((i) => i.level === 'error').length,
+    warningCount: issues.filter((i) => i.level === 'warning').length,
+  };
+}
+
+function getRoundIndexFromMatchId(bracket, matchId) {
+  const found = findMatch(bracket, matchId);
+  return found ? found.roundIndex : -1;
+}
+
+/**
+ * Lấy tên các vòng
+ */
+export function getRoundNames(totalRounds) {
+  const standard = ['Chung kết', 'Bán kết', 'Tứ kết', 'Vòng 1/8', 'Vòng 1/16', 'Vòng 1/32'];
+  const names = [];
+  for (let i = 0; i < totalRounds; i++) {
+    const fromEnd = totalRounds - 1 - i;
+    names.push(standard[fromEnd] || `Vòng ${i + 1}`);
   }
+  return names;
+}
 
-  // ===== Render =====
-  function render() {
-    if (!currentBracket) return;
+/**
+ * Lấy danh sách match đang chờ (ready) có thể đấu
+ */
+export function getReadyMatches(bracket) {
+  const list = [];
+  bracket.rounds.forEach((round, rIdx) => {
+    round.forEach((m) => {
+      if (m.status === 'ready' && m.teamA && m.teamB) {
+        list.push({
+          ...m,
+          roundName: bracket.roundNames[rIdx],
+        });
+      }
+    });
+  });
+  return list;
+}
 
-    // Stats
-    const stats = getBracketStats(currentBracket);
-    statsEl.innerHTML = `
-      <div class="stats">
-        <div class="stat-card"><div class="stat-label">Đội</div><div class="stat-value">${stats.teamCount}</div></div>
-        <div class="stat-card"><div class="stat-label">Bracket size</div><div class="stat-value">${stats.bracketSize}</div></div>
-        <div class="stat-card"><div class="stat-label">BYE</div><div class="stat-value">${stats.numByes}</div></div>
-        <div class="stat-card"><div class="stat-label">Vòng</div><div class="stat-value">${stats.totalRounds}</div></div>
-        <div class="stat-card"><div class="stat-label">Trận xong</div><div class="stat-value">${stats.doneMatches}/${stats.totalMatches}</div></div>
-        <div class="stat-card"><div class="stat-label">Tiến độ</div><div class="stat-value">${stats.progress}%</div></div>
-      </div>
-    `;
+/**
+ * Thống kê bracket
+ */
+export function getBracketStats(bracket) {
+  let totalMatches = 0;
+  let doneMatches = 0;
+  let pendingMatches = 0;
 
-    // Bracket
-    bracketViewEl.innerHTML = currentBracket.rounds.map((round, rIdx) => `
-      <div class="round">
-        <div class="round-title">${currentBracket.roundNames[rIdx]}</div>
-        ${round.map((m) => renderMatch(m)).join('')}
-      </div>
-    `).join('');
+  bracket.rounds.forEach((round) => {
+    round.forEach((m) => {
+      totalMatches++;
+      if (m.status === 'done') doneMatches++;
+      else pendingMatches++;
+    });
+  });
 
-    // Validation
-    const v = validateBracket(currentBracket);
-    if (v.valid && v.warningCount === 0) {
-      validationEl.innerHTML = `<div class="stat-card" style="border-color:#22c55e;">
-        <div class="stat-value" style="color:#22c55e;">✅ Bracket hợp lệ</div>
-        <div class="stat-label">Không có lỗi, không có cảnh báo</div>
-      </div>`;
-    } else {
-      validationEl.innerHTML = `<div class="stat-card" style="border-color:${v.valid ? '#f59e0b' : '#ef4444'};">
-        <div class="stat-value" style="color:${v.valid ? '#f59e0b' : '#ef4444'};">
-          ${v.valid ? '⚠️' : '❌'} ${v.errorCount} lỗi, ${v.warningCount} cảnh báo
-        </div>
-        <ul style="margin-top:8px;font-size:12px;color:#8b92a4;">
-          ${v.issues.map((i) => `<li>${i.location ? i.location + ': ' : ''}${i.message}</li>`).join('')}
-        </ul>
-      </div>`;
-    }
+  return {
+    bracketSize: bracket.bracketSize,
+    teamCount: bracket.teamCount,
+    numByes: bracket.numByes,
+    totalRounds: bracket.rounds.length,
+    totalMatches,
+    doneMatches,
+    pendingMatches,
+    progress: totalMatches > 0 ? Math.round((doneMatches / totalMatches) * 100) : 0,
+  };
+}
+
+/**
+ * Reset toàn bộ bracket (xóa kết quả, giữ đội)
+ */
+export function resetBracket(bracket) {
+  bracket.rounds.forEach((round, rIdx) => {
+    round.forEach((match) => {
+      if (rIdx === 0) {
+        // Vòng 1 giữ nguyên đội
+        match.scoreA = null;
+        match.scoreB = null;
+        match.winner = null;
+        match.status = match.isBye ? 'done' : (match.teamA && match.teamB ? 'ready' : 'pending');
+      } else {
+        // Vòng sau reset sạch
+        match.teamA = null;
+        match.teamB = null;
+        match.scoreA = null;
+        match.scoreB = null;
+        match.winner = null;
+        match.status = 'pending';
+        match.isPlaceholder = true;
+      }
+    });
+  });
+
+  bracket.thirdPlaceMatch = {
+    id: 'THIRD',
+    teamA: null,
+    teamB: null,
+    scoreA: null,
+    scoreB: null,
+    winner: null,
+    status: 'pending',
+    isThirdPlace: true,
+  };
+
+  return bracket;
+}
+
+/**
+ * Export bracket thành JSON gọn để lưu DB
+ */
+export function serializeBracket(bracket) {
+  return JSON.stringify(bracket);
+}
+
+/**
+ * Import bracket từ JSON
+ */
+export function deserializeBracket(json) {
+  try {
+    return typeof json === 'string' ? JSON.parse(json) : json;
+  } catch (err) {
+    throw new Error('Không đọc được bracket: ' + err.message);
   }
-
-  function renderMatch(m) {
-    const cls = m.isBye ? 'bye' : m.status === 'done' ? 'done' : m.status === 'ready' ? 'ready' : '';
-    const isWinnerA = m.winner === 'A';
-    const isWinnerB = m.winner === 'B';
-
-    return `
-      <div class="match ${cls}">
-        <div class="match-id">${m.id} ${m.status === 'done' ? '✓' : m.status === 'ready' ? '🎯' : ''}</div>
-        <div class="team ${isWinnerA ? 'winner' : m.teamA ? (m.winner ? 'loser' : '') : 'empty'}">
-          <span class="team-name">${m.teamA ? m.teamA.name : '—'}</span>
-          ${m.scoreA !== null ? `<span class="score">${m.scoreA}</span>` : ''}
-        </div>
-        <div class="vs-divider">VS</div>
-        <div class="team ${isWinnerB ? 'winner' : m.teamB ? (m.winner ? 'loser' : '') : 'empty'}">
-          <span class="team-name">${m.teamB ? m.teamB.name : (m.isBye ? '⭐ BYE' : '—')}</span>
-          ${m.scoreB !== null ? `<span class="score">${m.scoreB}</span>` : ''}
-        </div>
-      </div>
-    `;
-  }
-
-  log('🚀 Sẵn sàng test. Bấm nút "Chạy test" để bắt đầu.');
-</script>
-
-</body>
-</html>
+}
