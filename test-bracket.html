@@ -3,7 +3,11 @@
 <head>
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-  <title>Test Bracket Engine + Renderer</title>
+  <title>Test Bracket Engine + Renderer + Excel</title>
+
+  <!-- ExcelJS để export Excel -->
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/exceljs/4.4.0/exceljs.min.js"></script>
+
   <style>
     * { box-sizing: border-box; margin: 0; padding: 0; }
     body {
@@ -17,6 +21,7 @@
     h1 { color: #c4f82a; margin-bottom: 8px; font-size: 24px; }
     h2 { color: #c4f82a; margin: 24px 0 12px; font-size: 18px; border-bottom: 2px solid #1c2333; padding-bottom: 8px; }
     .subtitle { color: #8b92a4; margin-bottom: 24px; }
+
     .btn {
       padding: 10px 18px; border: none; border-radius: 8px;
       font-weight: 700; font-size: 14px; cursor: pointer;
@@ -27,8 +32,13 @@
     .btn-primary { background: #c4f82a; color: #0a0e1a; }
     .btn-primary:hover { background: #a8d91e; }
     .btn-success { background: #22c55e; color: white; }
+    .btn-success:hover { background: #16a34a; }
     .btn-danger { background: #ef4444; color: white; }
+    .btn-danger:hover { background: #dc2626; }
+    .btn-warning { background: #f59e0b; color: #0a0e1a; }
+    .btn-warning:hover { background: #d97706; }
     .btn-secondary { background: #1c2333; color: #e2e8f0; border: 1px solid #2a3142; }
+    .btn-secondary:hover { background: #2a3142; }
 
     .stats {
       display: grid; grid-template-columns: repeat(auto-fit, minmax(150px, 1fr));
@@ -46,42 +56,91 @@
       border-radius: 12px; padding: 20px; margin-bottom: 20px;
     }
     .test-section h3 { color: #c4f82a; font-size: 15px; margin-bottom: 12px; }
+    .test-section .hint { color: #8b92a4; font-size: 12px; margin-top: 8px; font-style: italic; }
 
     .log {
       background: #0d1117; border: 1px solid #2a3142;
       border-radius: 8px; padding: 12px;
-      font-family: 'SF Mono', monospace; font-size: 12px;
+      font-family: 'SF Mono', 'Courier New', monospace; font-size: 12px;
       color: #8b92a4; max-height: 300px; overflow-y: auto;
     }
     .log-entry { padding: 4px 0; border-bottom: 1px solid #161b22; }
+    .log-entry:last-child { border-bottom: none; }
     .log-entry.ok { color: #22c55e; }
     .log-entry.err { color: #ef4444; }
     .log-entry.warn { color: #f59e0b; }
+
+    .loading-overlay {
+      position: fixed; top: 0; left: 0; right: 0; bottom: 0;
+      background: rgba(0, 0, 0, 0.7);
+      display: none; align-items: center; justify-content: center;
+      z-index: 9999;
+    }
+    .loading-overlay.active { display: flex; }
+    .loading-box {
+      background: #131823; padding: 30px 40px;
+      border-radius: 16px; text-align: center;
+      border: 1px solid #2a3142;
+    }
+    .spinner {
+      display: inline-block; width: 40px; height: 40px;
+      border: 4px solid #1c2333;
+      border-top-color: #c4f82a;
+      border-radius: 50%;
+      animation: spin 0.8s linear infinite;
+    }
+    @keyframes spin { to { transform: rotate(360deg); } }
+    .loading-box p { margin-top: 16px; color: #c4f82a; font-weight: 700; }
   </style>
 </head>
 <body>
 
 <div class="container">
-  <h1>🧪 Test Bracket + Zoom/Pan</h1>
-  <p class="subtitle">Bracket engine + renderer giống referee.vn — thử zoom, pan, click match</p>
+  <h1>🧪 Test Bracket Engine + Renderer + Excel</h1>
+  <p class="subtitle">Test bracket, zoom/pan, mô phỏng, và xuất Excel đồng bộ với web</p>
 
+  <!-- Test buttons -->
   <div class="test-section">
-    <h3>Chọn kịch bản test:</h3>
+    <h3>🎯 Chọn kịch bản test:</h3>
     <button class="btn btn-primary" onclick="runTest(8)">▶ 8 đội</button>
     <button class="btn btn-primary" onclick="runTest(16)">▶ 16 đội</button>
     <button class="btn btn-primary" onclick="runTest(13)">▶ 13 đội (BYE)</button>
     <button class="btn btn-primary" onclick="runTest(32)">▶ 32 đội</button>
-    <button class="btn btn-success" onclick="simulateAll()">⚡ Mô phỏng tất cả trận</button>
-    <button class="btn btn-secondary" onclick="resetAll()">🔄 Reset</button>
+    <button class="btn btn-primary" onclick="runTest(20)">▶ 20 đội (12 BYE)</button>
   </div>
 
+  <!-- Action buttons -->
+  <div class="test-section">
+    <h3>⚡ Hành động:</h3>
+    <button class="btn btn-success" onclick="simulateAll()">⚡ Mô phỏng tất cả trận</button>
+    <button class="btn btn-warning" onclick="exportExcel()">📊 Xuất Excel</button>
+    <button class="btn btn-secondary" onclick="resetAll()">🔄 Reset</button>
+    <button class="btn btn-secondary" onclick="clearLog()">🗑 Xóa log</button>
+    <div class="hint">💡 Sau khi mô phỏng, bấm "Xuất Excel" để tải file .xlsx về máy</div>
+  </div>
+
+  <!-- Stats -->
   <div id="stats-container"></div>
 
+  <!-- Bracket view -->
   <h2>📊 Sơ đồ bracket (zoom/pan được)</h2>
   <div id="bracket-container"></div>
 
+  <!-- Validation -->
+  <h2>✅ Kiểm tra hợp lệ</h2>
+  <div id="validation-container"></div>
+
+  <!-- Log -->
   <h2>📋 Log</h2>
   <div id="log" class="log"></div>
+</div>
+
+<!-- Loading overlay -->
+<div class="loading-overlay" id="loadingOverlay">
+  <div class="loading-box">
+    <div class="spinner"></div>
+    <p id="loadingText">Đang xử lý...</p>
+  </div>
 </div>
 
 <script type="module">
@@ -90,7 +149,9 @@
     getBracketStats, getReadyMatches, resetBracket,
   } from './bracket-engine.js';
   import { renderBracket, injectBracketStyles } from './bracket-renderer.js';
+  import { downloadBracketExcel } from './bracket-excel.js';
 
+  // Inject CSS cho bracket
   injectBracketStyles();
 
   let currentBracket = null;
@@ -98,7 +159,13 @@
   const logEl = document.getElementById('log');
   const bracketContainer = document.getElementById('bracket-container');
   const statsContainer = document.getElementById('stats-container');
+  const validationContainer = document.getElementById('validation-container');
+  const loadingOverlay = document.getElementById('loadingOverlay');
+  const loadingText = document.getElementById('loadingText');
 
+  // ============================================================
+  // UTILS
+  // ============================================================
   function log(msg, type = '') {
     const div = document.createElement('div');
     div.className = 'log-entry ' + type;
@@ -107,9 +174,21 @@
     logEl.scrollTop = logEl.scrollHeight;
   }
 
-  function clearLog() { logEl.innerHTML = ''; }
+  window.clearLog = function () {
+    logEl.innerHTML = '';
+    log('🗑 Đã xóa log');
+  };
 
-  function makeTeams(n, prefix = 'Đội') {
+  function showLoading(text = 'Đang xử lý...') {
+    loadingText.textContent = text;
+    loadingOverlay.classList.add('active');
+  }
+
+  function hideLoading() {
+    loadingOverlay.classList.remove('active');
+  }
+
+  function makeTeams(n, prefix = 'VĐV') {
     const teams = [];
     for (let i = 1; i <= n; i++) {
       teams.push({
@@ -120,13 +199,30 @@
     return teams;
   }
 
+  // ============================================================
+  // TEST FUNCTIONS
+  // ============================================================
   window.runTest = function (n) {
     clearLog();
     log(`=== TEST ${n} ĐỘI ===`, 'ok');
-    const teams = makeTeams(n, 'VĐV');
-    currentBracket = createBracket(teams);
-    log(`✅ Tạo bracket: ${currentBracket.bracketSize} slots, ${currentBracket.numByes} BYE`, 'ok');
-    renderAll();
+    try {
+      const teams = makeTeams(n, 'VĐV');
+      currentBracket = createBracket(teams);
+      log(`✅ Tạo bracket: ${currentBracket.bracketSize} slots, ${currentBracket.numByes} BYE`, 'ok');
+
+      // Log BYE positions
+      if (currentBracket.numByes > 0) {
+        const byeMatches = currentBracket.rounds[0]
+          .filter((m) => m.isBye)
+          .map((m) => m.id);
+        log(`📍 BYE ở các trận: ${byeMatches.join(', ')}`, 'warn');
+      }
+
+      renderAll();
+    } catch (err) {
+      log(`❌ Lỗi tạo bracket: ${err.message}`, 'err');
+      console.error(err);
+    }
   };
 
   window.simulateAll = function () {
@@ -134,16 +230,19 @@
       log('⚠️ Chưa có bracket, bấm chọn test trước', 'warn');
       return;
     }
+
     let round = 0;
     let safety = 0;
 
     while (safety < 100) {
       safety++;
       const ready = getReadyMatches(currentBracket);
+
       if (ready.length === 0) {
         log('🎉 Không còn trận nào cần đấu', 'ok');
         break;
       }
+
       log(`--- Vòng ${round + 1}: ${ready.length} trận ---`);
 
       ready.forEach((m) => {
@@ -156,48 +255,141 @@
           log(`❌ ${m.id}: ${err.message}`, 'err');
         }
       });
+
       round++;
     }
+
     renderAll();
+    log('✅ Đã mô phỏng tất cả trận', 'ok');
   };
 
   window.resetAll = function () {
-    if (!currentBracket) return;
+    if (!currentBracket) {
+      log('⚠️ Chưa có bracket', 'warn');
+      return;
+    }
     resetBracket(currentBracket);
     renderAll();
     log('🔄 Đã reset bracket', 'ok');
   };
 
+  window.exportExcel = async function () {
+    if (!currentBracket) {
+      log('⚠️ Chưa có bracket, bấm chọn test trước', 'warn');
+      return;
+    }
+
+    try {
+      showLoading('Đang tạo file Excel...');
+      log('📊 Bắt đầu tạo file Excel...', 'warn');
+
+      const filename = await downloadBracketExcel(currentBracket, {
+        categoryName: 'Test Bracket',
+        tournamentName: 'SportsVN Test',
+        includeTeamList: true,
+      });
+
+      hideLoading();
+      log(`✅ Đã xuất file: ${filename}`, 'ok');
+      log('💡 Mở file Excel để kiểm tra layout có giống web không', 'warn');
+    } catch (err) {
+      hideLoading();
+      log(`❌ Lỗi xuất Excel: ${err.message}`, 'err');
+      console.error(err);
+    }
+  };
+
+  // ============================================================
+  // RENDER
+  // ============================================================
   function renderAll() {
     if (!currentBracket) return;
 
+    renderStats();
+    renderBracketView();
+    renderValidation();
+  }
+
+  function renderStats() {
     const stats = getBracketStats(currentBracket);
     statsContainer.innerHTML = `
       <div class="stats">
-        <div class="stat-card"><div class="stat-label">Đội</div><div class="stat-value">${stats.teamCount}</div></div>
-        <div class="stat-card"><div class="stat-label">Bracket size</div><div class="stat-value">${stats.bracketSize}</div></div>
-        <div class="stat-card"><div class="stat-label">BYE</div><div class="stat-value">${stats.numByes}</div></div>
-        <div class="stat-card"><div class="stat-label">Vòng</div><div class="stat-value">${stats.totalRounds}</div></div>
-        <div class="stat-card"><div class="stat-label">Trận xong</div><div class="stat-value">${stats.doneMatches}/${stats.totalMatches}</div></div>
-        <div class="stat-card"><div class="stat-label">Tiến độ</div><div class="stat-value">${stats.progress}%</div></div>
+        <div class="stat-card">
+          <div class="stat-label">Đội</div>
+          <div class="stat-value">${stats.teamCount}</div>
+        </div>
+        <div class="stat-card">
+          <div class="stat-label">Bracket size</div>
+          <div class="stat-value">${stats.bracketSize}</div>
+        </div>
+        <div class="stat-card">
+          <div class="stat-label">BYE</div>
+          <div class="stat-value">${stats.numByes}</div>
+        </div>
+        <div class="stat-card">
+          <div class="stat-label">Vòng</div>
+          <div class="stat-value">${stats.totalRounds}</div>
+        </div>
+        <div class="stat-card">
+          <div class="stat-label">Trận xong</div>
+          <div class="stat-value">${stats.doneMatches}/${stats.totalMatches}</div>
+        </div>
+        <div class="stat-card">
+          <div class="stat-label">Tiến độ</div>
+          <div class="stat-value">${stats.progress}%</div>
+        </div>
       </div>
     `;
+  }
 
+  function renderBracketView() {
     renderBracket(currentBracket, bracketContainer, {
       onMatchClick: (match, rIdx, mIdx) => {
-        log(`🖱️ Click: ${match.id} — ${match.teamA?.name || '?'} vs ${match.teamB?.name || '?'} (${match.status})`, 'warn');
+        const info = `${match.teamA?.name || '?'} vs ${match.teamB?.name || '?'}`;
+        log(`🖱️ Click: ${match.id} — ${info} (${match.status})`, 'warn');
       },
     });
+  }
 
+  function renderValidation() {
     const v = validateBracket(currentBracket);
+
     if (v.valid && v.warningCount === 0) {
-      log('✅ Bracket HỢP LỆ', 'ok');
+      validationContainer.innerHTML = `
+        <div class="stat-card" style="border-color:#22c55e;">
+          <div class="stat-value" style="color:#22c55e;">✅ Bracket hợp lệ</div>
+          <div class="stat-label">Không có lỗi, không có cảnh báo</div>
+        </div>
+      `;
     } else {
-      log(`⚠️ ${v.errorCount} lỗi, ${v.warningCount} cảnh báo`, v.valid ? 'warn' : 'err');
+      validationContainer.innerHTML = `
+        <div class="stat-card" style="border-color:${v.valid ? '#f59e0b' : '#ef4444'};">
+          <div class="stat-value" style="color:${v.valid ? '#f59e0b' : '#ef4444'};">
+            ${v.valid ? '⚠️' : '❌'} ${v.errorCount} lỗi, ${v.warningCount} cảnh báo
+          </div>
+          <ul style="margin-top:12px; font-size:13px; color:#8b92a4; padding-left:20px;">
+            ${v.issues.map((i) => `
+              <li style="margin-bottom:4px;">
+                ${i.location ? `<strong>${i.location}:</strong> ` : ''}${i.message}
+              </li>
+            `).join('')}
+          </ul>
+        </div>
+      `;
     }
   }
 
+  // ============================================================
+  // INIT
+  // ============================================================
   log('🚀 Sẵn sàng. Chọn số đội để test.');
+  log('💡 Gợi ý: Bấm "13 đội (BYE)" để xem BYE phân bố đều');
+
+  // Auto test 13 đội lần đầu
+  setTimeout(() => {
+    runTest(13);
+  }, 500);
+
 </script>
 
 </body>
