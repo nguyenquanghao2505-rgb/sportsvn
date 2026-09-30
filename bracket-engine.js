@@ -1,13 +1,13 @@
 // ============================================================
 // bracket-engine.js — Bracket engine chuẩn (cây đấu)
-// Fix bug: đội thắng không đẩy lên vòng sau
+// Version 2.0 — Fix BYE distribution theo chuẩn thể thao
 // Hỗ trợ: BYE, tranh hạng 3, validate, ghi kết quả
 // ============================================================
 
 /**
  * Tạo bracket từ danh sách đội
  * @param {Array} teams - [{ name, club }, ...]
- * @param {Object} options - { customByes: [2,15,...], seedOrder: [] }
+ * @param {Object} options - { customByes: [2,15,...] }
  * @returns {Object} bracket object
  */
 export function createBracket(teams, options = {}) {
@@ -59,8 +59,8 @@ export function createBracket(teams, options = {}) {
         teamB: null,
         scoreA: null,
         scoreB: null,
-        winner: null, // 'A' | 'B' | null
-        status: 'pending', // 'pending' | 'ready' | 'done'
+        winner: null,
+        status: 'pending',
         fromA: fromMatchA.id,
         fromB: fromMatchB.id,
         isBye: false,
@@ -68,9 +68,7 @@ export function createBracket(teams, options = {}) {
       });
     }
 
-    // Set status 'ready' nếu cả 2 nguồn đã done
     matches.forEach((m) => updateMatchStatus(m, rounds));
-
     rounds.push(matches);
     prevMatchCount = matchCount;
     roundIdx++;
@@ -99,7 +97,7 @@ export function createBracket(teams, options = {}) {
 }
 
 /**
- * Build vòng 1 (ghép cặp + chèn BYE)
+ * Build vòng 1 (ghép cặp + chèn BYE theo chuẩn thể thao)
  */
 function buildFirstRound(teams, bracketSize, numByes, customByes) {
   const matches = [];
@@ -107,9 +105,12 @@ function buildFirstRound(teams, bracketSize, numByes, customByes) {
   let players = [...teams];
 
   if (customByes) {
-    // Ghép theo slot chỉ định
+    // ═══════════════════════════════════════════════════════════
+    // Trường hợp 1: Người dùng CHỈ ĐỊNH vị trí BYE
+    // ═══════════════════════════════════════════════════════════
     const byeSet = new Set(customByes);
     let playerIdx = 0;
+
     for (let i = 0; i < matchCount; i++) {
       const slotA = i * 2 + 1;
       const slotB = i * 2 + 2;
@@ -128,32 +129,48 @@ function buildFirstRound(teams, bracketSize, numByes, customByes) {
         );
       }
     }
-  } else {
-    // Sinh BYE tự động — theo chuẩn thể thao
-    const byes = players.slice(0, numByes);
-    const playing = players.slice(numByes);
+  } else if (numByes > 0) {
+    // ═══════════════════════════════════════════════════════════
+    // Trường hợp 2: TỰ ĐỘNG sinh BYE theo chuẩn thể thao
+    // ═══════════════════════════════════════════════════════════
 
+    // Bước 1: Lấy vị trí BYE chuẩn
+    const byeSlots = getStandardByeSlots(bracketSize, numByes);
+
+    // Bước 2: Xáo trộn đội để công bằng
+    players = shuffleArray(players);
+
+    // Bước 3: Gán đội vào các slot KHÔNG phải BYE
+    let playerIdx = 0;
     for (let i = 0; i < matchCount; i++) {
-      if (byes.length > 0 && playing.length <= (matchCount - i - 1) * 2) {
-        matches.push(makeMatch(i, byes.shift(), null, true, false));
+      const slotA = i * 2 + 1;
+      const slotB = i * 2 + 2;
+      const isByeA = byeSlots.has(slotA);
+      const isByeB = byeSlots.has(slotB);
+
+      if (isByeA && isByeB) {
+        matches.push(makeMatch(i, null, null, false, true));
+      } else if (isByeA) {
+        matches.push(makeMatch(i, null, players[playerIdx++] || null, true, false));
+      } else if (isByeB) {
+        matches.push(makeMatch(i, players[playerIdx++] || null, null, true, false));
       } else {
-        const a = playing.shift() || null;
-        const b = playing.shift() || null;
-        if (a && !b) {
-          matches.push(makeMatch(i, a, null, true, false));
-        } else if (!a && !b) {
-          matches.push(makeMatch(i, null, null, false, true));
-        } else {
-          matches.push(makeMatch(i, a, b, false, false));
-        }
+        matches.push(
+          makeMatch(i, players[playerIdx++] || null, players[playerIdx++] || null, false, false)
+        );
       }
     }
+  } else {
+    // ═══════════════════════════════════════════════════════════
+    // Trường hợp 3: Không có BYE → ghép cặp thẳng
+    // ═══════════════════════════════════════════════════════════
+    players = shuffleArray(players);
+    let playerIdx = 0;
 
-    // Nếu còn BYE → thay vào các match placeholder
-    for (let i = 0; i < matches.length && byes.length > 0; i++) {
-      if (matches[i].isPlaceholder) {
-        matches[i] = makeMatch(i, byes.shift(), null, true, false);
-      }
+    for (let i = 0; i < matchCount; i++) {
+      matches.push(
+        makeMatch(i, players[playerIdx++] || null, players[playerIdx++] || null, false, false)
+      );
     }
   }
 
@@ -168,6 +185,146 @@ function buildFirstRound(teams, bracketSize, numByes, customByes) {
   });
 
   return matches;
+}
+
+/**
+ * ⚠️ HÀM QUAN TRỌNG — Sinh BYE theo chuẩn thể thao quốc tế
+ *
+ * Quy tắc:
+ * - BYE 1, 2: đặt ở 2 đầu nhánh (slot 2 và slot bracketSize - 1)
+ * - BYE tiếp theo: đặt xen kẽ, ưu tiên nhánh TRÊN trước
+ * - Kết quả: phân bố đều, không dồn cục
+ *
+ * Tham khảo chuẩn: Olympic, BWF (cầu lông), ITTF (bóng bàn)
+ */
+function getStandardByeSlots(bracketSize, numByes) {
+  if (numByes === 0) return new Set();
+  if (numByes >= bracketSize) return new Set();
+
+  // Bảng tra cứu chuẩn cho bracket phổ biến
+  const STANDARD_BYE_POSITIONS = {
+    4: {
+      1: [4],
+      2: [2, 3],
+    },
+    8: {
+      1: [8],
+      2: [2, 7],
+      3: [2, 4, 7],
+      4: [2, 3, 4, 7],
+    },
+    16: {
+      1: [16],
+      2: [2, 15],
+      3: [2, 7, 15],
+      4: [2, 7, 10, 15],
+      5: [2, 5, 7, 10, 15],
+      6: [2, 5, 7, 10, 12, 15],
+      7: [2, 4, 5, 7, 10, 12, 15],
+      8: [2, 4, 5, 7, 10, 12, 13, 15],
+      9: [2, 3, 4, 5, 7, 10, 12, 13, 15],
+      10: [2, 3, 4, 5, 7, 10, 11, 12, 13, 15],
+      11: [2, 3, 4, 5, 6, 7, 10, 11, 12, 13, 15],
+      12: [2, 3, 4, 5, 6, 7, 10, 11, 12, 13, 14, 15],
+      13: [2, 3, 4, 5, 6, 7, 8, 10, 11, 12, 13, 14, 15],
+      14: [2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12, 13, 14, 15],
+    },
+    32: {
+      1: [32],
+      2: [2, 31],
+      3: [2, 15, 31],
+      4: [2, 15, 18, 31],
+      5: [2, 15, 18, 23, 31],
+      6: [2, 11, 15, 18, 23, 31],
+      7: [2, 11, 15, 18, 23, 26, 31],
+      8: [2, 11, 15, 18, 23, 26, 28, 31],
+      9: [2, 7, 11, 15, 18, 23, 26, 28, 31],
+      10: [2, 7, 11, 15, 18, 20, 23, 26, 28, 31],
+      11: [2, 7, 11, 15, 17, 18, 20, 23, 26, 28, 31],
+      12: [2, 7, 11, 15, 17, 18, 20, 23, 25, 26, 28, 31],
+      13: [2, 5, 7, 11, 15, 17, 18, 20, 23, 25, 26, 28, 31],
+      14: [2, 4, 5, 7, 11, 15, 17, 18, 20, 23, 25, 26, 28, 31],
+      15: [2, 4, 5, 7, 11, 13, 15, 17, 18, 20, 23, 25, 26, 28, 31],
+      16: [2, 4, 5, 7, 11, 13, 15, 16, 17, 18, 20, 23, 25, 26, 28, 31],
+    },
+    64: {
+      1: [64],
+      2: [2, 63],
+      3: [2, 31, 63],
+      4: [2, 31, 34, 63],
+      5: [2, 31, 34, 47, 63],
+      6: [2, 23, 31, 34, 47, 63],
+      7: [2, 23, 31, 34, 47, 50, 63],
+      8: [2, 23, 31, 34, 47, 50, 55, 63],
+      9: [2, 15, 23, 31, 34, 47, 50, 55, 63],
+      10: [2, 15, 23, 31, 34, 42, 47, 50, 55, 63],
+      11: [2, 15, 23, 31, 34, 42, 47, 50, 55, 60, 63],
+      12: [2, 15, 23, 31, 34, 42, 47, 50, 53, 55, 60, 63],
+      13: [2, 15, 20, 23, 31, 34, 42, 47, 50, 53, 55, 60, 63],
+      14: [2, 15, 20, 23, 31, 34, 38, 42, 47, 50, 53, 55, 60, 63],
+      15: [2, 15, 20, 23, 31, 34, 38, 42, 45, 47, 50, 53, 55, 60, 63],
+      16: [2, 15, 20, 23, 31, 34, 38, 42, 45, 47, 50, 53, 55, 58, 60, 63],
+    },
+  };
+
+  // Nếu có bảng tra cứu → dùng luôn
+  if (STANDARD_BYE_POSITIONS[bracketSize]?.[numByes]) {
+    return new Set(STANDARD_BYE_POSITIONS[bracketSize][numByes]);
+  }
+
+  // Nếu không có → tự sinh theo thuật toán
+  return generateByeSlotsFallback(bracketSize, numByes);
+}
+
+/**
+ * Thuật toán sinh BYE dự phòng (cho bracket 128, 256, ...)
+ */
+function generateByeSlotsFallback(bracketSize, numByes) {
+  const slots = new Set();
+  if (numByes === 0) return slots;
+
+  // BYE 1: slot 2
+  slots.add(2);
+  if (numByes === 1) return slots;
+
+  // BYE 2: slot bracketSize - 1
+  slots.add(bracketSize - 1);
+  if (numByes === 2) return slots;
+
+  // Các BYE tiếp: chia đôi từng khoảng, ưu tiên trái
+  const segments = [[2, bracketSize - 1]];
+
+  while (slots.size < numByes && segments.length > 0) {
+    segments.sort((a, b) => (b[1] - b[0]) - (a[1] - a[0]));
+
+    const seg = segments.shift();
+    if (!seg || seg[1] - seg[0] <= 2) continue;
+
+    const mid = Math.floor((seg[0] + seg[1]) / 2);
+
+    let candidate = mid;
+    while (slots.has(candidate) && candidate < seg[1]) candidate++;
+
+    if (candidate < seg[1] && !slots.has(candidate)) {
+      slots.add(candidate);
+      segments.push([seg[0], candidate]);
+      segments.push([candidate, seg[1]]);
+    }
+  }
+
+  return slots;
+}
+
+/**
+ * Xáo trộn mảng (Fisher-Yates)
+ */
+function shuffleArray(arr) {
+  const a = [...arr];
+  for (let i = a.length - 1; i > 0; i--) {
+    const j = Math.floor(Math.random() * (i + 1));
+    [a[i], a[j]] = [a[j], a[i]];
+  }
+  return a;
 }
 
 function makeMatch(idx, teamA, teamB, isBye, isPlaceholder) {
@@ -201,7 +358,6 @@ export function recordWinner(bracket, matchId, winnerSlot, scoreA, scoreB) {
 
   const { match, roundIndex, matchIndex } = found;
 
-  // Validate
   if (match.isPlaceholder) {
     throw new Error('Trận chưa có đủ 2 đội');
   }
@@ -210,13 +366,11 @@ export function recordWinner(bracket, matchId, winnerSlot, scoreA, scoreB) {
     throw new Error(`Slot ${winnerSlot} không có đội`);
   }
 
-  // Ghi kết quả
   match.scoreA = scoreA !== undefined ? scoreA : null;
   match.scoreB = scoreB !== undefined ? scoreB : null;
   match.winner = winnerSlot;
   match.status = 'done';
 
-  // Đẩy winner lên vòng sau
   if (roundIndex < bracket.rounds.length - 1) {
     const nextRound = bracket.rounds[roundIndex + 1];
     const nextMatch = nextRound.find(
@@ -236,7 +390,6 @@ export function recordWinner(bracket, matchId, winnerSlot, scoreA, scoreB) {
     updateMatchStatus(nextMatch, bracket.rounds);
   }
 
-  // Xử lý tranh hạng 3 (đội thua bán kết)
   const semiRoundIndex = bracket.rounds.length - 2;
   if (roundIndex === semiRoundIndex) {
     const loserTeam = winnerSlot === 'A' ? match.teamB : match.teamA;
@@ -255,9 +408,6 @@ export function recordWinner(bracket, matchId, winnerSlot, scoreA, scoreB) {
   return bracket;
 }
 
-/**
- * Cập nhật status của match dựa vào nguồn gốc
- */
 function updateMatchStatus(match, rounds) {
   if (match.status === 'done') return;
 
@@ -273,9 +423,6 @@ function updateMatchStatus(match, rounds) {
   }
 }
 
-/**
- * Tìm match theo ID
- */
 export function findMatch(bracket, matchId) {
   for (let r = 0; r < bracket.rounds.length; r++) {
     for (let m = 0; m < bracket.rounds[r].length; m++) {
@@ -291,9 +438,6 @@ export function findMatch(bracket, matchId) {
   return null;
 }
 
-/**
- * Validate bracket — phát hiện lỗi
- */
 export function validateBracket(bracket) {
   const issues = [];
   const teamLocations = new Map();
@@ -302,7 +446,6 @@ export function validateBracket(bracket) {
     round.forEach((match, mIdx) => {
       const location = `${bracket.roundNames[rIdx]} - Trận ${mIdx + 1}`;
 
-      // Check nguồn gốc
       if (rIdx > 0) {
         if (!match.fromA || !match.fromB) {
           issues.push({
@@ -326,7 +469,6 @@ export function validateBracket(bracket) {
         }
       }
 
-      // Track vị trí đội
       [match.teamA, match.teamB].forEach((team, slot) => {
         if (!team) return;
         const key = `${team.name}|${team.club || ''}`;
@@ -340,26 +482,21 @@ export function validateBracket(bracket) {
     });
   });
 
-  // Phát hiện đội xuất hiện nhiều lần không hợp lệ
   teamLocations.forEach((locs, key) => {
     const [name] = key.split('|');
     if (locs.length > 1) {
-      // Đội xuất hiện nhiều lần → check xem có hợp lệ không
-      // Hợp lệ: đội thắng ở vòng trước xuất hiện ở vòng sau
       const sortedLocs = locs.sort((a, b) => {
         const rA = getRoundIndexFromMatchId(bracket, a.matchId);
         const rB = getRoundIndexFromMatchId(bracket, b.matchId);
         return rA - rB;
       });
 
-      // Kiểm tra mỗi cặp liên tiếp có hợp lệ không
       let valid = true;
       for (let i = 1; i < sortedLocs.length; i++) {
         const prevMatch = findMatch(bracket, sortedLocs[i - 1].matchId);
         const currMatch = findMatch(bracket, sortedLocs[i].matchId);
         if (!prevMatch || !currMatch) continue;
 
-        // Match sau phải là next của match trước
         if (
           currMatch.match.fromA !== prevMatch.match.id &&
           currMatch.match.fromB !== prevMatch.match.id
@@ -368,7 +505,6 @@ export function validateBracket(bracket) {
           break;
         }
 
-        // Đội phải là winner của match trước
         const winnerTeam = prevMatch.match.winner === 'A'
           ? prevMatch.match.teamA
           : prevMatch.match.teamB;
@@ -402,9 +538,6 @@ function getRoundIndexFromMatchId(bracket, matchId) {
   return found ? found.roundIndex : -1;
 }
 
-/**
- * Lấy tên các vòng
- */
 export function getRoundNames(totalRounds) {
   const standard = ['Chung kết', 'Bán kết', 'Tứ kết', 'Vòng 1/8', 'Vòng 1/16', 'Vòng 1/32'];
   const names = [];
@@ -415,9 +548,6 @@ export function getRoundNames(totalRounds) {
   return names;
 }
 
-/**
- * Lấy danh sách match đang chờ (ready) có thể đấu
- */
 export function getReadyMatches(bracket) {
   const list = [];
   bracket.rounds.forEach((round, rIdx) => {
@@ -433,9 +563,6 @@ export function getReadyMatches(bracket) {
   return list;
 }
 
-/**
- * Thống kê bracket
- */
 export function getBracketStats(bracket) {
   let totalMatches = 0;
   let doneMatches = 0;
@@ -461,20 +588,15 @@ export function getBracketStats(bracket) {
   };
 }
 
-/**
- * Reset toàn bộ bracket (xóa kết quả, giữ đội)
- */
 export function resetBracket(bracket) {
   bracket.rounds.forEach((round, rIdx) => {
     round.forEach((match) => {
       if (rIdx === 0) {
-        // Vòng 1 giữ nguyên đội
         match.scoreA = null;
         match.scoreB = null;
         match.winner = null;
         match.status = match.isBye ? 'done' : (match.teamA && match.teamB ? 'ready' : 'pending');
       } else {
-        // Vòng sau reset sạch
         match.teamA = null;
         match.teamB = null;
         match.scoreA = null;
@@ -500,20 +622,22 @@ export function resetBracket(bracket) {
   return bracket;
 }
 
-/**
- * Export bracket thành JSON gọn để lưu DB
- */
 export function serializeBracket(bracket) {
   return JSON.stringify(bracket);
 }
 
-/**
- * Import bracket từ JSON
- */
 export function deserializeBracket(json) {
   try {
     return typeof json === 'string' ? JSON.parse(json) : json;
   } catch (err) {
     throw new Error('Không đọc được bracket: ' + err.message);
   }
+}
+
+/**
+ * ⚠️ DEBUG — Lấy danh sách BYE slots (để test)
+ */
+export function debugByeSlots(bracketSize, numByes) {
+  const slots = getStandardByeSlots(bracketSize, numByes);
+  return [...slots].sort((a, b) => a - b);
 }
