@@ -1,6 +1,6 @@
 // ============================================================
-// bracket-excel.js v3 — Excel export với đường nối liền mạch
-// Layout chuẩn: Mỗi match 2 rows, đường nối bằng border
+// bracket-excel.js v4 — 3 rows per match, gap ở giữa để vẽ đường
+// Layout khớp với file Excel mẫu
 // ============================================================
 
 export async function exportBracketToExcel(bracket, options = {}) {
@@ -50,18 +50,22 @@ const C = {
   byeBg:     'FFFFF3CD',
   byeFg:     'FFB45309',
   border:    'FFCBD5E1',
-  line:      'FF1E3A8A',  // Xanh đậm cho đường kẻ
+  line:      'FF1E3A8A',  // Xanh đậm cho đường nối
   titleBg:   'FF0D1B3E',
   thirdBg:   'FFE67E22',
 };
 
-// Độ rộng cột
 const W = {
-  TT:     5,   // Số TT
-  TEAM:   24,  // Tên đội
-  SCORE:  5,   // Điểm
+  TT:     5,
+  TEAM:   22,
+  SCORE:  5,
   LINE:   3,   // Cột đường nối (mỏng)
 };
+
+// ─── Số rows cho mỗi match ───
+// 3 rows: Đội A | GAP | Đội B
+const ROWS_PER_MATCH = 3;
+const ROW_GAP = 1;  // 1 row trống giữa các match
 
 // ============================================================
 // MAIN
@@ -70,18 +74,7 @@ function drawBracket(ws, bracket, options) {
   const { categoryName, tournamentName } = options;
   const totalRounds = bracket.rounds.length;
 
-  // Cấu trúc cột:
-  // A = TT
-  // B = Tên đội vòng 1
-  // C = Điểm vòng 1
-  // D = Đường nối 1 (mỏng)
-  // E = Tên đội vòng 2
-  // F = Điểm vòng 2
-  // G = Đường nối 2 (mỏng)
-  // H = Tên đội vòng 3
-  // ...
-  //
-  // Mỗi vòng = 3 cột: TEAM + SCORE + LINE
+  // Mỗi vòng = 3 cột: TEAM | SCORE | LINE
   const COLS_PER_ROUND = 3;
 
   ws.getColumn(1).width = W.TT;
@@ -117,9 +110,9 @@ function drawBracket(ws, bracket, options) {
   ws.getRow(row).height = 18;
   row++;
 
-  row++; // trống
+  row++;
 
-  // ─── Header các vòng ───
+  // ─── Header ───
   const headerRow = row;
 
   const ttHeader = ws.getCell(headerRow, 1);
@@ -133,7 +126,6 @@ function drawBracket(ws, bracket, options) {
     cell.value = bracket.roundNames[r].toUpperCase();
     styleHeader(cell);
 
-    // Cột đường nối
     const lineHeader = ws.getCell(headerRow, baseCol + 2);
     lineHeader.border = border(C.headerBg);
     lineHeader.fill = { type: 'pattern', pattern: 'solid', fgColor: { argb: C.headerBg } };
@@ -143,14 +135,11 @@ function drawBracket(ws, bracket, options) {
 
   // ─── Vẽ bracket ───
   const bracketStartRow = row;
-  const ROWS_PER_MATCH = 2;
-  const ROW_GAP = 1;
-
   const positions = computePositions(bracket, ROWS_PER_MATCH, ROW_GAP);
 
   let maxRow = bracketStartRow;
 
-  // Vẽ tất cả match
+  // Vẽ tất cả match trước
   for (let rIdx = 0; rIdx < totalRounds; rIdx++) {
     const round = bracket.rounds[rIdx];
     const baseCol = 2 + rIdx * COLS_PER_ROUND;
@@ -165,7 +154,7 @@ function drawBracket(ws, bracket, options) {
     });
   }
 
-  // Vẽ đường nối giữa các vòng
+  // Vẽ đường nối
   for (let rIdx = 0; rIdx < totalRounds - 1; rIdx++) {
     const lineCol = 2 + rIdx * COLS_PER_ROUND + 2;
     const nextTeamCol = lineCol + 1;
@@ -178,52 +167,39 @@ function drawBracket(ws, bracket, options) {
 
       if (matchTopIdx >= round.length || matchBotIdx >= round.length) return;
 
-      const posTop = positions[rIdx][matchTopIdx];       // Vị trí match trên
-      const posBot = positions[rIdx][matchBotIdx];       // Vị trí match dưới
-      const posNext = positions[rIdx + 1][nMIdx];        // Vị trí match đích
+      const posTop = positions[rIdx][matchTopIdx];
+      const posBot = positions[rIdx][matchBotIdx];
+      const posNext = positions[rIdx + 1][nMIdx];
 
-      // Row tuyệt đối
-      const rowTopA = bracketStartRow + posTop;              // Đội A match trên
-      const rowTopB = rowTopA + 1;                            // Đội B match trên
-      const rowBotA = bracketStartRow + posBot;              // Đội A match dưới
-      const rowBotB = rowBotA + 1;                            // Đội B match dưới
+      // Row tuyệt đối (0-index trong bracket)
+      const rowTopA = bracketStartRow + posTop;           // Đội A match trên
+      const rowTopGap = rowTopA + 1;                       // GAP của match trên
+      const rowTopB = rowTopA + 2;                         // Đội B match trên
 
-      // Match đích — căn giữa 2 đội
-      const rowNextA = bracketStartRow + posNext;
-      const rowNextB = rowNextA + 1;
+      const rowBotA = bracketStartRow + posBot;           // Đội A match dưới
+      const rowBotGap = rowBotA + 1;                       // GAP của match dưới
+      const rowBotB = rowBotA + 2;                         // Đội B match dưới
 
-      // ═══════════════════════════════════════════════════════
-      // 1. Đường ngang từ ĐỘI A match trên → cột đường nối
-      //    (border-bottom của ô Điểm đội A)
-      // ═══════════════════════════════════════════════════════
-      const scoreCellTopA = ws.getCell(rowTopA, lineCol - 1);
-      // Không cần vẽ, đường sẽ từ cột LINE
+      // Match đích: nằm giữa 2 match nguồn
+      const rowNextA = bracketStartRow + posNext;         // Đội A match đích
+      const rowNextGap = rowNextA + 1;                     // GAP của match đích
+      const rowNextB = rowNextA + 2;                       // Đội B match đích
 
       // ═══════════════════════════════════════════════════════
-      // 2. Đường từ ĐỘI A match trên: ngang sang LINE + dọc xuống
-      //    Vẽ ở row của đội A
+      // VẼ ĐƯỜNG NỐI
       // ═══════════════════════════════════════════════════════
-      const cellLineTopA = ws.getCell(rowTopA, lineCol);
-      cellLineTopA.border = {
-        ...(cellLineTopA.border || {}),
+
+      // ─── Bước 1: Đường ngang từ ĐỘI A match trên ───
+      // Ở row GAP của match trên: vẽ border-top (đường trên) + border-right
+      const gapTop = ws.getCell(rowTopGap, lineCol);
+      gapTop.border = {
+        ...(gapTop.border || {}),
+        top: { style: 'medium', color: { argb: C.line } },
         right: { style: 'medium', color: { argb: C.line } },
       };
 
-      // ═══════════════════════════════════════════════════════
-      // 3. Đường từ ĐỘI B match trên: ngang sang LINE + dọc xuống
-      // ═══════════════════════════════════════════════════════
-      const cellLineTopB = ws.getCell(rowTopB, lineCol);
-      cellLineTopB.border = {
-        ...(cellLineTopB.border || {}),
-        right: { style: 'medium', color: { argb: C.line } },
-        bottom: { style: 'medium', color: { argb: C.line } },
-      };
-
-      // ═══════════════════════════════════════════════════════
-      // 4. Đường DỌC từ rowTopB xuống rowBotA (giữa 2 match)
-      //    Vẽ border-right ở tất cả row trung gian
-      // ═══════════════════════════════════════════════════════
-      for (let r = rowTopB + 1; r < rowBotA; r++) {
+      // ─── Bước 2: Đường dọc từ GAP match trên xuống GAP match dưới ───
+      for (let r = rowTopGap + 1; r < rowBotGap; r++) {
         const cell = ws.getCell(r, lineCol);
         cell.border = {
           ...(cell.border || {}),
@@ -231,46 +207,43 @@ function drawBracket(ws, bracket, options) {
         };
       }
 
-      // ═══════════════════════════════════════════════════════
-      // 5. Đường từ ĐỘI A match dưới: ngang sang LINE
-      // ═══════════════════════════════════════════════════════
-      const cellLineBotA = ws.getCell(rowBotA, lineCol);
-      cellLineBotA.border = {
-        ...(cellLineBotA.border || {}),
+      // ─── Bước 3: Đường ngang từ ĐỘI B match dưới (ở GAP) ───
+      const gapBot = ws.getCell(rowBotGap, lineCol);
+      gapBot.border = {
+        ...(gapBot.border || {}),
+        bottom: { style: 'medium', color: { argb: C.line } },
+        right: { style: 'medium', color: { argb: C.line } },
+      };
+
+      // ─── Bước 4: Đường ngang cuối cùng từ cột LINE → cột TEAM vòng sau ───
+      // Đặt ở GAP của match đích (rowNextGap)
+      const gapNext = ws.getCell(rowNextGap, lineCol);
+      gapNext.border = {
+        ...(gapNext.border || {}),
         right: { style: 'medium', color: { argb: C.line } },
         top: { style: 'medium', color: { argb: C.line } },
+        bottom: { style: 'medium', color: { argb: C.line } },
       };
 
-      // ═══════════════════════════════════════════════════════
-      // 6. Đường từ ĐỘI B match dưới: ngang sang LINE
-      // ═══════════════════════════════════════════════════════
-      const cellLineBotB = ws.getCell(rowBotB, lineCol);
-      cellLineBotB.border = {
-        ...(cellLineBotB.border || {}),
-        right: { style: 'medium', color: { argb: C.line } },
-      };
-
-      // ═══════════════════════════════════════════════════════
-      // 7. Đường NGANG từ cột LINE → cột TEAM của match đích
-      //    Vẽ ở row giữa (rowNextA hoặc rowNextB tùy)
-      //    Thực ra phải vẽ ở row nằm giữa 2 match nguồn
-      // ═══════════════════════════════════════════════════════
-      // Vị trí row giao nhau = giữa 2 match nguồn = rowTopB + 1 (hoặc dùng rowNextA)
-      const midRow = rowNextA; // Match đích có 2 rows, lấy row trên
-
-      // Vẽ ở cột LINE: border-right (đã có) + border-top (để tạo góc)
-      const midLineCell = ws.getCell(midRow, lineCol);
-      midLineCell.border = {
-        ...(midLineCell.border || {}),
-        right: { style: 'medium', color: { argb: C.line } },
-        top: { style: 'medium', color: { argb: C.line } },
-      };
-
-      // Vẽ ở cột TEAM của vòng sau: border-left để kết nối
-      const nextTeamCell = ws.getCell(midRow, nextTeamCol);
+      // Đường ngang sang cột TEAM vòng sau
+      const nextTeamCell = ws.getCell(rowNextGap, nextTeamCol);
       nextTeamCell.border = {
         ...(nextTeamCell.border || {}),
         left: { style: 'medium', color: { argb: C.line } },
+      };
+
+      // ─── Bước 5: Vẽ ở GAP của match trên (từ cột TEAM/SCORE sang LINE) ───
+      // Đường ngang từ Điểm đội A → LINE (ở row A)
+      const scoreTopA = ws.getCell(rowTopA, lineCol - 1);
+      scoreTopA.border = {
+        ...(scoreTopA.border || {}),
+        right: { style: 'medium', color: { argb: C.line } },
+      };
+
+      const scoreBotB = ws.getCell(rowBotB, lineCol - 1);
+      scoreBotB.border = {
+        ...(scoreBotB.border || {}),
+        right: { style: 'medium', color: { argb: C.line } },
       };
     });
   }
@@ -313,9 +286,9 @@ function computePositions(bracket, rowsPerMatch, rowGap) {
     const prev = positions[r - 1];
     const curr = [];
     for (let i = 0; i < bracket.rounds[r].length; i++) {
-      // Vị trí = trung bình của 2 match vòng trước
       const posA = prev[i * 2];
       const posB = prev[i * 2 + 1];
+      // Match đích nằm giữa 2 match nguồn
       curr.push(Math.floor((posA + posB) / 2));
     }
     positions.push(curr);
@@ -325,7 +298,7 @@ function computePositions(bracket, rowsPerMatch, rowGap) {
 }
 
 // ============================================================
-// DRAW MATCH
+// DRAW MATCH (3 rows: Đội A | GAP | Đội B)
 // ============================================================
 function drawMatch(ws, startRow, baseCol, match, options = {}) {
   const { showTT = false, isThird = false } = options;
@@ -334,8 +307,12 @@ function drawMatch(ws, startRow, baseCol, match, options = {}) {
   const isWinnerA = match.winner === 'A';
   const isWinnerB = match.winner === 'B';
 
-  // ─── Đội A ───
-  const cellA = ws.getCell(startRow, baseCol);
+  const rowA = startRow;
+  const rowGap = startRow + 1;
+  const rowB = startRow + 2;
+
+  // ─── Đội A (rowA) ───
+  const cellA = ws.getCell(rowA, baseCol);
   cellA.value = match.teamA ? match.teamA.name : (isBye && match.teamB ? '' : '—');
   cellA.font = {
     size: 10, bold: isWinnerA,
@@ -351,7 +328,7 @@ function drawMatch(ws, startRow, baseCol, match, options = {}) {
     cellA.fill = { type: 'pattern', pattern: 'solid', fgColor: { argb: 'FFFFF8F0' } };
   }
 
-  const scoreA = ws.getCell(startRow, baseCol + 1);
+  const scoreA = ws.getCell(rowA, baseCol + 1);
   scoreA.value = match.scoreA !== null && match.scoreA !== undefined ? match.scoreA : '';
   scoreA.font = {
     size: 11, bold: true,
@@ -363,8 +340,27 @@ function drawMatch(ws, startRow, baseCol, match, options = {}) {
     scoreA.fill = { type: 'pattern', pattern: 'solid', fgColor: { argb: C.winnerBg } };
   }
 
-  // ─── Đội B ───
-  const cellB = ws.getCell(startRow + 1, baseCol);
+  // ─── GAP row (rowGap) — chỉ vẽ viền nhẹ ───
+  const gapCellTeam = ws.getCell(rowGap, baseCol);
+  gapCellTeam.value = '';
+  gapCellTeam.border = {
+    left: { style: 'thin', color: { argb: C.border } },
+    right: { style: 'thin', color: { argb: C.border } },
+  };
+
+  const gapCellScore = ws.getCell(rowGap, baseCol + 1);
+  gapCellScore.value = '';
+  gapCellScore.border = {
+    left: { style: 'thin', color: { argb: C.border } },
+    right: { style: 'thin', color: { argb: C.border } },
+  };
+
+  const gapCellLine = ws.getCell(rowGap, baseCol + 2);
+  gapCellLine.value = '';
+  // KHÔNG set border ở đây — để cho phần vẽ đường nối tự do
+
+  // ─── Đội B (rowB) ───
+  const cellB = ws.getCell(rowB, baseCol);
   cellB.value = match.teamB ? match.teamB.name : (isBye && match.teamA ? '⭐ BYE' : '—');
   cellB.font = {
     size: 10, bold: isWinnerB,
@@ -382,7 +378,7 @@ function drawMatch(ws, startRow, baseCol, match, options = {}) {
     cellB.fill = { type: 'pattern', pattern: 'solid', fgColor: { argb: 'FFFFF8F0' } };
   }
 
-  const scoreB = ws.getCell(startRow + 1, baseCol + 1);
+  const scoreB = ws.getCell(rowB, baseCol + 1);
   scoreB.value = match.scoreB !== null && match.scoreB !== undefined ? match.scoreB : '';
   scoreB.font = {
     size: 11, bold: true,
@@ -394,27 +390,36 @@ function drawMatch(ws, startRow, baseCol, match, options = {}) {
     scoreB.fill = { type: 'pattern', pattern: 'solid', fgColor: { argb: C.winnerBg } };
   }
 
-  // ─── Cột LINE (đường nối) ───
-  const lineA = ws.getCell(startRow, baseCol + 2);
+  // ─── Cột LINE (baseCol + 2) — không set border, để vẽ đường nối ───
+  // Chỉ vẽ viền trên/dưới nhẹ
+  const lineA = ws.getCell(rowA, baseCol + 2);
   lineA.value = '';
-  lineA.border = border(C.border);
+  lineA.border = {
+    top: { style: 'thin', color: { argb: C.border } },
+    bottom: { style: 'thin', color: { argb: C.border } },
+  };
 
-  const lineB = ws.getCell(startRow + 1, baseCol + 2);
+  const lineB = ws.getCell(rowB, baseCol + 2);
   lineB.value = '';
-  lineB.border = border(C.border);
+  lineB.border = {
+    top: { style: 'thin', color: { argb: C.border } },
+    bottom: { style: 'thin', color: { argb: C.border } },
+  };
 
-  // ─── TT ───
+  // ─── TT (chỉ vòng 1) ───
   if (showTT) {
-    ws.mergeCells(startRow, 1, startRow + 1, 1);
-    const tt = ws.getCell(startRow, 1);
+    ws.mergeCells(rowA, 1, rowB, 1);
+    const tt = ws.getCell(rowA, 1);
     tt.value = match.matchIndex + 1;
     tt.font = { size: 9, color: { argb: 'FF94A3B8' }, bold: true };
     tt.alignment = { horizontal: 'center', vertical: 'middle' };
     tt.border = border(C.border);
   }
 
-  ws.getRow(startRow).height = 20;
-  ws.getRow(startRow + 1).height = 20;
+  // Row heights
+  ws.getRow(rowA).height = 18;
+  ws.getRow(rowGap).height = 8;    // ← GAP row thấp hơn
+  ws.getRow(rowB).height = 18;
 }
 
 // ============================================================
