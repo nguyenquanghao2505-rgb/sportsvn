@@ -1,10 +1,10 @@
 // ============================================================
-// bracket-excel.js v9 — Full rewrite
+// bracket-excel.js v10 — Excel bracket với đầy đủ border
 // Đặc điểm:
-//   - Layout bracket: Tên + Điểm cho mỗi vòng
+//   - Bracket: Tên + Điểm cho mỗi vòng
 //   - Cột tham chiếu bên phải: TT | Mã | Tên | Đơn vị | Trạng thái
-//   - Kẻ ô đầy đủ, có màu phân vùng
-//   - Đường nối bằng border (best effort với ExcelJS)
+//   - Kẻ border cho TẤT CẢ các dòng (kể cả trống)
+//   - Đường nối bằng border (best effort)
 // ============================================================
 
 export async function exportBracketToExcel(bracket, options = {}) {
@@ -156,7 +156,6 @@ function drawBracketSheet(ws, bracket, options) {
   h1.value = bracket.roundNames[0].toUpperCase();
   styleHeader(h1);
 
-  // Cột D spacer vẫn tô header
   styleHeader(ws.getCell(headerRow, 4));
 
   // Header vòng 2+
@@ -366,10 +365,10 @@ function drawMatch(ws, startRow, teamCol, scoreCol, match, options = {}) {
 }
 
 // ============================================================
-// DRAW REFERENCE COLUMN (5 cột: TT | Mã | Tên | Đơn vị | Trạng thái)
+// DRAW REFERENCE COLUMN — Kẻ border cho TẤT CẢ các dòng
 // ============================================================
 function drawReferenceColumn(ws, bracket, startRow, refCol, maxRow) {
-  // Lấy danh sách VĐV từ vòng 1
+  // ─── Lấy danh sách VĐV từ vòng 1 ───
   const allTeams = [];
   bracket.rounds[0].forEach((match) => {
     if (match.teamA) {
@@ -392,80 +391,113 @@ function drawReferenceColumn(ws, bracket, startRow, refCol, maxRow) {
     }
   });
 
-  allTeams.forEach((team, i) => {
+  // ─── Số dòng: = số VĐV + 5 dòng dự phòng ───
+  const numRows = allTeams.length;
+  const extraRows = 5;
+  const totalRows = numRows + extraRows;
+
+  // ─── Kẻ ô cho TẤT CẢ các dòng ───
+  for (let i = 0; i < totalRows; i++) {
     const r = startRow + i;
+    const team = allTeams[i];
     const isAlt = i % 2 === 1;
 
-    // ─── Cột 1: TT ───
+    // ─── KẺ BORDER CHO 5 CỘT ───
+    for (let c = 0; c < 5; c++) {
+      const cell = ws.getCell(r, refCol + c);
+      cell.border = {
+        top:    { style: 'thin', color: { argb: 'FF1E3A8A' } },
+        left:   { style: 'thin', color: { argb: 'FF1E3A8A' } },
+        bottom: { style: 'thin', color: { argb: 'FF1E3A8A' } },
+        right:  { style: 'thin', color: { argb: 'FF1E3A8A' } },
+      };
+    }
+
+    // ─── CỘT 1: TT ───
     const ttCell = ws.getCell(r, refCol);
-    ttCell.value = i + 1;
-    ttCell.font = { size: 10, bold: true, color: { argb: 'FF1E3A8A' } };
+    if (team) {
+      ttCell.value = i + 1;
+      ttCell.font = { size: 10, bold: true, color: { argb: 'FF1E3A8A' } };
+    } else {
+      ttCell.value = '';
+    }
     ttCell.alignment = { horizontal: 'center', vertical: 'middle' };
-    ttCell.border = border(C.borderStrong);
-    ttCell.fill = { type: 'pattern', pattern: 'solid', fgColor: { argb: C.refTTBg } };
+    ttCell.fill = { type: 'pattern', pattern: 'solid', fgColor: { argb: 'FFEFF6FF' } };
 
-    // ─── Cột 2: Mã ───
+    // ─── CỘT 2: Mã ───
     const codeCell = ws.getCell(r, refCol + 1);
-    codeCell.value = i + 1;
-    codeCell.font = { size: 10, color: { argb: 'FF1E3A8A' } };
+    if (team) {
+      codeCell.value = i + 1;
+      codeCell.font = { size: 10, color: { argb: 'FF1E3A8A' } };
+    } else {
+      codeCell.value = '';
+    }
     codeCell.alignment = { horizontal: 'center', vertical: 'middle' };
-    codeCell.border = border(C.borderStrong);
-    codeCell.fill = { type: 'pattern', pattern: 'solid', fgColor: { argb: C.refTTBg } };
+    codeCell.fill = { type: 'pattern', pattern: 'solid', fgColor: { argb: 'FFEFF6FF' } };
 
-    // ─── Cột 3: Tên VĐV ───
+    // ─── CỘT 3: Tên VĐV ───
     const nameCell = ws.getCell(r, refCol + 2);
-    nameCell.value = team.name || '—';
-    nameCell.font = {
-      size: 11,
-      bold: true,
-      color: { argb: team.isBye ? C.byeFg : 'FF0F172A' },
-    };
-    nameCell.alignment = { horizontal: 'left', vertical: 'middle', indent: 1 };
-    nameCell.border = border(C.borderStrong);
-    if (team.isBye) {
-      nameCell.fill = { type: 'pattern', pattern: 'solid', fgColor: { argb: C.refByeBg } };
-    } else if (isAlt) {
-      nameCell.fill = { type: 'pattern', pattern: 'solid', fgColor: { argb: C.refAltBg } };
+    if (team) {
+      nameCell.value = team.name || '—';
+      nameCell.font = {
+        size: 11,
+        bold: true,
+        color: { argb: team.isBye ? 'FFB45309' : 'FF0F172A' },
+      };
+      nameCell.alignment = { horizontal: 'left', vertical: 'middle', indent: 1 };
+      if (team.isBye) {
+        nameCell.fill = { type: 'pattern', pattern: 'solid', fgColor: { argb: 'FFFFF3CD' } };
+      } else if (isAlt) {
+        nameCell.fill = { type: 'pattern', pattern: 'solid', fgColor: { argb: 'FFF8FAFC' } };
+      }
+    } else {
+      nameCell.value = '';
+      nameCell.fill = { type: 'pattern', pattern: 'solid', fgColor: { argb: 'FFF8FAFC' } };
     }
 
-    // ─── Cột 4: Đơn vị ───
+    // ─── CỘT 4: Đơn vị ───
     const clubCell = ws.getCell(r, refCol + 3);
-    clubCell.value = team.club || '—';
-    clubCell.font = {
-      size: 10,
-      color: { argb: team.club ? 'FF1E3A8A' : 'FF94A3B8' },
-      italic: !team.club,
-    };
-    clubCell.alignment = { horizontal: 'left', vertical: 'middle', indent: 1 };
-    clubCell.border = border(C.borderStrong);
-    if (team.isBye) {
-      clubCell.fill = { type: 'pattern', pattern: 'solid', fgColor: { argb: C.refByeBg } };
-    } else if (isAlt) {
-      clubCell.fill = { type: 'pattern', pattern: 'solid', fgColor: { argb: C.refAltBg } };
+    if (team) {
+      clubCell.value = team.club || '—';
+      clubCell.font = {
+        size: 10,
+        color: { argb: team.club ? 'FF1E3A8A' : 'FF94A3B8' },
+        italic: !team.club,
+      };
+      clubCell.alignment = { horizontal: 'left', vertical: 'middle', indent: 1 };
+      if (team.isBye) {
+        clubCell.fill = { type: 'pattern', pattern: 'solid', fgColor: { argb: 'FFFFF3CD' } };
+      } else if (isAlt) {
+        clubCell.fill = { type: 'pattern', pattern: 'solid', fgColor: { argb: 'FFF8FAFC' } };
+      }
+    } else {
+      clubCell.value = '';
+      clubCell.fill = { type: 'pattern', pattern: 'solid', fgColor: { argb: 'FFF8FAFC' } };
     }
 
-    // ─── Cột 5: Trạng thái ───
+    // ─── CỘT 5: Trạng thái ───
     const statusCell = ws.getCell(r, refCol + 4);
-    let statusText = '';
-    if (team.isBye) statusText = '⭐ BYE';
-    else statusText = `Slot ${team.slot}`;
-
-    statusCell.value = statusText;
-    statusCell.font = {
-      size: 9,
-      bold: team.isBye,
-      color: { argb: team.isBye ? C.byeFg : 'FF64748B' },
-    };
-    statusCell.alignment = { horizontal: 'center', vertical: 'middle' };
-    statusCell.border = border(C.borderStrong);
-    if (team.isBye) {
-      statusCell.fill = { type: 'pattern', pattern: 'solid', fgColor: { argb: C.refByeBg } };
-    } else if (isAlt) {
-      statusCell.fill = { type: 'pattern', pattern: 'solid', fgColor: { argb: C.refAltBg } };
+    if (team) {
+      const statusText = team.isBye ? '⭐ BYE' : `Slot ${team.slot}`;
+      statusCell.value = statusText;
+      statusCell.font = {
+        size: 9,
+        bold: team.isBye,
+        color: { argb: team.isBye ? 'FFB45309' : 'FF64748B' },
+      };
+      statusCell.alignment = { horizontal: 'center', vertical: 'middle' };
+      if (team.isBye) {
+        statusCell.fill = { type: 'pattern', pattern: 'solid', fgColor: { argb: 'FFFFF3CD' } };
+      } else if (isAlt) {
+        statusCell.fill = { type: 'pattern', pattern: 'solid', fgColor: { argb: 'FFF8FAFC' } };
+      }
+    } else {
+      statusCell.value = '';
+      statusCell.fill = { type: 'pattern', pattern: 'solid', fgColor: { argb: 'FFF8FAFC' } };
     }
 
     ws.getRow(r).height = 20;
-  });
+  }
 }
 
 // ============================================================
