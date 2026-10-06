@@ -1,0 +1,506 @@
+/* ============================================================
+   banner-slider.css — Banner slider trang chủ SportsVN
+   ============================================================ */
+
+/* ============================================================
+   1. KHUNG BANNER CHÍNH
+   ============================================================ */
+.banner-section {
+  position: relative;
+  width: 100%;
+  height: 420px;
+  border-radius: 16px;
+  overflow: hidden;
+  background: #0f172a;
+  margin-bottom: 24px;
+  box-shadow: 0 4px 20px rgba(0, 0, 0, 0.15);
+}
+
+.banner-slides {
+  position: relative;
+  width: 100%;
+  height: 100%;
+}
+
+/* ============================================================
+   2. TỪNG SLIDE
+   ============================================================ */
+.banner-slide {
+  position: absolute;
+  inset: 0;
+  opacity: 0;
+  transition: opacity 0.6s ease, transform 0.6s ease;
+  transform: translateX(30px);
+  pointer-events: none;
+}
+
+.banner-slide.active {
+  opacity: 1;
+  transform: translateX(0);
+  z-index: 2;
+  pointer-events: auto;
+}
+
+.banner-slide.exit-left {
+  opacity: 0;
+  transform: translateX(-30px);
+  z-index: 1;
+}
+
+.banner-slide img {
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+  display: block;
+}
+
+/* Fallback khi ảnh lỗi */
+.banner-slide-fallback {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  height: 100%;
+  width: 100%;
+  color: #fff;
+  font-size: 2rem;
+  font-weight: 700;
+  background: linear-gradient(135deg, #1e3a8a, #0f172a);
+  text-align: center;
+  padding: 20px;
+}
+
+/* ============================================================
+   3. DOTS (chấm chuyển slide)
+   ============================================================ */
+.banner-dots {
+  position: absolute;
+  bottom: 16px;
+  left: 50%;
+  transform: translateX(-50%);
+  display: flex;
+  gap: 8px;
+  z-index: 10;
+  padding: 6px 12px;
+  background: rgba(0, 0, 0, 0.35);
+  border-radius: 20px;
+  backdrop-filter: blur(8px);
+}
+
+.banner-dot {
+  width: 10px;
+  height: 10px;
+  border-radius: 50%;
+  border: none;
+  background: rgba(255, 255, 255, 0.5);
+  cursor: pointer;
+  transition: all 0.3s;
+  padding: 0;
+}
+
+.banner-dot.active {
+  background: #c4f82a;
+  width: 24px;
+  border-radius: 5px;
+}
+
+.banner-dot:hover {
+  background: rgba(255, 255, 255, 0.9);
+}
+
+.banner-dot.active:hover {
+  background: #c4f82a;
+}
+
+/* ============================================================
+   4. NÚT ĐIỀU HƯỚNG PREV/NEXT
+   ============================================================ */
+.banner-nav-btn {
+  position: absolute;
+  top: 50%;
+  transform: translateY(-50%);
+  width: 44px;
+  height: 44px;
+  border-radius: 50%;
+  border: none;
+  background: rgba(0, 0, 0, 0.45);
+  color: #fff;
+  font-size: 1.6rem;
+  font-weight: 300;
+  cursor: pointer;
+  z-index: 10;
+  transition: all 0.2s;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  backdrop-filter: blur(8px);
+  user-select: none;
+  line-height: 1;
+}
+
+.banner-nav-btn:hover {
+  background: rgba(196, 248, 42, 0.9);
+  color: #0a0e1a;
+  transform: translateY(-50%) scale(1.1);
+}
+
+.banner-nav-btn.prev { left: 16px; }
+.banner-nav-btn.next { right: 16px; }
+
+/* ============================================================
+   5. NÚT CHỈNH SỬA (Admin)
+   ============================================================ */
+.banner-edit-btn {
+  position: absolute;
+  top: 16px;
+  right: 16px;
+  z-index: 20;
+  background: rgba(37, 99, 235, 0.9);
+  color: #fff;
+  border: none;
+  padding: 10px 18px;
+  border-radius: 10px;
+  font-size: 0.9rem;
+  font-weight: 700;
+  cursor: pointer;
+  display: flex;
+  align-items: center;
+  gap: 6px;
+  transition: all 0.2s;
+  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.3);
+  backdrop-filter: blur(10px);
+  font-family: inherit;
+}
+
+.banner-edit-btn:hover {
+  background: #1d4ed8;
+  transform: translateY(-2px);
+  box-shadow: 0 6px 16px rgba(37, 99, 235, 0.5);
+}
+
+/* ============================================================
+   6. MODAL QUẢN LÝ ẢNH
+   ============================================================ */
+.banner-modal-overlay {
+  position: fixed;
+  inset: 0;
+  background: rgba(0, 0, 0, 0.7);
+  z-index: 9999;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  padding: 20px;
+  animation: banner-fadeIn 0.2s ease;
+}
+
+@keyframes banner-fadeIn {
+  from { opacity: 0; }
+  to { opacity: 1; }
+}
+
+.banner-modal {
+  background: #fff;
+  border-radius: 16px;
+  width: 100%;
+  max-width: 720px;
+  max-height: 85vh;
+  display: flex;
+  flex-direction: column;
+  overflow: hidden;
+  box-shadow: 0 20px 60px rgba(0, 0, 0, 0.4);
+}
+
+.banner-modal-header {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  padding: 18px 24px;
+  border-bottom: 1px solid #e5e7eb;
+}
+
+.banner-modal-header h3 {
+  margin: 0;
+  font-size: 1.15rem;
+  color: #0f172a;
+}
+
+.banner-modal-close {
+  background: none;
+  border: none;
+  font-size: 1.4rem;
+  cursor: pointer;
+  color: #6b7280;
+  width: 36px;
+  height: 36px;
+  border-radius: 8px;
+  transition: all 0.2s;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+
+.banner-modal-close:hover {
+  background: #fee2e2;
+  color: #ef4444;
+}
+
+.banner-modal-body {
+  padding: 20px 24px;
+  overflow-y: auto;
+  flex: 1;
+}
+
+/* ============================================================
+   7. UPLOAD AREA
+   ============================================================ */
+.banner-upload-area {
+  border: 2px dashed #cbd5e1;
+  border-radius: 12px;
+  padding: 28px 20px;
+  text-align: center;
+  cursor: pointer;
+  transition: all 0.2s;
+  background: #f8fafc;
+  margin-bottom: 20px;
+}
+
+.banner-upload-area:hover,
+.banner-upload-area.dragover {
+  border-color: #2563eb;
+  background: #eff6ff;
+  transform: scale(1.01);
+}
+
+.banner-upload-icon {
+  font-size: 2.5rem;
+  display: block;
+  margin-bottom: 10px;
+}
+
+.banner-upload-inner p {
+  margin: 4px 0;
+  font-size: 0.95rem;
+  color: #334155;
+}
+
+.banner-upload-inner small {
+  color: #94a3b8;
+  font-size: 0.8rem;
+}
+
+/* ============================================================
+   8. DANH SÁCH ẢNH TRONG MODAL
+   ============================================================ */
+.banner-list {
+  display: flex;
+  flex-direction: column;
+  gap: 10px;
+  margin-top: 8px;
+}
+
+.banner-list-item {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  padding: 10px;
+  border: 1px solid #e5e7eb;
+  border-radius: 10px;
+  transition: all 0.2s;
+  background: white;
+}
+
+.banner-list-item:hover {
+  background: #f9fafb;
+  border-color: #cbd5e1;
+}
+
+.banner-list-item img {
+  width: 110px;
+  height: 62px;
+  object-fit: cover;
+  border-radius: 8px;
+  flex-shrink: 0;
+  background: #f1f5f9;
+}
+
+.banner-list-info {
+  flex: 1;
+  display: flex;
+  flex-direction: column;
+  gap: 3px;
+  min-width: 0;
+}
+
+.banner-list-name {
+  font-size: 0.9rem;
+  font-weight: 600;
+  color: #0f172a;
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+}
+
+.banner-list-index {
+  font-size: 0.78rem;
+  color: #6b7280;
+}
+
+.banner-list-delete {
+  background: #fee2e2;
+  border: none;
+  width: 40px;
+  height: 40px;
+  border-radius: 10px;
+  cursor: pointer;
+  font-size: 1.05rem;
+  transition: all 0.2s;
+  flex-shrink: 0;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+
+.banner-list-delete:hover {
+  background: #fecaca;
+  transform: scale(1.05);
+}
+
+.banner-list-loading,
+.banner-list-empty {
+  text-align: center;
+  color: #6b7280;
+  padding: 24px 20px;
+  font-size: 0.9rem;
+  background: #f8fafc;
+  border-radius: 10px;
+  border: 1px dashed #e5e7eb;
+}
+
+/* ============================================================
+   9. MODAL FOOTER
+   ============================================================ */
+.banner-modal-footer {
+  padding: 14px 24px;
+  border-top: 1px solid #e5e7eb;
+  display: flex;
+  justify-content: flex-end;
+  gap: 10px;
+  background: #f9fafb;
+}
+
+.banner-btn-close {
+  background: #f3f4f6;
+  border: none;
+  padding: 10px 22px;
+  border-radius: 10px;
+  cursor: pointer;
+  font-weight: 700;
+  font-size: 0.9rem;
+  transition: all 0.2s;
+  color: #334155;
+  font-family: inherit;
+}
+
+.banner-btn-close:hover {
+  background: #e5e7eb;
+  transform: translateY(-1px);
+}
+
+/* ============================================================
+   10. RESPONSIVE MOBILE
+   ============================================================ */
+@media (max-width: 768px) {
+  .banner-section {
+    height: 240px;
+    border-radius: 12px;
+    margin-bottom: 16px;
+  }
+
+  .banner-nav-btn {
+    width: 36px;
+    height: 36px;
+    font-size: 1.3rem;
+  }
+
+  .banner-nav-btn.prev { left: 8px; }
+  .banner-nav-btn.next { right: 8px; }
+
+  .banner-edit-btn {
+    font-size: 0.78rem;
+    padding: 7px 12px;
+    top: 10px;
+    right: 10px;
+  }
+
+  .banner-dots {
+    bottom: 10px;
+    padding: 4px 10px;
+  }
+
+  .banner-dot {
+    width: 8px;
+    height: 8px;
+  }
+
+  .banner-dot.active {
+    width: 18px;
+  }
+
+  .banner-modal {
+    max-height: 90vh;
+  }
+
+  .banner-modal-body {
+    padding: 16px;
+  }
+
+  .banner-list-item img {
+    width: 80px;
+    height: 48px;
+  }
+
+  .banner-list-name {
+    font-size: 0.82rem;
+  }
+
+  .banner-list-delete {
+    width: 34px;
+    height: 34px;
+    font-size: 0.95rem;
+  }
+}
+
+@media (max-width: 480px) {
+  .banner-section {
+    height: 200px;
+  }
+
+  .banner-upload-area {
+    padding: 20px 14px;
+  }
+
+  .banner-upload-icon {
+    font-size: 2rem;
+  }
+}
+
+/* ============================================================
+   11. TIỆN ÍCH CHUNG
+   ============================================================ */
+.banner-hidden {
+  display: none !important;
+}
+
+/* Hiệu ứng loading cho nút */
+.banner-loading-spinner {
+  display: inline-block;
+  width: 14px;
+  height: 14px;
+  border: 2px solid rgba(255, 255, 255, 0.3);
+  border-top-color: #fff;
+  border-radius: 50%;
+  animation: banner-spin 0.8s linear infinite;
+}
+
+@keyframes banner-spin {
+  to { transform: rotate(360deg); }
+}
