@@ -7,180 +7,38 @@
     <link rel="stylesheet" href="styles.css">
     <script src="sidebar.js" defer></script>
     <style>
-        .ranking-header {
-            display: flex;
-            justify-content: space-between;
-            align-items: center;
-            margin-bottom: 24px;
-            flex-wrap: wrap;
-            gap: 16px;
-        }
-        .ranking-header h1 {
-            font-size: 28px;
-            font-weight: 900;
-            color: var(--text-dark);
-        }
-        .ranking-header p {
-            color: var(--text-muted);
-            font-size: 14px;
-            margin-top: 4px;
-        }
-        .ranking-tabs {
-            display: flex;
-            gap: 8px;
-            margin-bottom: 24px;
-            background: #f3f4f6;
-            padding: 6px;
-            border-radius: 12px;
-            width: fit-content;
-            flex-wrap: wrap;
-        }
-        .ranking-tab {
-            padding: 10px 20px;
-            border-radius: 8px;
-            font-size: 13px;
-            font-weight: 700;
-            color: var(--text-muted);
-            cursor: pointer;
-            border: 0;
-            background: transparent;
-            transition: all 0.2s;
-        }
-        .ranking-tab.active {
-            background: #fff;
-            color: var(--primary);
-            box-shadow: 0 2px 8px rgba(0, 0, 0, 0.08);
-        }
-        .ranking-panel {
-            background: #fff;
-            border-radius: 16px;
-            border: 1px solid var(--border);
-            box-shadow: 0 1px 3px rgba(0, 0, 0, 0.08);
-            overflow: hidden;
-        }
-        .ranking-table {
-            width: 100%;
-            border-collapse: collapse;
-        }
-        .ranking-table thead {
-            background: #fafbfc;
-            border-bottom: 2px solid var(--border);
-        }
-        .ranking-table th {
-            padding: 14px 16px;
-            text-align: left;
-            font-size: 11.5px;
-            font-weight: 800;
-            color: var(--text-muted);
-            text-transform: uppercase;
-            letter-spacing: 0.5px;
-        }
-        .ranking-table th.center {
-            text-align: center;
-        }
-        .ranking-table tbody tr {
-            border-bottom: 1px solid var(--border-light);
-            transition: background 0.15s;
-        }
-        .ranking-table tbody tr:hover {
-            background: #f9fafb;
-        }
-        .ranking-table td {
-            padding: 14px 16px;
-            font-size: 13.5px;
-            color: var(--text);
-        }
-        .ranking-table td.center {
-            text-align: center;
-        }
-        .rank-number {
-            display: inline-flex;
-            align-items: center;
-            justify-content: center;
-            width: 32px;
-            height: 32px;
-            border-radius: 50%;
-            background: #f3f4f6;
-            font-weight: 800;
-            font-size: 13px;
-            color: var(--text-dark);
-        }
-        .rank-number.gold {
-            background: linear-gradient(135deg, #fbbf24, #f59e0b);
-            color: #fff;
-        }
-        .rank-number.silver {
-            background: linear-gradient(135deg, #d1d5db, #9ca3af);
-            color: #fff;
-        }
-        .rank-number.bronze {
-            background: linear-gradient(135deg, #d97706, #b45309);
-            color: #fff;
-        }
-        .team-name {
-            display: flex;
-            align-items: center;
-            gap: 10px;
-            font-weight: 700;
-            color: var(--text-dark);
-        }
-        .team-avatar {
-            width: 36px;
-            height: 36px;
-            border-radius: 50%;
-            background: linear-gradient(135deg, #dbeafe, #bfdbfe);
-            color: var(--primary);
-            display: flex;
-            align-items: center;
-            justify-content: center;
-            font-weight: 800;
-            font-size: 13px;
-            flex-shrink: 0;
-        }
-        .medal {
-            display: inline-flex;
-            align-items: center;
-            gap: 4px;
-            font-weight: 700;
-            font-size: 13px;
-        }
-        .points-badge {
-            display: inline-block;
-            padding: 4px 10px;
-            background: var(--primary-light);
-            color: var(--primary);
-            border-radius: 20px;
-            font-weight: 800;
-            font-size: 12px;
-        }
-        .empty-state {
-            text-align: center;
-            padding: 80px 20px;
-            color: var(--text-muted);
-        }
-        .empty-state-icon {
-            font-size: 64px;
-            margin-bottom: 16px;
-            opacity: 0.5;
-        }
-        .empty-state h3 {
-            color: var(--text-dark);
-            margin-bottom: 8px;
-            font-size: 20px;
-        }
-        .empty-state p {
-            font-size: 13px;
-        }
+        /* Giữ nguyên CSS cũ của bạn */
+        .ranking-header { display: flex; justify-content: space-between; align-items: center; margin-bottom: 24px; flex-wrap: wrap; gap: 16px; }
+        .ranking-header h1 { font-size: 28px; font-weight: 900; color: var(--text-dark); }
+        .ranking-header p { color: var(--text-muted); font-size: 14px; margin-top: 4px; }
+        .ranking-tabs { display: flex; gap: 8px; margin-bottom: 24px; background: #f3f4f6; padding: 6px; border-radius: 12px; width: fit-content; flex-wrap: wrap; }
+        .ranking-tab { padding: 10px 20px; border-radius: 8px; font-size: 13px; font-weight: 700; color: var(--text-muted); cursor: pointer; border: 0; background: transparent; transition: all 0.2s; }
+        .ranking-tab.active { background: #fff; color: var(--primary); box-shadow: 0 2px 8px rgba(0, 0, 0, 0.08); }
+        .ranking-panel { background: #fff; border-radius: 16px; border: 1px solid var(--border); box-shadow: 0 1px 3px rgba(0, 0, 0, 0.08); overflow: hidden; }
+        .ranking-table { width: 100%; border-collapse: collapse; }
+        .ranking-table thead { background: #fafbfc; border-bottom: 2px solid var(--border); }
+        .ranking-table th { padding: 14px 16px; text-align: left; font-size: 11.5px; font-weight: 800; color: var(--text-muted); text-transform: uppercase; letter-spacing: 0.5px; }
+        .ranking-table th.center { text-align: center; }
+        .ranking-table tbody tr { border-bottom: 1px solid var(--border-light); transition: background 0.15s; }
+        .ranking-table tbody tr:hover { background: #f9fafb; }
+        .ranking-table td { padding: 14px 16px; font-size: 13.5px; color: var(--text); }
+        .ranking-table td.center { text-align: center; }
+        .rank-number { display: inline-flex; align-items: center; justify-content: center; width: 32px; height: 32px; border-radius: 50%; background: #f3f4f6; font-weight: 800; font-size: 13px; color: var(--text-dark); }
+        .rank-number.gold { background: linear-gradient(135deg, #fbbf24, #f59e0b); color: #fff; }
+        .rank-number.silver { background: linear-gradient(135deg, #d1d5db, #9ca3af); color: #fff; }
+        .rank-number.bronze { background: linear-gradient(135deg, #d97706, #b45309); color: #fff; }
+        .team-name { display: flex; align-items: center; gap: 10px; font-weight: 700; color: var(--text-dark); }
+        .team-avatar { width: 36px; height: 36px; border-radius: 50%; background: linear-gradient(135deg, #dbeafe, #bfdbfe); color: var(--primary); display: flex; align-items: center; justify-content: center; font-weight: 800; font-size: 13px; flex-shrink: 0; }
+        .medal { display: inline-flex; align-items: center; gap: 4px; font-weight: 700; font-size: 13px; }
+        .points-badge { display: inline-block; padding: 4px 10px; background: var(--primary-light); color: var(--primary); border-radius: 20px; font-weight: 800; font-size: 12px; }
+        .empty-state { text-align: center; padding: 80px 20px; color: var(--text-muted); }
+        .empty-state-icon { font-size: 64px; margin-bottom: 16px; opacity: 0.5; }
+        .empty-state h3 { color: var(--text-dark); margin-bottom: 8px; font-size: 20px; }
+        .empty-state p { font-size: 13px; }
         @media (max-width: 640px) {
             .ranking-header h1 { font-size: 22px; }
-            .ranking-table th, .ranking-table td {
-                padding: 10px 8px;
-                font-size: 12px;
-            }
-            .ranking-table th:nth-child(4),
-            .ranking-table td:nth-child(4) {
-                display: none;
-            }
+            .ranking-table th, .ranking-table td { padding: 10px 8px; font-size: 12px; }
+            .ranking-table th:nth-child(4), .ranking-table td:nth-child(4) { display: none; }
         }
     </style>
 </head>
@@ -188,8 +46,6 @@
 <body>
 
     <div class="app">
-
-        <!-- Sidebar tự động render bởi sidebar.js -->
 
         <main class="main">
 
@@ -202,7 +58,6 @@
                         <p class="topbar-subtitle">Bảng thành tích thể thao</p>
                     </div>
                 </div>
-
                 <div class="topbar-right">
                     <a href="index.html" class="topbar-cta" style="background: #f3f4f6; color: #4b5563; box-shadow: none;">
                         ← Về trang chủ
@@ -243,9 +98,9 @@
                             <tr>
                                 <td colspan="6">
                                     <div class="empty-state">
-                                        <div class="empty-state-icon">📊</div>
-                                        <h3>Bảng thành tích đang được cập nhật</h3>
-                                        <p>Dữ liệu sẽ được cập nhật sau các giải đấu</p>
+                                        <div class="empty-state-icon">⏳</div>
+                                        <h3>Đang tải dữ liệu...</h3>
+                                        <p>Vui lòng chờ trong giây lát</p>
                                     </div>
                                 </td>
                             </tr>
@@ -268,7 +123,7 @@
     <script src="config.js"></script>
     <script>
         // ==========================================
-        // BẢNG THÀNH TÍCH - SUPABASE
+        // BẢNG THÀNH TÍCH - SUPABASE (REAL DATA)
         // ==========================================
         
         let supabaseClient = null;
@@ -287,19 +142,78 @@
                 config.SUPABASE_ANON_KEY
             );
 
-            // Dữ liệu mẫu (sẽ thay bằng Supabase sau)
-            const sampleRankings = [
-                { rank: 1, team: 'Đoàn Đà Nẵng', gold: 27, silver: 23, bronze: 39 },
-                { rank: 2, team: 'Đoàn Hà Nội', gold: 22, silver: 18, bronze: 25 },
-                { rank: 3, team: 'Đoàn TP.HCM', gold: 18, silver: 21, bronze: 19 },
-                { rank: 4, team: 'Đoàn Hải Phòng', gold: 15, silver: 14, bronze: 20 },
-                { rank: 5, team: 'Đoàn Cần Thơ', gold: 12, silver: 16, bronze: 15 },
-                { rank: 6, team: 'Đoàn Nghệ An', gold: 10, silver: 11, bronze: 14 },
-                { rank: 7, team: 'Đoàn Huế', gold: 8, silver: 9, bronze: 12 },
-                { rank: 8, team: 'Đoàn Khánh Hòa', gold: 6, silver: 8, bronze: 10 }
-            ];
+            // Gọi hàm tải dữ liệu ban đầu
+            fetchAndRenderRanking('all');
 
-            renderRanking(sampleRankings);
+            // ===== HÀM LẤY DỮ LIỆU TỪ SUPABASE =====
+            async function fetchAndRenderRanking(sportFilter = 'all') {
+                const tbody = document.getElementById('rankingBody');
+                
+                // Hiển thị trạng thái đang tải
+                tbody.innerHTML = `
+                    <tr>
+                        <td colspan="6">
+                            <div class="empty-state">
+                                <div class="empty-state-icon">⏳</div>
+                                <h3>Đang tải dữ liệu...</h3>
+                            </div>
+                        </td>
+                    </tr>
+                `;
+
+                try {
+                    // Tạo câu truy vấn
+                    let query = supabaseClient
+                        .from('medals') // Tên bảng của bạn trên Supabase
+                        .select('team_name, gold, silver, bronze, sport');
+
+                    // Nếu không phải 'all', lọc theo môn
+                    if (sportFilter !== 'all') {
+                        query = query.eq('sport', sportFilter);
+                    }
+
+                    const { data, error } = await query;
+
+                    if (error) throw error;
+
+                    // Xử lý dữ liệu: Tính tổng và Sắp xếp
+                    // Lưu ý: Nếu trên Supabase mỗi dòng là 1 huy chương, bạn cần dùng hàm SUM.
+                    // Ở đây tôi giả định bảng của bạn đã có sẵn cột gold, silver, bronze (dạng số).
+                    const processedData = data.map(item => ({
+                        ...item,
+                        total: (item.gold || 0) + (item.silver || 0) + (item.bronze || 0)
+                    }));
+
+                    // Sắp xếp: Vàng > Bạc > Đồng > Tổng
+                    processedData.sort((a, b) => {
+                        if (b.gold !== a.gold) return b.gold - a.gold;
+                        if (b.silver !== a.silver) return b.silver - a.silver;
+                        if (b.bronze !== a.bronze) return b.bronze - a.bronze;
+                        return b.total - a.total;
+                    });
+
+                    // Thêm số thứ tự (Rank)
+                    processedData.forEach((item, index) => {
+                        item.rank = index + 1;
+                    });
+
+                    renderRanking(processedData);
+
+                } catch (err) {
+                    console.error('Lỗi tải dữ liệu:', err);
+                    tbody.innerHTML = `
+                        <tr>
+                            <td colspan="6">
+                                <div class="empty-state">
+                                    <div class="empty-state-icon">⚠️</div>
+                                    <h3>Lỗi tải dữ liệu</h3>
+                                    <p>${err.message}</p>
+                                </div>
+                            </td>
+                        </tr>
+                    `;
+                }
+            }
 
             // ===== RENDER BẢNG =====
             function renderRanking(data) {
@@ -326,8 +240,7 @@
                     else if (item.rank === 2) rankClass = 'silver';
                     else if (item.rank === 3) rankClass = 'bronze';
 
-                    const total = item.gold + item.silver + item.bronze;
-                    const initials = item.team.split(' ').map(w => w[0]).join('').slice(0, 2).toUpperCase();
+                    const initials = item.team_name.split(' ').map(w => w[0]).join('').slice(0, 2).toUpperCase();
 
                     return `
                         <tr>
@@ -337,20 +250,20 @@
                             <td>
                                 <div class="team-name">
                                     <div class="team-avatar">${initials}</div>
-                                    <span>${item.team}</span>
+                                    <span>${item.team_name}</span>
                                 </div>
                             </td>
                             <td class="center">
-                                <span class="medal">🥇 ${item.gold}</span>
+                                <span class="medal">🥇 ${item.gold || 0}</span>
                             </td>
                             <td class="center">
-                                <span class="medal">🥈 ${item.silver}</span>
+                                <span class="medal">🥈 ${item.silver || 0}</span>
                             </td>
                             <td class="center">
-                                <span class="medal">🥉 ${item.bronze}</span>
+                                <span class="medal">🥉 ${item.bronze || 0}</span>
                             </td>
                             <td class="center">
-                                <span class="points-badge">${total}</span>
+                                <span class="points-badge">${item.total}</span>
                             </td>
                         </tr>
                     `;
@@ -362,10 +275,9 @@
                 tab.addEventListener('click', () => {
                     document.querySelectorAll('.ranking-tab').forEach(t => t.classList.remove('active'));
                     tab.classList.add('active');
-
-                    // Tạm thời dùng chung dữ liệu mẫu
-                    // Sau này sẽ filter theo môn từ Supabase
-                    renderRanking(sampleRankings);
+                    
+                    const sport = tab.getAttribute('data-sport');
+                    fetchAndRenderRanking(sport);
                 });
             });
 
