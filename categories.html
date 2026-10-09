@@ -161,11 +161,95 @@
             align-items: center;
         }
 
+        /* ============================================ */
+        /* FIX LỖI SỐ 5: Ô NHẬP ĐIỂM CHIA ĐỀU */
+        /* ============================================ */
+        .set-row {
+            display: grid;
+            grid-template-columns: 80px 1fr 70px 70px 1fr;
+            gap: 10px;
+            align-items: center;
+            margin-bottom: 12px;
+            padding: 14px;
+            background: #f8f9fa;
+            border-radius: 10px;
+            border-left: 4px solid #1a3a7a;
+        }
+
+        .set-row .set-label {
+            font-weight: 800;
+            color: #1a3a7a;
+            font-size: 13px;
+            text-align: center;
+        }
+
+        .set-row .team-name-display {
+            font-weight: 700;
+            color: #1a1a2e;
+            font-size: 13px;
+            white-space: nowrap;
+            overflow: hidden;
+            text-overflow: ellipsis;
+        }
+
+        .set-row .team-name-display.right {
+            text-align: right;
+        }
+
+        .set-row input.score-input {
+            width: 70px;
+            height: 48px;
+            padding: 0;
+            border: 2px solid #e9ecef;
+            border-radius: 8px;
+            text-align: center;
+            font-weight: 800;
+            font-size: 20px;
+            color: #1a3a7a;
+            box-sizing: border-box;
+            background: #fff;
+            transition: all 0.2s ease;
+        }
+
+        .set-row input.score-input:focus {
+            outline: none;
+            border-color: #1a3a7a;
+            box-shadow: 0 0 0 3px rgba(26, 58, 122, 0.15);
+        }
+
+        .set-row input.score-input.winner {
+            background: #d4edda;
+            border-color: #00b894;
+            color: #155724;
+        }
+
+        .set-row input.score-input.loser {
+            background: #f8d7da;
+            border-color: #e94560;
+            color: #721c24;
+        }
+
+        .set-row input.score-input:disabled {
+            background: #e9ecef;
+            color: #adb5bd;
+            cursor: not-allowed;
+        }
+
         @media (max-width: 768px) {
             .form-grid { grid-template-columns: 1fr; }
             .category-main { flex-direction: column; }
             .bracket-wrap { flex-direction: column; }
             .bracket-round { min-width: 100%; }
+            .set-row {
+                grid-template-columns: 60px 1fr 60px 60px 1fr;
+                gap: 6px;
+                padding: 10px;
+            }
+            .set-row input.score-input {
+                width: 60px;
+                height: 42px;
+                font-size: 17px;
+            }
         }
         @media print {
             .modal-close, .modal-actions, .no-print { display: none !important; }
@@ -397,7 +481,7 @@
 (function() {
     'use strict';
 
-    console.log('🚀 categories.html v7 - Nút Xuất Excel trong Điều hành');
+    console.log('🚀 categories.html v8 - Fix ô nhập điểm chia đều');
 
     const config = window.SPORTSVN_CONFIG || {};
     const supabaseClient = window.supabase.createClient(config.SUPABASE_URL, config.SUPABASE_ANON_KEY);
@@ -1416,7 +1500,6 @@
         };
 
         // Tiêu đề
-        // Tiêu đề
         ws.addRow([`${catName.toUpperCase()} - DANH SÁCH TRẬN & KẾT QUẢ`]);
         ws.mergeCells(`A1:H1`);
         const titleCell = ws.getCell('A1');
@@ -1858,12 +1941,12 @@
 
         for (let i = 1; i <= maxSets; i++) {
             html += `
-                <div class="set-row" id="set-row-${i}" style="display: grid; grid-template-columns: 70px 1fr 50px 1fr 1fr; gap: 12px; align-items: center; margin-bottom: 12px; padding: 14px; background: #f8f9fa; border-radius: 10px; border-left: 4px solid #1a3a7a;">
-                    <span style="font-weight: 800; color: #1a3a7a; font-size: 13px; text-align: center;">SÉC ${i}</span>
-                    <div style="font-weight: 700; color: #1a1a2e; font-size: 13px; white-space: nowrap; overflow: hidden; text-overflow: ellipsis;">${escapeHtml(teamA)}</div>
-                    <input type="number" id="set-${i}-a" min="0" max="99" oninput="checkSetWinner(${i})" placeholder="0" style="width: 100%; padding: 10px; border: 2px solid #e9ecef; border-radius: 8px; text-align: center; font-weight: 800; font-size: 18px; color: #1a3a7a;">
-                    <input type="number" id="set-${i}-b" min="0" max="99" oninput="checkSetWinner(${i})" placeholder="0" style="width: 100%; padding: 10px; border: 2px solid #e9ecef; border-radius: 8px; text-align: center; font-weight: 800; font-size: 18px; color: #1a3a7a;">
-                    <div style="font-weight: 700; color: #1a1a2e; font-size: 13px; text-align: right; white-space: nowrap; overflow: hidden; text-overflow: ellipsis;">${escapeHtml(teamB)}</div>
+                <div class="set-row" id="set-row-${i}">
+                    <span class="set-label">SÉC ${i}</span>
+                    <div class="team-name-display">${escapeHtml(teamA)}</div>
+                    <input type="number" id="set-${i}-a" min="0" max="99" oninput="checkSetWinner(${i})" placeholder="0" class="score-input">
+                    <input type="number" id="set-${i}-b" min="0" max="99" oninput="checkSetWinner(${i})" placeholder="0" class="score-input">
+                    <div class="team-name-display right">${escapeHtml(teamB)}</div>
                 </div>
             `;
         }
@@ -1913,17 +1996,10 @@
             if (valA > valB) {
                 a.classList.add('winner');
                 b.classList.add('loser');
-                a.style.background = '#d4edda';
-                b.style.background = '#f8d7da';
             } else {
                 b.classList.add('winner');
                 a.classList.add('loser');
-                b.style.background = '#d4edda';
-                a.style.background = '#f8d7da';
             }
-        } else {
-            a.style.background = '#fff';
-            b.style.background = '#fff';
         }
 
         checkAllSets();
