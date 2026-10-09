@@ -1,6 +1,6 @@
 // ============================================================
 // bracket-engine.js — Bracket engine chuẩn (cây đấu)
-// Version 2.0 — Fix BYE distribution theo chuẩn thể thao
+// Version 2.1 — Fix lỗi Bye nhảy cóc + tối ưu logic tạo vòng
 // Hỗ trợ: BYE, tranh hạng 3, validate, ghi kết quả
 // ============================================================
 
@@ -35,21 +35,30 @@ export function createBracket(teams, options = {}) {
     customByes = unique;
   }
 
-  // Build vòng 1
+  // ============================================================
+  // BƯỚC 1: Build vòng 1 (ghép cặp + chèn BYE)
+  // ============================================================
   const firstRound = buildFirstRound(teams, bracketSize, numByes, customByes);
 
-  // Build các vòng sau
+  // ============================================================
+  // BƯỚC 2: Build các vòng sau (FIX LỖI BYE NHẢY CÓC)
+  // ============================================================
   const rounds = [firstRound];
-  let prevMatchCount = firstRound.length;
+  
+  // Số VĐV ở Vòng 2 = bracketSize / 2 (vì mỗi trận Vòng 1 chọn ra 1 người)
+  // Đây là điểm mấu chốt: Vòng 2 luôn có đủ số VĐV, bất kể có bao nhiêu Bye.
+  let currentRoundPlayerCount = bracketSize / 2; 
   let roundIdx = 2;
 
-  while (prevMatchCount > 1) {
-    const matchCount = prevMatchCount / 2;
+  while (currentRoundPlayerCount > 1) {
+    const matchCount = currentRoundPlayerCount / 2;
     const matches = [];
+    const prevRound = rounds[roundIdx - 2];
 
     for (let i = 0; i < matchCount; i++) {
-      const fromMatchA = rounds[roundIdx - 2][i * 2];
-      const fromMatchB = rounds[roundIdx - 2][i * 2 + 1];
+      // Lấy 2 trận từ vòng trước để ghép thành 1 trận vòng này
+      const fromMatchA = prevRound[i * 2];
+      const fromMatchB = prevRound[i * 2 + 1];
 
       matches.push({
         id: `R${roundIdx}_M${i + 1}`,
@@ -61,8 +70,8 @@ export function createBracket(teams, options = {}) {
         scoreB: null,
         winner: null,
         status: 'pending',
-        fromA: fromMatchA.id,
-        fromB: fromMatchB.id,
+        fromA: fromMatchA ? fromMatchA.id : null,
+        fromB: fromMatchB ? fromMatchB.id : null,
         isBye: false,
         isPlaceholder: true,
       });
@@ -70,7 +79,9 @@ export function createBracket(teams, options = {}) {
 
     matches.forEach((m) => updateMatchStatus(m, rounds));
     rounds.push(matches);
-    prevMatchCount = matchCount;
+    
+    // Cập nhật số VĐV cho vòng tiếp theo
+    currentRoundPlayerCount = matchCount;
     roundIdx++;
   }
 
