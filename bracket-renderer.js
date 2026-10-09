@@ -1,6 +1,6 @@
 // ============================================================
 // bracket-renderer.js — Render bracket đẹp + zoom/pan
-// Style giống referee.vn
+// Đã tối ưu hóa xử lý BYE và hiển thị VĐV được đặc cách
 // ============================================================
 
 /**
@@ -22,11 +22,11 @@ export function renderBracket(bracket, container, options = {}) {
   } = options;
 
   // Layout constants
-  const SLOT_HEIGHT = 40;      // chiều cao 1 đội
-  const MATCH_HEIGHT = 88;     // chiều cao 1 match (2 đội + padding)
-  const MATCH_GAP = 12;        // khoảng cách giữa các match
-  const COL_WIDTH = 240;       // chiều rộng 1 cột
-  const CONNECTOR_WIDTH = 50;  // khoảng cách giữa các cột
+  const SLOT_HEIGHT = 40;
+  const MATCH_HEIGHT = 88;
+  const MATCH_GAP = 12;
+  const COL_WIDTH = 240;
+  const CONNECTOR_WIDTH = 50;
 
   // Tính chiều cao mỗi vòng
   const firstRoundMatchCount = bracket.rounds[0].length;
@@ -83,7 +83,6 @@ export function renderBracket(bracket, container, options = {}) {
     const toLeft = (rIdx + 1) * (COL_WIDTH + CONNECTOR_WIDTH);
 
     fromRound.forEach((fromMatch, mIdx) => {
-      // Tìm match đích
       const toMatchIdx = Math.floor(mIdx / 2);
       const toMatch = toRound[toMatchIdx];
       if (!toMatch) return;
@@ -92,7 +91,6 @@ export function renderBracket(bracket, container, options = {}) {
       const toY = matchPositions[rIdx + 1][toMatchIdx] + MATCH_HEIGHT / 2;
       const midX = fromLeft + CONNECTOR_WIDTH / 2;
 
-      // Path: from → mid → to
       html += `
         <path
           d="M ${fromLeft} ${fromY} L ${midX} ${fromY} L ${midX} ${toY} L ${toLeft} ${toY}"
@@ -108,7 +106,7 @@ export function renderBracket(bracket, container, options = {}) {
 
   html += `</svg>`;
 
-  // Tranh hạng 3 (nếu có và không phải vòng đầu)
+  // Tranh hạng 3
   if (showThirdPlace && bracket.thirdPlaceMatch && bracket.rounds.length >= 2) {
     const thirdTop = totalHeight + 20;
     const thirdLeft = (bracket.rounds.length - 2) * (COL_WIDTH + CONNECTOR_WIDTH);
@@ -154,6 +152,7 @@ export function renderBracket(bracket, container, options = {}) {
 
 /**
  * Render HTML cho 1 match card
+ * ĐÃ SỬA: Xử lý hiển thị Bye chính xác hơn
  */
 function renderMatchCard(match, opts) {
   const {
@@ -180,6 +179,18 @@ function renderMatchCard(match, opts) {
   else if (match.status === 'ready') statusBadge = '<span class="match-status-ready">🎯 Chưa đấu</span>';
   else if (match.isBye) statusBadge = '<span class="match-status-bye">⭐ BYE</span>';
 
+  // === XỬ LÝ HIỂN THỊ TÊN VĐV (SỬA LỖI SỐ 4) ===
+  // Logic: Nếu có tên VĐV -> hiển thị tên. Nếu không có tên nhưng là trận Bye -> hiển thị "Đặc cách".
+  // Nếu không có gì -> hiển thị "—"
+  
+  const displayTeamA = teamA 
+    ? escapeHtml(teamA.name) 
+    : (match.isBye ? '<span style="color:#f59e0b; font-weight:800;">⭐ Đặc cách</span>' : '—');
+    
+  const displayTeamB = teamB 
+    ? escapeHtml(teamB.name) 
+    : (match.isBye ? '<span style="color:#f59e0b; font-weight:800;">⭐ Đặc cách</span>' : '—');
+
   return `
     <div
       class="${cls}"
@@ -190,15 +201,15 @@ function renderMatchCard(match, opts) {
         <span class="match-id">${match.id}</span>
         ${statusBadge}
       </div>
-      <div class="match-team ${isWinnerA ? 'winner' : match.winner ? 'loser' : ''} ${!teamA ? 'empty' : ''}">
-        <span class="team-name">${teamA ? escapeHtml(teamA.name) : (match.isBye ? '⭐ BYE' : '—')}</span>
+      <div class="match-team ${isWinnerA ? 'winner' : match.winner ? 'loser' : ''} ${!teamA && !match.isBye ? 'empty' : ''}">
+        <span class="team-name">${displayTeamA}</span>
         ${match.scoreA !== null && match.scoreA !== undefined
           ? `<span class="team-score ${isWinnerA ? 'win' : ''}">${match.scoreA}</span>`
           : ''}
       </div>
       <div class="match-vs">VS</div>
-      <div class="match-team ${isWinnerB ? 'winner' : match.winner ? 'loser' : ''} ${!teamB ? 'empty' : ''}">
-        <span class="team-name">${teamB ? escapeHtml(teamB.name) : (match.isBye ? '⭐ BYE' : '—')}</span>
+      <div class="match-team ${isWinnerB ? 'winner' : match.winner ? 'loser' : ''} ${!teamB && !match.isBye ? 'empty' : ''}">
+        <span class="team-name">${displayTeamB}</span>
         ${match.scoreB !== null && match.scoreB !== undefined
           ? `<span class="team-score ${isWinnerB ? 'win' : ''}">${match.scoreB}</span>`
           : ''}
@@ -215,14 +226,12 @@ function calculatePositions(bracket, matchHeight, matchGap) {
   const firstRoundCount = bracket.rounds[0].length;
   const rowHeight = matchHeight + matchGap;
 
-  // Vòng 1: xếp đều
   const firstPositions = [];
   for (let i = 0; i < firstRoundCount; i++) {
     firstPositions.push(30 + i * rowHeight);
   }
   positions.push(firstPositions);
 
-  // Các vòng sau: nằm giữa 2 match vòng trước
   for (let r = 1; r < bracket.rounds.length; r++) {
     const prevPositions = positions[r - 1];
     const currPositions = [];
@@ -276,7 +285,6 @@ function bindZoomPan(container) {
   let startScrollLeft = 0;
   let startScrollTop = 0;
 
-  // Mouse wheel zoom
   scrollContainer.addEventListener('wheel', (e) => {
     if (e.ctrlKey || e.metaKey) {
       e.preventDefault();
@@ -286,7 +294,6 @@ function bindZoomPan(container) {
     }
   }, { passive: false });
 
-  // Mouse drag pan
   scrollContainer.addEventListener('mousedown', (e) => {
     if (e.target.closest('.bracket-match')) return;
     isPanning = true;
@@ -310,7 +317,6 @@ function bindZoomPan(container) {
     scrollContainer.style.cursor = 'grab';
   });
 
-  // Touch gestures (pinch zoom + pan)
   let touchStartDist = 0;
   let touchStartScale = 1;
   let touchStartMid = null;
@@ -357,7 +363,6 @@ function bindZoomPan(container) {
     touchStartScroll = null;
   });
 
-  // Zoom buttons
   container.querySelectorAll('.bracket-zoom-btn').forEach((btn) => {
     btn.addEventListener('click', (e) => {
       e.stopPropagation();
