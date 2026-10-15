@@ -276,7 +276,7 @@
     <div class="header">
         <div>
             <h1>📅 Xếp lịch tự động đa nội dung</h1>
-            <p>Tự động chia lịch cho tất cả nội dung, tránh trùng VĐV, tôn trọng thời gian nghỉ</p>
+            <p>Tự động chia lịch cho tất cả nội dung, tránh trùng VĐV, phân bổ đều Sáng/Chiều</p>
         </div>
         <div class="header-actions">
             <a href="categories.html" class="btn-outline" id="backLink">
@@ -366,16 +366,16 @@
                 <div class="form-group">
                     <label>Số slot nghỉ tối thiểu giữa 2 trận của 1 VĐV</label>
                     <input type="number" id="restSlots" value="1" min="0" max="5">
-                    <small style="color: #6c757d; font-size: 11px;">VD: 1 = nghỉ ít nhất 1 slot (khoảng 30-45 phút)</small>
+                    <small style="color: #6c757d; font-size: 11px;">VD: 1 = nghỉ ít nhất 1 slot</small>
                 </div>
                 <div class="form-group">
                     <label>Số trận tối đa 1 VĐV đấu trong 1 ngày</label>
                     <input type="number" id="maxMatchesPerDay" value="3" min="1" max="10">
                 </div>
                 <div class="form-group">
-                    <label>Phân bổ tối đa cùng nội dung/buổi</label>
+                    <label>Phân bổ tối đa cùng nội dung/buổi (%)</label>
                     <input type="number" id="maxSameCategoryPercent" value="60" min="30" max="100">
-                    <small style="color: #6c757d; font-size: 11px;">VD: 60% = không quá 60% số bàn trong 1 buổi là cùng nội dung</small>
+                    <small style="color: #6c757d; font-size: 11px;">60% = không quá 60% số bàn trong 1 buổi</small>
                 </div>
             </div>
         </div>
@@ -404,7 +404,6 @@
         </div>
         <p style="color: #6c757d; font-size: 13px; margin-bottom: 16px;">
             <i class="fas fa-info-circle"></i> Chọn buổi diễn ra BK/CK cho từng nội dung.
-            Hệ thống sẽ tự tránh xếp 2 trận BK/CK của cùng 1 VĐV vào 1 buổi.
         </p>
         <table class="final-config-table">
             <thead>
@@ -473,7 +472,7 @@
 (function() {
     'use strict';
 
-    console.log('🚀 schedule-auto.html v4 - Smart Scheduler with Rest Time');
+    console.log('🚀 schedule-auto.html v5 - Balanced Distribution (Sáng/Chiều đều nhau)');
 
     const config = window.SPORTSVN_CONFIG || {};
     const supabaseClient = window.supabase.createClient(config.SUPABASE_URL, config.SUPABASE_ANON_KEY);
@@ -808,7 +807,6 @@
             matchDuration: parseInt(document.getElementById('matchDuration')?.value) || 30,
             breakDuration: parseInt(document.getElementById('breakDuration')?.value) || 5,
             sessions: getActiveSessions(),
-            // Advanced config
             restSlots: parseInt(document.getElementById('restSlots')?.value) || 1,
             maxMatchesPerDay: parseInt(document.getElementById('maxMatchesPerDay')?.value) || 3,
             maxSameCategoryPercent: parseInt(document.getElementById('maxSameCategoryPercent')?.value) || 60,
@@ -831,7 +829,7 @@
     }
 
     // ==========================================
-    // GENERATE SCHEDULE - SMART ALGORITHM
+    // GENERATE SCHEDULE
     // ==========================================
     window.generateSchedule = async function() {
         if (contents.length === 0) { showAlert('Chưa có dữ liệu!', 'error'); return; }
@@ -840,11 +838,11 @@
         const finalConfig = getFinalConfig();
         if (cfg.sessions.length === 0) { showAlert('Cần chọn ít nhất 1 buổi!', 'error'); return; }
 
-        showLoading('Đang phân tích và xếp lịch thông minh...');
+        showLoading('Đang phân tích và xếp lịch (phân bổ đều Sáng/Chiều)...');
         await sleep(100);
 
         try {
-            const result = buildSmartSchedule(contents, cfg, finalConfig);
+            const result = buildBalancedSchedule(contents, cfg, finalConfig);
             scheduleResult = result;
             renderResult(result);
             document.getElementById('resultPanel').style.display = 'block';
@@ -853,7 +851,7 @@
             if (result.conflicts.length > 0) {
                 showAlert(`⚠️ Xếp xong! ${result.totalMatches} trận, ${result.conflicts.length} conflict!`, 'error');
             } else {
-                showAlert(`✅ Xếp lịch thành công! ${result.totalMatches} trận, không có conflict.`, 'success');
+                showAlert(`✅ Xếp lịch thành công! ${result.totalMatches} trận, phân bổ đều.`, 'success');
             }
         } catch (error) {
             console.error(error);
@@ -863,9 +861,9 @@
     };
 
     // ==========================================
-    // SMART SCHEDULE ALGORITHM
+    // BALANCED SCHEDULE ALGORITHM
     // ==========================================
-    function buildSmartSchedule(contents, cfg, finalConfig) {
+    function buildBalancedSchedule(contents, cfg, finalConfig) {
         const totalDays = cfg.numDays;
         const numCourts = cfg.numCourts;
         const matchDuration = cfg.matchDuration;
@@ -878,6 +876,7 @@
         // BƯỚC 1: Tạo danh sách tất cả các slot thời gian
         // ============================================================
         const slots = [];
+        let globalIndex = 0;
         for (let d = 0; d < totalDays; d++) {
             for (const sess of sessions) {
                 const sessionHours = sess.key === 'evening' ? 2.5 : sess.key === 'night' ? 2 : 3.5;
@@ -890,6 +889,7 @@
                 for (let slotIdx = 0; slotIdx < numSlotsPerCourt; slotIdx++) {
                     for (let court = 1; court <= numCourts; court++) {
                         slots.push({
+                            globalIndex: globalIndex++,
                             day: d + 1,
                             dayIndex: d,
                             session: sess.key,
@@ -929,7 +929,7 @@
         console.log(`🏆 Tổng ${allMatches.length} trận`);
 
         // ============================================================
-        // BƯỚC 3: Tính "tải" của từng VĐV (số trận tham gia)
+        // BƯỚC 3: Tính tải của từng VĐV
         // ============================================================
         const playerLoad = {};
         allMatches.forEach(m => {
@@ -940,47 +940,37 @@
         });
 
         // ============================================================
-        // BƯỚC 4: Sắp xếp trận theo độ ưu tiên thông minh
+        // BƯỚC 4: Sắp xếp trận theo độ ưu tiên
         // ============================================================
         allMatches.sort((a, b) => {
-            // Ưu tiên 1: Trận BK/CK (phải xếp vào slot đã cấu hình)
             if (a.isFinalRound !== b.isFinalRound) return b.isFinalRound - a.isFinalRound;
-            
-            // Ưu tiên 2: Vòng nhỏ trước (vòng 1, vòng bảng)
             if (a.roundOrder !== b.roundOrder) return a.roundOrder - b.roundOrder;
-            
-            // Ưu tiên 3: Trận có VĐV "bận rộn" hơn → xếp trước
             const aMaxLoad = Math.max(...a.players.map(p => playerLoad[p] || 0), 0);
             const bMaxLoad = Math.max(...b.players.map(p => playerLoad[p] || 0), 0);
             if (bMaxLoad !== aMaxLoad) return bMaxLoad - aMaxLoad;
-            
-            // Ưu tiên 4: Theo thứ tự nội dung
             return a.contentOrder - b.contentOrder;
         });
 
         // ============================================================
-        // BƯỚC 5: Gán trận vào slot với kiểm tra xung đột
+        // BƯỚC 5: Gán trận vào slot - PHÂN BỔ ĐỀU
         // ============================================================
-        const playerSchedule = {}; // { playerKey: [{ slotIndex, matchId, day, session }] }
-        const categoryStats = {};  // { catName: { day_session: count } }
+        const playerSchedule = {};
         const conflicts = [];
         const scheduled = [];
 
         for (const match of allMatches) {
-            if (match.players.length === 0) continue; // Bỏ qua trận placeholder
+            if (match.players.length === 0) continue;
 
-            const slot = findSmartSlot(match, slots, playerSchedule, categoryStats, finalConfig, cfg);
+            const slot = findBalancedSlot(match, slots, playerSchedule, finalConfig, cfg);
 
             if (!slot) {
-                conflicts.push({ match, reason: 'Không còn slot trống phù hợp (đã thử tất cả)' });
+                conflicts.push({ match, reason: 'Không còn slot trống phù hợp' });
                 continue;
             }
 
-            // Gán slot
             slot.assigned = true;
-            slot.matchId = match.matchId || scheduled.length + 1;
+            slot.matchId = scheduled.length + 1;
 
-            // Cập nhật lịch VĐV
             match.players.forEach(p => {
                 if (!playerSchedule[p]) playerSchedule[p] = [];
                 playerSchedule[p].push({
@@ -991,11 +981,6 @@
                 });
             });
 
-            // Cập nhật thống kê nội dung
-            const statKey = `${match.contentName}|${slot.day}|${slot.session}`;
-            if (!categoryStats[statKey]) categoryStats[statKey] = 0;
-            categoryStats[statKey]++;
-
             scheduled.push({
                 ...match,
                 slot,
@@ -1003,7 +988,6 @@
             });
         }
 
-        // Sắp xếp lại theo thời gian
         scheduled.sort((a, b) => {
             if (a.slot.day !== b.slot.day) return a.slot.day - b.slot.day;
             if (a.slot.timeMinutes !== b.slot.timeMinutes) return a.slot.timeMinutes - b.slot.timeMinutes;
@@ -1021,13 +1005,12 @@
     }
 
     // ==========================================
-    // FIND SMART SLOT
+    // FIND BALANCED SLOT — PHÂN BỔ ĐỀU
     // ==========================================
-    function findSmartSlot(match, slots, playerSchedule, categoryStats, finalConfig, cfg) {
+    function findBalancedSlot(match, slots, playerSchedule, finalConfig, cfg) {
         const contentFinal = finalConfig[match.contentId];
         let candidateSlots = slots.filter(s => !s.assigned);
 
-        // Nếu là trận BK/CK → ưu tiên slot đã cấu hình
         if (match.isFinalRound && contentFinal) {
             const preferred = candidateSlots.filter(s =>
                 s.day === contentFinal.day && s.session === contentFinal.session
@@ -1035,61 +1018,59 @@
             if (preferred.length > 0) candidateSlots = preferred;
         }
 
-        // ============================================================
         // Lọc slot hợp lệ
-        // ============================================================
         const validSlots = candidateSlots.filter(slot => {
-            // Kiểm tra từng VĐV
             for (const p of match.players) {
                 const schedule = playerSchedule[p] || [];
-                
-                // 1. Kiểm tra VĐV có đang bận ở slot này không (cùng slot)
+
+                // Kiểm tra trùng slot
                 if (schedule.some(s => s.slotIndex === slot.globalIndex)) return false;
 
-                // 2. Kiểm tra thời gian nghỉ (restSlots)
-                const slotTime = slot.dayIndex * 10000 + slot.timeMinutes;
+                // Kiểm tra thời gian nghỉ (cùng ngày)
                 for (const s of schedule) {
-                    const otherSlotTime = (s.day - 1) * 10000 + 
-                        (s.session === slot.session ? slot.timeMinutes : 0);
-                    
-                    // Chỉ kiểm tra nếu cùng ngày
                     if (s.day === slot.day) {
-                        // Đếm số slot cách nhau
-                        const slotIdx = getSlotIndexInDay(slot, cfg);
-                        const otherSlotIdx = getSlotIndexInDay({ ...s, session: slot.session }, cfg);
-                        
-                        // Nếu khoảng cách < restSlots → vi phạm
-                        if (Math.abs(slotIdx - otherSlotIdx) <= cfg.restSlots) {
-                            return false;
+                        const slotIdx = slot.slotInSession;
+                        const otherSlotInfo = findSlotInfo(slots, s.slotIndex);
+                        if (otherSlotInfo) {
+                            const otherSlotIdx = otherSlotInfo.slotInSession;
+                            if (Math.abs(slotIdx - otherSlotIdx) <= cfg.restSlots) {
+                                return false;
+                            }
                         }
                     }
                 }
 
-                // 3. Kiểm tra số trận tối đa/ngày
+                // Kiểm tra số trận tối đa/ngày
                 const matchesInDay = schedule.filter(s => s.day === slot.day).length;
                 if (matchesInDay >= cfg.maxMatchesPerDay) return false;
             }
-
-            // 4. Kiểm tra phân bổ đều nội dung trong cùng buổi
-            const statKey = `${match.contentName}|${slot.day}|${slot.session}`;
-            const currentCount = categoryStats[statKey] || 0;
-            const maxSameCategory = Math.ceil(cfg.numCourts * cfg.maxSameCategoryPercent / 100);
-            if (currentCount >= maxSameCategory) return false;
-
             return true;
         });
 
         if (validSlots.length === 0) return null;
 
         // ============================================================
-        // Chọn slot TỐT NHẤT (không chỉ slot đầu tiên)
+        // SẮP XẾP SLOT THEO ĐỘ ƯU TIÊN PHÂN BỔ ĐỀU
         // ============================================================
         validSlots.sort((a, b) => {
-            // Ưu tiên 1: Slot sớm nhất (theo ngày rồi giờ)
+            // Ưu tiên 1: Buổi ít trận hơn (Sáng vs Chiều)
+            const sessA = countMatchesInSession(slots, a.day, a.session);
+            const sessB = countMatchesInSession(slots, b.day, b.session);
+            if (sessA !== sessB) return sessA - sessB;
+
+            // Ưu tiên 2: Ngày ít trận hơn
+            const dayA = countMatchesInDay(slots, a.day);
+            const dayB = countMatchesInDay(slots, b.day);
+            if (dayA !== dayB) return dayA - dayB;
+
+            // Ưu tiên 3: Sân ít trận hơn
+            const courtA = countMatchesInCourt(slots, a.day, a.session, a.court);
+            const courtB = countMatchesInCourt(slots, b.day, b.session, b.court);
+            if (courtA !== courtB) return courtA - courtB;
+
+            // Ưu tiên 4: Slot sớm nhất
             if (a.day !== b.day) return a.day - b.day;
             if (a.timeMinutes !== b.timeMinutes) return a.timeMinutes - b.timeMinutes;
-            
-            // Ưu tiên 2: Sân ít trận hơn (cân bằng tải)
             return a.court - b.court;
         });
 
@@ -1097,12 +1078,22 @@
     }
 
     // ==========================================
-    // HELPER: Lấy index slot trong ngày
+    // HELPERS
     // ==========================================
-    function getSlotIndexInDay(slot, cfg) {
-        // Giả sử mỗi buổi có ~7 slot, mỗi slot cách nhau (matchDuration + breakDuration) phút
-        // Đơn giản: dùng timeMinutes / (matchDuration + breakDuration)
-        return Math.floor(slot.timeMinutes / (cfg.matchDuration + cfg.breakDuration));
+    function countMatchesInSession(slots, day, session) {
+        return slots.filter(s => s.assigned && s.day === day && s.session === session).length;
+    }
+
+    function countMatchesInDay(slots, day) {
+        return slots.filter(s => s.assigned && s.day === day).length;
+    }
+
+    function countMatchesInCourt(slots, day, session, court) {
+        return slots.filter(s => s.assigned && s.day === day && s.session === session && s.court === court).length;
+    }
+
+    function findSlotInfo(slots, globalIndex) {
+        return slots.find(s => s.globalIndex === globalIndex);
     }
 
     // ==========================================
@@ -1264,14 +1255,14 @@
                         `).join('')}
                         ${conflicts.length > 10 ? `<li>... và ${conflicts.length - 10} conflict khác</li>` : ''}
                     </ul>
-                    <p style="margin-top: 8px;"><strong>💡 Gợi ý:</strong> Tăng số ngày, tăng số sân, hoặc giảm số VĐV tham gia nhiều nội dung.</p>
+                    <p style="margin-top: 8px;"><strong>💡 Gợi ý:</strong> Tăng số ngày, tăng số sân, hoặc giảm restSlots.</p>
                 </div>
             `;
         } else {
             warningEl.innerHTML = `
                 <div class="warning-box success">
                     <strong><i class="fas fa-check-circle"></i> Không có conflict!</strong>
-                    Tất cả các trận đã được xếp lịch hợp lý, tôn trọng thời gian nghỉ của VĐV.
+                    Tất cả các trận đã được xếp lịch hợp lý, phân bổ đều Sáng/Chiều.
                 </div>
             `;
         }
@@ -1540,7 +1531,7 @@
     // START
     // ==========================================
     init();
-    console.log('✅ schedule-auto.html v4 - Smart Scheduler loaded');
+    console.log('✅ schedule-auto.html v5 - Balanced Distribution loaded');
 })();
 </script>
 </body>
