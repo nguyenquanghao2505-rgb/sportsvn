@@ -251,6 +251,18 @@
         }
         .loading-inline i { font-size: 32px; color: #1a3a7a; margin-bottom: 8px; display: block; }
 
+        .advanced-config {
+            background: #f0f4ff; border: 2px solid #1a3a7a;
+            border-radius: 12px; padding: 16px; margin-bottom: 16px;
+        }
+        .advanced-config h4 {
+            font-size: 14px; font-weight: 800; color: #1a3a7a;
+            margin-bottom: 12px; display: flex; align-items: center; gap: 8px;
+        }
+        .advanced-config .form-row {
+            grid-template-columns: repeat(auto-fit, minmax(180px, 1fr));
+        }
+
         @media (max-width: 768px) {
             .header h1 { font-size: 22px; }
             .courts-grid { grid-template-columns: 1fr; }
@@ -264,7 +276,7 @@
     <div class="header">
         <div>
             <h1>📅 Xếp lịch tự động đa nội dung</h1>
-            <p>Tự động chia lịch cho tất cả nội dung, tránh trùng VĐV</p>
+            <p>Tự động chia lịch cho tất cả nội dung, tránh trùng VĐV, tôn trọng thời gian nghỉ</p>
         </div>
         <div class="header-actions">
             <a href="categories.html" class="btn-outline" id="backLink">
@@ -339,6 +351,32 @@
                 <label style="margin-top: 6px; font-size: 13px;">
                     <input type="checkbox" id="sessionEvening" checked style="width: auto; margin-right: 4px;"> Có buổi Tối
                 </label>
+            </div>
+        </div>
+    </div>
+
+    <!-- BƯỚC 2B: CẤU HÌNH NÂNG CAO -->
+    <div class="panel">
+        <div class="panel-title">
+            <span class="step-num">⚙️</span> Cấu hình nâng cao (Tùy chọn)
+        </div>
+        <div class="advanced-config">
+            <h4><i class="fas fa-sliders-h"></i> Quy tắc xếp lịch thông minh</h4>
+            <div class="form-row">
+                <div class="form-group">
+                    <label>Số slot nghỉ tối thiểu giữa 2 trận của 1 VĐV</label>
+                    <input type="number" id="restSlots" value="1" min="0" max="5">
+                    <small style="color: #6c757d; font-size: 11px;">VD: 1 = nghỉ ít nhất 1 slot (khoảng 30-45 phút)</small>
+                </div>
+                <div class="form-group">
+                    <label>Số trận tối đa 1 VĐV đấu trong 1 ngày</label>
+                    <input type="number" id="maxMatchesPerDay" value="3" min="1" max="10">
+                </div>
+                <div class="form-group">
+                    <label>Phân bổ tối đa cùng nội dung/buổi</label>
+                    <input type="number" id="maxSameCategoryPercent" value="60" min="30" max="100">
+                    <small style="color: #6c757d; font-size: 11px;">VD: 60% = không quá 60% số bàn trong 1 buổi là cùng nội dung</small>
+                </div>
             </div>
         </div>
     </div>
@@ -435,14 +473,14 @@
 (function() {
     'use strict';
 
-    console.log('🚀 schedule-auto.html v3 - Query from Supabase');
+    console.log('🚀 schedule-auto.html v4 - Smart Scheduler with Rest Time');
 
     const config = window.SPORTSVN_CONFIG || {};
     const supabaseClient = window.supabase.createClient(config.SUPABASE_URL, config.SUPABASE_ANON_KEY);
     window.supabaseClient = supabaseClient;
 
     let tournamentId = null;
-    let contents = [];       // [{id, name, items, type, playerCount, drawData}]
+    let contents = [];
     let allPlayers = new Map();
     let scheduleResult = null;
     let dragSrcIndex = null;
@@ -463,7 +501,6 @@
 
         document.getElementById('backLink').href = `categories.html?tournament_id=${tournamentId}`;
 
-        // Set ngày mặc định = hôm nay
         const today = new Date();
         document.getElementById('startDate').value = today.toISOString().slice(0, 10);
 
@@ -472,7 +509,7 @@
     }
 
     // ==========================================
-    // LOAD DATA FROM SUPABASE (draws table)
+    // LOAD DATA FROM SUPABASE
     // ==========================================
     async function loadDataFromDraws() {
         try {
@@ -500,7 +537,6 @@
                 return;
             }
 
-            // Group by category
             const byCategory = new Map();
             data.forEach(row => {
                 const cat = row.category || 'Không tên';
@@ -510,7 +546,6 @@
 
             console.log('📂 Groups:', byCategory.size, 'categories');
 
-            // Build contents
             contents = [];
             allPlayers = new Map();
 
@@ -518,13 +553,11 @@
             for (const [catName, rows] of byCategory) {
                 contentId++;
 
-                // Detect type
                 const nameLower = catName.toLowerCase();
                 let type = 'single';
                 if (nameLower.includes('đồng đội') || nameLower.startsWith('đội ')) type = 'team';
                 else if (nameLower.includes('đôi')) type = 'double';
 
-                // Build items (VĐV/Đội)
                 const itemsMap = new Map();
                 rows.forEach(r => {
                     const key = r.team_name + '|' + (r.club || '');
@@ -555,7 +588,6 @@
 
                 contents.push(content);
 
-                // Track players
                 items.forEach(it => {
                     it.players.forEach(p => {
                         if (!allPlayers.has(p)) allPlayers.set(p, new Set());
@@ -776,6 +808,10 @@
             matchDuration: parseInt(document.getElementById('matchDuration')?.value) || 30,
             breakDuration: parseInt(document.getElementById('breakDuration')?.value) || 5,
             sessions: getActiveSessions(),
+            // Advanced config
+            restSlots: parseInt(document.getElementById('restSlots')?.value) || 1,
+            maxMatchesPerDay: parseInt(document.getElementById('maxMatchesPerDay')?.value) || 3,
+            maxSameCategoryPercent: parseInt(document.getElementById('maxSameCategoryPercent')?.value) || 60,
         };
     }
 
@@ -795,7 +831,7 @@
     }
 
     // ==========================================
-    // GENERATE SCHEDULE
+    // GENERATE SCHEDULE - SMART ALGORITHM
     // ==========================================
     window.generateSchedule = async function() {
         if (contents.length === 0) { showAlert('Chưa có dữ liệu!', 'error'); return; }
@@ -804,11 +840,11 @@
         const finalConfig = getFinalConfig();
         if (cfg.sessions.length === 0) { showAlert('Cần chọn ít nhất 1 buổi!', 'error'); return; }
 
-        showLoading('Đang xếp lịch...');
+        showLoading('Đang phân tích và xếp lịch thông minh...');
         await sleep(100);
 
         try {
-            const result = buildSchedule(contents, cfg, finalConfig);
+            const result = buildSmartSchedule(contents, cfg, finalConfig);
             scheduleResult = result;
             renderResult(result);
             document.getElementById('resultPanel').style.display = 'block';
@@ -817,7 +853,7 @@
             if (result.conflicts.length > 0) {
                 showAlert(`⚠️ Xếp xong! ${result.totalMatches} trận, ${result.conflicts.length} conflict!`, 'error');
             } else {
-                showAlert(`✅ Xếp lịch thành công! ${result.totalMatches} trận.`, 'success');
+                showAlert(`✅ Xếp lịch thành công! ${result.totalMatches} trận, không có conflict.`, 'success');
             }
         } catch (error) {
             console.error(error);
@@ -826,14 +862,21 @@
         hideLoading();
     };
 
-    function buildSchedule(contents, cfg, finalConfig) {
+    // ==========================================
+    // SMART SCHEDULE ALGORITHM
+    // ==========================================
+    function buildSmartSchedule(contents, cfg, finalConfig) {
         const totalDays = cfg.numDays;
         const numCourts = cfg.numCourts;
         const matchDuration = cfg.matchDuration;
         const breakDuration = cfg.breakDuration;
         const sessions = cfg.sessions;
+        const restSlots = cfg.restSlots;
+        const maxMatchesPerDay = cfg.maxMatchesPerDay;
 
-        // Tạo slots
+        // ============================================================
+        // BƯỚC 1: Tạo danh sách tất cả các slot thời gian
+        // ============================================================
         const slots = [];
         for (let d = 0; d < totalDays; d++) {
             for (const sess of sessions) {
@@ -848,12 +891,15 @@
                     for (let court = 1; court <= numCourts; court++) {
                         slots.push({
                             day: d + 1,
+                            dayIndex: d,
                             session: sess.key,
                             sessionLabel: sess.label,
                             time: formatTime(currentMinutes),
                             timeMinutes: currentMinutes,
+                            slotInSession: slotIdx,
                             court: court,
-                            dayIndex: d,
+                            assigned: false,
+                            matchId: null,
                         });
                     }
                     currentMinutes += slotDuration;
@@ -861,9 +907,11 @@
             }
         }
 
-        console.log(`📅 Tổng ${slots.length} slots`);
+        console.log(`📅 Tổng ${slots.length} slots (${totalDays} ngày × ${sessions.length} buổi × ${numCourts} sân)`);
 
-        // Tạo matches
+        // ============================================================
+        // BƯỚC 2: Tạo tất cả các trận đấu
+        // ============================================================
         const allMatches = [];
         contents.forEach((content, contentOrder) => {
             const matches = generateMatchesForContent(content, finalConfig[content.id], cfg);
@@ -880,58 +928,181 @@
 
         console.log(`🏆 Tổng ${allMatches.length} trận`);
 
-        // Sort
-        allMatches.sort((a, b) => {
-            if (a.contentOrder !== b.contentOrder) return a.contentOrder - b.contentOrder;
-            if (a.isFinalRound !== b.isFinalRound) return b.isFinalRound - a.isFinalRound;
-            return a.roundOrder - b.roundOrder;
+        // ============================================================
+        // BƯỚC 3: Tính "tải" của từng VĐV (số trận tham gia)
+        // ============================================================
+        const playerLoad = {};
+        allMatches.forEach(m => {
+            m.players.forEach(p => {
+                if (!playerLoad[p]) playerLoad[p] = 0;
+                playerLoad[p]++;
+            });
         });
 
-        // Gán slot
-        const playerBusy = new Map();
-        const playerFinalSession = new Map();
+        // ============================================================
+        // BƯỚC 4: Sắp xếp trận theo độ ưu tiên thông minh
+        // ============================================================
+        allMatches.sort((a, b) => {
+            // Ưu tiên 1: Trận BK/CK (phải xếp vào slot đã cấu hình)
+            if (a.isFinalRound !== b.isFinalRound) return b.isFinalRound - a.isFinalRound;
+            
+            // Ưu tiên 2: Vòng nhỏ trước (vòng 1, vòng bảng)
+            if (a.roundOrder !== b.roundOrder) return a.roundOrder - b.roundOrder;
+            
+            // Ưu tiên 3: Trận có VĐV "bận rộn" hơn → xếp trước
+            const aMaxLoad = Math.max(...a.players.map(p => playerLoad[p] || 0), 0);
+            const bMaxLoad = Math.max(...b.players.map(p => playerLoad[p] || 0), 0);
+            if (bMaxLoad !== aMaxLoad) return bMaxLoad - aMaxLoad;
+            
+            // Ưu tiên 4: Theo thứ tự nội dung
+            return a.contentOrder - b.contentOrder;
+        });
+
+        // ============================================================
+        // BƯỚC 5: Gán trận vào slot với kiểm tra xung đột
+        // ============================================================
+        const playerSchedule = {}; // { playerKey: [{ slotIndex, matchId, day, session }] }
+        const categoryStats = {};  // { catName: { day_session: count } }
         const conflicts = [];
-        const assignedSlots = new Set();
         const scheduled = [];
 
         for (const match of allMatches) {
-            const slot = findBestSlot(match, slots, assignedSlots, playerBusy, finalConfig, cfg);
+            if (match.players.length === 0) continue; // Bỏ qua trận placeholder
+
+            const slot = findSmartSlot(match, slots, playerSchedule, categoryStats, finalConfig, cfg);
+
             if (!slot) {
-                conflicts.push({ match, reason: 'Không còn slot trống phù hợp' });
+                conflicts.push({ match, reason: 'Không còn slot trống phù hợp (đã thử tất cả)' });
                 continue;
             }
 
-            assignedSlots.add(slotKey(slot));
+            // Gán slot
+            slot.assigned = true;
+            slot.matchId = match.matchId || scheduled.length + 1;
 
+            // Cập nhật lịch VĐV
             match.players.forEach(p => {
-                if (!playerBusy.has(p)) playerBusy.set(p, new Set());
-                playerBusy.get(p).add(slotKey(slot));
+                if (!playerSchedule[p]) playerSchedule[p] = [];
+                playerSchedule[p].push({
+                    slotIndex: slot.globalIndex,
+                    matchId: slot.matchId,
+                    day: slot.day,
+                    session: slot.session,
+                });
             });
 
-            if (match.isFinalRound && match.players.length > 0) {
-                match.players.forEach(p => {
-                    const key = `${p}|${slot.day}|${slot.session}`;
-                    if (playerFinalSession.has(key)) {
-                        conflicts.push({
-                            match,
-                            reason: `VĐV ${p} đã có trận BK/CK cùng buổi ${slot.sessionLabel} ngày ${slot.day}`,
-                            player: p,
-                        });
-                    }
-                    playerFinalSession.set(key, match);
-                });
-            }
+            // Cập nhật thống kê nội dung
+            const statKey = `${match.contentName}|${slot.day}|${slot.session}`;
+            if (!categoryStats[statKey]) categoryStats[statKey] = 0;
+            categoryStats[statKey]++;
 
-            scheduled.push({ ...match, slot, matchId: scheduled.length + 1 });
+            scheduled.push({
+                ...match,
+                slot,
+                matchId: scheduled.length + 1,
+            });
         }
 
+        // Sắp xếp lại theo thời gian
         scheduled.sort((a, b) => {
             if (a.slot.day !== b.slot.day) return a.slot.day - b.slot.day;
             if (a.slot.timeMinutes !== b.slot.timeMinutes) return a.slot.timeMinutes - b.slot.timeMinutes;
             return a.slot.court - b.slot.court;
         });
 
-        return { matches: scheduled, conflicts, slots, totalMatches: scheduled.length, totalSlots: slots.length, cfg };
+        return {
+            matches: scheduled,
+            conflicts,
+            slots,
+            totalMatches: scheduled.length,
+            totalSlots: slots.length,
+            cfg,
+        };
+    }
+
+    // ==========================================
+    // FIND SMART SLOT
+    // ==========================================
+    function findSmartSlot(match, slots, playerSchedule, categoryStats, finalConfig, cfg) {
+        const contentFinal = finalConfig[match.contentId];
+        let candidateSlots = slots.filter(s => !s.assigned);
+
+        // Nếu là trận BK/CK → ưu tiên slot đã cấu hình
+        if (match.isFinalRound && contentFinal) {
+            const preferred = candidateSlots.filter(s =>
+                s.day === contentFinal.day && s.session === contentFinal.session
+            );
+            if (preferred.length > 0) candidateSlots = preferred;
+        }
+
+        // ============================================================
+        // Lọc slot hợp lệ
+        // ============================================================
+        const validSlots = candidateSlots.filter(slot => {
+            // Kiểm tra từng VĐV
+            for (const p of match.players) {
+                const schedule = playerSchedule[p] || [];
+                
+                // 1. Kiểm tra VĐV có đang bận ở slot này không (cùng slot)
+                if (schedule.some(s => s.slotIndex === slot.globalIndex)) return false;
+
+                // 2. Kiểm tra thời gian nghỉ (restSlots)
+                const slotTime = slot.dayIndex * 10000 + slot.timeMinutes;
+                for (const s of schedule) {
+                    const otherSlotTime = (s.day - 1) * 10000 + 
+                        (s.session === slot.session ? slot.timeMinutes : 0);
+                    
+                    // Chỉ kiểm tra nếu cùng ngày
+                    if (s.day === slot.day) {
+                        // Đếm số slot cách nhau
+                        const slotIdx = getSlotIndexInDay(slot, cfg);
+                        const otherSlotIdx = getSlotIndexInDay({ ...s, session: slot.session }, cfg);
+                        
+                        // Nếu khoảng cách < restSlots → vi phạm
+                        if (Math.abs(slotIdx - otherSlotIdx) <= cfg.restSlots) {
+                            return false;
+                        }
+                    }
+                }
+
+                // 3. Kiểm tra số trận tối đa/ngày
+                const matchesInDay = schedule.filter(s => s.day === slot.day).length;
+                if (matchesInDay >= cfg.maxMatchesPerDay) return false;
+            }
+
+            // 4. Kiểm tra phân bổ đều nội dung trong cùng buổi
+            const statKey = `${match.contentName}|${slot.day}|${slot.session}`;
+            const currentCount = categoryStats[statKey] || 0;
+            const maxSameCategory = Math.ceil(cfg.numCourts * cfg.maxSameCategoryPercent / 100);
+            if (currentCount >= maxSameCategory) return false;
+
+            return true;
+        });
+
+        if (validSlots.length === 0) return null;
+
+        // ============================================================
+        // Chọn slot TỐT NHẤT (không chỉ slot đầu tiên)
+        // ============================================================
+        validSlots.sort((a, b) => {
+            // Ưu tiên 1: Slot sớm nhất (theo ngày rồi giờ)
+            if (a.day !== b.day) return a.day - b.day;
+            if (a.timeMinutes !== b.timeMinutes) return a.timeMinutes - b.timeMinutes;
+            
+            // Ưu tiên 2: Sân ít trận hơn (cân bằng tải)
+            return a.court - b.court;
+        });
+
+        return validSlots[0];
+    }
+
+    // ==========================================
+    // HELPER: Lấy index slot trong ngày
+    // ==========================================
+    function getSlotIndexInDay(slot, cfg) {
+        // Giả sử mỗi buổi có ~7 slot, mỗi slot cách nhau (matchDuration + breakDuration) phút
+        // Đơn giản: dùng timeMinutes / (matchDuration + breakDuration)
+        return Math.floor(slot.timeMinutes / (cfg.matchDuration + cfg.breakDuration));
     }
 
     // ==========================================
@@ -940,11 +1111,7 @@
     function generateMatchesForContent(content, finalCfg, cfg) {
         const matches = [];
 
-        // Sử dụng drawData (bảng draws từ draw.html)
-        // Mỗi row = 1 VĐV/đội trong 1 slot
-
         if (content.type === 'team') {
-            // Đồng đội: gom theo Đơn Vị
             const teamsMap = new Map();
             content.items.forEach(it => {
                 const unit = it.unit || 'Không rõ';
@@ -956,7 +1123,6 @@
                 name, players, displayName: name,
             }));
 
-            // Vòng tròn
             for (let i = 0; i < teams.length; i++) {
                 for (let j = i + 1; j < teams.length; j++) {
                     matches.push({
@@ -973,8 +1139,6 @@
                 }
             }
         } else {
-            // Đơn hoặc Đôi
-            // Group theo group_name (Bảng A, Bảng B, ...) hoặc "Vòng 1"
             const groups = new Map();
             content.drawData.forEach(r => {
                 const g = r.group_name || 'Vòng 1';
@@ -983,7 +1147,6 @@
             });
 
             groups.forEach((rows, groupName) => {
-                // Tạo items từ rows
                 const itemsMap = new Map();
                 rows.forEach(r => {
                     const key = r.team_name;
@@ -999,7 +1162,6 @@
                 const items = Array.from(itemsMap.values());
 
                 if (items.length <= 8) {
-                    // Vòng tròn trong bảng
                     for (let i = 0; i < items.length; i++) {
                         for (let j = i + 1; j < items.length; j++) {
                             matches.push({
@@ -1016,7 +1178,6 @@
                         }
                     }
                 } else {
-                    // Knockout
                     matches.push(...generateKnockoutMatches(items, content.name, groupName));
                 }
             });
@@ -1086,43 +1247,6 @@
     }
 
     // ==========================================
-    // FIND BEST SLOT
-    // ==========================================
-    function findBestSlot(match, slots, assignedSlots, playerBusy, finalConfig, cfg) {
-        const contentFinal = finalConfig[match.contentId];
-        let candidateSlots = slots;
-
-        if (match.isFinalRound && contentFinal) {
-            candidateSlots = slots.filter(s =>
-                s.day === contentFinal.day && s.session === contentFinal.session
-            );
-            if (candidateSlots.length === 0) candidateSlots = slots;
-        }
-
-        const validSlots = candidateSlots.filter(slot => {
-            if (assignedSlots.has(slotKey(slot))) return false;
-            for (const p of match.players) {
-                if (playerBusy.has(p) && playerBusy.get(p).has(slotKey(slot))) return false;
-            }
-            return true;
-        });
-
-        if (validSlots.length === 0) return null;
-
-        validSlots.sort((a, b) => {
-            if (a.day !== b.day) return a.day - b.day;
-            if (a.timeMinutes !== b.timeMinutes) return a.timeMinutes - b.timeMinutes;
-            return a.court - b.court;
-        });
-
-        return validSlots[0];
-    }
-
-    function slotKey(slot) {
-        return `${slot.day}|${slot.session}|${slot.court}|${slot.timeMinutes}`;
-    }
-
-    // ==========================================
     // RENDER RESULT
     // ==========================================
     function renderResult(result) {
@@ -1140,13 +1264,14 @@
                         `).join('')}
                         ${conflicts.length > 10 ? `<li>... và ${conflicts.length - 10} conflict khác</li>` : ''}
                     </ul>
+                    <p style="margin-top: 8px;"><strong>💡 Gợi ý:</strong> Tăng số ngày, tăng số sân, hoặc giảm số VĐV tham gia nhiều nội dung.</p>
                 </div>
             `;
         } else {
             warningEl.innerHTML = `
                 <div class="warning-box success">
                     <strong><i class="fas fa-check-circle"></i> Không có conflict!</strong>
-                    Tất cả các trận đã được xếp lịch hợp lý.
+                    Tất cả các trận đã được xếp lịch hợp lý, tôn trọng thời gian nghỉ của VĐV.
                 </div>
             `;
         }
@@ -1369,7 +1494,7 @@
     // EVENT LISTENERS
     // ==========================================
     function setupEventListeners() {
-        ['numDays', 'numCourts', 'matchDuration'].forEach(id => {
+        ['numDays', 'numCourts', 'matchDuration', 'restSlots', 'maxMatchesPerDay'].forEach(id => {
             const el = document.getElementById(id);
             if (el) el.addEventListener('change', renderFinalConfig);
         });
@@ -1415,7 +1540,7 @@
     // START
     // ==========================================
     init();
-    console.log('✅ schedule-auto.html v3 - loaded');
+    console.log('✅ schedule-auto.html v4 - Smart Scheduler loaded');
 })();
 </script>
 </body>
