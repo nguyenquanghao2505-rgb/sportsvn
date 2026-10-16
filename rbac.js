@@ -1,60 +1,88 @@
 // ============================================================
-// rbac.js — Role-Based Access Control (Ma trận phân quyền)
-// File này ĐỊNH NGHĨA luật chơi. Không chứa logic nghiệp vụ.
+// rbac.js — Role-Based Access Control
+// Định nghĩa roles và permissions cho hệ thống SportsVN
 // ============================================================
 
-// ---------- 1. ĐỊNH NGHĨA ROLE TOÀN CỤC ----------
-export const GLOBAL_ROLES = {
-  GUEST: 'guest',   // khách chưa đăng nhập
-  USER:  'user',    // user đã xác thực
-  ADMIN: 'admin',   // quản trị hệ thống
+export const ROLES = {
+    ADMIN:    'admin',
+    MANAGER:  'manager',
+    EMPLOYEE: 'employee',
+    EDITOR:   'editor',
 };
 
-// ---------- 2. PERMISSION TOÀN CỤC ----------
-// Mỗi role có danh sách permission. '*' = toàn quyền.
+export const ROLE_LABELS = {
+    admin:    { name: 'Giám đốc',      icon: '👑', color: '#dc2626', bg: '#fee2e2' },
+    manager:  { name: 'Trưởng phòng',  icon: '🎖️', color: '#d97706', bg: '#fef3c7' },
+    employee: { name: 'Nhân viên',     icon: '👤', color: '#1769ff', bg: '#dbeafe' },
+    editor:   { name: 'Cộng tác viên', icon: '✍️', color: '#059669', bg: '#d1fae5' },
+};
+
 export const PERMISSIONS = {
-  [GLOBAL_ROLES.GUEST]: [
-    'view_tournaments',
-    'view_articles',
-  ],
-  [GLOBAL_ROLES.USER]: [
-    'view_tournaments',
-    'view_articles',
-    'create_tournament',     // tạo giải → tự thành OWNER
-    'create_article',        // đăng bài
-  ],
-  [GLOBAL_ROLES.ADMIN]: [
-    '*',                     // wildcard = mọi quyền
-  ],
+    // --- Quản lý người dùng ---
+    USER_CREATE:          ['admin'],
+    USER_EDIT:            ['admin'],
+    USER_DELETE:          ['admin'],
+    USER_VIEW_ALL:        ['admin', 'manager'],
+    USER_CHANGE_ROLE:     ['admin'],
+
+    // --- Giải đấu ---
+    TOURNAMENT_CREATE:    ['admin', 'manager', 'employee'],
+    TOURNAMENT_EDIT_ALL:  ['admin', 'manager'],
+    TOURNAMENT_EDIT_OWN:  ['admin', 'manager', 'employee'],
+    TOURNAMENT_DELETE:    ['admin'],
+    TOURNAMENT_VIEW_ALL:  ['admin', 'manager'],
+
+    // --- Tin tức / Bài viết ---
+    NEWS_CREATE:          ['admin', 'manager', 'editor'],
+    NEWS_EDIT_ALL:        ['admin', 'manager'],
+    NEWS_EDIT_OWN:        ['admin', 'manager', 'editor'],
+    NEWS_DELETE:          ['admin', 'manager'],
+
+    // --- Video ---
+    VIDEO_CREATE:         ['admin', 'manager', 'editor'],
+    VIDEO_DELETE:         ['admin', 'manager'],
+
+    // --- Shop ---
+    SHOP_APPROVE:         ['admin', 'manager'],
+    SHOP_DELETE:          ['admin'],
+
+    // --- Đơn hàng ---
+    ORDER_VIEW:           ['admin', 'manager'],
+    ORDER_UPDATE:         ['admin', 'manager'],
+    ORDER_DELETE:         ['admin'],
+
+    // --- Analytics ---
+    ANALYTICS_VIEW:       ['admin', 'manager'],
+
+    // --- Hệ thống ---
+    SYSTEM_SETTINGS:      ['admin'],
 };
 
 /**
- * Kiểm tra user có permission toàn cục không
- * @param {Object|null} user - { id, username, global_role }
- * @param {string} permission
- * @returns {boolean}
+ * Kiểm tra user có quyền thực hiện action không
+ * @param {Object} user - { role: 'admin' | 'manager' | ... }
+ * @param {string} action - Tên quyền (VD: 'USER_CREATE')
  */
-export function can(user, permission) {
-  if (!user) return false;
-  const role = user.global_role || GLOBAL_ROLES.GUEST;
-  const perms = PERMISSIONS[role] || [];
-  return perms.includes('*') || perms.includes(permission);
+export function hasPermission(user, action) {
+    if (!user || !user.role) return false;
+    const allowed = PERMISSIONS[action];
+    if (!allowed) return false;
+    return allowed.includes(user.role);
 }
 
 /**
- * Có phải admin toàn hệ thống?
+ * Kiểm tra user có role trong danh sách không
  */
-export function isAdmin(user) {
-  return !!user && user.global_role === GLOBAL_ROLES.ADMIN;
+export function hasRole(user, roles) {
+    if (!user || !user.role) return false;
+    const list = Array.isArray(roles) ? roles : [roles];
+    return list.includes(user.role);
 }
 
 /**
- * Đã đăng nhập chưa?
+ * Cấp bậc (cao hơn = quyền cao hơn)
  */
-export function isLoggedIn(user) {
-  return !!user && !!user.id;
+export function getRoleLevel(role) {
+    const levels = { admin: 4, manager: 3, employee: 2, editor: 1 };
+    return levels[role] || 0;
 }
-
-// ---------- 3. RE-EXPORT từ tournament-members ----------
-// (sẽ có sau ở GĐ 5). Tạm để comment.
-// export { canInTournament, getRoleInTournament } from './tournament-members.js';
