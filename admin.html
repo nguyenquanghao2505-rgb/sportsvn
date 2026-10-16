@@ -3,1328 +3,1536 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <meta name="description" content="SportsVN Admin - Nền tảng quản lý giải thể thao">
-    <title>Admin Dashboard - SportsVN</title>
-    <link rel="stylesheet" href="styles.css">
-    <script src="banner.js" defer></script>
-    <script src="football.js" defer></script>
-    <script src="provinces.js" defer></script>
-    <script src="sidebar.js" defer></script>
-    <script src="analytics.js" defer></script>   <!-- 👈 THÊM DÒNG NÀY -->
-
-    <!-- CSS riêng cho Post Editor + Analytics Widget -->
+    <title>Xếp lịch tự động - SportsVN</title>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
     <style>
-        /* ============================================
-           POST EDITOR — Admin đăng bài thể thao
-           ============================================ */
-        .post-form { display: flex; flex-direction: column; gap: 14px; padding: 0 4px 12px; }
-        .form-row { display: flex; gap: 12px; flex-wrap: wrap; }
-        .form-row > .form-group { flex: 1; min-width: 200px; }
-        .form-group { display: flex; flex-direction: column; gap: 6px; }
-        .form-group label { font-weight: 600; font-size: 12px; }
-        .form-group .req { color: #dc2626; }
-        .form-group input[type="text"],
-        .form-group input[type="file"],
-        .form-group textarea,
-        .form-group select {
-            padding: 9px 10px; border: 1px solid #d8dee6;
-            border-radius: 8px; font-size: 13px; font-family: inherit; background: #fff;
-        }
-        .form-group textarea { resize: vertical; min-height: 120px; }
-        .form-hint { font-size: 11px; color: #6b7280; }
-        .form-fieldset {
-            border: 1px dashed #c7d0db; border-radius: 10px;
-            padding: 14px; background: #fafbfc;
-            display: flex; flex-direction: column; gap: 12px;
-        }
-        .form-fieldset legend { font-weight: 700; font-size: 13px; color: #1769ff; padding: 0 6px; }
-        .checkbox-inline { display: flex; align-items: center; gap: 6px; font-size: 13px; cursor: pointer; }
-        .form-actions {
-            display: flex; gap: 10px; flex-wrap: wrap;
-            padding-top: 8px; border-top: 1px solid #e5e9ee;
-        }
-        .btn-primary, .btn-secondary, .btn-ghost {
-            padding: 9px 16px; border-radius: 8px; border: none;
-            font-size: 13px; font-weight: 600; cursor: pointer;
-        }
-        .btn-primary { background: #1769ff; color: #fff; }
-        .btn-primary:disabled { opacity: .6; cursor: not-allowed; }
-        .btn-secondary { background: #eef2f7; color: #111; }
-        .btn-ghost { background: transparent; color: #1769ff; }
+        * { margin: 0; padding: 0; box-sizing: border-box; font-family: 'Segoe UI', system-ui, sans-serif; }
+        body { background: #f0f2f8; min-height: 100vh; padding: 24px; }
+        .container { max-width: 1500px; margin: 0 auto; }
 
-        .image-block {
-            position: relative; border: 1px solid #d8dee6; border-radius: 8px;
-            padding: 12px; margin-bottom: 12px; background: #fff;
-            display: flex; flex-direction: column; gap: 8px;
+        .header {
+            background: linear-gradient(135deg, #0d1b3e, #1a3a7a);
+            border-radius: 20px; padding: 32px; color: #fff;
+            margin-bottom: 24px; display: flex; justify-content: space-between;
+            align-items: center; flex-wrap: wrap; gap: 16px;
+            box-shadow: 0 8px 30px rgba(13,27,62,0.25);
         }
-        .image-block h4 { margin: 0; font-size: 12px; color: #1769ff; text-transform: uppercase; }
-        .image-block .remove-img {
-            position: absolute; top: 8px; right: 8px;
-            background: #e63946; color: #fff; border: none;
-            border-radius: 6px; padding: 4px 8px; font-size: 11px; cursor: pointer;
+        .header h1 { font-size: 28px; margin-bottom: 8px; }
+        .header p { opacity: 0.85; }
+        .header-actions { display: flex; gap: 10px; flex-wrap: wrap; }
+        .btn-outline {
+            background: transparent; color: #fff; border: 2px solid #fff;
+            padding: 10px 20px; border-radius: 10px; font-size: 14px;
+            font-weight: 700; cursor: pointer; text-decoration: none;
+            display: inline-flex; align-items: center; gap: 8px; transition: all 0.2s;
         }
-        .img-preview { max-width: 100%; max-height: 220px; border-radius: 8px; margin-top: 6px; object-fit: cover; }
+        .btn-outline:hover { background: #fff; color: #0d1b3e; }
 
-        .post-preview {
-            margin-top: 20px; padding-top: 20px;
-            border-top: 1px solid #e5e9ee; max-width: 720px;
+        .panel {
+            background: #fff; border-radius: 16px; padding: 24px;
+            margin-bottom: 24px; box-shadow: 0 4px 20px rgba(0,0,0,0.08);
         }
-        .post-preview .post-title { font-size: 22px; margin: 0 0 4px; }
-        .post-preview .post-author { color: #6b7280; font-size: 13px; margin: 0 0 14px; }
-        .post-preview p { line-height: 1.7; margin: 12px 0; }
+        .panel-title {
+            font-size: 20px; font-weight: 700; color: #1a1a2e;
+            margin-bottom: 16px; display: flex; align-items: center; gap: 10px;
+        }
+        .step-num {
+            background: #1a3a7a; color: #fff; width: 32px; height: 32px;
+            border-radius: 50%; display: flex; align-items: center;
+            justify-content: center; font-size: 15px; flex-shrink: 0;
+        }
 
-        .post-figure { margin: 18px 0; text-align: center; }
-        .post-figure img { max-width: 100%; border-radius: 8px; display: block; margin: 0 auto; }
-        .post-figure figcaption {
-            font-size: 12px; color: #6b7280; font-style: italic;
-            margin-top: 6px; text-align: center;
-        }
-        .post-figure.cover img { width: 100%; }
-
-        /* ============================================
-           ANALYTICS WIDGET — Thống kê truy cập
-           ============================================ */
-        .analytics-widget {
-            margin: 16px 0;
-            padding: 20px;
-            background: #fff;
-            border-radius: 16px;
-            border: 1px solid var(--border, #e5e9ee);
-            box-shadow: 0 1px 3px rgba(0,0,0,.06);
-        }
-        .analytics-header {
-            display: flex; justify-content: space-between; align-items: center;
-            margin-bottom: 16px;
-        }
-        .analytics-header h2 {
-            font-size: 16px; font-weight: 800; margin: 0;
-            color: var(--text-dark, #111);
-        }
-        .analytics-refresh {
-            width: 34px; height: 34px; border-radius: 8px; border: 0;
-            background: #f3f4f6; color: #4b5563; font-size: 16px;
-            cursor: pointer; transition: all .2s ease;
-        }
-        .analytics-refresh:hover { background: #1769ff; color: #fff; }
-        .analytics-refresh.spinning { animation: spin .8s linear infinite; }
-        @keyframes spin { to { transform: rotate(360deg); } }
-
-        .analytics-grid {
-            display: grid;
-            grid-template-columns: repeat(auto-fit, minmax(220px, 1fr));
+        .stats-grid {
+            display: grid; grid-template-columns: repeat(auto-fill, minmax(200px, 1fr));
             gap: 12px;
         }
-
         .stat-card {
-            display: flex; align-items: center; gap: 14px;
-            padding: 16px; border-radius: 12px;
-            background: #fafbfc;
-            border: 1px solid #e5e9ee;
-            transition: all .2s ease;
+            background: #f8f9fa; border: 2px solid #e9ecef;
+            border-radius: 12px; padding: 16px;
+            display: flex; align-items: center; gap: 12px;
         }
-        .stat-card:hover { transform: translateY(-2px); box-shadow: 0 6px 16px rgba(0,0,0,.06); }
-        .stat-card.stat-primary {
-            background: linear-gradient(135deg, #1769ff 0%, #4d94ff 100%);
-            border-color: transparent; color: #fff;
+        .stat-card .icon {
+            width: 44px; height: 44px; border-radius: 10px;
+            background: linear-gradient(135deg, #1a3a7a, #0d1b3e);
+            color: #fff; display: flex; align-items: center;
+            justify-content: center; font-size: 18px; flex-shrink: 0;
         }
-        .stat-card.stat-primary .stat-label,
-        .stat-card.stat-primary .stat-sub { color: rgba(255,255,255,.85); }
-        .stat-card.stat-primary .stat-value { color: #fff; }
+        .stat-card .info { flex: 1; min-width: 0; }
+        .stat-card .num { font-size: 22px; font-weight: 800; color: #1a3a7a; }
+        .stat-card .lbl { font-size: 12px; color: #6c757d; text-transform: uppercase; }
 
-        .stat-icon {
-            width: 48px; height: 48px; border-radius: 12px;
-            background: #fff; display: flex; align-items: center; justify-content: center;
-            font-size: 24px;
-            box-shadow: 0 2px 6px rgba(0,0,0,.06);
+        .form-row {
+            display: grid; grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+            gap: 12px; margin-bottom: 16px;
         }
-        .stat-card.stat-primary .stat-icon { background: rgba(255,255,255,.2); }
-
-        .stat-info { display: flex; flex-direction: column; gap: 2px; }
-        .stat-label { font-size: 11px; font-weight: 700; color: #6b7280; text-transform: uppercase; letter-spacing: .3px; }
-        .stat-value { font-size: 22px; font-weight: 900; color: #111; line-height: 1.1; }
-        .stat-sub { font-size: 11px; color: #9ca3af; }
-
-        .analytics-row {
-            display: grid; grid-template-columns: 1fr 1fr; gap: 16px; margin-top: 20px;
+        .form-group label {
+            display: block; font-weight: 600; font-size: 14px;
+            margin-bottom: 6px; color: #1a1a2e;
         }
-        @media (max-width: 768px) { .analytics-row { grid-template-columns: 1fr; } }
-
-        .analytics-col h3 {
-            font-size: 13px; font-weight: 800; color: #111;
-            margin: 0 0 10px; padding-left: 8px;
-            border-left: 3px solid #1769ff;
+        .form-group input, .form-group select {
+            width: 100%; padding: 12px 16px; border: 2px solid #e9ecef;
+            border-radius: 10px; font-size: 15px; font-family: inherit;
+            transition: all 0.2s;
+        }
+        .form-group input:focus, .form-group select:focus {
+            border-color: #1a3a7a; outline: none;
+            box-shadow: 0 0 0 3px rgba(26,58,122,0.1);
         }
 
-        .top-list { display: flex; flex-direction: column; gap: 8px; }
-        .top-item {
-            display: flex; align-items: center; gap: 10px;
-            padding: 10px 12px; background: #fafbfc;
-            border-radius: 8px; font-size: 12.5px;
-            border: 1px solid #e5e9ee;
+        .btn {
+            padding: 12px 24px; border-radius: 10px; font-size: 14px;
+            font-weight: 700; cursor: pointer; border: none;
+            transition: all 0.3s ease; text-decoration: none;
+            display: inline-flex; align-items: center;
+            justify-content: center; gap: 6px;
         }
-        .top-item .rank {
-            width: 24px; height: 24px; border-radius: 6px;
-            background: #eef2f7; color: #4b5563;
-            display: flex; align-items: center; justify-content: center;
-            font-size: 11px; font-weight: 800; flex-shrink: 0;
-        }
-        .top-item:nth-child(1) .rank { background: #fef3c7; color: #d97706; }
-        .top-item:nth-child(2) .rank { background: #e5e7eb; color: #6b7280; }
-        .top-item:nth-child(3) .rank { background: #fed7aa; color: #c2410c; }
+        .btn:hover { transform: translateY(-2px); }
+        .btn:disabled { opacity: 0.5; cursor: not-allowed; transform: none; }
+        .btn-primary { background: linear-gradient(135deg, #0d1b3e, #1a3a7a); color: #fff; }
+        .btn-success { background: linear-gradient(135deg, #00b894, #00a859); color: #fff; }
+        .btn-warning { background: #fdcb6e; color: #1a1a2e; }
+        .btn-danger { background: #e94560; color: #fff; }
+        .btn-info { background: #0984e3; color: #fff; }
+        .btn-block { width: 100%; }
+        .btn-lg { padding: 16px 32px; font-size: 17px; font-weight: 800; }
 
-        .top-item .top-title {
-            flex: 1; overflow: hidden; text-overflow: ellipsis;
-            white-space: nowrap; color: #111; font-weight: 600;
+        .content-list { display: grid; gap: 10px; }
+        .content-item {
+            background: #f8f9fa; border: 2px solid #e9ecef;
+            border-radius: 12px; padding: 14px 16px;
+            display: flex; align-items: center; gap: 12px;
+            cursor: move; transition: all 0.2s;
         }
-        .top-item .top-count {
-            font-weight: 800; color: #1769ff; font-size: 12px;
+        .content-item:hover { border-color: #1a3a7a; background: #fff; }
+        .content-item.dragging { opacity: 0.4; }
+        .content-item.drag-over { border-color: #e94560; border-style: dashed; }
+        .content-item .drag-handle { color: #adb5bd; cursor: grab; font-size: 18px; }
+        .content-item .order-badge {
+            width: 32px; height: 32px; border-radius: 50%;
+            background: linear-gradient(135deg, #1a3a7a, #0d1b3e);
+            color: #fff; display: flex; align-items: center;
+            justify-content: center; font-weight: 800;
+            font-size: 14px; flex-shrink: 0;
+        }
+        .content-item .content-info { flex: 1; min-width: 0; }
+        .content-item .content-name { font-size: 15px; font-weight: 700; color: #1a1a2e; }
+        .content-item .content-meta { font-size: 12px; color: #6c757d; margin-top: 4px; }
+        .content-item .content-badge {
+            font-size: 11px; font-weight: 700;
+            padding: 4px 10px; border-radius: 12px;
+            flex-shrink: 0;
+        }
+        .badge-team { background: #fdcb6e; color: #856404; }
+        .badge-single { background: #a29bfe; color: #fff; }
+        .badge-double { background: #00b894; color: #fff; }
+
+        .final-config-table {
+            width: 100%; border-collapse: collapse;
+            font-size: 13px; background: #fff;
+            border-radius: 10px; overflow: hidden;
+            box-shadow: 0 2px 8px rgba(0,0,0,0.05);
+        }
+        .final-config-table th {
+            background: #1a3a7a; color: #fff; padding: 12px;
+            text-align: left; font-size: 12px;
+            text-transform: uppercase; letter-spacing: 0.5px;
+        }
+        .final-config-table td { padding: 12px; border-bottom: 1px solid #e9ecef; }
+        .final-config-table tr:last-child td { border-bottom: none; }
+        .final-config-table tr:hover { background: #f8f9fa; }
+        .final-config-table select {
+            width: 100%; padding: 8px 12px; border: 2px solid #e9ecef;
+            border-radius: 8px; font-size: 13px;
+        }
+        .final-config-table select:focus { border-color: #1a3a7a; outline: none; }
+
+        .warning-box {
+            padding: 14px 18px; background: #fff3cd;
+            border: 1px solid #ffeaa7; border-left: 4px solid #fdcb6e;
+            border-radius: 10px; color: #856404;
+            margin-bottom: 20px; font-size: 14px; line-height: 1.6;
+        }
+        .warning-box.error {
+            background: #f8d7da; border-color: #f5c6cb;
+            border-left-color: #e94560; color: #721c24;
+        }
+        .warning-box.success {
+            background: #d4edda; border-color: #c3e6cb;
+            border-left-color: #00b894; color: #155724;
+        }
+        .warning-box strong { display: block; margin-bottom: 4px; }
+        .warning-box ul { margin-left: 20px; margin-top: 8px; }
+        .warning-box li { margin-bottom: 4px; }
+
+        .alert {
+            padding: 14px 18px; border-radius: 10px;
+            margin-top: 16px; display: none; font-size: 14px;
+        }
+        .alert.show { display: block; }
+        .alert.error { background: #f8d7da; color: #721c24; border: 1px solid #f5c6cb; }
+        .alert.success { background: #d4edda; color: #155724; border: 1px solid #c3e6cb; }
+        .alert.info { background: #cce5ff; color: #004085; border: 1px solid #b8daff; }
+
+        .schedule-preview {
+            background: #f8f9fa; border-radius: 12px;
+            padding: 16px; overflow-x: auto;
+        }
+        .schedule-day { margin-bottom: 24px; }
+        .schedule-day-header {
+            background: linear-gradient(135deg, #0d1b3e, #1a3a7a);
+            color: #fff; padding: 12px 20px;
+            border-radius: 10px; font-weight: 800;
+            font-size: 16px; margin-bottom: 12px;
+            display: flex; justify-content: space-between; align-items: center;
+        }
+        .schedule-session { margin-bottom: 16px; }
+        .schedule-session-header {
+            background: #fff; padding: 10px 16px;
+            border-radius: 8px; font-weight: 700;
+            color: #1a3a7a; font-size: 14px;
+            margin-bottom: 10px; border-left: 4px solid #1a3a7a;
+        }
+        .courts-grid { display: grid; gap: 10px; }
+        .court-column {
+            background: #fff; border-radius: 10px;
+            padding: 12px; min-width: 200px;
+        }
+        .court-title {
+            font-size: 13px; font-weight: 800;
+            color: #1a3a7a; margin-bottom: 8px;
+            padding-bottom: 6px; border-bottom: 2px solid #e9ecef;
+            display: flex; justify-content: space-between;
+        }
+        .match-card {
+            background: #f8f9fa; border-radius: 8px;
+            padding: 10px; margin-bottom: 8px;
+            font-size: 12px; border-left: 3px solid #1a3a7a;
+            transition: all 0.2s;
+        }
+        .match-card:hover { background: #e7f3ff; }
+        .match-card.conflict { border-left-color: #e94560; background: #fff5f7; }
+        .match-card .time {
+            font-weight: 800; color: #1a3a7a;
+            font-size: 11px; margin-bottom: 4px;
+            display: flex; justify-content: space-between;
+        }
+        .match-card .content-name {
+            font-weight: 700; color: #e94560;
+            font-size: 11px; margin-bottom: 4px;
+            text-transform: uppercase;
+        }
+        .match-card .players {
+            font-size: 12px; font-weight: 600;
+            color: #1a1a2e;
         }
 
-        .analytics-loading {
-            text-align: center; padding: 20px;
-            color: #6b7280; font-size: 12px;
+        .loading-overlay {
+            position: fixed; top: 0; left: 0; right: 0; bottom: 0;
+            background: rgba(0,0,0,0.7); display: none;
+            align-items: center; justify-content: center; z-index: 9999;
+        }
+        .loading-overlay.active { display: flex; }
+        .loading-box {
+            background: #fff; padding: 30px 40px;
+            border-radius: 16px; text-align: center;
+        }
+        .spinner {
+            display: inline-block; width: 40px; height: 40px;
+            border: 4px solid #e9ecef; border-top-color: #1a3a7a;
+            border-radius: 50%; animation: spin 0.8s linear infinite;
+        }
+        @keyframes spin { to { transform: rotate(360deg); } }
+
+        .empty-state { text-align: center; padding: 40px 20px; color: #6c757d; }
+        .empty-state i { font-size: 48px; color: #dee2e6; margin-bottom: 12px; display: block; }
+
+        .loading-inline {
+            text-align: center; padding: 30px; color: #6c757d;
+        }
+        .loading-inline i { font-size: 32px; color: #1a3a7a; margin-bottom: 8px; display: block; }
+
+        .advanced-config {
+            background: #f0f4ff; border: 2px solid #1a3a7a;
+            border-radius: 12px; padding: 16px; margin-bottom: 16px;
+        }
+        .advanced-config h4 {
+            font-size: 14px; font-weight: 800; color: #1a3a7a;
+            margin-bottom: 12px; display: flex; align-items: center; gap: 8px;
+        }
+        .advanced-config .form-row {
+            grid-template-columns: repeat(auto-fit, minmax(180px, 1fr));
+        }
+
+        @media (max-width: 768px) {
+            .header h1 { font-size: 22px; }
+            .courts-grid { grid-template-columns: 1fr; }
         }
     </style>
 </head>
-
-<body data-page="admin.html">
-
-    <div class="sidebar-overlay" id="sidebarOverlay"></div>
-
-    <div class="app">
-
-        <main class="main">
-
-            <!-- TOPBAR -->
-            <header class="topbar">
-                <div class="topbar-left">
-                    <button class="mobile-menu" id="mobileMenu" aria-label="Mở menu">☰</button>
-                    <div class="topbar-brand">
-                        <span class="topbar-label">SPORTS MANAGEMENT PLATFORM</span>
-                        <h1 class="topbar-title-main">SPORTS<span>VN</span></h1>
-                        <p class="topbar-subtitle">Kết nối đam mê thể thao — Cập nhật nhanh chóng — Chính xác — Toàn diện</p>
-                    </div>
-                </div>
-
-                <div class="topbar-right">
-                    <a href="tournaments.html" class="topbar-cta">
-                        <span>＋</span> Tạo giải đấu
-                    </a>
-
-                    <button class="icon-button" title="Thông báo">
-                        ♢
-                        <span class="notification-dot"></span>
-                    </button>
-
-                    <button class="icon-button" title="Tìm kiếm">⌕</button>
-
-                    <div class="top-user" id="topUser" title="Bấm để đăng xuất">
-                        <div class="top-avatar">A</div>
-                        <div class="top-user-info">
-                            <strong>Quản trị viên</strong>
-                            <span>SportsVN</span>
-                        </div>
-                        <span class="arrow">▾</span>
-                    </div>
-                </div>
-            </header>
-
-
-            <!-- CONTENT -->
-            <section class="content">
-
-                <!-- BANNER ĐÔI + NÚT ĐỔI ẢNH -->
-                <div class="banner-double" id="bannerSection">
-                    <div class="banner-half" id="bannerLeft">
-                        <div class="banner-half-slides" id="bannerLeftSlides"></div>
-                        <div class="banner-half-dots" id="bannerLeftDots"></div>
-                    </div>
-                    <div class="banner-half" id="bannerRight">
-                        <div class="banner-half-slides" id="bannerRightSlides"></div>
-                        <div class="banner-half-dots" id="bannerRightDots"></div>
-                    </div>
-
-                    <!-- Nút đổi ảnh bìa (chỉ admin chính thấy) -->
-                    <button class="change-banner-btn" id="changeBannerBtn" title="Đổi ảnh bìa">
-                        📷 Đổi ảnh bìa
-                    </button>
-                    <input type="file" id="bannerInput" accept="image/*" style="display: none;">
-                </div>
-
-
-                <!-- 👇 ============================================ -->
-                <!-- 👇 THÊM: ANALYTICS WIDGET (chỉ admin thấy) -->
-                <!-- 👇 ============================================ -->
-                <section class="analytics-widget" id="analyticsWidget" style="display:none;">
-                    <div class="analytics-header">
-                        <h2>📊 Thống kê truy cập</h2>
-                        <button class="analytics-refresh" id="analyticsRefresh" title="Làm mới">↻</button>
-                    </div>
-
-                    <div class="analytics-grid">
-                        <div class="stat-card stat-primary">
-                            <div class="stat-icon">👥</div>
-                            <div class="stat-info">
-                                <span class="stat-label">Người truy cập duy nhất</span>
-                                <strong class="stat-value" id="statUniqueVisitors">—</strong>
-                                <span class="stat-sub" id="statUniqueSub">Đang tải...</span>
-                            </div>
-                        </div>
-
-                        <div class="stat-card">
-                            <div class="stat-icon">🟢</div>
-                            <div class="stat-info">
-                                <span class="stat-label">Đang online</span>
-                                <strong class="stat-value" id="statOnlineNow">—</strong>
-                                <span class="stat-sub">5 phút qua</span>
-                            </div>
-                        </div>
-
-                        <div class="stat-card">
-                            <div class="stat-icon">📄</div>
-                            <div class="stat-info">
-                                <span class="stat-label">Lượt xem trang</span>
-                                <strong class="stat-value" id="statTotalPageViews">—</strong>
-                                <span class="stat-sub" id="statTodayPageViews">Hôm nay: —</span>
-                            </div>
-                        </div>
-
-                        <div class="stat-card">
-                            <div class="stat-icon">👁️</div>
-                            <div class="stat-info">
-                                <span class="stat-label">Lượt xem tin tức</span>
-                                <strong class="stat-value" id="statTotalNewsViews">—</strong>
-                                <span class="stat-sub">tất cả bài viết</span>
-                            </div>
-                        </div>
-                    </div>
-
-                    <div class="analytics-row">
-                        <div class="analytics-col">
-                            <h3>🔥 Top bài viết xem nhiều</h3>
-                            <div id="topNewsList" class="top-list">
-                                <div class="analytics-loading">⏳ Đang tải...</div>
-                            </div>
-                        </div>
-
-                        <div class="analytics-col">
-                            <h3>📈 Top trang truy cập</h3>
-                            <div id="topPagesList" class="top-list">
-                                <div class="analytics-loading">⏳ Đang tải...</div>
-                            </div>
-                        </div>
-                    </div>
-                </section>
-                <!-- 👆 =============== HẾT ĐOẠN THÊM ============= -->
-
-
-                <!-- DASHBOARD 3 CỘT -->
-                <div class="dashboard-grid">
-
-                    <!-- CỘT 1: GIẢI ĐẤU -->
-                    <section class="panel">
-                        <div class="panel-header">
-                            <div>
-                                <h2>🏆 Giải đấu đang diễn ra</h2>
-                                <p>Các giải đấu mới nhất trên hệ thống</p>
-                            </div>
-                            <a href="tournaments.html">Xem tất cả →</a>
-                        </div>
-
-                        <div class="tournament-list" id="homeTournamentList">
-                            <div class="tournament">
-                                <div class="sport-logo football">⚽</div>
-                                <div class="tournament-info">
-                                    <strong>Giải Bóng đá Đại hội TDTT thành phố Đà Nẵng</strong>
-                                    <span>Bóng đá nam · 16 đội</span>
-                                </div>
-                                <div class="tournament-status">
-                                    <span class="status active">Đang diễn ra</span>
-                                    <small>24/08/2026</small>
-                                </div>
-                            </div>
-
-                            <div class="tournament">
-                                <div class="sport-logo swimming">🏊</div>
-                                <div class="tournament-info">
-                                    <strong>Giải Bơi Đại hội TDTT thành phố Đà Nẵng</strong>
-                                    <span>Bơi · 25 đơn vị</span>
-                                </div>
-                                <div class="tournament-status">
-                                    <span class="status upcoming">Sắp diễn ra</span>
-                                    <small>27/08/2026</small>
-                                </div>
-                            </div>
-
-                            <div class="tournament">
-                                <div class="sport-logo basketball">🏀</div>
-                                <div class="tournament-info">
-                                    <strong>Giải Bóng rổ trẻ 5x5 Quốc gia</strong>
-                                    <span>Bóng rổ · U16</span>
-                                </div>
-                                <div class="tournament-status">
-                                    <span class="status active">Đang diễn ra</span>
-                                    <small>24/08/2026</small>
-                                </div>
-                            </div>
-
-                            <div class="tournament">
-                                <div class="sport-logo pickleball">◉</div>
-                                <div class="tournament-info">
-                                    <strong>Giải Pickleball Đại hội TDTT thành phố Đà Nẵng</strong>
-                                    <span>Pickleball · 25 đơn vị</span>
-                                </div>
-                                <div class="tournament-status">
-                                    <span class="status completed">Đã kết thúc</span>
-                                    <small>30/06/2026</small>
-                                </div>
-                            </div>
-                        </div>
-                    </section>
-
-
-                    <!-- CỘT 2: TIN TỨC -->
-                    <section class="panel">
-                        <div class="panel-header">
-                            <div>
-                                <h2>📰 Tin tức mới nhất</h2>
-                                <p>Cập nhật tin tức thể thao</p>
-                            </div>
-                            <a href="news-list.html">Xem tất cả →</a>
-                        </div>
-
-                        <div class="news-list" id="homeNewsList">
-                            <div style="text-align:center;padding:30px;color:#6b7280;font-size:12px;">
-                                ⏳ Đang tải...
-                            </div>
-                        </div>
-                    </section>
-
-
-                    <!-- CỘT 3: KẾT QUẢ BÓNG ĐÁ -->
-                    <section class="panel">
-                        <div class="panel-header">
-                            <div>
-                                <h2>⚽ Kết quả Bóng đá</h2>
-                            </div>
-                            <a href="#">Xem tất cả →</a>
-                        </div>
-
-                        <div class="results-list">
-                            <div class="result-tabs" id="footballLeagueTabs">
-                                <div class="result-tab active" data-league="4328">NHA</div>
-                                <div class="result-tab" data-league="4335">La Liga</div>
-                                <div class="result-tab" data-league="4480">C1</div>
-                                <div class="result-tab" data-league="4564">V.League</div>
-                            </div>
-
-                            <div class="result-tabs" id="footballStatusTabs" style="margin-top:8px;">
-                                <div class="result-tab active" data-status="upcoming">Sắp tới</div>
-                                <div class="result-tab" data-status="recent">Gần đây</div>
-                            </div>
-
-                            <div id="footballMatches">
-                                <div style="text-align:center;padding:30px;color:#6b7280;font-size:12px;">
-                                    ⏳ Đang tải...
-                                </div>
-                            </div>
-                        </div>
-
-                        <div class="panel-header" style="border-top: 1px solid var(--border-light); margin-top: 8px;">
-                            <div>
-                                <h2>🔗 Liên kết nhanh</h2>
-                            </div>
-                        </div>
-
-                        <div class="quick-links">
-                            <a href="draw.html" class="quick-link-item" style="text-decoration: none;">
-                                <div class="quick-link-icon blue">◇</div>
-                                <div class="quick-link-text">
-                                    <strong>Bốc thăm</strong>
-                                    <span>Trực tuyến</span>
-                                </div>
-                            </a>
-
-                            <a href="booking.html" class="quick-link-item" style="text-decoration: none;">
-                                <div class="quick-link-icon green">🏟️</div>
-                                <div class="quick-link-text">
-                                    <strong>Đặt sân</strong>
-                                    <span>Online</span>
-                                </div>
-                            </a>
-
-                            <a href="shop.html" class="quick-link-item" style="text-decoration: none;">
-                                <div class="quick-link-icon orange">🛍️</div>
-                                <div class="quick-link-text">
-                                    <strong>Mua sắm</strong>
-                                    <span>Sản phẩm</span>
-                                </div>
-                            </a>
-
-                            <a href="lucky-wheel.html" class="quick-link-item" style="text-decoration: none;">
-                                <div class="quick-link-icon purple">🎰</div>
-                                <div class="quick-link-text">
-                                    <strong>Vòng quay</strong>
-                                    <span>May mắn</span>
-                                </div>
-                            </a>
-                        </div>
-                    </section>
-
-                </div>
-
-
-                <!-- ============================================ -->
-                <!-- PANEL ĐĂNG BÀI (chỉ admin chính thấy) -->
-                <!-- ============================================ -->
-                <section class="panel post-editor-panel" id="postEditorPanel" style="display:none;margin-top:16px;">
-                    <div class="panel-header">
-                        <div>
-                            <h2>✍️ Đăng bài thể thao</h2>
-                            <p>Soạn tin, thêm ảnh bìa và ảnh nội dung có chú thích + nguồn</p>
-                        </div>
-                    </div>
-
-                    <form id="postForm" class="post-form">
-
-                        <div class="form-row">
-                            <div class="form-group" style="flex:2;">
-                                <label for="postTitle">Tiêu đề bài viết <span class="req">*</span></label>
-                                <input type="text" id="postTitle" placeholder="VD: Việt Nam vô địch AFF Cup 2026" required>
-                            </div>
-                            <div class="form-group" style="flex:1;">
-                                <label for="postPenName">Bút danh</label>
-                                <input type="text" id="postPenName" placeholder="Bút danh cho bài viết">
-                                <small class="form-hint">Mặc định lấy từ tài khoản — có thể sửa cho từng bài.</small>
-                            </div>
-                        </div>
-
-                        <div class="form-row">
-                            <div class="form-group" style="flex:3;">
-                                <label for="postSummary">Tóm tắt (summary)</label>
-                                <input type="text" id="postSummary" placeholder="Mô tả ngắn hiển thị ở trang chủ">
-                            </div>
-                            <div class="form-group" style="flex:1;">
-                                <label for="postHot">Đánh dấu</label>
-                                <label class="checkbox-inline">
-                                    <input type="checkbox" id="postHot"> Tin HOT
-                                </label>
-                            </div>
-                        </div>
-
-                        <!-- ẢNH BÌA -->
-                        <fieldset class="form-fieldset">
-                            <legend>🖼️ Ảnh bìa</legend>
-
-                            <div class="form-row">
-                                <div class="form-group">
-                                    <label>File ảnh bìa</label>
-                                    <input type="file" id="coverFile" accept="image/*">
-                                </div>
-                                <div class="form-group">
-                                    <label for="coverUrl">Hoặc URL ảnh bìa</label>
-                                    <input type="text" id="coverUrl" placeholder="https://...">
-                                </div>
-                            </div>
-
-                            <div class="form-row">
-                                <div class="form-group">
-                                    <label for="coverCaption">Chú thích ảnh bìa</label>
-                                    <input type="text" id="coverCaption" placeholder="VD: Cầu thủ ăn mừng bàn thắng">
-                                </div>
-                                <div class="form-group">
-                                    <label for="coverSource">Nguồn ảnh bìa</label>
-                                    <input type="text" id="coverSource" placeholder="VD: Ảnh: Văn Hùng">
-                                </div>
-                            </div>
-
-                            <img id="coverPreview" class="img-preview" alt="preview" style="display:none;">
-                        </fieldset>
-
-                        <!-- NỘI DUNG -->
-                        <div class="form-group">
-                            <label for="postContent">Nội dung bài viết <span class="req">*</span></label>
-                            <textarea id="postContent" rows="8" placeholder="Nhập nội dung... (xuống dòng để tách đoạn)"></textarea>
-                        </div>
-
-                        <!-- ẢNH NỘI DUNG -->
-                        <fieldset class="form-fieldset">
-                            <legend>📷 Ảnh nội dung</legend>
-                            <p class="form-hint" style="margin-top:0;">
-                                Thêm nhiều ảnh — mỗi ảnh có chú thích + nguồn và chọn vị trí chèn (giữa bài / cuối bài).
-                            </p>
-                            <div id="contentImages"></div>
-                            <button type="button" class="btn-secondary" id="addImageBtn" style="align-self:flex-start;">➕ Thêm ảnh nội dung</button>
-                        </fieldset>
-
-                        <!-- ACTIONS -->
-                        <div class="form-actions">
-                            <button type="submit" class="btn-primary" id="submitPostBtn">💾 Đăng bài</button>
-                            <button type="button" class="btn-secondary" id="previewPostBtn">👁️ Xem trước</button>
-                            <button type="reset" class="btn-ghost">↺ Xóa form</button>
-                        </div>
-                    </form>
-
-                    <div id="postPreview" class="post-preview" style="display:none;"></div>
-                </section>
-
-
-                <!-- UPCOMING BAR -->
-                <div class="upcoming-bar">
-                    <div class="upcoming-title">
-                        <span>📅</span> Giải đấu sắp tới
-                    </div>
-
-                    <div class="upcoming-item">
-                        <div class="upcoming-icon" style="background:#fff3e0; color:#f57c00;">🏀</div>
-                        <div class="upcoming-info">
-                            <strong>Bóng rổ U16</strong>
-                            <span>24/08 - 28/08/2026</span>
-                        </div>
-                    </div>
-
-                    <div class="upcoming-item">
-                        <div class="upcoming-icon" style="background:#e0f7fa; color:#00acc1;">🏊</div>
-                        <div class="upcoming-info">
-                            <strong>Bơi</strong>
-                            <span>27/08 - 29/08/2026</span>
-                        </div>
-                    </div>
-
-                    <div class="upcoming-item">
-                        <div class="upcoming-icon" style="background:#fff8e1; color:#fbc02d;">♟️</div>
-                        <div class="upcoming-info">
-                            <strong>Cờ tướng trẻ</strong>
-                            <span>23/06 - 02/07/2026</span>
-                        </div>
-                    </div>
-
-                    <div class="upcoming-item">
-                        <div class="upcoming-icon" style="background:#fce4ec; color:#e91e63;">🎱</div>
-                        <div class="upcoming-info">
-                            <strong>Bi sắt</strong>
-                            <span>12/09 - 15/09/2026</span>
-                        </div>
-                    </div>
-
-                    <div class="upcoming-item">
-                        <div class="upcoming-icon" style="background:#e3f2fd; color:#1976d2;">🥋</div>
-                        <div class="upcoming-info">
-                            <strong>Vovinam</strong>
-                            <span>20/09 - 24/09/2026</span>
-                        </div>
-                    </div>
-                </div>
-
-            </section>
-
-
-            <footer class="footer">
-                <span>© 2026 SportsVN</span>
-                <span>Nền tảng công nghệ thể thao Việt Nam</span>
-            </footer>
-
-        </main>
-
+<body>
+
+<div class="container">
+
+    <div class="header">
+        <div>
+            <h1>📅 Xếp lịch tự động đa nội dung</h1>
+            <p>Tự động chia lịch cho tất cả nội dung, tránh trùng VĐV, phân bổ đều Sáng/Chiều</p>
+        </div>
+        <div class="header-actions">
+            <a href="categories.html" class="btn-outline" id="backLink">
+                <i class="fas fa-arrow-left"></i> Quay lại
+            </a>
+        </div>
     </div>
 
+    <!-- BƯỚC 1: LOAD DỮ LIỆU TỪ DRAWs -->
+    <div class="panel">
+        <div class="panel-title">
+            <span class="step-num">1</span> Dữ liệu từ các nội dung đã bốc thăm
+        </div>
+        <div id="dataStatus" class="loading-inline">
+            <i class="fas fa-spinner fa-spin"></i>
+            <p>Đang tải dữ liệu từ Supabase...</p>
+        </div>
+        <div id="dataStats" class="stats-grid" style="display: none;"></div>
+        <div id="contentList" class="content-list" style="margin-top: 16px;">
+            <div class="empty-state">
+                <i class="fas fa-inbox"></i>
+                <p>Đang tải...</p>
+            </div>
+        </div>
+    </div>
 
-    <!-- SCRIPTS -->
-    <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
-    <script src="config.js"></script>
-    <script>
-        // ==========================================
-        // SPORTSVN ADMIN DASHBOARD
-        // Yêu cầu đăng nhập + quyền admin
-        // ==========================================
+    <!-- BƯỚC 2: CẤU HÌNH LỊCH -->
+    <div class="panel">
+        <div class="panel-title">
+            <span class="step-num">2</span> Cấu hình lịch thi đấu
+        </div>
+        <div class="form-row">
+            <div class="form-group">
+                <label><i class="fas fa-calendar"></i> Ngày bắt đầu</label>
+                <input type="date" id="startDate">
+            </div>
+            <div class="form-group">
+                <label><i class="fas fa-calendar-week"></i> Số ngày thi đấu</label>
+                <input type="number" id="numDays" value="3" min="1" max="30">
+            </div>
+            <div class="form-group">
+                <label><i class="fas fa-table-tennis"></i> Số sân thi đấu</label>
+                <input type="number" id="numCourts" value="8" min="1" max="30">
+            </div>
+            <div class="form-group">
+                <label><i class="fas fa-clock"></i> Thời gian/trận (phút)</label>
+                <input type="number" id="matchDuration" value="30" min="10" max="180">
+            </div>
+        </div>
+        <div class="form-row">
+            <div class="form-group">
+                <label><i class="fas fa-hourglass"></i> Nghỉ giữa trận (phút)</label>
+                <input type="number" id="breakDuration" value="5" min="0" max="60">
+            </div>
+            <div class="form-group">
+                <label><i class="fas fa-sun"></i> Giờ bắt đầu Sáng</label>
+                <input type="time" id="timeMorning" value="08:00">
+                <label style="margin-top: 6px; font-size: 13px;">
+                    <input type="checkbox" id="sessionMorning" checked style="width: auto; margin-right: 4px;"> Có buổi Sáng
+                </label>
+            </div>
+            <div class="form-group">
+                <label><i class="fas fa-cloud-sun"></i> Giờ bắt đầu Chiều</label>
+                <input type="time" id="timeAfternoon" value="14:00">
+                <label style="margin-top: 6px; font-size: 13px;">
+                    <input type="checkbox" id="sessionAfternoon" checked style="width: auto; margin-right: 4px;"> Có buổi Chiều
+                </label>
+            </div>
+            <div class="form-group">
+                <label><i class="fas fa-moon"></i> Giờ bắt đầu Tối</label>
+                <input type="time" id="timeEvening" value="19:00">
+                <label style="margin-top: 6px; font-size: 13px;">
+                    <input type="checkbox" id="sessionEvening" checked style="width: auto; margin-right: 4px;"> Có buổi Tối
+                </label>
+            </div>
+        </div>
+    </div>
 
-        window.supabaseClient = null;
-        window.currentSession = null;
+    <!-- BƯỚC 2B: CẤU HÌNH NÂNG CAO -->
+    <div class="panel">
+        <div class="panel-title">
+            <span class="step-num">⚙️</span> Cấu hình nâng cao (Tùy chọn)
+        </div>
+        <div class="advanced-config">
+            <h4><i class="fas fa-sliders-h"></i> Quy tắc xếp lịch thông minh</h4>
+            <div class="form-row">
+                <div class="form-group">
+                    <label>Số slot nghỉ tối thiểu giữa 2 trận của 1 VĐV</label>
+                    <input type="number" id="restSlots" value="1" min="0" max="5">
+                    <small style="color: #6c757d; font-size: 11px;">VD: 1 = nghỉ ít nhất 1 slot</small>
+                </div>
+                <div class="form-group">
+                    <label>Số trận tối đa 1 VĐV đấu trong 1 ngày</label>
+                    <input type="number" id="maxMatchesPerDay" value="3" min="1" max="10">
+                </div>
+                <div class="form-group">
+                    <label>Phân bổ tối đa cùng nội dung/buổi (%)</label>
+                    <input type="number" id="maxSameCategoryPercent" value="60" min="30" max="100">
+                    <small style="color: #6c757d; font-size: 11px;">60% = không quá 60% số bàn trong 1 buổi</small>
+                </div>
+            </div>
+        </div>
+    </div>
 
-        document.addEventListener('DOMContentLoaded', async function() {
-            'use strict';
+    <!-- BƯỚC 3: THỨ TỰ ƯU TIÊN -->
+    <div class="panel">
+        <div class="panel-title">
+            <span class="step-num">3</span> Thứ tự ưu tiên nội dung
+        </div>
+        <p style="color: #6c757d; font-size: 13px; margin-bottom: 16px;">
+            <i class="fas fa-info-circle"></i> Kéo thả để sắp xếp thứ tự. Nội dung xếp trên sẽ thi đấu trước.
+        </p>
+        <div class="content-list" id="contentPriorityList">
+            <div class="empty-state">
+                <i class="fas fa-inbox"></i>
+                <p>Đang tải...</p>
+            </div>
+        </div>
+    </div>
 
-            const config = window.SPORTSVN_CONFIG || {};
-            if (!config.SUPABASE_URL || !config.SUPABASE_ANON_KEY) {
-                console.warn('⚠️ Chưa cấu hình Supabase trong config.js');
-                alert('Chưa cấu hình Supabase. Vui lòng kiểm tra file config.js');
+    <!-- BƯỚC 4: CẤU HÌNH VÒNG CUỐI -->
+    <div class="panel" id="finalConfigPanel" style="display: none;">
+        <div class="panel-title">
+            <span class="step-num">4</span> Cấu hình vòng Bán kết / Chung kết
+        </div>
+        <p style="color: #6c757d; font-size: 13px; margin-bottom: 16px;">
+            <i class="fas fa-info-circle"></i> Chọn buổi diễn ra BK/CK cho từng nội dung.
+        </p>
+        <table class="final-config-table">
+            <thead>
+                <tr>
+                    <th style="width: 50px;">#</th>
+                    <th>Nội dung</th>
+                    <th style="width: 150px;">Ngày</th>
+                    <th style="width: 150px;">Buổi</th>
+                </tr>
+            </thead>
+            <tbody id="finalConfigBody"></tbody>
+        </table>
+    </div>
+
+    <!-- BƯỚC 5: XẾP LỊCH -->
+    <div class="panel">
+        <div class="panel-title">
+            <span class="step-num">5</span> Tiến hành xếp lịch
+        </div>
+        <button class="btn btn-success btn-block btn-lg" onclick="generateSchedule()" id="generateBtn" disabled>
+            <i class="fas fa-magic"></i> XẾP LỊCH TỰ ĐỘNG
+        </button>
+        <div id="alert" class="alert"></div>
+    </div>
+
+    <!-- BƯỚC 6: KẾT QUẢ -->
+    <div class="panel" id="resultPanel" style="display: none;">
+        <div class="panel-title">
+            <span class="step-num">6</span> Kết quả xếp lịch
+        </div>
+        <div id="conflictWarning"></div>
+        <div id="scheduleResult" class="schedule-preview"></div>
+        <div style="margin-top: 20px; display: flex; gap: 12px; flex-wrap: wrap;">
+            <button class="btn btn-primary" onclick="window.print()">
+                <i class="fas fa-print"></i> In lịch
+            </button>
+            <button class="btn btn-info" onclick="exportSchedule()">
+                <i class="fas fa-file-excel"></i> Xuất Excel
+            </button>
+            <button class="btn btn-success" onclick="saveToDatabase()" id="saveBtn">
+                <i class="fas fa-save"></i> Lưu vào hệ thống
+            </button>
+            <button class="btn btn-warning" onclick="generateSchedule()">
+                <i class="fas fa-redo"></i> Xếp lại
+            </button>
+        </div>
+    </div>
+
+</div>
+
+<div class="loading-overlay" id="loadingOverlay">
+    <div class="loading-box">
+        <div class="spinner"></div>
+        <p id="loadingText" style="margin-top: 16px; color: #1a3a7a; font-weight: 700;">
+            Đang xử lý...
+        </p>
+    </div>
+</div>
+
+<script src="https://cdn.jsdelivr.net/npm/xlsx@0.18.5/dist/xlsx.full.min.js"></script>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/exceljs/4.4.0/exceljs.min.js"></script>
+<script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+<script src="config.js"></script>
+
+<script>
+(function() {
+    'use strict';
+
+    console.log('🚀 schedule-auto.html v5 - Balanced Distribution (Sáng/Chiều đều nhau)');
+
+    const config = window.SPORTSVN_CONFIG || {};
+    const supabaseClient = window.supabase.createClient(config.SUPABASE_URL, config.SUPABASE_ANON_KEY);
+    window.supabaseClient = supabaseClient;
+
+    let tournamentId = null;
+    let contents = [];
+    let allPlayers = new Map();
+    let scheduleResult = null;
+    let dragSrcIndex = null;
+
+    // ==========================================
+    // INIT
+    // ==========================================
+    async function init() {
+        const params = new URLSearchParams(window.location.search);
+        tournamentId = params.get('tournament_id');
+        if (!tournamentId) {
+            alert('Thiếu tournament_id!');
+            window.location.href = 'tournaments.html';
+            return;
+        }
+        window.tournamentId = tournamentId;
+        console.log('📌 Tournament ID:', tournamentId);
+
+        document.getElementById('backLink').href = `categories.html?tournament_id=${tournamentId}`;
+
+        const today = new Date();
+        document.getElementById('startDate').value = today.toISOString().slice(0, 10);
+
+        await loadDataFromDraws();
+        setupEventListeners();
+    }
+
+    // ==========================================
+    // LOAD DATA FROM SUPABASE
+    // ==========================================
+    async function loadDataFromDraws() {
+        try {
+            console.log('📥 Loading draws...');
+
+            const { data, error } = await supabaseClient
+                .from('draws')
+                .select('*')
+                .eq('tournament_id', tournamentId);
+
+            if (error) throw error;
+
+            console.log('📦 Loaded', data.length, 'draw records');
+
+            if (!data || data.length === 0) {
+                document.getElementById('dataStatus').innerHTML = `
+                    <div class="empty-state">
+                        <i class="fas fa-inbox"></i>
+                        <p>Chưa có dữ liệu bốc thăm. Hãy bốc thăm ít nhất 1 nội dung trước.</p>
+                        <a href="categories.html?tournament_id=${tournamentId}" class="btn btn-primary" style="margin-top: 12px;">
+                            <i class="fas fa-dice"></i> Đi bốc thăm
+                        </a>
+                    </div>
+                `;
                 return;
             }
 
-            window.supabaseClient = window.supabase.createClient(
-                config.SUPABASE_URL,
-                config.SUPABASE_ANON_KEY
-            );
-            const supabase = window.supabaseClient;
-
-            // 👇 ==========================================
-            // 👇 THÊM: GHI NHẬN LƯỢT TRUY CẬP
-            // 👇 ==========================================
-            if (window.SportsVNAnalytics) {
-                window.SportsVNAnalytics.trackVisit(supabase);
-            }
-            // 👆 =============== HẾT ĐOẠN THÊM =============
-
-            const ADMIN_EMAIL = 'nguyenquanghao2505@gmail.com';
-
-            // ==========================================
-            // 1. KIỂM TRA ĐĂNG NHẬP + QUYỀN ADMIN
-            // ==========================================
-            async function checkAuth() {
-                try {
-                    const { data: { session }, error } = await supabase.auth.getSession();
-
-                    if (error || !session) {
-                        console.log('Chưa đăng nhập → chuyển về login.html');
-                        window.location.href = 'login.html';
-                        return false;
-                    }
-
-                    window.currentSession = session;
-
-                    const { data: roleData, error: roleError } = await supabase
-                        .from('user_roles')
-                        .select('role')
-                        .eq('user_id', session.user.id)
-                        .single();
-
-                    if (roleError || !roleData || roleData.role !== 'admin') {
-                        alert('Tài khoản không có quyền Admin');
-                        await supabase.auth.signOut();
-                        window.location.href = 'login.html';
-                        return false;
-                    }
-
-                    const name = session.user.user_metadata?.full_name ||
-                                 session.user.email.split('@')[0];
-                    const initials = name.split(' ')
-                        .map(w => w[0])
-                        .join('')
-                        .slice(0, 2)
-                        .toUpperCase();
-
-                    document.querySelectorAll('.avatar, .top-avatar').forEach(el => el.textContent = initials);
-                    document.querySelectorAll('.user-info strong, .top-user-info strong')
-                        .forEach(el => el.textContent = name);
-
-                    // Chỉ admin chính mới thấy nút "Đổi ảnh bìa"
-                    const userEmail = session.user.email;
-                    const changeBannerBtn = document.getElementById('changeBannerBtn');
-
-                    if (changeBannerBtn && userEmail === ADMIN_EMAIL) {
-                        changeBannerBtn.classList.add('visible');
-                        console.log('✅ Admin chính đã đăng nhập');
-                    }
-
-                    return true;
-
-                } catch (err) {
-                    console.error('Lỗi checkAuth:', err);
-                    window.location.href = 'login.html';
-                    return false;
-                }
-            }
-
-            const isAuth = await checkAuth();
-            if (!isAuth) return;
-
-            const session = window.currentSession;
-
-            // ==========================================
-            // 2. ĐĂNG XUẤT
-            // ==========================================
-            const topUser = document.getElementById('topUser');
-            if (topUser) {
-                topUser.addEventListener('click', async function() {
-                    if (confirm('Bạn có muốn đăng xuất không?')) {
-                        await supabase.auth.signOut();
-                        window.location.href = 'index.html';
-                    }
-                });
-            }
-
-            // ==========================================
-            // 3. MOBILE MENU + OVERLAY
-            // ==========================================
-            const sidebarEl = document.querySelector('.sidebar');
-            const overlayEl = document.getElementById('sidebarOverlay');
-            const mobileMenu = document.getElementById('mobileMenu');
-
-            function openSidebar() {
-                sidebarEl?.classList.add('open');
-                overlayEl?.classList.add('show');
-                document.body.style.overflow = 'hidden';
-            }
-
-            function closeSidebar() {
-                sidebarEl?.classList.remove('open');
-                overlayEl?.classList.remove('show');
-                document.body.style.overflow = '';
-            }
-
-            mobileMenu?.addEventListener('click', () => {
-                if (sidebarEl?.classList.contains('open')) closeSidebar();
-                else openSidebar();
+            const byCategory = new Map();
+            data.forEach(row => {
+                const cat = row.category || 'Không tên';
+                if (!byCategory.has(cat)) byCategory.set(cat, []);
+                byCategory.get(cat).push(row);
             });
 
-            overlayEl?.addEventListener('click', closeSidebar);
+            console.log('📂 Groups:', byCategory.size, 'categories');
 
-            document.querySelectorAll('.sidebar .nav-item').forEach(link => {
-                link.addEventListener('click', () => {
-                    if (window.innerWidth <= 768) closeSidebar();
+            contents = [];
+            allPlayers = new Map();
+
+            let contentId = 0;
+            for (const [catName, rows] of byCategory) {
+                contentId++;
+
+                const nameLower = catName.toLowerCase();
+                let type = 'single';
+                if (nameLower.includes('đồng đội') || nameLower.startsWith('đội ')) type = 'team';
+                else if (nameLower.includes('đôi')) type = 'double';
+
+                const itemsMap = new Map();
+                rows.forEach(r => {
+                    const key = r.team_name + '|' + (r.club || '');
+                    if (!itemsMap.has(key)) {
+                        itemsMap.set(key, {
+                            name: r.team_name,
+                            unit: r.club || '',
+                            players: [r.team_name],
+                            group: r.group_name,
+                            position: r.position,
+                            draw_type: r.draw_type,
+                            rows: [],
+                        });
+                    }
+                    itemsMap.get(key).rows.push(r);
                 });
-            });
 
-            // ==========================================
-            // 4. ĐỔI ẢNH BÌA (chỉ admin chính)
-            // ==========================================
-            var changeBtn = document.getElementById('changeBannerBtn');
-            var fileInput = document.getElementById('bannerInput');
+                const items = Array.from(itemsMap.values());
 
-            if (changeBtn && fileInput) {
+                const content = {
+                    id: contentId,
+                    name: catName,
+                    type,
+                    items,
+                    drawData: rows,
+                    playerCount: items.reduce((sum, it) => sum + it.players.length, 0),
+                };
 
-                changeBtn.addEventListener('click', function(e) {
-                    e.stopPropagation();
-                    fileInput.click();
-                });
+                contents.push(content);
 
-                fileInput.addEventListener('change', async function(e) {
-                    var file = e.target.files[0];
-                    if (!file) return;
-
-                    if (!file.type.startsWith('image/')) {
-                        alert('Vui lòng chọn file ảnh');
-                        return;
-                    }
-
-                    if (file.size > 5 * 1024 * 1024) {
-                        alert('Ảnh quá lớn! Vui lòng chọn ảnh dưới 5MB.');
-                        return;
-                    }
-
-                    var originalText = changeBtn.innerHTML;
-                    changeBtn.innerHTML = '⏳ Đang tải...';
-                    changeBtn.disabled = true;
-
-                    try {
-                        var ext = file.name.split('.').pop().toLowerCase();
-                        var fileName = 'banner-' + Date.now() + '.' + ext;
-
-                        const { error } = await supabase
-                            .storage
-                            .from('banners')
-                            .upload(fileName, file, {
-                                cacheControl: '3600',
-                                upsert: true,
-                                contentType: file.type
-                            });
-
-                        if (error) throw error;
-
-                        const { data: urlData } = supabase
-                            .storage
-                            .from('banners')
-                            .getPublicUrl(fileName);
-
-                        console.log('✅ Upload thành công:', urlData.publicUrl);
-
-                        showToast('✓ Đã đổi ảnh bìa thành công!');
-
-                        setTimeout(() => {
-                            window.location.reload();
-                        }, 1500);
-
-                    } catch (err) {
-                        console.error('Lỗi upload:', err);
-                        alert('Lỗi upload ảnh: ' + err.message);
-                    } finally {
-                        changeBtn.innerHTML = originalText;
-                        changeBtn.disabled = false;
-                        fileInput.value = '';
-                    }
-                });
-            }
-
-            // ==========================================
-            // 5. LOAD TIN TỨC MỚI NHẤT
-            // ==========================================
-            async function loadHomeNews() {
-                try {
-                    const { data, error } = await supabase
-                        .from('news')
-                        .select('*')
-                        .order('created_at', { ascending: false })
-                        .limit(3);
-
-                    const container = document.getElementById('homeNewsList');
-                    if (!container) return;
-
-                    if (error || !data || data.length === 0) {
-                        container.innerHTML = '<div style="text-align:center;padding:30px;color:#9ca3af;font-size:12px;">📰 Chưa có tin tức</div>';
-                        return;
-                    }
-
-                    container.innerHTML = data.map(news => {
-                        const cap = [news.cover_caption, news.cover_source].filter(Boolean).join(' — ');
-                        const coverHTML = news.image_url
-                            ? `<figure class="post-figure cover" style="margin:0;">
-                                 <img src="${news.image_url}" alt="${news.title}" loading="lazy">
-                                 ${cap ? `<figcaption>${cap}</figcaption>` : ''}
-                               </figure>`
-                            : `<div style="width:100%;height:100%;display:flex;align-items:center;justify-content:center;font-size:32px;background:#f3f4f6;">📰</div>`;
-
-                        return `
-                            <a href="news-detail.html?id=${news.id}" class="news-item-link">
-                                <div class="news-item">
-                                    <div class="news-thumb">${coverHTML}</div>
-                                    <div class="news-content">
-                                        <strong>${news.title}</strong>
-                                        <p>${news.summary || ''}</p>
-                                        <div class="news-meta">
-                                            <span>${new Date(news.created_at).toLocaleDateString('vi-VN')}</span>
-                                            ${news.pen_name ? `<span>✍️ ${news.pen_name}</span>` : ''}
-                                            ${news.is_hot ? '<span class="news-tag">HOT</span>' : ''}
-                                        </div>
-                                    </div>
-                                </div>
-                            </a>
-                        `;
-                    }).join('');
-
-                    console.log('✅ Đã load ' + data.length + ' tin tức');
-                } catch (err) {
-                    console.warn('Lỗi load tin tức:', err);
-                }
-            }
-
-            loadHomeNews();
-
-            // ==========================================
-            // 6. LOAD KẾT QUẢ BÓNG ĐÁ
-            // ==========================================
-            let currentLeague = '4328';
-            let currentStatus = 'upcoming';
-
-            async function loadFootballMatches() {
-                const container = document.getElementById('footballMatches');
-                if (!container) return;
-
-                if (!window.FootballAPI) {
-                    container.innerHTML = '<div style="text-align:center;padding:30px;color:#dc2626;font-size:12px;">❌ Football API chưa load</div>';
-                    return;
-                }
-
-                container.innerHTML = '<div style="text-align:center;padding:30px;color:#6b7280;font-size:12px;">⏳ Đang tải...</div>';
-
-                try {
-                    let matches = [];
-
-                    if (currentStatus === 'upcoming') {
-                        matches = await window.FootballAPI.getUpcomingMatches(currentLeague);
-                    } else {
-                        matches = await window.FootballAPI.getRecentMatches(currentLeague);
-                    }
-
-                    if (!matches || matches.length === 0) {
-                        container.innerHTML = '<div style="text-align:center;padding:30px;color:#9ca3af;font-size:12px;">📅 Không có trận đấu nào</div>';
-                        return;
-                    }
-
-                    matches.sort((a, b) => new Date(a.dateEvent) - new Date(b.dateEvent));
-                    const displayMatches = matches.slice(0, 5);
-
-                    container.innerHTML = displayMatches.map(match => {
-                        const homeScore = match.intHomeScore ?? '-';
-                        const awayScore = match.intAwayScore ?? '-';
-                        const isFinished = match.intHomeScore !== null && match.intHomeScore !== undefined;
-
-                        const statusText = isFinished
-                            ? 'KT'
-                            : (match.strTime ? window.FootballAPI.formatMatchTime(match.strTime) : '—');
-
-                        const statusColor = isFinished ? '#6b7280' : '#1769ff';
-
-                        return `
-                            <div class="result-item">
-                                <div class="result-team">${match.strHomeTeam}</div>
-                                <div class="result-score">${homeScore} - ${awayScore}</div>
-                                <div class="result-team" style="text-align:right;">${match.strAwayTeam}</div>
-                                <div class="result-status" style="color:${statusColor};font-weight:700;">${statusText}</div>
-                            </div>
-                        `;
-                    }).join('');
-
-                    console.log(`✅ Đã load ${displayMatches.length} trận ${currentLeague}`);
-
-                } catch (error) {
-                    console.error('Lỗi load bóng đá:', error);
-                    container.innerHTML = '<div style="text-align:center;padding:30px;color:#dc2626;font-size:12px;">❌ Không thể tải dữ liệu</div>';
-                }
-            }
-
-            // Tab giải đấu
-            document.querySelectorAll('#footballLeagueTabs .result-tab').forEach(tab => {
-                tab.addEventListener('click', () => {
-                    document.querySelectorAll('#footballLeagueTabs .result-tab')
-                        .forEach(t => t.classList.remove('active'));
-                    tab.classList.add('active');
-                    currentLeague = tab.dataset.league;
-                    loadFootballMatches();
-                });
-            });
-
-            // Tab trạng thái
-            document.querySelectorAll('#footballStatusTabs .result-tab').forEach(tab => {
-                tab.addEventListener('click', () => {
-                    document.querySelectorAll('#footballStatusTabs .result-tab')
-                        .forEach(t => t.classList.remove('active'));
-                    tab.classList.add('active');
-                    currentStatus = tab.dataset.status;
-                    loadFootballMatches();
-                });
-            });
-
-            setTimeout(() => loadFootballMatches(), 500);
-
-            // ==========================================
-            // 7. TOAST NOTIFICATION
-            // ==========================================
-            function showToast(message) {
-                var toast = document.createElement('div');
-                toast.className = 'dashboard-toast';
-                toast.textContent = message;
-                document.body.appendChild(toast);
-
-                setTimeout(function() { toast.classList.add('show'); }, 100);
-                setTimeout(function() {
-                    toast.classList.remove('show');
-                    setTimeout(function() { toast.remove(); }, 300);
-                }, 3500);
-            }
-
-            // ==========================================
-            // 8. FORM ĐĂNG BÀI THỂ THAO (chỉ admin chính)
-            // ==========================================
-            const postEditorPanel = document.getElementById('postEditorPanel');
-            const postForm        = document.getElementById('postForm');
-            const contentImagesEl = document.getElementById('contentImages');
-
-            if (postEditorPanel && postForm && session.user.email === ADMIN_EMAIL) {
-                postEditorPanel.style.display = '';
-
-                const meta = session.user.user_metadata || {};
-                const defaultPenName =
-                    meta.pen_name || meta.full_name || session.user.email.split('@')[0];
-                document.getElementById('postPenName').value = defaultPenName;
-
-                let imgIdx = 0;
-
-                function addImageBlock(data = {}) {
-                    const id = ++imgIdx;
-                    const block = document.createElement('div');
-                    block.className = 'image-block';
-                    block.dataset.id = id;
-                    block.innerHTML = `
-                        <button type="button" class="remove-img">✕ Xóa</button>
-                        <h4>Ảnh nội dung #${id}</h4>
-                        <div class="form-group">
-                            <label>File ảnh</label>
-                            <input type="file" class="img-file" accept="image/*">
-                        </div>
-                        <div class="form-group">
-                            <label>Hoặc URL ảnh</label>
-                            <input type="text" class="img-url" placeholder="https://..." value="${data.url || ''}">
-                        </div>
-                        <div class="form-row">
-                            <div class="form-group">
-                                <label>Chú thích ảnh</label>
-                                <input type="text" class="img-caption" placeholder="VD: HLV phát biểu sau trận" value="${data.caption || ''}">
-                            </div>
-                            <div class="form-group">
-                                <label>Nguồn ảnh</label>
-                                <input type="text" class="img-source" placeholder="VD: Ảnh: Văn Hùng" value="${data.source || ''}">
-                            </div>
-                        </div>
-                        <div class="form-group">
-                            <label>Vị trí chèn</label>
-                            <select class="img-position">
-                                <option value="middle">Giữa bài</option>
-                                <option value="end">Cuối bài</option>
-                            </select>
-                        </div>
-                        <img class="img-preview" alt="preview" style="display:none;">
-                    `;
-
-                    block.querySelector('.remove-img').addEventListener('click', () => block.remove());
-
-                    const urlInput = block.querySelector('.img-url');
-                    const preview  = block.querySelector('.img-preview');
-                    urlInput.addEventListener('input', () => {
-                        const v = urlInput.value.trim();
-                        if (v) { preview.src = v; preview.style.display = 'block'; }
-                        else preview.style.display = 'none';
+                items.forEach(it => {
+                    it.players.forEach(p => {
+                        if (!allPlayers.has(p)) allPlayers.set(p, new Set());
+                        allPlayers.get(p).add(catName);
                     });
-                    block.querySelector('.img-file').addEventListener('change', (e) => {
-                        const f = e.target.files[0];
-                        if (f) { preview.src = URL.createObjectURL(f); preview.style.display = 'block'; }
-                    });
-                    if (data.url) { preview.src = data.url; preview.style.display = 'block'; }
-
-                    contentImagesEl.appendChild(block);
-                }
-
-                document.getElementById('addImageBtn')?.addEventListener('click', () => addImageBlock());
-
-                async function uploadImage(file, prefix = 'post') {
-                    if (!file.type.startsWith('image/')) throw new Error('File không phải ảnh');
-                    if (file.size > 5 * 1024 * 1024) throw new Error('Ảnh vượt quá 5MB');
-                    const ext = file.name.split('.').pop().toLowerCase();
-                    const fileName = `${prefix}-${Date.now()}-${Math.random().toString(36).slice(2, 7)}.${ext}`;
-                    const { error } = await supabase.storage.from('banners')
-                        .upload(fileName, file, { cacheControl: '3600', upsert: true, contentType: file.type });
-                    if (error) throw error;
-                    const { data } = supabase.storage.from('banners').getPublicUrl(fileName);
-                    return data.publicUrl;
-                }
-
-                document.getElementById('coverFile')?.addEventListener('change', (e) => {
-                    const f = e.target.files[0];
-                    const p = document.getElementById('coverPreview');
-                    if (f) { p.src = URL.createObjectURL(f); p.style.display = 'block'; }
-                    else p.style.display = 'none';
                 });
-                document.getElementById('coverUrl')?.addEventListener('input', (e) => {
-                    const p = document.getElementById('coverPreview');
-                    const v = e.target.value.trim();
-                    if (v) { p.src = v; p.style.display = 'block'; }
-                    else p.style.display = 'none';
-                });
-
-                function collectPostData() {
-                    const images = [...contentImagesEl.querySelectorAll('.image-block')].map(b => ({
-                        file:     b.querySelector('.img-file').files[0] || null,
-                        url:      b.querySelector('.img-url').value.trim(),
-                        caption:  b.querySelector('.img-caption').value.trim(),
-                        source:   b.querySelector('.img-source').value.trim(),
-                        position: b.querySelector('.img-position').value
-                    }));
-                    return {
-                        title:   document.getElementById('postTitle').value.trim(),
-                        penName: document.getElementById('postPenName').value.trim() || defaultPenName,
-                        summary: document.getElementById('postSummary').value.trim(),
-                        content: document.getElementById('postContent').value.trim(),
-                        isHot:   document.getElementById('postHot').checked,
-                        cover: {
-                            file:    document.getElementById('coverFile').files[0] || null,
-                            url:     document.getElementById('coverUrl').value.trim(),
-                            caption: document.getElementById('coverCaption').value.trim(),
-                            source:  document.getElementById('coverSource').value.trim()
-                        },
-                        images
-                    };
-                }
-
-                function renderFigure(url, caption, source, cls = '') {
-                    if (!url) return '';
-                    const cap = [caption, source].filter(Boolean).join(' — ');
-                    return `<figure class="post-figure ${cls}">
-                        <img src="${url}" alt="${caption || 'Ảnh bài viết'}" loading="lazy">
-                        ${cap ? `<figcaption>${cap}</figcaption>` : ''}
-                    </figure>`;
-                }
-
-                function renderPostPreview(post) {
-                    const middleHTML = post.images
-                        .filter(i => i.position === 'middle' && i.url)
-                        .map(i => renderFigure(i.url, i.caption, i.source)).join('');
-                    const endHTML = post.images
-                        .filter(i => i.position === 'end' && i.url)
-                        .map(i => renderFigure(i.url, i.caption, i.source)).join('');
-
-                    const paras = post.content.split('\n').filter(p => p.trim());
-                    const mid = Math.ceil(paras.length / 2);
-                    const first  = paras.slice(0, mid).map(p => `<p>${p}</p>`).join('');
-                    const second = paras.slice(mid).map(p => `<p>${p}</p>`).join('');
-
-                    return `
-                        <h1 class="post-title">${post.title}</h1>
-                        <p class="post-author">✍️ <strong>${post.penName}</strong></p>
-                        ${renderFigure(post.cover.url, post.cover.caption, post.cover.source, 'cover')}
-                        ${first}${middleHTML}${second}${endHTML}
-                    `;
-                }
-
-                document.getElementById('previewPostBtn')?.addEventListener('click', () => {
-                    const data = collectPostData();
-                    if (!data.title) { alert('Vui lòng nhập tiêu đề!'); return; }
-                    if (data.cover.file) data.cover.url = URL.createObjectURL(data.cover.file);
-                    data.images = data.images.map(i => {
-                        if (!i.url && i.file) i.url = URL.createObjectURL(i.file);
-                        return i;
-                    });
-                    const box = document.getElementById('postPreview');
-                    box.innerHTML = renderPostPreview(data);
-                    box.style.display = 'block';
-                    box.scrollIntoView({ behavior: 'smooth' });
-                });
-
-                postForm.addEventListener('submit', async (e) => {
-                    e.preventDefault();
-                    const data = collectPostData();
-                    if (!data.title)   { alert('Vui lòng nhập tiêu đề!'); return; }
-                    if (!data.content) { alert('Vui lòng nhập nội dung!'); return; }
-
-                    const btn = document.getElementById('submitPostBtn');
-                    const oldText = btn.textContent;
-                    btn.disabled = true;
-                    btn.textContent = '⏳ Đang xử lý...';
-
-                    try {
-                        let coverUrl = data.cover.url;
-                        if (data.cover.file) coverUrl = await uploadImage(data.cover.file, 'cover');
-
-                        const uploadedImages = [];
-                        for (const img of data.images) {
-                            let url = img.url;
-                            if (img.file) url = await uploadImage(img.file, 'content');
-                            if (!url) continue;
-                            uploadedImages.push({ url, caption: img.caption, source: img.source, position: img.position });
-                        }
-
-                        const payload = {
-                            title: data.title,
-                            summary: data.summary || data.content.slice(0, 160),
-                            image_url: coverUrl || null,
-                            content: data.content,
-                            pen_name: data.penName,
-                            cover_caption: data.cover.caption,
-                            cover_source: data.cover.source,
-                            images: uploadedImages,
-                            is_hot: data.isHot,
-                            created_at: new Date().toISOString()
-                        };
-
-                        const { error } = await supabase.from('news').insert([payload]);
-                        if (error) throw error;
-
-                        showToast('✓ Đã đăng bài thành công!');
-
-                        payload.cover = { url: coverUrl, caption: data.cover.caption, source: data.cover.source };
-                        const box = document.getElementById('postPreview');
-                        box.innerHTML = renderPostPreview(payload);
-                        box.style.display = 'block';
-
-                        postForm.reset();
-                        contentImagesEl.innerHTML = '';
-                        document.getElementById('coverPreview').style.display = 'none';
-
-                        await loadHomeNews();
-
-                    } catch (err) {
-                        console.error('Lỗi đăng bài:', err);
-                        alert('Lỗi: ' + err.message);
-                    } finally {
-                        btn.disabled = false;
-                        btn.textContent = oldText;
-                    }
-                });
-
-                addImageBlock();
-                console.log('✅ Post Editor sẵn sàng cho admin chính');
             }
 
-            // ==========================================
-            // 9. ANALYTICS WIDGET — Thống kê truy cập
-            // ==========================================
-            if (session.user.email === ADMIN_EMAIL) {
-                const analyticsWidget = document.getElementById('analyticsWidget');
-                if (analyticsWidget) {
-                    analyticsWidget.style.display = '';
+            console.log('✅ Parsed', contents.length, 'nội dung');
+            console.log('👥', allPlayers.size, 'VĐV duy nhất');
 
-                    async function loadAnalytics() {
-                        const refreshBtn = document.getElementById('analyticsRefresh');
-                        refreshBtn?.classList.add('spinning');
+            renderDataStats();
+            renderContentPriorityList();
+            renderFinalConfig();
+            updateGenerateButton();
 
-                        try {
-                            const { data, error } = await supabase.rpc('get_visit_stats');
-                            if (error) throw error;
-                            if (!data) throw new Error('Không có dữ liệu');
+            document.getElementById('dataStatus').style.display = 'none';
+        } catch (error) {
+            console.error(error);
+            document.getElementById('dataStatus').innerHTML = `
+                <div class="empty-state">
+                    <i class="fas fa-exclamation-triangle" style="color: #e94560;"></i>
+                    <p>Lỗi tải dữ liệu: ${escapeHtml(error.message)}</p>
+                </div>
+            `;
+        }
+    }
 
-                            const s = data;
+    // ==========================================
+    // RENDER DATA STATS
+    // ==========================================
+    function renderDataStats() {
+        const el = document.getElementById('dataStats');
+        el.style.display = 'grid';
 
-                            // --- 4 ô số liệu chính ---
-                            document.getElementById('statUniqueVisitors').textContent =
-                                Number(s.unique_visitors || 0).toLocaleString('vi-VN');
-                            document.getElementById('statUniqueSub').textContent =
-                                `Tháng: ${Number(s.month_visitors || 0).toLocaleString('vi-VN')} · Tuần: ${Number(s.week_visitors || 0).toLocaleString('vi-VN')}`;
+        const totalPlayers = new Set();
+        contents.forEach(c => c.items.forEach(it => it.players.forEach(p => totalPlayers.add(p))));
+        const multiContentPlayers = Array.from(allPlayers.values()).filter(set => set.size > 1).length;
+        const totalMatches = contents.reduce((sum, c) => sum + estimateMatches(c), 0);
 
-                            document.getElementById('statOnlineNow').textContent =
-                                Number(s.online_now || 0).toLocaleString('vi-VN');
+        el.innerHTML = `
+            <div class="stat-card">
+                <div class="icon"><i class="fas fa-list"></i></div>
+                <div class="info">
+                    <div class="num">${contents.length}</div>
+                    <div class="lbl">Nội dung</div>
+                </div>
+            </div>
+            <div class="stat-card">
+                <div class="icon"><i class="fas fa-users"></i></div>
+                <div class="info">
+                    <div class="num">${totalPlayers.size}</div>
+                    <div class="lbl">VĐV</div>
+                </div>
+            </div>
+            <div class="stat-card">
+                <div class="icon"><i class="fas fa-user-tag"></i></div>
+                <div class="info">
+                    <div class="num">${multiContentPlayers}</div>
+                    <div class="lbl">VĐV đa nội dung</div>
+                </div>
+            </div>
+            <div class="stat-card">
+                <div class="icon"><i class="fas fa-trophy"></i></div>
+                <div class="info">
+                    <div class="num">~${totalMatches}</div>
+                    <div class="lbl">Trận (dự kiến)</div>
+                </div>
+            </div>
+        `;
+    }
 
-                            document.getElementById('statTotalPageViews').textContent =
-                                Number(s.total_page_views || 0).toLocaleString('vi-VN');
-                            document.getElementById('statTodayPageViews').textContent =
-                                `Hôm nay: ${Number(s.today_page_views || 0).toLocaleString('vi-VN')}`;
+    function estimateMatches(content) {
+        if (content.type === 'team') {
+            const teamsMap = new Map();
+            content.items.forEach(it => {
+                if (!teamsMap.has(it.unit)) teamsMap.set(it.unit, true);
+            });
+            const n = teamsMap.size;
+            return n * (n - 1) / 2;
+        } else {
+            const n = content.items.length;
+            if (n <= 8) return n * (n - 1) / 2;
+            let bracketSize = 2;
+            while (bracketSize < n) bracketSize *= 2;
+            return bracketSize - 1;
+        }
+    }
 
-                            document.getElementById('statTotalNewsViews').textContent =
-                                Number(s.total_news_views || 0).toLocaleString('vi-VN');
+    // ==========================================
+    // RENDER CONTENT PRIORITY LIST
+    // ==========================================
+    function renderContentPriorityList() {
+        const list = document.getElementById('contentPriorityList');
+        if (contents.length === 0) {
+            list.innerHTML = '<div class="empty-state"><i class="fas fa-inbox"></i><p>Không có nội dung.</p></div>';
+            return;
+        }
 
-                            // --- Top bài viết ---
-                            const topNews = Array.isArray(s.top_news) ? s.top_news : [];
-                            const topNewsEl = document.getElementById('topNewsList');
-                            if (topNews.length === 0) {
-                                topNewsEl.innerHTML = '<div class="analytics-loading">Chưa có dữ liệu</div>';
-                            } else {
-                                topNewsEl.innerHTML = topNews.map((n, i) => `
-                                    <a href="news-detail.html?id=${n.id}" class="top-item" style="text-decoration:none;">
-                                        <div class="rank">${i + 1}</div>
-                                        <div class="top-title" title="${n.title}">${n.title}</div>
-                                        <div class="top-count">👁️ ${Number(n.views || 0).toLocaleString('vi-VN')}</div>
-                                    </a>
-                                `).join('');
-                            }
+        list.innerHTML = contents.map((c, i) => `
+            <div class="content-item" draggable="true" data-index="${i}">
+                <span class="drag-handle"><i class="fas fa-grip-vertical"></i></span>
+                <div class="order-badge">${i + 1}</div>
+                <div class="content-info">
+                    <div class="content-name">${escapeHtml(c.name)}</div>
+                    <div class="content-meta">
+                        ${c.items.length} đăng ký · ${c.drawData.length} dòng draws
+                        ${c.type === 'team' ? ' · Thi đấu đồng đội' : c.type === 'double' ? ' · Đôi' : ' · Đơn'}
+                    </div>
+                </div>
+                <span class="content-badge ${c.type === 'team' ? 'badge-team' : c.type === 'double' ? 'badge-double' : 'badge-single'}">
+                    ${c.type === 'team' ? 'ĐỘI' : c.type === 'double' ? 'ĐÔI' : 'ĐƠN'}
+                </span>
+            </div>
+        `).join('');
 
-                            // --- Top trang ---
-                            const topPages = Array.isArray(s.top_pages) ? s.top_pages : [];
-                            const topPagesEl = document.getElementById('topPagesList');
-                            if (topPages.length === 0) {
-                                topPagesEl.innerHTML = '<div class="analytics-loading">Chưa có dữ liệu</div>';
-                            } else {
-                                topPagesEl.innerHTML = topPages.map((p, i) => `
-                                    <div class="top-item">
-                                        <div class="rank">${i + 1}</div>
-                                        <div class="top-title">/${p.page}</div>
-                                        <div class="top-count">${Number(p.visits || 0).toLocaleString('vi-VN')} lượt</div>
-                                    </div>
-                                `).join('');
-                            }
+        attachDragHandlers();
+    }
 
-                            console.log('✅ Đã load analytics:', s);
-
-                        } catch (err) {
-                            console.error('Lỗi load analytics:', err);
-                            document.getElementById('topNewsList').innerHTML =
-                                '<div class="analytics-loading">❌ ' + err.message + '</div>';
-                            document.getElementById('topPagesList').innerHTML =
-                                '<div class="analytics-loading">❌ ' + err.message + '</div>';
-                        } finally {
-                            refreshBtn?.classList.remove('spinning');
-                        }
-                    }
-
-                    // Load lần đầu + tự động refresh mỗi 60s
-                    loadAnalytics();
-                    setInterval(loadAnalytics, 60000);
-
-                    document.getElementById('analyticsRefresh')?.addEventListener('click', loadAnalytics);
-
-                    console.log('✅ Analytics Widget đã sẵn sàng');
-                }
-            }
-
-            console.log('✅ Admin Dashboard SportsVN đã sẵn sàng');
+    function attachDragHandlers() {
+        document.querySelectorAll('#contentPriorityList .content-item').forEach(item => {
+            item.addEventListener('dragstart', handleDragStart);
+            item.addEventListener('dragover', handleDragOver);
+            item.addEventListener('dragleave', handleDragLeave);
+            item.addEventListener('drop', handleDrop);
+            item.addEventListener('dragend', handleDragEnd);
         });
-    </script>
+    }
 
+    function handleDragStart(e) {
+        dragSrcIndex = parseInt(this.dataset.index);
+        this.classList.add('dragging');
+        e.dataTransfer.effectAllowed = 'move';
+    }
+
+    function handleDragOver(e) {
+        e.preventDefault();
+        e.dataTransfer.dropEffect = 'move';
+        if (parseInt(this.dataset.index) !== dragSrcIndex) {
+            this.classList.add('drag-over');
+        }
+    }
+
+    function handleDragLeave(e) { this.classList.remove('drag-over'); }
+
+    function handleDrop(e) {
+        e.preventDefault();
+        this.classList.remove('drag-over');
+        const targetIndex = parseInt(this.dataset.index);
+        if (dragSrcIndex === null || dragSrcIndex === targetIndex) return;
+        const moved = contents.splice(dragSrcIndex, 1)[0];
+        contents.splice(targetIndex, 0, moved);
+        renderContentPriorityList();
+        renderFinalConfig();
+    }
+
+    function handleDragEnd(e) {
+        this.classList.remove('dragging');
+        document.querySelectorAll('.content-item').forEach(i => i.classList.remove('drag-over'));
+        dragSrcIndex = null;
+    }
+
+    // ==========================================
+    // RENDER FINAL CONFIG
+    // ==========================================
+    function renderFinalConfig() {
+        const panel = document.getElementById('finalConfigPanel');
+        const body = document.getElementById('finalConfigBody');
+        if (contents.length === 0) { panel.style.display = 'none'; return; }
+        panel.style.display = 'block';
+
+        const numDays = parseInt(document.getElementById('numDays')?.value) || 3;
+        const sessions = getActiveSessions();
+        if (sessions.length === 0) return;
+
+        body.innerHTML = contents.map((c, i) => `
+            <tr>
+                <td><strong>${i + 1}</strong></td>
+                <td><strong>${escapeHtml(c.name)}</strong></td>
+                <td>
+                    <select data-content-id="${c.id}" data-field="day">
+                        ${Array.from({length: numDays}, (_, d) => `
+                            <option value="${d + 1}" ${d === numDays - 1 ? 'selected' : ''}>Ngày ${d + 1}</option>
+                        `).join('')}
+                    </select>
+                </td>
+                <td>
+                    <select data-content-id="${c.id}" data-field="session">
+                        ${sessions.map(s => `
+                            <option value="${s.key}" ${s.key === 'afternoon' ? 'selected' : ''}>${s.label}</option>
+                        `).join('')}
+                    </select>
+                </td>
+            </tr>
+        `).join('');
+    }
+
+    function getActiveSessions() {
+        const sessions = [];
+        if (document.getElementById('sessionMorning')?.checked)
+            sessions.push({ key: 'morning', label: 'Sáng', time: document.getElementById('timeMorning')?.value || '08:00' });
+        if (document.getElementById('sessionAfternoon')?.checked)
+            sessions.push({ key: 'afternoon', label: 'Chiều', time: document.getElementById('timeAfternoon')?.value || '14:00' });
+        if (document.getElementById('sessionEvening')?.checked)
+            sessions.push({ key: 'evening', label: 'Tối', time: document.getElementById('timeEvening')?.value || '19:00' });
+        return sessions;
+    }
+
+    function updateGenerateButton() {
+        document.getElementById('generateBtn').disabled = contents.length === 0;
+    }
+
+    function getConfig() {
+        return {
+            startDate: document.getElementById('startDate')?.value || new Date().toISOString().slice(0, 10),
+            numDays: parseInt(document.getElementById('numDays')?.value) || 3,
+            numCourts: parseInt(document.getElementById('numCourts')?.value) || 8,
+            matchDuration: parseInt(document.getElementById('matchDuration')?.value) || 30,
+            breakDuration: parseInt(document.getElementById('breakDuration')?.value) || 5,
+            sessions: getActiveSessions(),
+            restSlots: parseInt(document.getElementById('restSlots')?.value) || 1,
+            maxMatchesPerDay: parseInt(document.getElementById('maxMatchesPerDay')?.value) || 3,
+            maxSameCategoryPercent: parseInt(document.getElementById('maxSameCategoryPercent')?.value) || 60,
+        };
+    }
+
+    function getFinalConfig() {
+        const result = {};
+        document.querySelectorAll('#finalConfigBody select[data-field="day"]').forEach(sel => {
+            const id = parseInt(sel.dataset.contentId);
+            if (!result[id]) result[id] = {};
+            result[id].day = parseInt(sel.value);
+        });
+        document.querySelectorAll('#finalConfigBody select[data-field="session"]').forEach(sel => {
+            const id = parseInt(sel.dataset.contentId);
+            if (!result[id]) result[id] = {};
+            result[id].session = sel.value;
+        });
+        return result;
+    }
+
+    // ==========================================
+    // GENERATE SCHEDULE
+    // ==========================================
+    window.generateSchedule = async function() {
+        if (contents.length === 0) { showAlert('Chưa có dữ liệu!', 'error'); return; }
+
+        const cfg = getConfig();
+        const finalConfig = getFinalConfig();
+        if (cfg.sessions.length === 0) { showAlert('Cần chọn ít nhất 1 buổi!', 'error'); return; }
+
+        showLoading('Đang phân tích và xếp lịch (phân bổ đều Sáng/Chiều)...');
+        await sleep(100);
+
+        try {
+            const result = buildBalancedSchedule(contents, cfg, finalConfig);
+            scheduleResult = result;
+            renderResult(result);
+            document.getElementById('resultPanel').style.display = 'block';
+            document.getElementById('resultPanel').scrollIntoView({ behavior: 'smooth' });
+
+            if (result.conflicts.length > 0) {
+                showAlert(`⚠️ Xếp xong! ${result.totalMatches} trận, ${result.conflicts.length} conflict!`, 'error');
+            } else {
+                showAlert(`✅ Xếp lịch thành công! ${result.totalMatches} trận, phân bổ đều.`, 'success');
+            }
+        } catch (error) {
+            console.error(error);
+            showAlert('Lỗi xếp lịch: ' + error.message, 'error');
+        }
+        hideLoading();
+    };
+
+    // ==========================================
+    // BALANCED SCHEDULE ALGORITHM
+    // ==========================================
+    function buildBalancedSchedule(contents, cfg, finalConfig) {
+        const totalDays = cfg.numDays;
+        const numCourts = cfg.numCourts;
+        const matchDuration = cfg.matchDuration;
+        const breakDuration = cfg.breakDuration;
+        const sessions = cfg.sessions;
+        const restSlots = cfg.restSlots;
+        const maxMatchesPerDay = cfg.maxMatchesPerDay;
+
+        // ============================================================
+        // BƯỚC 1: Tạo danh sách tất cả các slot thời gian
+        // ============================================================
+        const slots = [];
+        let globalIndex = 0;
+        for (let d = 0; d < totalDays; d++) {
+            for (const sess of sessions) {
+                const sessionHours = sess.key === 'evening' ? 2.5 : sess.key === 'night' ? 2 : 3.5;
+                const totalMinutes = sessionHours * 60;
+                const slotDuration = matchDuration + breakDuration;
+                const numSlotsPerCourt = Math.floor(totalMinutes / slotDuration);
+                const [startH, startM] = sess.time.split(':').map(Number);
+                let currentMinutes = startH * 60 + startM;
+
+                for (let slotIdx = 0; slotIdx < numSlotsPerCourt; slotIdx++) {
+                    for (let court = 1; court <= numCourts; court++) {
+                        slots.push({
+                            globalIndex: globalIndex++,
+                            day: d + 1,
+                            dayIndex: d,
+                            session: sess.key,
+                            sessionLabel: sess.label,
+                            time: formatTime(currentMinutes),
+                            timeMinutes: currentMinutes,
+                            slotInSession: slotIdx,
+                            court: court,
+                            assigned: false,
+                            matchId: null,
+                        });
+                    }
+                    currentMinutes += slotDuration;
+                }
+            }
+        }
+
+        console.log(`📅 Tổng ${slots.length} slots (${totalDays} ngày × ${sessions.length} buổi × ${numCourts} sân)`);
+
+        // ============================================================
+        // BƯỚC 2: Tạo tất cả các trận đấu
+        // ============================================================
+        const allMatches = [];
+        contents.forEach((content, contentOrder) => {
+            const matches = generateMatchesForContent(content, finalConfig[content.id], cfg);
+            matches.forEach(m => {
+                allMatches.push({
+                    ...m,
+                    contentId: content.id,
+                    contentName: content.name,
+                    contentOrder,
+                    contentType: content.type,
+                });
+            });
+        });
+
+        console.log(`🏆 Tổng ${allMatches.length} trận`);
+
+        // ============================================================
+        // BƯỚC 3: Tính tải của từng VĐV
+        // ============================================================
+        const playerLoad = {};
+        allMatches.forEach(m => {
+            m.players.forEach(p => {
+                if (!playerLoad[p]) playerLoad[p] = 0;
+                playerLoad[p]++;
+            });
+        });
+
+        // ============================================================
+        // BƯỚC 4: Sắp xếp trận theo độ ưu tiên
+        // ============================================================
+        allMatches.sort((a, b) => {
+            if (a.isFinalRound !== b.isFinalRound) return b.isFinalRound - a.isFinalRound;
+            if (a.roundOrder !== b.roundOrder) return a.roundOrder - b.roundOrder;
+            const aMaxLoad = Math.max(...a.players.map(p => playerLoad[p] || 0), 0);
+            const bMaxLoad = Math.max(...b.players.map(p => playerLoad[p] || 0), 0);
+            if (bMaxLoad !== aMaxLoad) return bMaxLoad - aMaxLoad;
+            return a.contentOrder - b.contentOrder;
+        });
+
+        // ============================================================
+        // BƯỚC 5: Gán trận vào slot - PHÂN BỔ ĐỀU
+        // ============================================================
+        const playerSchedule = {};
+        const conflicts = [];
+        const scheduled = [];
+
+        for (const match of allMatches) {
+            if (match.players.length === 0) continue;
+
+            const slot = findBalancedSlot(match, slots, playerSchedule, finalConfig, cfg);
+
+            if (!slot) {
+                conflicts.push({ match, reason: 'Không còn slot trống phù hợp' });
+                continue;
+            }
+
+            slot.assigned = true;
+            slot.matchId = scheduled.length + 1;
+
+            match.players.forEach(p => {
+                if (!playerSchedule[p]) playerSchedule[p] = [];
+                playerSchedule[p].push({
+                    slotIndex: slot.globalIndex,
+                    matchId: slot.matchId,
+                    day: slot.day,
+                    session: slot.session,
+                });
+            });
+
+            scheduled.push({
+                ...match,
+                slot,
+                matchId: scheduled.length + 1,
+            });
+        }
+
+        scheduled.sort((a, b) => {
+            if (a.slot.day !== b.slot.day) return a.slot.day - b.slot.day;
+            if (a.slot.timeMinutes !== b.slot.timeMinutes) return a.slot.timeMinutes - b.slot.timeMinutes;
+            return a.slot.court - b.slot.court;
+        });
+
+        return {
+            matches: scheduled,
+            conflicts,
+            slots,
+            totalMatches: scheduled.length,
+            totalSlots: slots.length,
+            cfg,
+        };
+    }
+
+    // ==========================================
+    // FIND BALANCED SLOT — PHÂN BỔ ĐỀU
+    // ==========================================
+    function findBalancedSlot(match, slots, playerSchedule, finalConfig, cfg) {
+        const contentFinal = finalConfig[match.contentId];
+        let candidateSlots = slots.filter(s => !s.assigned);
+
+        if (match.isFinalRound && contentFinal) {
+            const preferred = candidateSlots.filter(s =>
+                s.day === contentFinal.day && s.session === contentFinal.session
+            );
+            if (preferred.length > 0) candidateSlots = preferred;
+        }
+
+        // Lọc slot hợp lệ
+        const validSlots = candidateSlots.filter(slot => {
+            for (const p of match.players) {
+                const schedule = playerSchedule[p] || [];
+
+                // Kiểm tra trùng slot
+                if (schedule.some(s => s.slotIndex === slot.globalIndex)) return false;
+
+                // Kiểm tra thời gian nghỉ (cùng ngày)
+                for (const s of schedule) {
+                    if (s.day === slot.day) {
+                        const slotIdx = slot.slotInSession;
+                        const otherSlotInfo = findSlotInfo(slots, s.slotIndex);
+                        if (otherSlotInfo) {
+                            const otherSlotIdx = otherSlotInfo.slotInSession;
+                            if (Math.abs(slotIdx - otherSlotIdx) <= cfg.restSlots) {
+                                return false;
+                            }
+                        }
+                    }
+                }
+
+                // Kiểm tra số trận tối đa/ngày
+                const matchesInDay = schedule.filter(s => s.day === slot.day).length;
+                if (matchesInDay >= cfg.maxMatchesPerDay) return false;
+            }
+            return true;
+        });
+
+        if (validSlots.length === 0) return null;
+
+        // ============================================================
+        // SẮP XẾP SLOT THEO ĐỘ ƯU TIÊN PHÂN BỔ ĐỀU
+        // ============================================================
+        validSlots.sort((a, b) => {
+            // Ưu tiên 1: Buổi ít trận hơn (Sáng vs Chiều)
+            const sessA = countMatchesInSession(slots, a.day, a.session);
+            const sessB = countMatchesInSession(slots, b.day, b.session);
+            if (sessA !== sessB) return sessA - sessB;
+
+            // Ưu tiên 2: Ngày ít trận hơn
+            const dayA = countMatchesInDay(slots, a.day);
+            const dayB = countMatchesInDay(slots, b.day);
+            if (dayA !== dayB) return dayA - dayB;
+
+            // Ưu tiên 3: Sân ít trận hơn
+            const courtA = countMatchesInCourt(slots, a.day, a.session, a.court);
+            const courtB = countMatchesInCourt(slots, b.day, b.session, b.court);
+            if (courtA !== courtB) return courtA - courtB;
+
+            // Ưu tiên 4: Slot sớm nhất
+            if (a.day !== b.day) return a.day - b.day;
+            if (a.timeMinutes !== b.timeMinutes) return a.timeMinutes - b.timeMinutes;
+            return a.court - b.court;
+        });
+
+        return validSlots[0];
+    }
+
+    // ==========================================
+    // HELPERS
+    // ==========================================
+    function countMatchesInSession(slots, day, session) {
+        return slots.filter(s => s.assigned && s.day === day && s.session === session).length;
+    }
+
+    function countMatchesInDay(slots, day) {
+        return slots.filter(s => s.assigned && s.day === day).length;
+    }
+
+    function countMatchesInCourt(slots, day, session, court) {
+        return slots.filter(s => s.assigned && s.day === day && s.session === session && s.court === court).length;
+    }
+
+    function findSlotInfo(slots, globalIndex) {
+        return slots.find(s => s.globalIndex === globalIndex);
+    }
+
+    // ==========================================
+    // GENERATE MATCHES FROM DRAWS DATA
+    // ==========================================
+    function generateMatchesForContent(content, finalCfg, cfg) {
+        const matches = [];
+
+        if (content.type === 'team') {
+            const teamsMap = new Map();
+            content.items.forEach(it => {
+                const unit = it.unit || 'Không rõ';
+                if (!teamsMap.has(unit)) teamsMap.set(unit, []);
+                teamsMap.get(unit).push(...it.players);
+            });
+
+            const teams = Array.from(teamsMap.entries()).map(([name, players]) => ({
+                name, players, displayName: name,
+            }));
+
+            for (let i = 0; i < teams.length; i++) {
+                for (let j = i + 1; j < teams.length; j++) {
+                    matches.push({
+                        contentName: content.name,
+                        roundName: 'Vòng bảng',
+                        roundOrder: 1,
+                        isFinalRound: false,
+                        teamA: teams[i],
+                        teamB: teams[j],
+                        players: [...teams[i].players, ...teams[j].players],
+                        displayA: teams[i].displayName,
+                        displayB: teams[j].displayName,
+                    });
+                }
+            }
+        } else {
+            const groups = new Map();
+            content.drawData.forEach(r => {
+                const g = r.group_name || 'Vòng 1';
+                if (!groups.has(g)) groups.set(g, []);
+                groups.get(g).push(r);
+            });
+
+            groups.forEach((rows, groupName) => {
+                const itemsMap = new Map();
+                rows.forEach(r => {
+                    const key = r.team_name;
+                    if (!itemsMap.has(key)) {
+                        itemsMap.set(key, {
+                            name: r.team_name,
+                            unit: r.club || '',
+                            players: [r.team_name],
+                            displayName: r.team_name + (r.club ? ` (${r.club})` : ''),
+                        });
+                    }
+                });
+                const items = Array.from(itemsMap.values());
+
+                if (items.length <= 8) {
+                    for (let i = 0; i < items.length; i++) {
+                        for (let j = i + 1; j < items.length; j++) {
+                            matches.push({
+                                contentName: content.name,
+                                roundName: groupName,
+                                roundOrder: 1,
+                                isFinalRound: false,
+                                teamA: items[i],
+                                teamB: items[j],
+                                players: [...items[i].players, ...items[j].players],
+                                displayA: items[i].displayName,
+                                displayB: items[j].displayName,
+                            });
+                        }
+                    }
+                } else {
+                    matches.push(...generateKnockoutMatches(items, content.name, groupName));
+                }
+            });
+        }
+
+        return matches;
+    }
+
+    function generateKnockoutMatches(participants, contentName, groupName) {
+        const matches = [];
+        let n = participants.length;
+        let bracketSize = 2;
+        while (bracketSize < n) bracketSize *= 2;
+
+        const round1 = [];
+        const shuffled = [...participants];
+        for (let i = 0; i < bracketSize / 2; i++) {
+            const a = shuffled[i * 2] || null;
+            const b = shuffled[i * 2 + 1] || null;
+            if (a && b) {
+                round1.push({
+                    teamA: a, teamB: b,
+                    players: [...a.players, ...b.players],
+                    displayA: a.displayName,
+                    displayB: b.displayName,
+                });
+            }
+        }
+
+        round1.forEach(m => {
+            matches.push({
+                contentName,
+                roundName: groupName || ('Vòng 1/' + (bracketSize / 2)),
+                roundOrder: 1,
+                isFinalRound: false,
+                ...m,
+            });
+        });
+
+        let remaining = round1.length;
+        let roundNum = 2;
+        const roundNames = ['Vòng 1/16', 'Vòng 1/8', 'Tứ kết', 'Bán kết', 'Chung kết'];
+
+        while (remaining > 1) {
+            remaining = Math.floor(remaining / 2);
+            const roundName = roundNames[roundNum - 2] || `Vòng ${roundNum}`;
+            const isFinal = remaining <= 1;
+
+            for (let i = 0; i < remaining; i++) {
+                matches.push({
+                    contentName,
+                    roundName,
+                    roundOrder: roundNum,
+                    isFinalRound: isFinal,
+                    teamA: { name: 'TBD', players: [], displayName: 'TBD' },
+                    teamB: { name: 'TBD', players: [], displayName: 'TBD' },
+                    players: [],
+                    displayA: 'TBD',
+                    displayB: 'TBD',
+                    isPlaceholder: true,
+                });
+            }
+            roundNum++;
+        }
+
+        return matches;
+    }
+
+    // ==========================================
+    // RENDER RESULT
+    // ==========================================
+    function renderResult(result) {
+        const { matches, conflicts } = result;
+        const warningEl = document.getElementById('conflictWarning');
+        const scheduleEl = document.getElementById('scheduleResult');
+
+        if (conflicts.length > 0) {
+            warningEl.innerHTML = `
+                <div class="warning-box error">
+                    <strong><i class="fas fa-exclamation-triangle"></i> Phát hiện ${conflicts.length} conflict!</strong>
+                    <ul>
+                        ${conflicts.slice(0, 10).map(c => `
+                            <li><strong>${escapeHtml(c.match.contentName)}</strong> - ${escapeHtml(c.match.displayA)} vs ${escapeHtml(c.match.displayB)}: ${escapeHtml(c.reason)}</li>
+                        `).join('')}
+                        ${conflicts.length > 10 ? `<li>... và ${conflicts.length - 10} conflict khác</li>` : ''}
+                    </ul>
+                    <p style="margin-top: 8px;"><strong>💡 Gợi ý:</strong> Tăng số ngày, tăng số sân, hoặc giảm restSlots.</p>
+                </div>
+            `;
+        } else {
+            warningEl.innerHTML = `
+                <div class="warning-box success">
+                    <strong><i class="fas fa-check-circle"></i> Không có conflict!</strong>
+                    Tất cả các trận đã được xếp lịch hợp lý, phân bổ đều Sáng/Chiều.
+                </div>
+            `;
+        }
+
+        const byDay = {};
+        matches.forEach(m => {
+            const day = m.slot.day;
+            if (!byDay[day]) byDay[day] = {};
+            const sess = m.slot.session;
+            if (!byDay[day][sess]) byDay[day][sess] = [];
+            byDay[day][sess].push(m);
+        });
+
+        let html = '';
+        const daysSorted = Object.keys(byDay).map(Number).sort((a, b) => a - b);
+
+        for (const day of daysSorted) {
+            const dayMatches = Object.values(byDay[day]).flat();
+            html += `<div class="schedule-day">`;
+            html += `<div class="schedule-day-header">
+                <span>📅 Ngày ${day}</span>
+                <span>${dayMatches.length} trận</span>
+            </div>`;
+
+            const sessions = Object.keys(byDay[day]).sort((a, b) => {
+                const order = { morning: 0, afternoon: 1, evening: 2, night: 3 };
+                return (order[a] || 99) - (order[b] || 99);
+            });
+
+            for (const sess of sessions) {
+                const sessMatches = byDay[day][sess];
+                const sessLabel = sessMatches[0]?.slot.sessionLabel || sess;
+                html += `<div class="schedule-session">`;
+                html += `<div class="schedule-session-header">
+                    <i class="fas fa-clock"></i> Buổi ${sessLabel} — ${sessMatches.length} trận
+                </div>`;
+
+                const byCourt = {};
+                sessMatches.forEach(m => {
+                    const court = m.slot.court;
+                    if (!byCourt[court]) byCourt[court] = [];
+                    byCourt[court].push(m);
+                });
+
+                html += `<div class="courts-grid" style="grid-template-columns: repeat(auto-fill, minmax(220px, 1fr));">`;
+                for (const court of Object.keys(byCourt).map(Number).sort((a, b) => a - b)) {
+                    html += `<div class="court-column">`;
+                    html += `<div class="court-title">
+                        <span>SÂN ${court}</span>
+                        <span style="color: #6c757d; font-weight: 600;">${byCourt[court].length} trận</span>
+                    </div>`;
+
+                    byCourt[court].sort((a, b) => a.slot.timeMinutes - b.slot.timeMinutes).forEach(m => {
+                        const hasConflict = conflicts.some(c => c.match === m);
+                        html += `
+                            <div class="match-card ${hasConflict ? 'conflict' : ''}">
+                                <div class="time">
+                                    <span>${m.slot.time}</span>
+                                    <span>${m.roundName}</span>
+                                </div>
+                                <div class="content-name">${escapeHtml(m.contentName)}</div>
+                                <div class="players">
+                                    ${escapeHtml(m.displayA)}<br>
+                                    <span style="color: #e94560; font-size: 10px;">VS</span><br>
+                                    ${escapeHtml(m.displayB)}
+                                </div>
+                            </div>
+                        `;
+                    });
+
+                    html += `</div>`;
+                }
+                html += `</div></div>`;
+            }
+
+            html += `</div>`;
+        }
+
+        scheduleEl.innerHTML = html;
+    }
+
+    // ==========================================
+    // EXPORT EXCEL
+    // ==========================================
+    window.exportSchedule = async function() {
+        if (!scheduleResult || scheduleResult.matches.length === 0) {
+            showAlert('Chưa có kết quả để xuất!', 'error');
+            return;
+        }
+
+        showLoading('Đang tạo file Excel...');
+        try {
+            const wb = new ExcelJS.Workbook();
+            wb.creator = 'SportsVN Scheduler';
+            wb.created = new Date();
+
+            const ws = wb.addWorksheet('Lịch thi đấu', {
+                pageSetup: { paperSize: 9, orientation: 'landscape', fitToPage: true },
+            });
+
+            ws.columns = [
+                { width: 6 }, { width: 8 }, { width: 10 }, { width: 8 }, { width: 6 },
+                { width: 25 }, { width: 15 }, { width: 28 }, { width: 28 }, { width: 30 },
+            ];
+
+            const titleRow = ws.addRow(['LỊCH THI ĐẤU TỔNG HỢP']);
+            ws.mergeCells('A1:J1');
+            titleRow.height = 30;
+            titleRow.getCell(1).font = { bold: true, size: 14, color: { argb: 'FFFFFFFF' } };
+            titleRow.getCell(1).fill = { type: 'pattern', pattern: 'solid', fgColor: { argb: 'FF1A3A7A' } };
+            titleRow.getCell(1).alignment = { horizontal: 'center', vertical: 'middle' };
+
+            const headerRow = ws.addRow(['TT', 'Ngày', 'Buổi', 'Giờ', 'Sân', 'Nội dung', 'Vòng', 'VĐV A', 'VĐV B', 'Ghi chú']);
+            headerRow.height = 25;
+            headerRow.eachCell(cell => {
+                cell.font = { bold: true, color: { argb: 'FFFFFFFF' }, size: 11 };
+                cell.fill = { type: 'pattern', pattern: 'solid', fgColor: { argb: 'FF1A3A7A' } };
+                cell.alignment = { horizontal: 'center', vertical: 'middle' };
+                cell.border = { top: { style: 'thin' }, left: { style: 'thin' }, bottom: { style: 'thin' }, right: { style: 'thin' } };
+            });
+
+            const thinBorder = {
+                top: { style: 'thin', color: { argb: 'FFDEE2E6' } },
+                left: { style: 'thin', color: { argb: 'FFDEE2E6' } },
+                bottom: { style: 'thin', color: { argb: 'FFDEE2E6' } },
+                right: { style: 'thin', color: { argb: 'FFDEE2E6' } },
+            };
+
+            scheduleResult.matches.forEach((m, i) => {
+                const row = ws.addRow([
+                    i + 1,
+                    `Ngày ${m.slot.day}`,
+                    m.slot.sessionLabel,
+                    m.slot.time,
+                    `Sân ${m.slot.court}`,
+                    m.contentName,
+                    m.roundName,
+                    m.displayA,
+                    m.displayB,
+                    '',
+                ]);
+                row.height = 22;
+                row.eachCell(cell => {
+                    cell.border = thinBorder;
+                    cell.alignment = { vertical: 'middle' };
+                });
+                [1, 2, 3, 4, 5, 7].forEach(c => {
+                    row.getCell(c).alignment = { horizontal: 'center', vertical: 'middle' };
+                });
+                row.getCell(8).font = { bold: true, color: { argb: 'FF1A3A7A' } };
+                row.getCell(9).font = { bold: true, color: { argb: 'FF1A3A7A' } };
+            });
+
+            const buffer = await wb.xlsx.writeBuffer();
+            const blob = new Blob([buffer], { type: 'application/vnd.openxmlformats-officedocument.spreadsheetml.sheet' });
+            const url = URL.createObjectURL(blob);
+            const a = document.createElement('a');
+            a.href = url;
+            a.download = `LichThiDau_${new Date().toISOString().slice(0, 10)}.xlsx`;
+            a.click();
+            URL.revokeObjectURL(url);
+
+            hideLoading();
+            showAlert('✅ Đã xuất file Excel!', 'success');
+        } catch (error) {
+            console.error(error);
+            hideLoading();
+            showAlert('Lỗi xuất Excel: ' + error.message, 'error');
+        }
+    };
+
+    // ==========================================
+    // SAVE TO DATABASE
+    // ==========================================
+    window.saveToDatabase = async function() {
+        if (!scheduleResult || scheduleResult.matches.length === 0) {
+            showAlert('Chưa có kết quả!', 'error');
+            return;
+        }
+        if (!tournamentId) { showAlert('Thiếu tournament_id', 'error'); return; }
+
+        const btn = document.getElementById('saveBtn');
+        btn.disabled = true;
+        btn.innerHTML = '<i class="fas fa-spinner fa-spin"></i> Đang lưu...';
+
+        try {
+            const records = scheduleResult.matches.map(m => ({
+                tournament_id: tournamentId,
+                category: m.contentName,
+                round_name: m.roundName,
+                round_order: m.roundOrder,
+                match_number: 1,
+                court: m.slot.court,
+                team_a_name: m.displayA,
+                team_b_name: m.displayB,
+                status: 'pending',
+                match_session: m.slot.sessionLabel,
+                match_time: m.slot.time,
+                match_table: m.slot.court,
+                scheduled_day: m.slot.day,
+            }));
+
+            await supabaseClient.from('matches').delete().eq('tournament_id', tournamentId);
+            const { error } = await supabaseClient.from('matches').insert(records);
+            if (error) throw error;
+
+            showAlert(`✅ Đã lưu ${records.length} trận!`, 'success');
+            setTimeout(() => {
+                window.location.href = 'schedule.html?tournament_id=' + tournamentId;
+            }, 1500);
+        } catch (error) {
+            console.error(error);
+            showAlert('Lỗi lưu: ' + error.message, 'error');
+            btn.disabled = false;
+            btn.innerHTML = '<i class="fas fa-save"></i> Lưu vào hệ thống';
+        }
+    };
+
+    // ==========================================
+    // EVENT LISTENERS
+    // ==========================================
+    function setupEventListeners() {
+        ['numDays', 'numCourts', 'matchDuration', 'restSlots', 'maxMatchesPerDay'].forEach(id => {
+            const el = document.getElementById(id);
+            if (el) el.addEventListener('change', renderFinalConfig);
+        });
+        ['sessionMorning', 'sessionAfternoon', 'sessionEvening'].forEach(id => {
+            const el = document.getElementById(id);
+            if (el) el.addEventListener('change', renderFinalConfig);
+        });
+    }
+
+    // ==========================================
+    // HELPERS
+    // ==========================================
+    function formatTime(minutes) {
+        const h = Math.floor(minutes / 60);
+        const m = minutes % 60;
+        return `${String(h).padStart(2, '0')}:${String(m).padStart(2, '0')}`;
+    }
+
+    function sleep(ms) { return new Promise(r => setTimeout(r, ms)); }
+
+    window.showAlert = function(message, type) {
+        const el = document.getElementById('alert');
+        if (!message) { el.className = 'alert'; return; }
+        el.textContent = message;
+        el.className = 'alert show ' + type;
+    };
+
+    window.showLoading = function(text) {
+        document.getElementById('loadingText').textContent = text || 'Đang xử lý...';
+        document.getElementById('loadingOverlay').classList.add('active');
+    };
+
+    window.hideLoading = function() {
+        document.getElementById('loadingOverlay').classList.remove('active');
+    };
+
+    function escapeHtml(text) {
+        return String(text || '').replace(/&/g, '&amp;').replace(/</g, '&lt;')
+            .replace(/>/g, '&gt;').replace(/"/g, '&quot;');
+    }
+
+    // ==========================================
+    // START
+    // ==========================================
+    init();
+    console.log('✅ schedule-auto.html v5 - Balanced Distribution loaded');
+})();
+</script>
 </body>
 </html>
